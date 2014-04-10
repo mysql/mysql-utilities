@@ -34,11 +34,16 @@ except ImportError:
     from xml.parsers.expat import ExpatError as ParseError
 
 
+# Fields for the old format.
 _MANDATORY_FIELDS = ['NAME', 'TIMESTAMP']
 _OPTIONAL_FIELDS = ['CONNECTION_ID', 'DB', 'HOST', 'IP', 'MYSQL_VERSION',
                     'OS_LOGIN', 'OS_VERSION', 'PRIV_USER', 'PROXY_USER',
                     'SERVER_ID', 'SQLTEXT', 'STARTUP_OPTIONS', 'STATUS',
                     'USER', 'VERSION']
+
+# Fields for the new format.
+_NEW_MANDATORY_FIELDS = _MANDATORY_FIELDS + ['RECORD_ID']
+_NEW_OPTIONAL_FIELDS = _OPTIONAL_FIELDS + ['COMMAND_CLASS', 'STATUS_CODE']
 
 
 class AuditLogReader(object):
@@ -100,20 +105,46 @@ class AuditLogReader(object):
         the original record.
         """
         next_line = ""
+        new_format = False
+        multiline = False
         for line in self.log:
-            if ((line.lstrip()).startswith('<AUDIT_RECORD') and
-                    not line.endswith('/>\n')):
+            if line.lstrip().startswith('<AUDIT_RECORD>'):
+                # Found first record line in the new format.
+                new_format = True
+                multiline = True
+                next_line = line
+                continue
+            elif (line.lstrip().startswith('<AUDIT_RECORD')
+                  and not line.endswith('/>\n')):
+                # Found (first) record line in the old format.
                 next_line = "{0} ".format(line.strip('\n'))
-                continue
-            elif len(next_line) > 0 and not line.endswith('/>\n'):
-                next_line = '{0}{1}'.format(next_line, line.strip('\n'))
-                continue
+                if not line.endswith('/>\n'):
+                    multiline = True
+                    continue
+            elif multiline:
+                if ((new_format and line.strip().endswith('</AUDIT_RECORD>'))
+                        or (not new_format and line.endswith('/>\n'))):
+                    # Detect end of record in the old and new format and
+                    # append last record line.
+                    next_line += line
+                else:
+                    if not line.strip().startswith('<'):
+                        # Handle SQL queries broke into multiple lines,
+                        # removing newline characters.
+                        next_line = '{0}{1}'.format(next_line.strip('\n'),
+                                                    line.strip('\n'))
+                    else:
+                        next_line += line
+                    continue
             else:
                 next_line += line
             log_entry = next_line
             next_line = ""
             try:
-                yield (self._make_record(xml.fromstring(log_entry)), log_entry)
+                yield (
+                    self._make_record(xml.fromstring(log_entry), new_format),
+                    log_entry
+                )
             except (ParseError, SyntaxError):
                 # SyntaxError is also caught for compatibility reasons with
                 # python 2.6. In case an ExpatError which does not inherits
@@ -133,16 +164,34 @@ class AuditLogReader(object):
         new_str = new_str.replace("&amp;", "&")
         return new_str
 
-    def _make_record(self, node):
+    def _make_record(self, node, new_format=False):
         """Make a dictionary record from the node element.
 
         The given node is converted to a dictionary record, reformatting
         as needed for the special characters.
+
+        node[in]        XML node holding a single audit log record.
+        new_format[in]  Flag indicating if the new XML format is used for the
+                        audit log record. By default False (old format used).
+
+        Return a dictionary with the data in the given audit log record.
         """
-        # do mandatory fields
-        record = {'NAME': node.get("NAME"), 'TIMESTAMP': node.get("TIMESTAMP")}
-        # do optional fields
-        for field in _OPTIONAL_FIELDS:
-            if node.get(field, None):
-                record[field] = self._do_replacements(node.get(field))
+        if new_format:
+            # Handle audit record in the new format.
+            # Do mandatory fields.
+            record = {field: node.find(field).text
+                      for field in _NEW_MANDATORY_FIELDS}
+            # Do optional fields.
+            for field in _NEW_OPTIONAL_FIELDS:
+                field_node = node.find(field)
+                if field_node is not None and field_node.text:
+                    record[field] = self._do_replacements(field_node.text)
+        else:
+            # Handle audit record in the old format.
+            # Do mandatory fields.
+            record = {field: node.get(field) for field in _MANDATORY_FIELDS}
+            # Do optional fields.
+            for field in _OPTIONAL_FIELDS:
+                if node.get(field, None):
+                    record[field] = self._do_replacements(node.get(field))
         return record

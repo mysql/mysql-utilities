@@ -76,7 +76,7 @@ Test case 3 - No search criteria defined
 #
 # No search criteria defined.
 #
-Test case 4 - Convert all records to the defined format
+Test case 4 - Show all records in the RAW format
   <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:11" NAME="Audit" SERVER_ID="1" VERSION="1" STARTUP_OPTIONS="/home/user/mysql-5.5/sql/mysqld --defaults-group-suffix=.1 --defaults-file=/home/user/mysql-5.5/mysql-test/var/my.cnf --log-output=file --default-storage-engine=MyISAM --loose-skip-log-bin --core-file --loose-debug-sync-timeout=300" OS_VERSION="x86_64-Linux" MYSQL_VERSION="5.5.29-log"/>
   <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:11" NAME="Query" CONNECTION_ID="6" STATUS="0" SQLTEXT="install plugin audit_log soname 'audit_log.so'"/>
   <AUDIT_RECORD TIMESTAMP="2012-09-27T13:33:11" NAME="Quit" CONNECTION_ID="6" STATUS="0"/>
@@ -164,6 +164,1079 @@ Test case 4 - Convert all records to the defined format
   <AUDIT_RECORD TIMESTAMP="2013-06-03T15:36:14" NAME="Query" CONNECTION_ID="13" STATUS="0" SQLTEXT="SET @b = 8"/>
   <AUDIT_RECORD TIMESTAMP="2013-06-03T15:36:23" NAME="Query" CONNECTION_ID="13" STATUS="0" SQLTEXT="SELECT SQRT(POW(?,2) + POW(?,2)) AS hypotenuse"/>
   <AUDIT_RECORD TIMESTAMP="2013-06-03T15:36:42" NAME="Query" CONNECTION_ID="13" STATUS="0" SQLTEXT="DROP PREPARE stmt2"/>
+Test case 4 (NEW) - Show all records in the RAW format
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:15:34 UTC</TIMESTAMP>
+  <RECORD_ID>1_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Audit</NAME>
+  <SERVER_ID>1</SERVER_ID>
+  <VERSION>1</VERSION>
+  <STARTUP_OPTIONS>/home/workspace/bzr/work/SERVERS/mysql-advanced-5.6.16-linux-glibc2.5-x86_64/bin/mysqld --defaults-group-suffix=.1 --defaults-file=my_custom.cnf</STARTUP_OPTIONS>
+  <OS_VERSION>x86_64-linux-glibc2.5</OS_VERSION>
+  <MYSQL_VERSION>5.6.16-enterprise-commercial-advanced-log</MYSQL_VERSION>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:15:43 UTC</TIMESTAMP>
+  <RECORD_ID>2_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Connect</NAME>
+  <CONNECTION_ID>1</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+  <PRIV_USER>root</PRIV_USER>
+  <PROXY_USER/>
+  <DB/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:15:43 UTC</TIMESTAMP>
+  <RECORD_ID>3_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>1</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_variables</COMMAND_CLASS>
+  <SQLTEXT>SHOW VARIABLES LIKE '%audit%'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:18:00 UTC</TIMESTAMP>
+  <RECORD_ID>4_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Quit</NAME>
+  <CONNECTION_ID>1</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER/>
+  <OS_LOGIN/>
+  <HOST/>
+  <IP/>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:18:04 UTC</TIMESTAMP>
+  <RECORD_ID>5_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Connect</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+  <PRIV_USER>root</PRIV_USER>
+  <PROXY_USER/>
+  <DB/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:18:04 UTC</TIMESTAMP>
+  <RECORD_ID>6_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>select</COMMAND_CLASS>
+  <SQLTEXT>select @@version_comment limit 1</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:18:11 UTC</TIMESTAMP>
+  <RECORD_ID>7_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>select</COMMAND_CLASS>
+  <SQLTEXT>SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:18:18 UTC</TIMESTAMP>
+  <RECORD_ID>8_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>select</COMMAND_CLASS>
+  <SQLTEXT>SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:21:07 UTC</TIMESTAMP>
+  <RECORD_ID>9_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>1146</STATUS>
+  <STATUS_CODE>1</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>select</COMMAND_CLASS>
+  <SQLTEXT>select * from teste.employees where salary &gt; 500 and salary &lt; 1000</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:21:28 UTC</TIMESTAMP>
+  <RECORD_ID>10_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>1046</STATUS>
+  <STATUS_CODE>1</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>create_table</COMMAND_CLASS>
+  <SQLTEXT>create table select_one (a INT)</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:22:03 UTC</TIMESTAMP>
+  <RECORD_ID>11_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>select</COMMAND_CLASS>
+  <SQLTEXT>SELECT DATABASE()</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:22:03 UTC</TIMESTAMP>
+  <RECORD_ID>12_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Init DB</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:22:03 UTC</TIMESTAMP>
+  <RECORD_ID>13_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_databases</COMMAND_CLASS>
+  <SQLTEXT>show databases</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:22:03 UTC</TIMESTAMP>
+  <RECORD_ID>14_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_tables</COMMAND_CLASS>
+  <SQLTEXT>show tables</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:22:21 UTC</TIMESTAMP>
+  <RECORD_ID>15_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>create_table</COMMAND_CLASS>
+  <SQLTEXT>CREATE TABLE select_one (a INT)</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:22:44 UTC</TIMESTAMP>
+  <RECORD_ID>16_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>1146</STATUS>
+  <STATUS_CODE>1</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>select</COMMAND_CLASS>
+  <SQLTEXT>SELECT * FROM `set`.`prepare`</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:23:02 UTC</TIMESTAMP>
+  <RECORD_ID>17_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>insert</COMMAND_CLASS>
+  <SQLTEXT>INSERT select_one SET a = 'commit'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:23:18 UTC</TIMESTAMP>
+  <RECORD_ID>18_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>update</COMMAND_CLASS>
+  <SQLTEXT>UPDATE select_one SET a = 'set'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:23:35 UTC</TIMESTAMP>
+  <RECORD_ID>19_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>commit</COMMAND_CLASS>
+  <SQLTEXT>COMMIT</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:24:27 UTC</TIMESTAMP>
+  <RECORD_ID>20_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>drop_table</COMMAND_CLASS>
+  <SQLTEXT>drop table  select_one</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:24:45 UTC</TIMESTAMP>
+  <RECORD_ID>21_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>prepare_sql</COMMAND_CLASS>
+  <SQLTEXT>PREPARE stmt1 FROM ...</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:24:56 UTC</TIMESTAMP>
+  <RECORD_ID>22_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET @a = 3</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:25:05 UTC</TIMESTAMP>
+  <RECORD_ID>23_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET @b = 4</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:25:17 UTC</TIMESTAMP>
+  <RECORD_ID>24_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>1064</STATUS>
+  <STATUS_CODE>1</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+  <SQLTEXT>SELECT SQRT(POW(?,2) + POW(?,2)) AS hypotenuse</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:26:41 UTC</TIMESTAMP>
+  <RECORD_ID>25_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>1054</STATUS>
+  <STATUS_CODE>1</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>select</COMMAND_CLASS>
+  <SQLTEXT>SELECT stmt1</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:30:53 UTC</TIMESTAMP>
+  <RECORD_ID>26_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>execute_sql</COMMAND_CLASS>
+  <SQLTEXT>SELECT SQRT(POW(3,2) + POW(4,2)) AS hypotenuse</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:31:10 UTC</TIMESTAMP>
+  <RECORD_ID>27_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>dealloc_sql</COMMAND_CLASS>
+  <SQLTEXT>DEALLOCATE PREPARE stmt1</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:31:33 UTC</TIMESTAMP>
+  <RECORD_ID>28_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET @s = 'SELECT SQRT(POW(?,2) + POW(?,2)) AS hypotenuse'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:31:46 UTC</TIMESTAMP>
+  <RECORD_ID>29_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>prepare_sql</COMMAND_CLASS>
+  <SQLTEXT>PREPARE stmt2 FROM @s</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:31:59 UTC</TIMESTAMP>
+  <RECORD_ID>30_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET @a = 6</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:32:15 UTC</TIMESTAMP>
+  <RECORD_ID>31_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET @b = 8</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:32:31 UTC</TIMESTAMP>
+  <RECORD_ID>32_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>execute_sql</COMMAND_CLASS>
+  <SQLTEXT>SELECT SQRT(POW(6,2) + POW(8,2)) AS hypotenuse</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:32:48 UTC</TIMESTAMP>
+  <RECORD_ID>33_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>2</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>dealloc_sql</COMMAND_CLASS>
+  <SQLTEXT>DEALLOCATE PREPARE stmt2</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>34_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Connect</NAME>
+  <CONNECTION_ID>3</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+  <PRIV_USER>root</PRIV_USER>
+  <PROXY_USER/>
+  <DB/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>35_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>3</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET NAMES 'utf8' COLLATE 'utf8_general_ci'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>36_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>3</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET @@session.autocommit = OFF</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>37_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Ping</NAME>
+  <CONNECTION_ID>3</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>38_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>3</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_variables</COMMAND_CLASS>
+  <SQLTEXT>SHOW VARIABLES LIKE 'character_set_client'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>39_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>3</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET NAMES 'utf8' COLLATE 'utf8_general_ci'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>40_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Ping</NAME>
+  <CONNECTION_ID>3</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>41_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>3</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_variables</COMMAND_CLASS>
+  <SQLTEXT>SHOW VARIABLES LIKE 'READ_ONLY'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>42_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Ping</NAME>
+  <CONNECTION_ID>3</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>43_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>3</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>select</COMMAND_CLASS>
+  <SQLTEXT>SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>44_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Quit</NAME>
+  <CONNECTION_ID>3</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER/>
+  <OS_LOGIN/>
+  <HOST/>
+  <IP/>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>45_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Connect</NAME>
+  <CONNECTION_ID>4</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+  <PRIV_USER>root</PRIV_USER>
+  <PROXY_USER/>
+  <DB/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>46_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>4</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET NAMES 'utf8' COLLATE 'utf8_general_ci'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>47_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>4</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET @@session.autocommit = OFF</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>48_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Ping</NAME>
+  <CONNECTION_ID>4</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>49_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>4</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_variables</COMMAND_CLASS>
+  <SQLTEXT>SHOW VARIABLES LIKE 'character_set_client'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>50_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>4</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET NAMES 'utf8' COLLATE 'utf8_general_ci'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>51_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Ping</NAME>
+  <CONNECTION_ID>4</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>52_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>4</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_variables</COMMAND_CLASS>
+  <SQLTEXT>SHOW VARIABLES LIKE 'READ_ONLY'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>53_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Ping</NAME>
+  <CONNECTION_ID>4</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>54_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>4</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_variables</COMMAND_CLASS>
+  <SQLTEXT>SHOW VARIABLES LIKE 'audit%'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>55_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Quit</NAME>
+  <CONNECTION_ID>4</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER/>
+  <OS_LOGIN/>
+  <HOST/>
+  <IP/>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>56_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Connect</NAME>
+  <CONNECTION_ID>5</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+  <PRIV_USER>root</PRIV_USER>
+  <PROXY_USER/>
+  <DB/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>57_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>5</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET NAMES 'utf8' COLLATE 'utf8_general_ci'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>58_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>5</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET @@session.autocommit = OFF</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>59_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Ping</NAME>
+  <CONNECTION_ID>5</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>60_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>5</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_variables</COMMAND_CLASS>
+  <SQLTEXT>SHOW VARIABLES LIKE 'character_set_client'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>61_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>5</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>set_option</COMMAND_CLASS>
+  <SQLTEXT>SET NAMES 'utf8' COLLATE 'utf8_general_ci'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>62_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Ping</NAME>
+  <CONNECTION_ID>5</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>63_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>5</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_variables</COMMAND_CLASS>
+  <SQLTEXT>SHOW VARIABLES LIKE 'READ_ONLY'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>64_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Ping</NAME>
+  <CONNECTION_ID>5</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>65_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>5</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_variables</COMMAND_CLASS>
+  <SQLTEXT>SHOW VARIABLES LIKE 'audit_log_rotate_on_size'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-18T11:34:30 UTC</TIMESTAMP>
+  <RECORD_ID>66_2014-03-18T11:15:34</RECORD_ID>
+  <NAME>Ping</NAME>
+  <CONNECTION_ID>5</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-25T09:17:32 UTC</TIMESTAMP>
+  <RECORD_ID>179_2014-03-24T19:08:38</RECORD_ID>
+  <NAME>Connect</NAME>
+  <CONNECTION_ID>14</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+  <PRIV_USER>tester</PRIV_USER>
+  <PROXY_USER/>
+  <DB/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-25T09:17:32 UTC</TIMESTAMP>
+  <RECORD_ID>180_2014-03-24T19:08:38</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>14</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[tester] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>select</COMMAND_CLASS>
+  <SQLTEXT>select @@version_comment limit 1</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-25T09:17:38 UTC</TIMESTAMP>
+  <RECORD_ID>181_2014-03-24T19:08:38</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>14</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[tester] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_databases</COMMAND_CLASS>
+  <SQLTEXT>show databases</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-25T09:17:53 UTC</TIMESTAMP>
+  <RECORD_ID>182_2014-03-24T19:08:38</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>14</CONNECTION_ID>
+  <STATUS>1046</STATUS>
+  <STATUS_CODE>1</STATUS_CODE>
+  <USER>root[tester] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_tables</COMMAND_CLASS>
+  <SQLTEXT>show tables test</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-25T09:18:09 UTC</TIMESTAMP>
+  <RECORD_ID>183_2014-03-24T19:08:38</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>14</CONNECTION_ID>
+  <STATUS>1046</STATUS>
+  <STATUS_CODE>1</STATUS_CODE>
+  <USER>root[tester] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_tables</COMMAND_CLASS>
+  <SQLTEXT>show tables test</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-25T09:18:20 UTC</TIMESTAMP>
+  <RECORD_ID>184_2014-03-24T19:08:38</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>14</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>root[tester] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>show_tables</COMMAND_CLASS>
+  <SQLTEXT>show tables in test</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-25T09:18:27 UTC</TIMESTAMP>
+  <RECORD_ID>185_2014-03-24T19:08:38</RECORD_ID>
+  <NAME>Quit</NAME>
+  <CONNECTION_ID>14</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER/>
+  <OS_LOGIN/>
+  <HOST/>
+  <IP/>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-25T15:05:47 UTC</TIMESTAMP>
+  <RECORD_ID>347_2014-03-24T19:08:38</RECORD_ID>
+  <NAME>Connect</NAME>
+  <CONNECTION_ID>15</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+  <PRIV_USER>root</PRIV_USER>
+  <PROXY_USER/>
+  <DB/>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-25T15:05:47 UTC</TIMESTAMP>
+  <RECORD_ID>348_2014-03-24T19:08:38</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>15</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER>tester[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS>select</COMMAND_CLASS>
+  <SQLTEXT>select @@version_comment limit 1</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-25T15:05:53 UTC</TIMESTAMP>
+  <RECORD_ID>349_2014-03-24T19:08:38</RECORD_ID>
+  <NAME>Query</NAME>
+  <CONNECTION_ID>15</CONNECTION_ID>
+  <STATUS>1046</STATUS>
+  <STATUS_CODE>1</STATUS_CODE>
+  <USER>tester[root] @ localhost [127.0.0.1]</USER>
+  <OS_LOGIN/>
+  <HOST>localhost</HOST>
+  <IP>127.0.0.1</IP>
+  <COMMAND_CLASS/>
+  <SQLTEXT>select * from test_encoding where value = '&lt;&gt;&quot;&amp;'</SQLTEXT>
+ </AUDIT_RECORD>
+ <AUDIT_RECORD>
+  <TIMESTAMP>2014-03-25T15:05:57 UTC</TIMESTAMP>
+  <RECORD_ID>350_2014-03-24T19:08:38</RECORD_ID>
+  <NAME>Quit</NAME>
+  <CONNECTION_ID>15</CONNECTION_ID>
+  <STATUS>0</STATUS>
+  <STATUS_CODE>0</STATUS_CODE>
+  <USER/>
+  <OS_LOGIN/>
+  <HOST/>
+  <IP/>
+  <COMMAND_CLASS>connect</COMMAND_CLASS>
+ </AUDIT_RECORD>
 Test case 5 - Search entries of specific users
 +---------+------------+----------+----------------------+----------------+------------+---------+------------+------------+---------------------------------------------------------------------------+
 | STATUS  | SERVER_ID  | NAME     | TIMESTAMP            | CONNECTION_ID  | HOST       | USER    | PRIV_USER  | IP         | SQLTEXT                                                                   |
@@ -191,7 +1264,38 @@ Test case 5 - Search entries of specific users
 | 1046    | 1          | Query    | 2012-10-10T17:47:17  | 12             | None       | tester  | root       | None       | select * from test_encoding where value = '<>"&'                          |
 | 0       | 1          | Quit     | 2012-10-10T17:47:22  | 12             | None       | tester  | root       | None       | None                                                                      |
 +---------+------------+----------+----------------------+----------------+------------+---------+------------+------------+---------------------------------------------------------------------------+
+Test case 5 (NEW) - Search entries of specific users
++---------+------------+----------+--------------------------+-----------------+----------------+------------+---------+------------+------------+--------------------------+--------------+---------------------------------------------------------------------------+
+| STATUS  | SERVER_ID  | NAME     | TIMESTAMP                | COMMAND_CLASS   | CONNECTION_ID  | HOST       | USER    | PRIV_USER  | IP         | RECORD_ID                | STATUS_CODE  | SQLTEXT                                                                   |
++---------+------------+----------+--------------------------+-----------------+----------------+------------+---------+------------+------------+--------------------------+--------------+---------------------------------------------------------------------------+
+| 0       | 1          | Connect  | 2014-03-18T11:34:30 UTC  | connect         | 3              | localhost  | tester  | root       | 127.0.0.1  | 34_2014-03-18T11:15:34   | 0            | None                                                                      |
+| 0       | 1          | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 3              | localhost  | tester  | root       | 127.0.0.1  | 35_2014-03-18T11:15:34   | 0            | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                                |
+| 0       | 1          | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 3              | localhost  | tester  | root       | 127.0.0.1  | 36_2014-03-18T11:15:34   | 0            | SET @@session.autocommit = OFF                                            |
+| 0       | 1          | Ping     | 2014-03-18T11:34:30 UTC  | None            | 3              | localhost  | tester  | root       | 127.0.0.1  | 37_2014-03-18T11:15:34   | 0            | None                                                                      |
+| 0       | 1          | Query    | 2014-03-18T11:34:30 UTC  | show_variables  | 3              | localhost  | tester  | root       | 127.0.0.1  | 38_2014-03-18T11:15:34   | 0            | SHOW VARIABLES LIKE 'character_set_client'                                |
+| 0       | 1          | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 3              | localhost  | tester  | root       | 127.0.0.1  | 39_2014-03-18T11:15:34   | 0            | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                                |
+| 0       | 1          | Ping     | 2014-03-18T11:34:30 UTC  | None            | 3              | localhost  | tester  | root       | 127.0.0.1  | 40_2014-03-18T11:15:34   | 0            | None                                                                      |
+| 0       | 1          | Query    | 2014-03-18T11:34:30 UTC  | show_variables  | 3              | localhost  | tester  | root       | 127.0.0.1  | 41_2014-03-18T11:15:34   | 0            | SHOW VARIABLES LIKE 'READ_ONLY'                                           |
+| 0       | 1          | Ping     | 2014-03-18T11:34:30 UTC  | None            | 3              | localhost  | tester  | root       | 127.0.0.1  | 42_2014-03-18T11:15:34   | 0            | None                                                                      |
+| 0       | 1          | Query    | 2014-03-18T11:34:30 UTC  | select          | 3              | localhost  | tester  | root       | 127.0.0.1  | 43_2014-03-18T11:15:34   | 0            | SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'  |
+| 0       | 1          | Quit     | 2014-03-18T11:34:30 UTC  | connect         | 3              | None       | tester  | root       | None       | 44_2014-03-18T11:15:34   | 0            | None                                                                      |
+| 0       | 1          | Connect  | 2014-03-25T09:17:32 UTC  | connect         | 14             | localhost  | root    | tester     | 127.0.0.1  | 179_2014-03-24T19:08:38  | 0            | None                                                                      |
+| 0       | 1          | Query    | 2014-03-25T09:17:32 UTC  | select          | 14             | localhost  | root    | tester     | 127.0.0.1  | 180_2014-03-24T19:08:38  | 0            | select @@version_comment limit 1                                          |
+| 0       | 1          | Query    | 2014-03-25T09:17:38 UTC  | show_databases  | 14             | localhost  | root    | tester     | 127.0.0.1  | 181_2014-03-24T19:08:38  | 0            | show databases                                                            |
+| 1046    | 1          | Query    | 2014-03-25T09:17:53 UTC  | show_tables     | 14             | localhost  | root    | tester     | 127.0.0.1  | 182_2014-03-24T19:08:38  | 1            | show tables test                                                          |
+| 1046    | 1          | Query    | 2014-03-25T09:18:09 UTC  | show_tables     | 14             | localhost  | root    | tester     | 127.0.0.1  | 183_2014-03-24T19:08:38  | 1            | show tables test                                                          |
+| 0       | 1          | Query    | 2014-03-25T09:18:20 UTC  | show_tables     | 14             | localhost  | root    | tester     | 127.0.0.1  | 184_2014-03-24T19:08:38  | 0            | show tables in test                                                       |
+| 0       | 1          | Quit     | 2014-03-25T09:18:27 UTC  | connect         | 14             | None       | root    | tester     | None       | 185_2014-03-24T19:08:38  | 0            | None                                                                      |
+| 0       | 1          | Connect  | 2014-03-25T15:05:47 UTC  | connect         | 15             | localhost  | tester  | root       | 127.0.0.1  | 347_2014-03-24T19:08:38  | 0            | None                                                                      |
+| 0       | 1          | Query    | 2014-03-25T15:05:47 UTC  | select          | 15             | localhost  | tester  | root       | 127.0.0.1  | 348_2014-03-24T19:08:38  | 0            | select @@version_comment limit 1                                          |
+| 1046    | 1          | Query    | 2014-03-25T15:05:53 UTC  | None            | 15             | localhost  | tester  | root       | 127.0.0.1  | 349_2014-03-24T19:08:38  | 1            | select * from test_encoding where value = '<>"&'                          |
+| 0       | 1          | Quit     | 2014-03-25T15:05:57 UTC  | connect         | 15             | None       | tester  | root       | None       | 350_2014-03-24T19:08:38  | 0            | None                                                                      |
++---------+------------+----------+--------------------------+-----------------+----------------+------------+---------+------------+------------+--------------------------+--------------+---------------------------------------------------------------------------+
 Test case 6 - No entry found for specified users
+#
+# No entry found!
+#
+Test case 6 (NEW) - No entry found for specified users
 #
 # No entry found!
 #
@@ -205,7 +1309,49 @@ Test case 7 - Search entries for a specific datetime range
 | 0       | 2012-09-27T13:34:48  | Quit   | 7              | None                                                                      |
 | 0       | 2012-09-27T13:34:48  | Quit   | 8              | None                                                                      |
 +---------+----------------------+--------+----------------+---------------------------------------------------------------------------+
+Test case 7 (NEW) - Search entries for a specific datetime range
++---------+----------+--------------------------+-----------------+----------------+------------+---------------------------------------+------------+------------+-------------------------+--------------+---------------------------------------------------------------------------+
+| STATUS  | NAME     | TIMESTAMP                | COMMAND_CLASS   | CONNECTION_ID  | HOST       | USER                                  | PRIV_USER  | IP         | RECORD_ID               | STATUS_CODE  | SQLTEXT                                                                   |
++---------+----------+--------------------------+-----------------+----------------+------------+---------------------------------------+------------+------------+-------------------------+--------------+---------------------------------------------------------------------------+
+| 0       | Connect  | 2014-03-18T11:34:30 UTC  | connect         | 3              | localhost  | tester                                | root       | 127.0.0.1  | 34_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 35_2014-03-18T11:15:34  | 0            | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                                |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 36_2014-03-18T11:15:34  | 0            | SET @@session.autocommit = OFF                                            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None            | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 37_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | show_variables  | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 38_2014-03-18T11:15:34  | 0            | SHOW VARIABLES LIKE 'character_set_client'                                |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 39_2014-03-18T11:15:34  | 0            | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                                |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None            | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 40_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | show_variables  | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 41_2014-03-18T11:15:34  | 0            | SHOW VARIABLES LIKE 'READ_ONLY'                                           |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None            | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 42_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | select          | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 43_2014-03-18T11:15:34  | 0            | SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'  |
+| 0       | Quit     | 2014-03-18T11:34:30 UTC  | connect         | 3              | None       | None                                  | None       | None       | 44_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Connect  | 2014-03-18T11:34:30 UTC  | connect         | 4              | localhost  | root                                  | root       | 127.0.0.1  | 45_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 46_2014-03-18T11:15:34  | 0            | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                                |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 47_2014-03-18T11:15:34  | 0            | SET @@session.autocommit = OFF                                            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None            | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 48_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | show_variables  | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 49_2014-03-18T11:15:34  | 0            | SHOW VARIABLES LIKE 'character_set_client'                                |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 50_2014-03-18T11:15:34  | 0            | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                                |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None            | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 51_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | show_variables  | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 52_2014-03-18T11:15:34  | 0            | SHOW VARIABLES LIKE 'READ_ONLY'                                           |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None            | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 53_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | show_variables  | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 54_2014-03-18T11:15:34  | 0            | SHOW VARIABLES LIKE 'audit%'                                              |
+| 0       | Quit     | 2014-03-18T11:34:30 UTC  | connect         | 4              | None       | None                                  | None       | None       | 55_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Connect  | 2014-03-18T11:34:30 UTC  | connect         | 5              | localhost  | root                                  | root       | 127.0.0.1  | 56_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 57_2014-03-18T11:15:34  | 0            | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                                |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 58_2014-03-18T11:15:34  | 0            | SET @@session.autocommit = OFF                                            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None            | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 59_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | show_variables  | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 60_2014-03-18T11:15:34  | 0            | SHOW VARIABLES LIKE 'character_set_client'                                |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | set_option      | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 61_2014-03-18T11:15:34  | 0            | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                                |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None            | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 62_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | show_variables  | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 63_2014-03-18T11:15:34  | 0            | SHOW VARIABLES LIKE 'READ_ONLY'                                           |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None            | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 64_2014-03-18T11:15:34  | 0            | None                                                                      |
+| 0       | Query    | 2014-03-18T11:34:30 UTC  | show_variables  | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 65_2014-03-18T11:15:34  | 0            | SHOW VARIABLES LIKE 'audit_log_rotate_on_size'                            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None            | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 66_2014-03-18T11:15:34  | 0            | None                                                                      |
++---------+----------+--------------------------+-----------------+----------------+------------+---------------------------------------+------------+------------+-------------------------+--------------+---------------------------------------------------------------------------+
 Test case 8 - No entry found for specified datetime range
+#
+# No entry found!
+#
+Test case 8 (NEW) - No entry found for specified datetime range
 #
 # No entry found!
 #
@@ -218,6 +1364,14 @@ Test case 9 - Search entries matching SQL LIKE pattern
 | 0       | 2012-09-28T11:26:50  | Query  | SET @@session.autocommit = OFF  | 9              |
 | 0       | 2012-09-28T11:26:50  | Query  | SET @@session.autocommit = OFF  | 10             |
 +---------+----------------------+--------+---------------------------------+----------------+
+Test case 9 (NEW) - Search entries matching SQL LIKE pattern 
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+-------------------------+---------------------------------+
+| STATUS  | NAME   | TIMESTAMP                | COMMAND_CLASS  | CONNECTION_ID  | HOST       | USER                                  | STATUS_CODE  | IP         | RECORD_ID               | SQLTEXT                         |
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+-------------------------+---------------------------------+
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 36_2014-03-18T11:15:34  | SET @@session.autocommit = OFF  |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 47_2014-03-18T11:15:34  | SET @@session.autocommit = OFF  |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 58_2014-03-18T11:15:34  | SET @@session.autocommit = OFF  |
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+-------------------------+---------------------------------+
 Test case 10 - Search entries matching REGEXP pattern 
 +---------+----------------------+--------+------------------------------------------------------------+----------------+
 | STATUS  | TIMESTAMP            | NAME   | SQLTEXT                                                    | CONNECTION_ID  |
@@ -231,7 +1385,23 @@ Test case 10 - Search entries matching REGEXP pattern
 | 0       | 2013-06-03T14:51:01  | Query  | UPDATE select_one SET a = 'set'                            | 13             |
 | 0       | 2013-06-03T15:35:31  | Query  | SET @s = 'SELECT SQRT(POW(?,2) + POW(?,2)) AS hypotenuse'  | 13             |
 +---------+----------------------+--------+------------------------------------------------------------+----------------+
+Test case 10 (NEW) - Search entries matching REGEXP pattern 
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+------------------------------------------------------------+
+| STATUS  | NAME   | TIMESTAMP                | COMMAND_CLASS  | CONNECTION_ID  | HOST       | USER                                  | STATUS_CODE  | IP         | RECORD_ID                | SQLTEXT                                                    |
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+------------------------------------------------------------+
+| 0       | Query  | 2014-03-18T11:23:02 UTC  | insert         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 17_2014-03-18T11:15:34   | INSERT select_one SET a = 'commit'                         |
+| 0       | Query  | 2014-03-18T11:23:18 UTC  | update         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 18_2014-03-18T11:15:34   | UPDATE select_one SET a = 'set'                            |
+| 0       | Query  | 2014-03-18T11:31:33 UTC  | set_option     | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 28_2014-03-18T11:15:34   | SET @s = 'SELECT SQRT(POW(?,2) + POW(?,2)) AS hypotenuse'  |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 36_2014-03-18T11:15:34   | SET @@session.autocommit = OFF                             |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 47_2014-03-18T11:15:34   | SET @@session.autocommit = OFF                             |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 58_2014-03-18T11:15:34   | SET @@session.autocommit = OFF                             |
+| 1046    | Query  | 2014-03-25T15:05:53 UTC  | None           | 15             | localhost  | tester[root] @ localhost [127.0.0.1]  | 1            | 127.0.0.1  | 349_2014-03-24T19:08:38  | select * from test_encoding where value = '<>"&'           |
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+------------------------------------------------------------+
 Test case 11 - No entry found matching specified pattern 
+#
+# No entry found!
+#
+Test case 11 (NEW) - No entry found matching specified pattern 
 #
 # No entry found!
 #
@@ -267,7 +1437,45 @@ Test case 12 - Search entries of specific query types
 | 0       | 2013-06-03T15:36:04  | Query  | SET @a = 6                                                 | 13             |
 | 0       | 2013-06-03T15:36:14  | Query  | SET @b = 8                                                 | 13             |
 +---------+----------------------+--------+------------------------------------------------------------+----------------+
+Test case 12 (NEW) - Search entries of specific query types
++---------+--------+--------------------------+-----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+------------------------------------------------------------+
+| STATUS  | NAME   | TIMESTAMP                | COMMAND_CLASS   | CONNECTION_ID  | HOST       | USER                                  | STATUS_CODE  | IP         | RECORD_ID                | SQLTEXT                                                    |
++---------+--------+--------------------------+-----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+------------------------------------------------------------+
+| 0       | Query  | 2014-03-18T11:15:43 UTC  | show_variables  | 1              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 3_2014-03-18T11:15:34    | SHOW VARIABLES LIKE '%audit%'                              |
+| 0       | Query  | 2014-03-18T11:22:03 UTC  | show_databases  | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 13_2014-03-18T11:15:34   | show databases                                             |
+| 0       | Query  | 2014-03-18T11:22:03 UTC  | show_tables     | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 14_2014-03-18T11:15:34   | show tables                                                |
+| 0       | Query  | 2014-03-18T11:24:56 UTC  | set_option      | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 22_2014-03-18T11:15:34   | SET @a = 3                                                 |
+| 0       | Query  | 2014-03-18T11:25:05 UTC  | set_option      | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 23_2014-03-18T11:15:34   | SET @b = 4                                                 |
+| 0       | Query  | 2014-03-18T11:31:33 UTC  | set_option      | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 28_2014-03-18T11:15:34   | SET @s = 'SELECT SQRT(POW(?,2) + POW(?,2)) AS hypotenuse'  |
+| 0       | Query  | 2014-03-18T11:31:59 UTC  | set_option      | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 30_2014-03-18T11:15:34   | SET @a = 6                                                 |
+| 0       | Query  | 2014-03-18T11:32:15 UTC  | set_option      | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 31_2014-03-18T11:15:34   | SET @b = 8                                                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option      | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 35_2014-03-18T11:15:34   | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option      | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 36_2014-03-18T11:15:34   | SET @@session.autocommit = OFF                             |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | show_variables  | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 38_2014-03-18T11:15:34   | SHOW VARIABLES LIKE 'character_set_client'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option      | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 39_2014-03-18T11:15:34   | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | show_variables  | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 41_2014-03-18T11:15:34   | SHOW VARIABLES LIKE 'READ_ONLY'                            |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option      | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 46_2014-03-18T11:15:34   | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option      | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 47_2014-03-18T11:15:34   | SET @@session.autocommit = OFF                             |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | show_variables  | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 49_2014-03-18T11:15:34   | SHOW VARIABLES LIKE 'character_set_client'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option      | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 50_2014-03-18T11:15:34   | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | show_variables  | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 52_2014-03-18T11:15:34   | SHOW VARIABLES LIKE 'READ_ONLY'                            |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | show_variables  | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 54_2014-03-18T11:15:34   | SHOW VARIABLES LIKE 'audit%'                               |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option      | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 57_2014-03-18T11:15:34   | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option      | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 58_2014-03-18T11:15:34   | SET @@session.autocommit = OFF                             |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | show_variables  | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 60_2014-03-18T11:15:34   | SHOW VARIABLES LIKE 'character_set_client'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option      | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 61_2014-03-18T11:15:34   | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | show_variables  | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 63_2014-03-18T11:15:34   | SHOW VARIABLES LIKE 'READ_ONLY'                            |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | show_variables  | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 65_2014-03-18T11:15:34   | SHOW VARIABLES LIKE 'audit_log_rotate_on_size'             |
+| 0       | Query  | 2014-03-25T09:17:38 UTC  | show_databases  | 14             | localhost  | root[tester] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 181_2014-03-24T19:08:38  | show databases                                             |
+| 1046    | Query  | 2014-03-25T09:17:53 UTC  | show_tables     | 14             | localhost  | root[tester] @ localhost [127.0.0.1]  | 1            | 127.0.0.1  | 182_2014-03-24T19:08:38  | show tables test                                           |
+| 1046    | Query  | 2014-03-25T09:18:09 UTC  | show_tables     | 14             | localhost  | root[tester] @ localhost [127.0.0.1]  | 1            | 127.0.0.1  | 183_2014-03-24T19:08:38  | show tables test                                           |
+| 0       | Query  | 2014-03-25T09:18:20 UTC  | show_tables     | 14             | localhost  | root[tester] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 184_2014-03-24T19:08:38  | show tables in test                                        |
++---------+--------+--------------------------+-----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+------------------------------------------------------------+
 Test case 13 - No entry found for specified query types
+#
+# No entry found!
+#
+Test case 13 (NEW) - No entry found for specified query types
 #
 # No entry found!
 #
@@ -296,7 +1504,33 @@ Test case 14 - Search entries of specific event types
 | 0       | Connect  | 2012-10-10T15:55:55  | 11             | localhost  | tester  | root       | 127.0.0.1  |
 | 0       | Connect  | 2012-10-10T17:35:42  | 12             | localhost  | tester  | root       | 127.0.0.1  |
 +---------+----------+----------------------+----------------+------------+---------+------------+------------+
+Test case 14 (NEW) - Search entries of specific event types
++---------+----------+--------------------------+----------------+----------------+------------+---------------------------------------+------------+------------+--------------------------+--------------+
+| STATUS  | NAME     | TIMESTAMP                | COMMAND_CLASS  | CONNECTION_ID  | HOST       | USER                                  | PRIV_USER  | IP         | RECORD_ID                | STATUS_CODE  |
++---------+----------+--------------------------+----------------+----------------+------------+---------------------------------------+------------+------------+--------------------------+--------------+
+| 0       | Connect  | 2014-03-18T11:15:43 UTC  | connect        | 1              | localhost  | root                                  | root       | 127.0.0.1  | 2_2014-03-18T11:15:34    | 0            |
+| 0       | Connect  | 2014-03-18T11:18:04 UTC  | connect        | 2              | localhost  | root                                  | root       | 127.0.0.1  | 5_2014-03-18T11:15:34    | 0            |
+| 0       | Connect  | 2014-03-18T11:34:30 UTC  | connect        | 3              | localhost  | tester                                | root       | 127.0.0.1  | 34_2014-03-18T11:15:34   | 0            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None           | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 37_2014-03-18T11:15:34   | 0            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None           | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 40_2014-03-18T11:15:34   | 0            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None           | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | None       | 127.0.0.1  | 42_2014-03-18T11:15:34   | 0            |
+| 0       | Connect  | 2014-03-18T11:34:30 UTC  | connect        | 4              | localhost  | root                                  | root       | 127.0.0.1  | 45_2014-03-18T11:15:34   | 0            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None           | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 48_2014-03-18T11:15:34   | 0            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None           | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 51_2014-03-18T11:15:34   | 0            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None           | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 53_2014-03-18T11:15:34   | 0            |
+| 0       | Connect  | 2014-03-18T11:34:30 UTC  | connect        | 5              | localhost  | root                                  | root       | 127.0.0.1  | 56_2014-03-18T11:15:34   | 0            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None           | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 59_2014-03-18T11:15:34   | 0            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None           | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 62_2014-03-18T11:15:34   | 0            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None           | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 64_2014-03-18T11:15:34   | 0            |
+| 0       | Ping     | 2014-03-18T11:34:30 UTC  | None           | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | None       | 127.0.0.1  | 66_2014-03-18T11:15:34   | 0            |
+| 0       | Connect  | 2014-03-25T09:17:32 UTC  | connect        | 14             | localhost  | root                                  | tester     | 127.0.0.1  | 179_2014-03-24T19:08:38  | 0            |
+| 0       | Connect  | 2014-03-25T15:05:47 UTC  | connect        | 15             | localhost  | tester                                | root       | 127.0.0.1  | 347_2014-03-24T19:08:38  | 0            |
++---------+----------+--------------------------+----------------+----------------+------------+---------------------------------------+------------+------------+--------------------------+--------------+
 Test case 15 - No entry found for specified event types
+#
+# No entry found!
+#
+Test case 15 (NEW) - No entry found for specified event types
 #
 # No entry found!
 #
@@ -310,7 +1544,22 @@ Test case 16 - Search entries with specific status
 | 1046    | 2012-10-10T17:47:17  | Query  | select * from test_encoding where value = '<>"&'                    | 12             |
 | 1146    | 2013-06-03T14:50:32  | Query  | SELECT * FROM `set`.`prepare`                                       | 13             |
 +---------+----------------------+--------+---------------------------------------------------------------------+----------------+
+Test case 16 (NEW) - Search entries with specific status
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+---------------------------------------------------------------------+
+| STATUS  | NAME   | TIMESTAMP                | COMMAND_CLASS  | CONNECTION_ID  | HOST       | USER                                  | STATUS_CODE  | IP         | RECORD_ID                | SQLTEXT                                                             |
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+---------------------------------------------------------------------+
+| 1146    | Query  | 2014-03-18T11:21:07 UTC  | select         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 1            | 127.0.0.1  | 9_2014-03-18T11:15:34    | select * from teste.employees where salary > 500 and salary < 1000  |
+| 1046    | Query  | 2014-03-18T11:21:28 UTC  | create_table   | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 1            | 127.0.0.1  | 10_2014-03-18T11:15:34   | create table select_one (a INT)                                     |
+| 1146    | Query  | 2014-03-18T11:22:44 UTC  | select         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 1            | 127.0.0.1  | 16_2014-03-18T11:15:34   | SELECT * FROM `set`.`prepare`                                       |
+| 1046    | Query  | 2014-03-25T09:17:53 UTC  | show_tables    | 14             | localhost  | root[tester] @ localhost [127.0.0.1]  | 1            | 127.0.0.1  | 182_2014-03-24T19:08:38  | show tables test                                                    |
+| 1046    | Query  | 2014-03-25T09:18:09 UTC  | show_tables    | 14             | localhost  | root[tester] @ localhost [127.0.0.1]  | 1            | 127.0.0.1  | 183_2014-03-24T19:08:38  | show tables test                                                    |
+| 1046    | Query  | 2014-03-25T15:05:53 UTC  | None           | 15             | localhost  | tester[root] @ localhost [127.0.0.1]  | 1            | 127.0.0.1  | 349_2014-03-24T19:08:38  | select * from test_encoding where value = '<>"&'                    |
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+---------------------------------------------------------------------+
 Test case 17 - No entry found for specific status
+#
+# No entry found!
+#
+Test case 17 (NEW) - No entry found for specific status
 #
 # No entry found!
 #
@@ -320,6 +1569,12 @@ Test case 18 - Apply all search criteria
 +---------+------------+--------+----------------------+----------------+---------+------------+---------------------------------------------------+
 | 1046    | 1          | Query  | 2012-10-10T17:47:17  | 12             | tester  | root       | select * from test_encoding where value = '<>"&'  |
 +---------+------------+--------+----------------------+----------------+---------+------------+---------------------------------------------------+
+Test case 18 (NEW) - Apply all search criteria
++---------+------------+------------+--------+--------------------------+----------------+------------+---------+--------------+------------+--------------------------+---------------------------------------------------+
+| STATUS  | SERVER_ID  | PRIV_USER  | NAME   | TIMESTAMP                | CONNECTION_ID  | HOST       | USER    | STATUS_CODE  | IP         | RECORD_ID                | SQLTEXT                                           |
++---------+------------+------------+--------+--------------------------+----------------+------------+---------+--------------+------------+--------------------------+---------------------------------------------------+
+| 1046    | 1          | root       | Query  | 2014-03-25T15:05:53 UTC  | 15             | localhost  | tester  | 1            | 127.0.0.1  | 349_2014-03-24T19:08:38  | select * from test_encoding where value = '<>"&'  |
++---------+------------+------------+--------+--------------------------+----------------+------------+---------+--------------+------------+--------------------------+---------------------------------------------------+
 Test case 19 - Test query-type false positives
 +---------+----------------------+--------+---------------------------------------------------------------------------+----------------+
 | STATUS  | TIMESTAMP            | NAME   | SQLTEXT                                                                   | CONNECTION_ID  |
@@ -335,6 +1590,25 @@ Test case 19 - Test query-type false positives
 | 0       | 2013-06-03T15:31:28  | Query  | SELECT SQRT(POW(?,2) + POW(?,2)) AS hypotenuse                            | 13             |
 | 0       | 2013-06-03T15:36:23  | Query  | SELECT SQRT(POW(?,2) + POW(?,2)) AS hypotenuse                            | 13             |
 +---------+----------------------+--------+---------------------------------------------------------------------------+----------------+
+Test case 19 (NEW) - Test query-type false positives
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+---------------------------------------------------------------------------+
+| STATUS  | NAME   | TIMESTAMP                | COMMAND_CLASS  | CONNECTION_ID  | HOST       | USER                                  | STATUS_CODE  | IP         | RECORD_ID                | SQLTEXT                                                                   |
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+---------------------------------------------------------------------------+
+| 0       | Query  | 2014-03-18T11:18:04 UTC  | select         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 6_2014-03-18T11:15:34    | select @@version_comment limit 1                                          |
+| 0       | Query  | 2014-03-18T11:18:11 UTC  | select         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 7_2014-03-18T11:15:34    | SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'  |
+| 0       | Query  | 2014-03-18T11:18:18 UTC  | select         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 8_2014-03-18T11:15:34    | SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'  |
+| 1146    | Query  | 2014-03-18T11:21:07 UTC  | select         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 1            | 127.0.0.1  | 9_2014-03-18T11:15:34    | select * from teste.employees where salary > 500 and salary < 1000        |
+| 0       | Query  | 2014-03-18T11:22:03 UTC  | select         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 11_2014-03-18T11:15:34   | SELECT DATABASE()                                                         |
+| 1146    | Query  | 2014-03-18T11:22:44 UTC  | select         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 1            | 127.0.0.1  | 16_2014-03-18T11:15:34   | SELECT * FROM `set`.`prepare`                                             |
+| 1064    | Query  | 2014-03-18T11:25:17 UTC  | None           | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 1            | 127.0.0.1  | 24_2014-03-18T11:15:34   | SELECT SQRT(POW(?,2) + POW(?,2)) AS hypotenuse                            |
+| 1054    | Query  | 2014-03-18T11:26:41 UTC  | select         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 1            | 127.0.0.1  | 25_2014-03-18T11:15:34   | SELECT stmt1                                                              |
+| 0       | Query  | 2014-03-18T11:30:53 UTC  | execute_sql    | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 26_2014-03-18T11:15:34   | SELECT SQRT(POW(3,2) + POW(4,2)) AS hypotenuse                            |
+| 0       | Query  | 2014-03-18T11:32:31 UTC  | execute_sql    | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 32_2014-03-18T11:15:34   | SELECT SQRT(POW(6,2) + POW(8,2)) AS hypotenuse                            |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | select         | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 43_2014-03-18T11:15:34   | SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE PLUGIN_NAME LIKE 'audit%'  |
+| 0       | Query  | 2014-03-25T09:17:32 UTC  | select         | 14             | localhost  | root[tester] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 180_2014-03-24T19:08:38  | select @@version_comment limit 1                                          |
+| 0       | Query  | 2014-03-25T15:05:47 UTC  | select         | 15             | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 348_2014-03-24T19:08:38  | select @@version_comment limit 1                                          |
+| 1046    | Query  | 2014-03-25T15:05:53 UTC  | None           | 15             | localhost  | tester[root] @ localhost [127.0.0.1]  | 1            | 127.0.0.1  | 349_2014-03-24T19:08:38  | select * from test_encoding where value = '<>"&'                          |
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+--------------------------+---------------------------------------------------------------------------+
 Test case 20 - Test query-type false positives (particular cases)
 +---------+----------------------+--------+----------------------------------------------------------------------+----------------+
 | STATUS  | TIMESTAMP            | NAME   | SQLTEXT                                                              | CONNECTION_ID  |
@@ -370,10 +1644,40 @@ Test case 20 - Test query-type false positives (particular cases)
 | 0       | 2013-06-03T15:36:04  | Query  | SET @a = 6                                                           | 13             |
 | 0       | 2013-06-03T15:36:14  | Query  | SET @b = 8                                                           | 13             |
 +---------+----------------------+--------+----------------------------------------------------------------------+----------------+
+Test case 20 (NEW) - Test query-type false positives (particular cases)
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+-------------------------+------------------------------------------------------------+
+| STATUS  | NAME   | TIMESTAMP                | COMMAND_CLASS  | CONNECTION_ID  | HOST       | USER                                  | STATUS_CODE  | IP         | RECORD_ID               | SQLTEXT                                                    |
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+-------------------------+------------------------------------------------------------+
+| 0       | Query  | 2014-03-18T11:23:35 UTC  | commit         | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 19_2014-03-18T11:15:34  | COMMIT                                                     |
+| 0       | Query  | 2014-03-18T11:24:45 UTC  | prepare_sql    | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 21_2014-03-18T11:15:34  | PREPARE stmt1 FROM ...                                     |
+| 0       | Query  | 2014-03-18T11:24:56 UTC  | set_option     | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 22_2014-03-18T11:15:34  | SET @a = 3                                                 |
+| 0       | Query  | 2014-03-18T11:25:05 UTC  | set_option     | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 23_2014-03-18T11:15:34  | SET @b = 4                                                 |
+| 0       | Query  | 2014-03-18T11:31:33 UTC  | set_option     | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 28_2014-03-18T11:15:34  | SET @s = 'SELECT SQRT(POW(?,2) + POW(?,2)) AS hypotenuse'  |
+| 0       | Query  | 2014-03-18T11:31:46 UTC  | prepare_sql    | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 29_2014-03-18T11:15:34  | PREPARE stmt2 FROM @s                                      |
+| 0       | Query  | 2014-03-18T11:31:59 UTC  | set_option     | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 30_2014-03-18T11:15:34  | SET @a = 6                                                 |
+| 0       | Query  | 2014-03-18T11:32:15 UTC  | set_option     | 2              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 31_2014-03-18T11:15:34  | SET @b = 8                                                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 35_2014-03-18T11:15:34  | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 36_2014-03-18T11:15:34  | SET @@session.autocommit = OFF                             |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 3              | localhost  | tester[root] @ localhost [127.0.0.1]  | 0            | 127.0.0.1  | 39_2014-03-18T11:15:34  | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 46_2014-03-18T11:15:34  | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 47_2014-03-18T11:15:34  | SET @@session.autocommit = OFF                             |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 4              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 50_2014-03-18T11:15:34  | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 57_2014-03-18T11:15:34  | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 58_2014-03-18T11:15:34  | SET @@session.autocommit = OFF                             |
+| 0       | Query  | 2014-03-18T11:34:30 UTC  | set_option     | 5              | localhost  | root[root] @ localhost [127.0.0.1]    | 0            | 127.0.0.1  | 61_2014-03-18T11:15:34  | SET NAMES 'utf8' COLLATE 'utf8_general_ci'                 |
++---------+--------+--------------------------+----------------+----------------+------------+---------------------------------------+--------------+------------+-------------------------+------------------------------------------------------------+
 Test case 21 - Search entries of multi-line log
 STATUS,TIMESTAMP,NAME,SQLTEXT,CONNECTION_ID
 0,2013-04-19T19:11:35,Query,"CREATE TABLE mytexttable(id   INT NOT NULL,txt  TEXT NOT NULL,PRIMARY KEY (id),FULLTEXT (txt)) ENGINE=MyISAM",24578
 0,2013-05-31T07:04:30,Query,"CREATE TABLE mytexttable2 (  id   INT NOT NULL,  txt  TEXT NOT NULL,  PRIMARY KEY (id),  FULLTEXT (txt)) ENGINE=MyISAM",1
+Test case 21 (NEW) - Search entries of multi-line log
+STATUS,NAME,TIMESTAMP,COMMAND_CLASS,CONNECTION_ID,HOST,USER,STATUS_CODE,IP,RECORD_ID,SQLTEXT
+0,Query,2014-03-25T16:28:33 UTC,create_table,48,localhost,root[root] @ localhost [127.0.0.1],0,127.0.0.1,595_2014-03-24T19:08:38,"CREATE TABLE mytexttable(id   INT NOT NULL,txt  TEXT NOT NULL,PRIMARY KEY (id),FULLTEXT (txt)) ENGINE=MyISAM"
+0,Query,2014-03-25T16:28:52 UTC,create_table,48,localhost,root[root] @ localhost [127.0.0.1],0,127.0.0.1,596_2014-03-24T19:08:38,"CREATE TABLE mytexttable2(  id   INT NOT NULL,  txt  TEXT NOT NULL,  PRIMARY KEY (id),  FULLTEXT (txt)) ENGINE=MyISAM"
 Test case 22 - Search entries of single line log
 STATUS,TIMESTAMP,NAME,SQLTEXT,CONNECTION_ID
 0,2013-04-19T19:11:35,Query,"CREATE TABLE mytexttable(id   INT NOT NULL, txt TEXT NOT NULL, PRIMARY KEY (id), FULLTEXT (txt)) ENGINE=MyISAM",24578
+Test case 22 (NEW) - Search entries of single line log
+STATUS,NAME,TIMESTAMP,COMMAND_CLASS,CONNECTION_ID,HOST,USER,STATUS_CODE,IP,RECORD_ID,SQLTEXT
+0,Query,2014-03-25T16:28:33 UTC,create_table,48,localhost,root[root] @ localhost [127.0.0.1],0,127.0.0.1,595_2014-03-24T19:08:38,"CREATE TABLE mytexttable(id   INT NOT NULL,txt  TEXT NOT NULL,PRIMARY KEY (id),FULLTEXT (txt)) ENGINE=MyISAM"
+0,Query,2014-03-25T16:28:52 UTC,create_table,48,localhost,root[root] @ localhost [127.0.0.1],0,127.0.0.1,596_2014-03-24T19:08:38,"CREATE TABLE mytexttable2(  id   INT NOT NULL,  txt  TEXT NOT NULL,  PRIMARY KEY (id),  FULLTEXT (txt)) ENGINE=MyISAM"
