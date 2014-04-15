@@ -179,8 +179,9 @@ class AuditLogReader(object):
         if new_format:
             # Handle audit record in the new format.
             # Do mandatory fields.
-            record = {field: node.find(field).text
-                      for field in _NEW_MANDATORY_FIELDS}
+            # Note: Use dict constructor for compatibility with Python 2.6.
+            record = dict((field, node.find(field).text)
+                          for field in _NEW_MANDATORY_FIELDS)
             # Do optional fields.
             for field in _NEW_OPTIONAL_FIELDS:
                 field_node = node.find(field)
@@ -189,7 +190,9 @@ class AuditLogReader(object):
         else:
             # Handle audit record in the old format.
             # Do mandatory fields.
-            record = {field: node.get(field) for field in _MANDATORY_FIELDS}
+            # Note: Use dict constructor for compatibility with Python 2.6.
+            record = dict((field, node.get(field))
+                          for field in _MANDATORY_FIELDS)
             # Do optional fields.
             for field in _OPTIONAL_FIELDS:
                 if node.get(field, None):
