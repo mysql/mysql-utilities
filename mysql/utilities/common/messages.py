@@ -87,6 +87,8 @@ PARSE_ERR_OPT_REQ_NON_NEGATIVE_VALUE = ("Option '{opt}' requires a "
 PARSE_ERR_OPT_REQ_GREATER_VALUE = ("Option '{opt}' requires a value greater "
                                    "than {val}.")
 
+PARSE_ERR_OPT_REQ_VALUE = "Option '{opt}' requires a non-empty value."
+
 PARSE_ERR_OPTS_REQ = "Option '{opt}' is required."
 
 PARSE_ERR_OPTS_REQ_BY_CMD = ("'{cmd}' requires the following option(s): "

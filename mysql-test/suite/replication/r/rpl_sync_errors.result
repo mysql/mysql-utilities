@@ -53,3 +53,8 @@ Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]
 
 mysqlrplsync: error: Option '--interval' requires a value greater than zero.
+Test case 13 - value for --exclude cannot be empty.
+Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
+                    [<db_name>[.<tbl_name>]]
+
+mysqlrplsync: error: Option '--exclude' requires a non-empty value.
