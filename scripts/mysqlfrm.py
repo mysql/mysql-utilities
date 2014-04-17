@@ -170,247 +170,259 @@ Enjoy!
 
 """
 
-# Setup the command parser
-program = os.path.basename(sys.argv[0]).replace(".py", "")
-parser = MyParser(
-    version=VERSION_FRM.format(program=program),
-    description=DESCRIPTION,
-    usage=USAGE,
-    add_help_option=False,
-    option_class=CaseInsensitiveChoicesOption,
-    epilog=EXTENDED_HELP,
-    prog=program
-)
+if __name__ == '__main__':
+    # Setup the command parser
+    program = os.path.basename(sys.argv[0]).replace(".py", "")
+    parser = MyParser(
+        version=VERSION_FRM.format(program=program),
+        description=DESCRIPTION,
+        usage=USAGE,
+        add_help_option=False,
+        option_class=CaseInsensitiveChoicesOption,
+        epilog=EXTENDED_HELP,
+        prog=program
+    )
 
-# Add --License option
-parser.add_option("--license", action='callback',
-                  callback=license_callback,
-                  help="display program's license and exit")
+    # Add --License option
+    parser.add_option("--license", action='callback',
+                      callback=license_callback,
+                      help="display program's license and exit")
 
-# Add --help option
-parser.add_option("--help", action="help")
+    # Add --help option
+    parser.add_option("--help", action="help")
 
-# Setup utility-specific options:
+    # Setup utility-specific options:
 
-# Add --basedir option
-parser.add_option("--basedir", action="store", dest="basedir", default=None,
-                  type="string", help="the base directory for the server")
+    # Add --basedir option
+    parser.add_option("--basedir", action="store", dest="basedir",
+                      default=None, type="string",
+                      help="the base directory for the server")
 
-# Add diagnostic mode
-parser.add_option("--diagnostic", action="store_true", dest="diagnostic",
-                  help="read the frm files byte-by-byte to form the "
-                  "CREATE statement. May require the --server or "
-                  "--basedir options to decipher character set information")
-# Add engine
-parser.add_option("--new-storage-engine", action="store", dest="new_engine",
-                  default=None, help="change ENGINE clause to use this "
-                  "engine.")
+    # Add diagnostic mode
+    parser.add_option("--diagnostic", action="store_true", dest="diagnostic",
+                      help="read the frm files byte-by-byte to form the "
+                           "CREATE statement. May require the --server or "
+                           "--basedir options to decipher character set "
+                           "information")
+    # Add engine
+    parser.add_option("--new-storage-engine", action="store",
+                      dest="new_engine", default=None,
+                      help="change ENGINE clause to use this engine.")
 
-# Add frmdir
-parser.add_option("--frmdir", action="store", dest="frmdir", default=None,
-                  help="save the new .frm files in this directory. Used and "
-                       "valid with --new-storage-engine only.")
+    # Add frmdir
+    parser.add_option("--frmdir", action="store", dest="frmdir", default=None,
+                      help="save the new .frm files in this directory. "
+                           "Used and valid with --new-storage-engine only.")
 
-# Need port - only valid with --diagnostic mode
-parser.add_option("--port", action="store", dest="port", help="Port to use "
-                  "for the spawned server.", default=None)
+    # Need port - only valid with --diagnostic mode
+    parser.add_option("--port", action="store", dest="port",
+                      help="Port to use for the spawned server.", default=None)
 
-# Add show-stats
-parser.add_option("--show-stats", "-s", action="store_true", dest="show_stats",
-                  help="show file statistics and general table information.")
+    # Add show-stats
+    parser.add_option("--show-stats", "-s", action="store_true",
+                      dest="show_stats",
+                      help="show file statistics and general table "
+                           "information.")
 
-# Add server option
-parser.add_option("--server", action="store", dest="server", type="string",
-                  default=None, help="connection information for the server in"
-                  " the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
-                  " or <login-path>[:<port>][:<socket>] "
-                  "(optional) - if provided, the storage engine and character "
-                  "set information will be validated against this server.")
+    # Add server option
+    parser.add_option("--server", action="store", dest="server", type="string",
+                      default=None,
+                      help="connection information for the server in the "
+                           "form: <user>[:<password>]@<host>[:<port>]"
+                           "[:<socket>] or <login-path>[:<port>][:<socket>] "
+                           "(optional) - if provided, the storage engine and "
+                           "character set information will be validated "
+                           "against this server.")
 
-# Add user option
-parser.add_option("--user", action="store", dest="user", type="string",
-                  default=None, help="user account to launch spawned server. "
-                  "Required if running as root user. Used only in the "
-                  "default mode.")
+    # Add user option
+    parser.add_option("--user", action="store", dest="user", type="string",
+                      default=None,
+                      help="user account to launch spawned server. Required "
+                           "if running as root user. Used only in the "
+                           "default mode.")
 
-# Add startup timeout
-parser.add_option("--start-timeout", action="store", dest="start_timeout",
-                  type=int, default=10, help="Number of seconds to wait for "
-                  "spawned server to start. Default = 10.")
+    # Add startup timeout
+    parser.add_option("--start-timeout", action="store", dest="start_timeout",
+                      type=int, default=10,
+                      help="Number of seconds to wait for spawned server to "
+                           "start. Default = 10.")
 
-# Add verbosity mode
-add_verbosity(parser, True)
+    # Add verbosity mode
+    add_verbosity(parser, True)
 
-# Now we process the rest of the arguments.
-opt, args = parser.parse_args()
+    # Now we process the rest of the arguments.
+    opt, args = parser.parse_args()
 
-# Check for argument errors
-if not args:
-    parser.error("Nothing to do. You must specify a list of paths or "
-                 "files to read. See --help for more information and "
-                 "examples.")
+    # Check for argument errors
+    if not args:
+        parser.error("Nothing to do. You must specify a list of paths or "
+                     "files to read. See --help for more information and "
+                     "examples.")
 
-if not opt.port and not opt.diagnostic:
-    parser.error("The --port option is required for reading .frm files in "
-                 "the default mode.")
+    if not opt.port and not opt.diagnostic:
+        parser.error("The --port option is required for reading .frm files in "
+                     "the default mode.")
 
-if opt.diagnostic and opt.port:
-    print "# WARNING The --port option is not used in the --diagnostic mode."
+    if opt.diagnostic and opt.port:
+        print("# WARNING The --port option is not used in the "
+              "--diagnostic mode.")
 
-use_port = opt.port
-if not opt.diagnostic and opt.port:
-    try:
-        use_port = int(opt.port)
-    except:
-        parser.error("The --port option requires an integer value.")
+    use_port = opt.port
+    if not opt.diagnostic and opt.port:
+        try:
+            use_port = int(opt.port)
+        except ValueError:
+            parser.error("The --port option requires an integer value.")
 
-# Check for access to basedir if specified
-if opt.basedir:
-    opt.basedir = os.path.expanduser(opt.basedir)
-    if not os.access(opt.basedir, os.R_OK):
-        parser.error("You must have read access to the base directory "
-                     "specified with the --basedir option.")
+    # Check for access to basedir if specified
+    if opt.basedir:
+        opt.basedir = os.path.expanduser(opt.basedir)
+        if not os.access(opt.basedir, os.R_OK):
+            parser.error("You must have read access to the base directory "
+                         "specified with the --basedir option.")
 
-# Warn if both --server and --basedir used
-if opt.server and opt.basedir:
-    print ("# WARNING: The --server option is not needed when the --basedir "
-           "option is used.")
+    # Warn if both --server and --basedir used
+    if opt.server and opt.basedir:
+        print ("# WARNING: The --server option is not needed when the "
+               "--basedir option is used.")
 
-# Warn if --diagnostic and --user
-if opt.diagnostic and opt.user:
-    print ("# WARNING: The --user option is only used for the default mode.")
+    # Warn if --diagnostic and --user
+    if opt.diagnostic and opt.user:
+        print ("# WARNING: The --user option is only used for the default "
+               "mode.")
 
-# Check for --new-storage-engine and --frmdir
-if opt.new_engine:
-    if not opt.frmdir:
-        parser.error("You must specify the --frmdir with "
-                     "--new-storage-engine.")
-    # Check frmdir validity
+    # Check for --new-storage-engine and --frmdir
+    if opt.new_engine:
+        if not opt.frmdir:
+            parser.error("You must specify the --frmdir with "
+                         "--new-storage-engine.")
+        # Check frmdir validity
+        else:
+            if not os.path.exists(opt.frmdir):
+                parser.error("The directory, "
+                             "'{0}' does not exist.".format(opt.frmdir))
+            if not os.access(opt.frmdir, os.R_OK | os.W_OK):
+                parser.error("You must have read and write access to the .frm "
+                             "directory '{0}'.".format(opt.frmdir))
+    elif not opt.new_engine and opt.frmdir:
+        print("# WARNING: --frmdir encountered without --new-storage-engine. "
+              "No .frm files will be saved.")
+
+    server = None
+    if opt.server is None and opt.diagnostic:
+        print("# WARNING: Cannot generate character set or "
+              "collation names without the --server option.")
+
+    # Check start timeout for minimal value
+    if int(opt.start_timeout) < 10:
+        opt.start_timeout = 10
+        print("# WARNING: --start-timeout must be >= 10 seconds. Using "
+              "default value.")
+
+    # Parse source connection values if --server provided
+    if opt.server is not None and not opt.basedir:
+        try:
+            source_values = parse_connection(opt.server, None, {})
+        except FormatError as err:
+            parser.error("Source connection values invalid: %s." % err)
+        except UtilError as err:
+            parser.error("Source connection values invalid: %s." % err.errmsg)
+
+        try:
+            conn_options = {
+                'version': "5.1.30",
+                'quiet': opt.quiet,
+            }
+            servers = connect_servers(source_values, None, conn_options)
+        except UtilError as error:
+            parser.error(error.errmsg)
+        server = servers[0]
+
+        if use_port == int(server.port):
+            parser.error("You must specify a different port to use for the "
+                         "spawned server.")
+
+        basedir = server.show_server_variable("basedir")[0][1]
     else:
-        if not os.path.exists(opt.frmdir):
-            parser.error("The directory, "
-                         "'{0}' does not exist.".format(opt.frmdir))
-        if not os.access(opt.frmdir, os.R_OK | os.W_OK):
-            parser.error("You must have read and write access to the .frm "
-                         "directory '{0}'.".format(opt.frmdir))
-elif not opt.new_engine and opt.frmdir:
-    print("# WARNING: --frmdir encountered without --new-storage-engine. "
-          "No .frm files will be saved.")
+        basedir = opt.basedir
 
-server = None
-if opt.server is None and opt.diagnostic:
-    print("# WARNING: Cannot generate character set or "
-          "collation names without the --server option.")
+    # Set options for frm operations.
+    options = {
+        "basedir": basedir,
+        "new_engine": opt.new_engine,
+        "show_stats": opt.show_stats,
+        "port": use_port,
+        "quiet": opt.quiet,
+        "server": server,
+        "verbosity": opt.verbosity if opt.verbosity else 0,
+        "user": opt.user,
+        "start_timeout": opt.start_timeout,
+        "frm_dir": opt.frmdir,
+    }
 
-# Check start timeout for minimal value
-if int(opt.start_timeout) < 10:
-    opt.start_timeout = 10
-    print("# WARNING: --start-timeout must be >= 10 seconds. Using "
-          "default value.")
-
-# Parse source connection values if --server provided
-if opt.server is not None and not opt.basedir:
-    try:
-        source_values = parse_connection(opt.server, None, {})
-    except FormatError as err:
-        parser.error("Source connection values invalid: %s." % err)
-    except UtilError as err:
-        parser.error("Source connection values invalid: %s." % err.errmsg)
-
-    try:
-        conn_options = {
-            'version': "5.1.30",
-            'quiet': opt.quiet,
-        }
-        servers = connect_servers(source_values, None, conn_options)
-    except UtilError as error:
-        parser.error(error.errmsg)
-    server = servers[0]
-
-    if use_port == int(server.port):
-        parser.error("You must specify a different port to use for the "
-                     "spawned server.")
-
-    basedir = server.show_server_variable("basedir")[0][1]
-else:
-    basedir = opt.basedir
-
-# Set options for frm operations.
-options = {
-    "basedir": basedir,
-    "new_engine": opt.new_engine,
-    "show_stats": opt.show_stats,
-    "port": use_port,
-    "quiet": opt.quiet,
-    "server": server,
-    "verbosity": opt.verbosity if opt.verbosity else 0,
-    "user": opt.user,
-    "start_timeout": opt.start_timeout,
-    "frm_dir": opt.frmdir,
-}
-
-# Print disclaimer banner for diagnostic mode
-if opt.diagnostic:
-    print ("# CAUTION: The diagnostic mode is a best-effort parse of the "
-           ".frm file. As such, it may not identify all of the components "
-           "of the table correctly. This is especially true for damaged "
-           "files. It will also not read the default values for the columns "
-           "and the resulting statement may not be syntactically correct.")
-
-if os.name == "posix":
-    if os.getuid() == 0 and not opt.diagnostic and not opt.user:
-        parser.error("Running a spawned server as root is not advised. If "
-                     "you want to run the utility as root, please provide "
-                     "the --user option to specify a user to use to launch "
-                     "the server. Example: --user=mysql.")
-
-all_frm_files = []
-for arg in args:
-    frm_files_found = []
-
-    # check to see if we have access iff it is not in the form of
-    # db:table.frm, but watchout for Windows paths!
-    if (os.name != "nt" and ":" not in arg) or \
-       (os.name == "nt" and len(arg) >= 2 and ":" not in arg[2:]):
-        if not os.access(arg, os.R_OK):
-            print ("ERROR: Cannot read %s. You must have read privileges"
-                   " to the file or path and it must exist. Skipping "
-                   "this argument." % arg)
-            continue
-
-    # if argument is a folder, get all files from the folder and read them
-    if os.path.isdir(arg):
-        files = os.listdir(arg)
-        for filename in files:
-            if os.path.splitext(filename)[1].lower() == ".frm":
-                frm_files_found.append(os.path.join(arg, filename))
-    else:
-        frm_files_found.append(arg)
-
-    if not frm_files_found:
-        print "# NOTE: No .frm files found in folder %s." % arg
-        continue
-    all_frm_files.extend(frm_files_found)
-
-# For each file specified, attempt to read the .frm file
-try:
-    all_frm_files.sort()
+    # Print disclaimer banner for diagnostic mode
     if opt.diagnostic:
-        read_frm_files_diagnostic(all_frm_files, options)
-    else:
-        failed = read_frm_files(all_frm_files, options)
-        if failed:
-            print ("#\n# WARNING: The following files could not be read. "
-                   "You can try the --diagnostic mode to read these "
-                   "files.\n#")
-            for frm_file in failed:
-                print "#", frm_file
-            print "#"
-except UtilError as error:
-    print "ERROR:", error.errmsg
-    sys.exit(1)
+        print ("# CAUTION: The diagnostic mode is a best-effort parse of the "
+               ".frm file. As such, it may not identify all of the components "
+               "of the table correctly. This is especially true for damaged "
+               "files. It will also not read the default values for the "
+               "columns and the resulting statement may not be syntactically "
+               "correct.")
 
-if not opt.quiet:
-    print "#...done."
+    if os.name == "posix":
+        if os.getuid() == 0 and not opt.diagnostic and not opt.user:
+            parser.error("Running a spawned server as root is not advised. If "
+                         "you want to run the utility as root, please provide "
+                         "the --user option to specify a user to use to "
+                         "launch the server. Example: --user=mysql.")
 
-sys.exit()
+    all_frm_files = []
+    for arg in args:
+        frm_files_found = []
+
+        # check to see if we have access iff it is not in the form of
+        # db:table.frm, but watchout for Windows paths!
+        if (os.name != "nt" and ":" not in arg) or \
+           (os.name == "nt" and len(arg) >= 2 and ":" not in arg[2:]):
+            if not os.access(arg, os.R_OK):
+                print ("ERROR: Cannot read %s. You must have read privileges"
+                       " to the file or path and it must exist. Skipping "
+                       "this argument." % arg)
+                continue
+
+        # if argument is a folder, get all files from the folder and read them
+        if os.path.isdir(arg):
+            files = os.listdir(arg)
+            for filename in files:
+                if os.path.splitext(filename)[1].lower() == ".frm":
+                    frm_files_found.append(os.path.join(arg, filename))
+        else:
+            frm_files_found.append(arg)
+
+        if not frm_files_found:
+            print "# NOTE: No .frm files found in folder %s." % arg
+            continue
+        all_frm_files.extend(frm_files_found)
+
+    # For each file specified, attempt to read the .frm file
+    try:
+        all_frm_files.sort()
+        if opt.diagnostic:
+            read_frm_files_diagnostic(all_frm_files, options)
+        else:
+            failed = read_frm_files(all_frm_files, options)
+            if failed:
+                print ("#\n# WARNING: The following files could not be read. "
+                       "You can try the --diagnostic mode to read these "
+                       "files.\n#")
+                for frm_file in failed:
+                    print "#", frm_file
+                print "#"
+    except UtilError as error:
+        print "ERROR: {0}".format(error.errmsg)
+        sys.exit(1)
+
+    if not opt.quiet:
+        print "#...done."
+
+    sys.exit()

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,105 +49,113 @@ PRINT_WIDTH = 75
 if not check_connector_python():
     sys.exit(1)
 
-# Setup the command parser
-parser = setup_common_options(os.path.basename(sys.argv[0]),
-                              DESCRIPTION, USAGE, True, False)
+if __name__ == '__main__':
+    # Setup the command parser
+    parser = setup_common_options(os.path.basename(sys.argv[0]),
+                                  DESCRIPTION, USAGE, True, False)
 
-# Setup utility-specific options:
+    # Setup utility-specific options:
 
-# Connection information for the source server
-parser.add_option("--master", action="store", dest="master",
-                  type="string", default="root@localhost:3306",
-                  help="connection information for master server in "
-                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
-                  " or <login-path>[:<port>][:<socket>].")
+    # Connection information for the source server
+    parser.add_option("--master", action="store", dest="master",
+                      type="string", default="root@localhost:3306",
+                      help="connection information for master server in the "
+                           "form: <user>[:<password>]@<host>[:<port>]"
+                           "[:<socket>] or <login-path>[:<port>][:<socket>].")
 
-# Show graph option
-parser.add_option("-l", "--show-list", action="store_true", dest="show_list",
-                  help="print a list of the topology.", default=False)
+    # Show graph option
+    parser.add_option("-l", "--show-list", action="store_true",
+                      dest="show_list",
+                      help="print a list of the topology.",
+                      default=False)
 
-# Output format
-add_format_option(parser, "display the list in either grid (default), "
-                  "tab, csv, or vertical format", "grid")
+    # Output format
+    add_format_option(parser, "display the list in either grid (default), "
+                      "tab, csv, or vertical format", "grid")
 
-# Check slaves option - if True, recurse slaves from master to find
-# additional master/slave connections
-parser.add_option("-r", "--recurse", action="store_true",
-                  dest="recurse",
-                  help="traverse the list of slaves to find additional "
-                  "master/slave connections. User this option to map a "
-                  "replication topology.", default=False)
+    # Check slaves option - if True, recurse slaves from master to find
+    # additional master/slave connections
+    parser.add_option("-r", "--recurse", action="store_true",
+                      dest="recurse",
+                      help="traverse the list of slaves to find additional "
+                      "master/slave connections. User this option to map a "
+                      "replication topology.", default=False)
 
-# Add limit for recursion
-parser.add_option("--max-depth", action="store", default=None, type="int",
-                  help="limit the traversal to this depth. Valid only with "
-                  "the --recurse option. Valid values are non-negative "
-                  "integers.", dest="max_depth")
+    # Add limit for recursion
+    parser.add_option("--max-depth", action="store", default=None, type="int",
+                      help="limit the traversal to this depth. Valid only "
+                           "with the --recurse option. Valid values are "
+                           "non-negative integers.",
+                      dest="max_depth")
 
-# Prompt for slave connections if default login/password fail
-parser.add_option("-p", "--prompt", action="store_true", dest="prompt",
-                  help="prompt for slave user and password if different from "
-                  "master login.", default=False)
+    # Prompt for slave connections if default login/password fail
+    parser.add_option("-p", "--prompt", action="store_true", dest="prompt",
+                      help="prompt for slave user and password if different "
+                           "from master login.",
+                      default=False)
 
-# Number of retries for failed slave login
-parser.add_option("-n", "--num-retries", action="store", dest="num_retries",
-                  type="int", help="number of retries allowed for failed "
-                  "slave login attempt. Valid with --prompt only.",
-                  default=0)
+    # Number of retries for failed slave login
+    parser.add_option("-n", "--num-retries", action="store",
+                      dest="num_retries", type="int",
+                      help="number of retries allowed for failed slave login "
+                           "attempt. Valid with --prompt only.",
+                      default=0)
 
-# Add verbosity mode and quiet option
-add_verbosity(parser, True)
+    # Add verbosity mode and quiet option
+    add_verbosity(parser, True)
 
-parser.add_option("--discover-slaves-login", action="store", dest="discover",
-                  default=None, type="string", help="at startup, query "
-                  "master for all registered slaves and use the user name "
-                  "and password specified to connect. Supply the user and "
-                  "password in the form <user>[:<password>] or <login-path>. "
-                  "For example, --discover-slaves-login=joe:secret will use "
-                  "'joe' as the user and 'secret' as the password for each "
-                  "discovered slave.")
+    parser.add_option("--discover-slaves-login", action="store",
+                      dest="discover", default=None, type="string",
+                      help="at startup, query master for all registered "
+                           "slaves and use the user name and password "
+                           "specified to connect. Supply the user and "
+                           "password in the form <user>[:<password>] or "
+                           "<login-path>. For example, --discover-slaves-"
+                           "login=joe:secret will use 'joe' as the user and "
+                           "'secret' as the password for each discovered "
+                           "slave.")
 
-# Now we process the rest of the arguments.
-opt, args = parser.parse_args()
+    # Now we process the rest of the arguments.
+    opt, args = parser.parse_args()
 
-# Fail is --discover-slaves-login not specified
-if opt.discover is None:
-    parser.error("The --discover-slaves-login is required to test slave "
-                 "connectivity.")
+    # Fail is --discover-slaves-login not specified
+    if opt.discover is None:
+        parser.error("The --discover-slaves-login is required to test slave "
+                     "connectivity.")
 
-# Fail if recurse specified and max-depth is invalid
-if opt.recurse and opt.max_depth is not None:
-    if opt.max_depth < 0:
-        parser.error("The --max-depth option needs to be >= 0.")
+    # Fail if recurse specified and max-depth is invalid
+    if opt.recurse and opt.max_depth is not None:
+        if opt.max_depth < 0:
+            parser.error("The --max-depth option needs to be >= 0.")
 
-# Parse master connection values
-try:
-    m_values = parse_connection(opt.master, None, opt)
-except FormatError:
-    _, err, _ = sys.exc_info()
-    parser.error("Master connection values invalid: %s." % err)
-except UtilError:
-    _, err, _ = sys.exc_info()
-    parser.error("Master connection values invalid: %s." % err.errmsg)
+    # Parse master connection values
+    try:
+        m_values = parse_connection(opt.master, None, opt)
+    except FormatError:
+        _, err, _ = sys.exc_info()
+        parser.error("Master connection values invalid: %s." % err)
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        parser.error("Master connection values invalid: %s." % err.errmsg)
 
-# Create dictionary of options
-options = {
-    'quiet': opt.quiet,
-    'prompt': opt.prompt,
-    'num_retries': opt.num_retries,
-    'recurse': opt.recurse,
-    'show_list': opt.show_list,
-    'format': opt.format,
-    'max_depth': opt.max_depth,
-    'discover': opt.discover,
-    'verbosity': opt.verbosity
-}
+    # Create dictionary of options
+    options = {
+        'quiet': opt.quiet,
+        'prompt': opt.prompt,
+        'num_retries': opt.num_retries,
+        'recurse': opt.recurse,
+        'show_list': opt.show_list,
+        'format': opt.format,
+        'max_depth': opt.max_depth,
+        'discover': opt.discover,
+        'verbosity': opt.verbosity
+    }
 
-try:
-    show_topology(m_values, options)
-except UtilError:
-    _, e, _ = sys.exc_info()
-    print("ERROR: %s" % e.errmsg)
-    sys.exit(1)
+    try:
+        show_topology(m_values, options)
+    except UtilError:
+        _, e, _ = sys.exc_info()
+        print("ERROR: {0}".format(e.errmsg))
+        sys.exit(1)
 
-sys.exit()
+    sys.exit()

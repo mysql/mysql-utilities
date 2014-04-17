@@ -224,4 +224,5 @@ class test(diskusage_basic.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        return diskusage_basic.test.cleanup(self)
+        return (self.drop_db(self.server1, "strange.`name") and
+                diskusage_basic.test.cleanup(self))

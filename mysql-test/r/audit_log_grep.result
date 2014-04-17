@@ -15,7 +15,7 @@ Test case 1 - Show the help
                         date/time. If not specified or the value is 0, all
                         entries from the start of the log are displayed.
                         Accepted formats: yyyy-mm-ddThh:mm:ss or yyyy-mm-dd.
-  --end-date=END_DATE   retrieve log entries until the specified date/time.If
+  --end-date=END_DATE   retrieve log entries until the specified date/time. If
                         not specified or the value is 0, all entries to the
                         end of the log are displayed. Accepted formats: yyyy-
                         mm-ddThh:mm:ss or yyyy-mm-dd.

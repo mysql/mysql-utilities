@@ -58,304 +58,313 @@ _DATE_LEN = 22
 if not check_connector_python():
     sys.exit(1)
 
-# Setup a terminal signal handler for SIGNIT
-# Must use SetConsoleCtrlHandler function on Windows!
-# If posix, save old terminal settings so we can restore them on exit.
-try:
-    # Only valid for *nix systems.
-    import termios
-    old_terminal_settings = termios.tcgetattr(sys.stdin)
-except:
-    # Ok to fail for Windows
-    pass
+if __name__ == '__main__':
+    # Setup a terminal signal handler for SIGNIT
+    # Must use SetConsoleCtrlHandler function on Windows!
+    # If posix, save old terminal settings so we can restore them on exit.
+    try:
+        # Only valid for *nix systems.
+        import termios
+        old_terminal_settings = termios.tcgetattr(sys.stdin)
+    except:
+        # Ok to fail for Windows
+        pass
 
-
-def set_signal_handler(func):
-    """Set the signal handler.
-    """
-    # If posix, restore old terminal settings.
-    if os.name == "nt":
-        from ctypes import windll
-        windll.kernel32.SetConsoleCtrlHandler(func, True)
-    # Install SIGTERM signal handler
-    else:
-        signal.signal(signal.SIGTERM, func)
-
-# If ctypes present, we have Windows so define the exit with decorators
-try:
-    import ctypes
-
-    @ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_uint)
-    def on_exit(signal, func=None):
-        """Override the on_exit callback.
+    def set_signal_handler(func):
+        """Set the signal handler.
         """
-        logging.info("Failover console stopped with SIGTERM.")
-        sys.exit(0)
-except:
-    def on_exit(signal, func=None):
-        """Override the on_exit callback.
-        """
-        if os.name == "posix":
-            termios.tcsetattr(sys.stdin, termios.TCSADRAIN,
-                              old_terminal_settings)
-        logging.info("Failover console stopped with SIGTERM.")
-        sys.exit(0)
-
-set_signal_handler(on_exit)
-
-# Setup the command parser
-program = os.path.basename(sys.argv[0]).replace(".py", "")
-parser = UtilitiesParser(
-    version=VERSION_FRM.format(program=program),
-    description=DESCRIPTION,
-    usage=USAGE,
-    add_help_option=False,
-    prog=program
-)
-
-# Default option to provide help information
-parser.add_option("--help", action="help", help="display this help message "
-                  "and exit")
-
-# Add --License option
-parser.add_option("--license", action='callback',
-                  callback=license_callback,
-                  help="display program's license and exit")
-
-# Setup utility-specific options:
-add_failover_options(parser)
-
-# Interval for continuous mode
-parser.add_option("--interval", "-i", action="store", dest="interval",
-                  type="int", default="15", help="interval in seconds for "
-                  "polling the master for failure and reporting health. "
-                  "Default = 15 seconds. Lowest value is 5 seconds.")
-
-# Add failover modes
-parser.add_option("--failover-mode", "-f", action="store",
-                  dest="failover_mode", type="choice", default="auto",
-                  choices=["auto", "elect", "fail"],
-                  help="action to take when the master "
-                  "fails. 'auto' = automatically fail to best slave, "
-                  "'elect' = fail to candidate list or if no candidate meets "
-                  "criteria fail, 'fail' = take no action and stop when "
-                  "master fails. Default = 'auto'.")
-
-# Add failover detection extension point
-parser.add_option("--exec-fail-check", action="store", dest="exec_fail",
-                  type="string", default=None, help="name of script to "
-                  "execute on each interval to invoke failover")
-
-# Add force to override registry entry
-parser.add_option("--force", action="store_true", dest="force", default=False,
-                  help="override the registration check on master for "
-                  "multiple instances of the console monitoring the same "
-                  "master.")
-
-# Add refresh script external point
-parser.add_option("--exec-post-failover", action="store",
-                  dest="exec_post_fail", type="string", default=None,
-                  help="name of script to execute after failover is complete "
-                  "and the utility has refreshed the health report.")
-
-
-# Add rediscover on interval
-parser.add_option("--rediscover", action="store_true", dest="rediscover",
-                  help="rediscover slaves on interval. Allows console to "
-                  "detect when slaves have been removed or added.")
-
-# Pedantic mode for failing if some inconsistencies are found
-parser.add_option("-p", "--pedantic", action="store_true", default=False,
-                  dest="pedantic", help="fail if some inconsistencies are "
-                  "found (e.g. errant transactions on slaves).")
-
-# Add no keyboard input
-parser.add_option("--no-keyboard", action="store_true", default=False,
-                  dest="no_keyboard", help="start with no keyboard input "
-                  "support.")
-
-# Add option to run as daemon
-parser.add_option("--daemon", action="store", dest="daemon", default=None,
-                  help="run on daemon mode. It can be start, stop, restart "
-                  "or nodetach.",
-                  type="choice", choices=("start", "stop", "restart",
-                                          "nodetach"))
-
-# Add pidfile for the daemon option
-parser.add_option("--pidfile", action="store", dest="pidfile",
-                  type="string", default=None, help="pidfile for running "
-                  "mysqlfailover as a daemon.")
-
-# Add report values for daemon mode
-parser.add_option("--report-values", action="store", dest="report_values",
-                  type="string", default="health",
-                  help="report values used in mysqlfailover running as a "
-                  "daemon. It can be health, gtid or uuid. Multiple values "
-                  "can be used separated by commas. The default is health.")
-
-# Add verbosity mode
-add_verbosity(parser, False)
-
-# Replication user and password
-add_rpl_user(parser, None)
-
-# Now we process the rest of the arguments.
-opt, args = parser.parse_args()
-
-# Check slaves list
-if opt.daemon != "stop":
-    check_server_lists(parser, opt.master, opt.slaves)
-
-# Check for errors
-if int(opt.interval) < 5:
-    parser.error("The --interval option requires a value greater than or "
-                 "equal to 5.")
-
-# The value for --timeout needs to be an integer > 0.
-try:
-    if int(opt.timeout) <= 0:
-        parser.error("The --timeout option requires a value greater than 0.")
-except ValueError:
-    parser.error("The --timeout option requires an integer value.")
-
-# if opt.master is None and opt.daemon and opt.daemon != "stop":
-if opt.master is None and opt.daemon != "stop":
-    parser.error("You must specify a master to monitor.")
-
-if opt.slaves is None and opt.discover is None and opt.daemon != "stop":
-    parser.error("You must supply a list of slaves or the "
-                 "--discover-slaves-login option.")
-
-if opt.failover_mode == 'elect' and opt.candidates is None:
-    parser.error("Failover mode = 'elect' requires at least one candidate.")
-
-# Parse the master, slaves, and candidates connection parameters
-try:
-    master_val, slaves_val, candidates_val = parse_topology_connections(opt)
-except UtilRplError:
-    _, e, _ = sys.exc_info()
-    print("ERROR: %s" % e.errmsg)
-    sys.exit(1)
-
-# Check hostname alias
-for slave_val in slaves_val:
-    if check_hostname_alias(master_val, slave_val):
-        parser.error("The master and one of the slaves are the same host and "
-                     "port.")
-for cand_val in candidates_val:
-    if check_hostname_alias(master_val, cand_val):
-        parser.error("The master and one of the candidates are the same host "
-                     "and port.")
-
-# Create dictionary of options
-options = {
-    'candidates': candidates_val,
-    'ping': 3 if opt.ping is None else opt.ping,
-    'verbosity': 0 if opt.verbosity is None else opt.verbosity,
-    'before': opt.exec_before,
-    'after': opt.exec_after,
-    'fail_check': opt.exec_fail,
-    'max_position': opt.max_position,
-    'max_delay': opt.max_delay,
-    'discover': opt.discover,
-    'timeout': int(opt.timeout),
-    'interval': opt.interval,
-    'failover_mode': opt.failover_mode,
-    'logging': opt.log_file is not None,
-    'log_file': opt.log_file,
-    'force': opt.force,
-    'post_fail': opt.exec_post_fail,
-    'rpl_user': opt.rpl_user,
-    'rediscover': opt.rediscover,
-    'pedantic': opt.pedantic,
-    'no_keyboard': opt.no_keyboard,
-    'daemon': opt.daemon,
-    'pidfile': opt.pidfile,
-    'report_values': opt.report_values,
-    'script_threshold': opt.script_threshold,
-}
-
-# Purge log file of old data
-if opt.log_file is not None and not purge_log(opt.log_file, opt.log_age):
-    parser.error("Error purging log file.")
-
-# Setup log file
-logging.basicConfig(filename=opt.log_file, level=logging.INFO,
-                    format='%(asctime)s %(levelname)s %(message)s',
-                    datefmt=_DATE_FORMAT)
-
-# Warn user about script threshold checking.
-if opt.script_threshold:
-    print(SCRIPT_THRESHOLD_WARNING)
-
-# Check if the values specified for the --report-values option are valid.
-for report in opt.report_values.split(','):
-    if report.lower() not in ("health", "gtid", "uuid"):
-        parser.error("The value for the option --report-values is not valid: "
-                     "'{0}', the values allowed are 'health', 'gitd' or 'uuid'"
-                     "".format(opt.report_values))
-
-# Check the daemon options
-if opt.daemon:
-    # Check if a POSIX system
-    if os.name != "posix":
-        parser.error("Running mysqlfailover with --daemon is only available "
-                     "for POSIX systems.")
-
-    # Check the presence of --log
-    if opt.daemon != "stop" and not opt.log_file:
-        parser.error("The option --log is required when using --daemon.")
-
-    # Test pidfile
-    if opt.daemon != "nodetach":
-        pidfile = opt.pidfile or "./failover_daemon.pid"
-        pidfile = os.path.realpath(os.path.normpath(pidfile))
-        if opt.daemon == "start":
-            # Test if pidfile exists
-            if os.path.exists(pidfile):
-                parser.error("pidfile {0} already exists. The daemon is "
-                             "already running?".format(pidfile))
-            # Test if pidfile is writable
-            try:
-                with open(pidfile, "w") as f:
-                    f.write("{0}\n".format(0))
-                # Delete temporary pidfile
-                os.remove(pidfile)
-            except IOError as err:
-                parser.error("Unable to write pidfile: {0}"
-                             "".format(err.strerror))
+        # If posix, restore old terminal settings.
+        if os.name == "nt":
+            from ctypes import windll
+            windll.kernel32.SetConsoleCtrlHandler(func, True)
+        # Install SIGTERM signal handler
         else:
-            # opt.daemon == stop/restart, test if pidfile is readable
-            pid = None
-            try:
-                if not os.path.exists(pidfile):
-                    parser.error("pidfile {0} does not exist.".format(pidfile))
-                with open(pidfile, "r") as f:
-                    pid = int(f.read().strip())
-            except IOError:
-                pid = None
-            except ValueError:
-                pid = None
-            # Test pid presence
-            if not pid:
-                parser.error("Can not read pid from pidfile.")
+            signal.signal(signal.SIGTERM, func)
 
-if opt.pidfile and not opt.daemon:
-    parser.error("The option --daemon is required when using --pidfile.")
+    # If ctypes present, we have Windows so define the exit with decorators
+    try:
+        import ctypes
 
-try:
-    rpl_cmds = RplCommands(master_val, slaves_val, options)
+        @ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_uint)
+        def on_exit(signal, func=None):
+            """Override the on_exit callback.
+            """
+            logging.info("Failover console stopped with SIGTERM.")
+            sys.exit(0)
+    except:
+        def on_exit(signal, func=None):
+            """Override the on_exit callback.
+            """
+            if os.name == "posix":
+                termios.tcsetattr(sys.stdin, termios.TCSADRAIN,
+                                  old_terminal_settings)
+            logging.info("Failover console stopped with SIGTERM.")
+            sys.exit(0)
+
+    set_signal_handler(on_exit)
+
+    # Setup the command parser
+    program = os.path.basename(sys.argv[0]).replace(".py", "")
+    parser = UtilitiesParser(
+        version=VERSION_FRM.format(program=program),
+        description=DESCRIPTION,
+        usage=USAGE,
+        add_help_option=False,
+        prog=program
+    )
+
+    # Default option to provide help information
+    parser.add_option("--help", action="help",
+                      help="display this help message and exit")
+
+    # Add --License option
+    parser.add_option("--license", action='callback',
+                      callback=license_callback,
+                      help="display program's license and exit")
+
+    # Setup utility-specific options:
+    add_failover_options(parser)
+
+    # Interval for continuous mode
+    parser.add_option("--interval", "-i", action="store", dest="interval",
+                      type="int", default="15",
+                      help="interval in seconds for polling the master for "
+                           "failure and reporting health. Default = 15 "
+                           "seconds. Lowest value is 5 seconds.")
+
+    # Add failover modes
+    parser.add_option("--failover-mode", "-f", action="store",
+                      dest="failover_mode", type="choice", default="auto",
+                      choices=["auto", "elect", "fail"],
+                      help="action to take when the master fails. 'auto' = "
+                           "automatically fail to best slave, 'elect' = fail "
+                           "to candidate list or if no candidate meets "
+                           "criteria fail, 'fail' = take no action and stop "
+                           "when master fails. Default = 'auto'.")
+
+    # Add failover detection extension point
+    parser.add_option("--exec-fail-check", action="store", dest="exec_fail",
+                      type="string", default=None,
+                      help="name of script to execute on each interval "
+                           "to invoke failover")
+
+    # Add force to override registry entry
+    parser.add_option("--force", action="store_true", dest="force",
+                      default=False,
+                      help="override the registration check on master for "
+                           "multiple instances of the console monitoring the "
+                           "same master.")
+
+    # Add refresh script external point
+    parser.add_option("--exec-post-failover", action="store",
+                      dest="exec_post_fail", type="string", default=None,
+                      help="name of script to execute after failover is "
+                           "complete and the utility has refreshed the "
+                           "health report.")
+
+    # Add rediscover on interval
+    parser.add_option("--rediscover", action="store_true", dest="rediscover",
+                      help="rediscover slaves on interval. Allows console to "
+                           "detect when slaves have been removed or added.")
+
+    # Pedantic mode for failing if some inconsistencies are found
+    parser.add_option("-p", "--pedantic", action="store_true", default=False,
+                      dest="pedantic",
+                      help="fail if some inconsistencies are found (e.g. "
+                           "errant transactions on slaves).")
+
+    # Add no keyboard input
+    parser.add_option("--no-keyboard", action="store_true", default=False,
+                      dest="no_keyboard",
+                      help="start with no keyboard input support.")
+
+    # Add option to run as daemon
+    parser.add_option("--daemon", action="store", dest="daemon", default=None,
+                      help="run on daemon mode. It can be start, stop, "
+                           "restart or nodetach.",
+                      type="choice",
+                      choices=("start", "stop", "restart", "nodetach"))
+
+    # Add pidfile for the daemon option
+    parser.add_option("--pidfile", action="store", dest="pidfile",
+                      type="string", default=None,
+                      help="pidfile for running mysqlfailover as a daemon.")
+
+    # Add report values for daemon mode
+    parser.add_option("--report-values", action="store", dest="report_values",
+                      type="string", default="health",
+                      help="report values used in mysqlfailover running as a "
+                           "daemon. It can be health, gtid or uuid. Multiple "
+                           "values can be used separated by commas. The "
+                           "default is health.")
+
+    # Add verbosity mode
+    add_verbosity(parser, False)
+
+    # Replication user and password
+    add_rpl_user(parser, None)
+
+    # Now we process the rest of the arguments.
+    opt, args = parser.parse_args()
+
+    # Check slaves list
+    if opt.daemon != "stop":
+        check_server_lists(parser, opt.master, opt.slaves)
+
+    # Check for errors
+    if int(opt.interval) < 5:
+        parser.error("The --interval option requires a value greater than or "
+                     "equal to 5.")
+
+    # The value for --timeout needs to be an integer > 0.
+    try:
+        if int(opt.timeout) <= 0:
+            parser.error("The --timeout option requires a value greater "
+                         "than 0.")
+    except ValueError:
+        parser.error("The --timeout option requires an integer value.")
+
+    # if opt.master is None and opt.daemon and opt.daemon != "stop":
+    if opt.master is None and opt.daemon != "stop":
+        parser.error("You must specify a master to monitor.")
+
+    if opt.slaves is None and opt.discover is None and opt.daemon != "stop":
+        parser.error("You must supply a list of slaves or the "
+                     "--discover-slaves-login option.")
+
+    if opt.failover_mode == 'elect' and opt.candidates is None:
+        parser.error("Failover mode = 'elect' requires at least one "
+                     "candidate.")
+
+    # Parse the master, slaves, and candidates connection parameters
+    try:
+        master_val, slaves_val, candidates_val = parse_topology_connections(
+            opt)
+    except UtilRplError:
+        _, e, _ = sys.exc_info()
+        print("ERROR: {0}".format(e.errmsg))
+        sys.exit(1)
+
+    # Check hostname alias
+    for slave_val in slaves_val:
+        if check_hostname_alias(master_val, slave_val):
+            parser.error("The master and one of the slaves are the same "
+                         "host and port.")
+    for cand_val in candidates_val:
+        if check_hostname_alias(master_val, cand_val):
+            parser.error("The master and one of the candidates are the same "
+                         "host and port.")
+
+    # Create dictionary of options
+    options = {
+        'candidates': candidates_val,
+        'ping': 3 if opt.ping is None else opt.ping,
+        'verbosity': 0 if opt.verbosity is None else opt.verbosity,
+        'before': opt.exec_before,
+        'after': opt.exec_after,
+        'fail_check': opt.exec_fail,
+        'max_position': opt.max_position,
+        'max_delay': opt.max_delay,
+        'discover': opt.discover,
+        'timeout': int(opt.timeout),
+        'interval': opt.interval,
+        'failover_mode': opt.failover_mode,
+        'logging': opt.log_file is not None,
+        'log_file': opt.log_file,
+        'force': opt.force,
+        'post_fail': opt.exec_post_fail,
+        'rpl_user': opt.rpl_user,
+        'rediscover': opt.rediscover,
+        'pedantic': opt.pedantic,
+        'no_keyboard': opt.no_keyboard,
+        'daemon': opt.daemon,
+        'pidfile': opt.pidfile,
+        'report_values': opt.report_values,
+        'script_threshold': opt.script_threshold,
+    }
+
+    # Purge log file of old data
+    if opt.log_file is not None and not purge_log(opt.log_file, opt.log_age):
+        parser.error("Error purging log file.")
+
+    # Setup log file
+    logging.basicConfig(filename=opt.log_file, level=logging.INFO,
+                        format='%(asctime)s %(levelname)s %(message)s',
+                        datefmt=_DATE_FORMAT)
+
+    # Warn user about script threshold checking.
+    if opt.script_threshold:
+        print(SCRIPT_THRESHOLD_WARNING)
+
+    # Check if the values specified for the --report-values option are valid.
+    for report in opt.report_values.split(','):
+        if report.lower() not in ("health", "gtid", "uuid"):
+            parser.error("The value for the option --report-values is not "
+                         "valid: '{0}', the values allowed are 'health', "
+                         "'gitd' or 'uuid'".format(opt.report_values))
+
+    # Check the daemon options
     if opt.daemon:
-        rpl_cmds.auto_failover_as_daemon()
-    else:
-        rpl_cmds.auto_failover(opt.interval)
-except UtilError:
-    _, e, _ = sys.exc_info()
-    # log the error in case it was an usual exception
-    logging.log(logging.CRITICAL, e.errmsg.strip(' '))
-    print("ERROR: %s" % e.errmsg)
-    sys.exit(1)
-except KeyboardInterrupt:
-    sys.exit(0)
+        # Check if a POSIX system
+        if os.name != "posix":
+            parser.error("Running mysqlfailover with --daemon is only "
+                         "available for POSIX systems.")
 
-sys.exit(0)
+        # Check the presence of --log
+        if opt.daemon != "stop" and not opt.log_file:
+            parser.error("The option --log is required when using --daemon.")
+
+        # Test pidfile
+        if opt.daemon != "nodetach":
+            pidfile = opt.pidfile or "./failover_daemon.pid"
+            pidfile = os.path.realpath(os.path.normpath(pidfile))
+            if opt.daemon == "start":
+                # Test if pidfile exists
+                if os.path.exists(pidfile):
+                    parser.error("pidfile {0} already exists. The daemon is "
+                                 "already running?".format(pidfile))
+                # Test if pidfile is writable
+                try:
+                    with open(pidfile, "w") as f:
+                        f.write("{0}\n".format(0))
+                    # Delete temporary pidfile
+                    os.remove(pidfile)
+                except IOError as err:
+                    parser.error("Unable to write pidfile: {0}"
+                                 "".format(err.strerror))
+            else:
+                # opt.daemon == stop/restart, test if pidfile is readable
+                pid = None
+                try:
+                    if not os.path.exists(pidfile):
+                        parser.error("pidfile {0} does not exist.".format(
+                            pidfile))
+                    with open(pidfile, "r") as f:
+                        pid = int(f.read().strip())
+                except IOError:
+                    pid = None
+                except ValueError:
+                    pid = None
+                # Test pid presence
+                if not pid:
+                    parser.error("Can not read pid from pidfile.")
+
+    if opt.pidfile and not opt.daemon:
+        parser.error("The option --daemon is required when using --pidfile.")
+
+    try:
+        rpl_cmds = RplCommands(master_val, slaves_val, options)
+        if opt.daemon:
+            rpl_cmds.auto_failover_as_daemon()
+        else:
+            rpl_cmds.auto_failover(opt.interval)
+    except UtilError:
+        _, e, _ = sys.exc_info()
+        # log the error in case it was an usual exception
+        logging.log(logging.CRITICAL, e.errmsg.strip(' '))
+        print("ERROR: %s" % e.errmsg)
+        sys.exit(1)
+    except KeyboardInterrupt:
+        sys.exit(0)
+
+    sys.exit(0)
