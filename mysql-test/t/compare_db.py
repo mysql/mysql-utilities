@@ -460,6 +460,23 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Clone inventory database with a different name
+        cmd = ("mysqldbcopy.py --skip-gtid --source={0} --destination={1} {2}"
+               "".format(self.build_connection_string(self.server1),
+                         self.build_connection_string(self.server2),
+                         "inventory:inventory_clone"))
+        res = self.exec_util(cmd, self.res_fname)
+        if res:
+            raise MUTLibError("'{0}' failed. Return code: {1}"
+                              "".format(cmd, res))
+        test_num += 1
+        comment = ("Test case {0} - compare two equal databases with "
+                   "different names (including VIEWS)").format(test_num)
+        cmd = "{0} inventory:inventory_clone -a".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.do_replacements()
 
         return True
@@ -496,6 +513,7 @@ class test(mutlib.System_test):
         self.drop_db(self.server1, "inventory1")
         self.drop_db(self.server1, "inventory2")
         self.drop_db(self.server2, "inventory")
+        self.drop_db(self.server2, "inventory_clone")
         self.drop_db(self.server1, 'db.`:db')
         self.drop_db(self.server2, 'db.`:db')
         self.drop_db(self.server1, 'db_diff_test')

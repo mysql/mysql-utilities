@@ -1182,3 +1182,29 @@ Test case 21 - using --use-indexes with backticks verbose (Differences)
 # Database consistency check failed.
 #
 # ...done
+Test case 22 - compare two equal databases with different names (including VIEWS)
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory_clone on server2
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- `inventory`
++++ `inventory_clone`
+@@ -1,1 +1,1 @@
+-CREATE DATABASE `inventory` /*!40100 DEFAULT CHARACTER SET latin1 */
++CREATE DATABASE `inventory_clone` /*!40100 DEFAULT CHARACTER SET latin1 */
+
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    pass    pass    
+# TABLE     supplies                                pass    pass    pass    
+# VIEW      cleaning                                pass    -       -       
+# VIEW      finishing_up                            pass    -       -       
+# VIEW      tools                                   pass    -       -      
+
+# Databases are consistent.
+#
+# ...done
