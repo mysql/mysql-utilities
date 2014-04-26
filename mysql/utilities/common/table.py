@@ -129,11 +129,11 @@ class Index(object):
         Returns True if column list is a subset of index.
         """
 
-        # Uniqueness counts - can't be duplicate if uniquess differs
-        #                     except for primary keys which are always unique
-        if index.name != "PRIMARY":
-            if self.unique != index.unique:
-                return False
+#        # Uniqueness counts - can't be duplicate if uniquess differs
+#        #                     except for primary keys which are always unique
+#        if index.name != "PRIMARY": # or self.name != "PRIMARY":
+#            if self.unique != index.unique:
+#                return False
         num_cols_this = len(self.columns)
         num_cols_that = len(index.columns)
         num_cols_same = 0
@@ -1006,15 +1006,24 @@ class Table(object):
         duplicate_list = []
         if indexes and index:
             for idx in indexes:
+                if index == idx:
+                    continue
                 # Don't compare b == a when a == b has already occurred
                 if not index.compared and idx.is_duplicate(index):
                     # make sure we haven't already found this match
                     if not idx.column_subparts:
                         idx.compared = True
-                    if not (idx in master_list):
+                    if idx not in master_list:
                         duplicates_found = True
-                        idx.duplicate_of = index
-                        duplicate_list.append(idx)
+                        # PRIMARY key be identified as redundant of an unique
+                        # index with more columns, in that case always mark
+                        # the other as the duplicate.
+                        if idx.name == "PRIMARY":
+                            index.duplicate_of = idx
+                            duplicate_list.append(index)
+                        else:
+                            idx.duplicate_of = index
+                            duplicate_list.append(idx)
         return (duplicates_found, duplicate_list)
 
     def __check_index_list(self, indexes):

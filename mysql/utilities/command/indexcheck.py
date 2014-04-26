@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ from mysql.utilities.exception import UtilError
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.database import Database
 from mysql.utilities.common.table import Table
+from mysql.utilities.common.sql_transform import quote_with_backticks
 
 
 def check_index(src_val, table_args, options):
@@ -97,7 +98,8 @@ def check_index(src_val, table_args, options):
         if not tables and verbosity >= 1:
             print "# Warning: database %s does not exist. Skipping." % (db)
         for table in tables:
-            table_list.append(db + "." + table[0])
+            table_list.append("{0}.{1}".format(quote_with_backticks(db),
+                                               quote_with_backticks(table[0])))
 
     # Fail if no tables to check
     if not table_list:
@@ -127,7 +129,8 @@ def check_index(src_val, table_args, options):
                     # Show if table has primary key
                 if not tbl.has_primary_key():
                     if verbosity > 1:
-                        print "#   Table %s does not contain a PRIMARY key."
+                        print("#   Table {0} does not contain a PRIMARY key."
+                              "".format(table_name))
                 tbl.check_indexes(show_drops)
 
             # Show best and/or worst indexes
