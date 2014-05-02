@@ -81,9 +81,13 @@ _COMPARE_SUM = """
     GROUP BY span
 """
 
+# ORDER BY is used to ensure determinism for the order in which rows are
+# returned between compared tables, otherwise rows might be returned in a
+# different for server without the binlog enable (--log-bin option) leading to
+# incorrect SQL diff statements (UPDATES).
 _COMPARE_DIFF = """
     SELECT * FROM {db}.{compare_tbl}
-    WHERE span = '{span}'
+    WHERE span = '{span}' ORDER BY pk_hash
 """
 
 _COMPARE_SPAN_QUERY = """
@@ -957,27 +961,153 @@ def _get_rows_span(table, span, index):
     """
     server = table.server
     rows = []
+    ukeys = [col[0] for col in index]
     # build WHERE clause
     for row in span:
         # Quote compare table appropriately with backticks
         q_tbl_name = quote_with_backticks(
             _COMPARE_TABLE_NAME.format(tbl=table.tbl_name))
 
-        res1 = server.exec_query(
+        span_rows = server.exec_query(
             _COMPARE_DIFF.format(db=table.q_db_name, compare_tbl=q_tbl_name,
                                  span=row))
-        pk = res1[0][2:len(res1[0]) - 1]
-        ukeys = [col[0] for col in index]
-        where_clause = ' AND '.join("{0} = '{1}'".
-                                    format(key, col)
-                                    for key, col in zip(ukeys, pk))
-        res2 = server.exec_query(
-            _COMPARE_SPAN_QUERY.format(db=table.q_db_name,
-                                       table=table.q_tbl_name,
-                                       where=where_clause))
-        rows.append(res2[0])
+        # Loop through multiple rows with the same span value.
+        for res_row in span_rows:
+            pk = res_row[2:-1]
+            where_clause = ' AND '.join("{0} = '{1}'".
+                                        format(key, col)
+                                        for key, col in zip(ukeys, pk))
+            orig_rows = server.exec_query(
+                _COMPARE_SPAN_QUERY.format(db=table.q_db_name,
+                                           table=table.q_tbl_name,
+                                           where=where_clause))
+            rows.append(orig_rows[0])
 
     return rows
+
+
+def _get_changed_rows_span(table1, table2, span, index):
+    """Get the original changed rows corresponding to a list of span values.
+
+    This method returns the changed rows from the original tables that match
+    the given list of span keys. Several rows might be associated to each span,
+    including unchanged, changed, missing or extra rows. This method takes all
+    these situations into account, ignoring unchanged rows and separating
+    changed rows from missing/extra rows for each table when retrieving the
+    original data. This separation is required in order to generate the
+    appropriate SQL diff statement (UPDATE, INSERT, DELETE) later.
+
+    table1[in]      First table instance.
+    table2[in]      Second table instance.
+    span[in]        List of span keys.
+    index[in]       Used table index (unique key).
+
+    Returns the changed rows from original tables, i.e., a tuple with two
+    elements containing the changes for each table. At its turn, the element
+    for each table is another tuple where the first element contains the list
+    of changed rows and the second the list of extra rows (compared to the
+    other table).
+    """
+    # Get all span rows for table 1.
+    server1 = table1.server
+    full_span_data_1 = []
+    for row in span:
+        # Quote compare table appropriately with backticks
+        q_tbl_name = quote_with_backticks(
+            _COMPARE_TABLE_NAME.format(tbl=table1.tbl_name))
+
+        span_rows = server1.exec_query(
+            _COMPARE_DIFF.format(db=table1.q_db_name, compare_tbl=q_tbl_name,
+                                 span=row))
+        # Auxiliary set with (compare_sign, pk_hash) tuples for table.
+        cmp_signs = set([(row[0], row[1]) for row in span_rows])
+        # Keep span rows and auxiliary data for table 1.
+        full_span_data_1.append((span_rows, cmp_signs))
+
+    # Get all span rows for table 2.
+    server2 = table2.server
+    full_span_data_2 = []
+    for row in span:
+        # Quote compare table appropriately with backticks
+        q_tbl_name = quote_with_backticks(
+            _COMPARE_TABLE_NAME.format(tbl=table2.tbl_name))
+
+        span_rows = server2.exec_query(
+            _COMPARE_DIFF.format(db=table2.q_db_name, compare_tbl=q_tbl_name,
+                                 span=row))
+        # Auxiliary set with (compare_sign, pk_hash) tuples for table.
+        cmp_signs = set([(row[0], row[1]) for row in span_rows])
+        # Keep span rows and auxiliary data for table 1.
+        full_span_data_2.append((span_rows, cmp_signs))
+
+    # List of key columns
+    ukeys = [col[0] for col in index]
+
+    # Get the original diff rows for tables 1 and 2.
+    changed_in1 = []
+    extra_in1 = []
+    changed_in2 = []
+    extra_in2 = []
+    for pos, span_data1 in enumerate(full_span_data_1):
+        # Also get span data for table 2.
+        # Note: specific span data is at the same position for both tables.
+        span_data2 = full_span_data_2[pos]
+
+        # Determine different rows for tables 1 and 2 (exclude unchanged rows).
+        diff_rows_sign1 = span_data1[1] - span_data2[1]
+        diff_rows_sign2 = span_data2[1] - span_data1[1]
+        diff_pk_hash1 = set(cmp_sign[1] for cmp_sign in diff_rows_sign1)
+        diff_pk_hash2 = set(cmp_sign[1] for cmp_sign in diff_rows_sign2)
+
+        # Get the original diff rows for tables 1.
+        for res_row in span_data1[0]:
+            # Skip row if not in previously identified changed rows set.
+            if (res_row[0], res_row[1]) in diff_rows_sign1:
+                # Execute query to get the original row.
+                pk = res_row[2:-1]
+                where_clause = ' AND '.join("{0} = '{1}'".
+                                            format(key, col)
+                                            for key, col in zip(ukeys, pk))
+                res = server1.exec_query(
+                    _COMPARE_SPAN_QUERY.format(db=table1.q_db_name,
+                                               table=table1.q_tbl_name,
+                                               where=where_clause))
+
+                # Determine if it is a changed or extra row.
+                # Check if the same pk_hash is found in table 2.
+                if res_row[1] in diff_pk_hash2:
+                    # Store original changed row (to UPDATE).
+                    changed_in1.append(res[0])
+                else:
+                    # Store original extra row (to DELETE).
+                    extra_in1.append(res[0])
+
+        # Get the original diff rows for table 2.
+        for res_row in span_data2[0]:
+            # Skip row if not in previously identified changed rows set.
+            if (res_row[0], res_row[1]) in diff_rows_sign2:
+                # Execute query to get the original row.
+                pk = res_row[2:-1]
+                where_clause = ' AND '.join("{0} = '{1}'".
+                                            format(key, col)
+                                            for key, col in zip(ukeys, pk))
+                res = server2.exec_query(
+                    _COMPARE_SPAN_QUERY.format(db=table2.q_db_name,
+                                               table=table2.q_tbl_name,
+                                               where=where_clause))
+
+                # Determine if it is a changed or extra row.
+                # Check if the same pk_hash is found in table 1.
+                if res_row[1] in diff_pk_hash1:
+                    # Store original changed row (to UPDATE).
+                    changed_in2.append(res[0])
+                else:
+                    # Store original extra row (to ADD).
+                    extra_in2.append(res[0])
+
+    # Return a tuple with a tuple for each table, containing the changed and
+    # extra original row for each table.
+    return (changed_in1, extra_in1), (changed_in2, extra_in2)
 
 
 def _get_formatted_rows(rows, table, fmt='GRID'):
@@ -1140,7 +1270,7 @@ def check_consistency(server1, server2, table1_name, table2_name,
     tbl1_hash = _make_sum_rows(table1, pri_idx_str1, span_key_size)
     tbl2_hash = _make_sum_rows(table2, pri_idx_str2, span_key_size)
 
-    # Compare results
+    # Compare results (between spans).
     _, in1_not2, in2_not1 = get_common_lists(tbl1_hash, tbl2_hash)
 
     # If mismatch found, go back to compare table and retrieve grouping.
@@ -1163,14 +1293,33 @@ def check_consistency(server1, server2, table1_name, table2_name,
 
         if len(changed_rows) > 0:
             data_diffs.append("# Data differences found among rows:")
-            tbl1_rows = _get_rows_span(table1, changed_rows, used_index)
-            tbl2_rows = _get_rows_span(table2, changed_rows, used_index)
+            # Get original changed/extra rows for each table within the given
+            # span set 'changed_rows' (excluding unchanged rows).
+            # Note: each span can refer to multiple rows.
+            tbl1_rows, tbl2_rows = _get_changed_rows_span(table1, table2,
+                                                          changed_rows,
+                                                          used_index)
+
             if difftype == 'sql':
+                # Compute SQL diff for changed rows.
                 data_diffs.extend(transform_data(table1, table2, "UPDATE",
-                                                 (tbl1_rows, tbl2_rows)))
+                                                 (tbl1_rows[0], tbl2_rows[0])))
+                # Compute SQL diff for extra rows in table 1.
+                if tbl1_rows[1]:
+                    data_diffs.extend(transform_data(table1, table2,
+                                                     "DELETE", tbl1_rows[1]))
+                # Compute SQL diff for extra rows in table 2.
+                if tbl2_rows[1]:
+                    data_diffs.extend(transform_data(table1, table2,
+                                                     "INSERT", tbl2_rows[1]))
             else:
+                # Join changed and extra rows for table 1.
+                tbl1_rows = tbl1_rows[0] + tbl1_rows[1]
                 rows1 = _get_formatted_rows(tbl1_rows, table1, fmt)
+                # Join changed and extra rows for table 2.
+                tbl2_rows = tbl2_rows[0] + tbl2_rows[1]
                 rows2 = _get_formatted_rows(tbl2_rows, table2, fmt)
+                # Compute diff for all changes between table 1 and 2.
                 diff_str = _get_diff(rows1, rows2, table1_name, table2_name,
                                      difftype, compact=compact_diff)
                 if len(diff_str) > 0:

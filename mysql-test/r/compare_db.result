@@ -1208,3 +1208,72 @@ Test case 22 - compare two equal databases with different names (including VIEWS
 # Databases are consistent.
 #
 # ...done
+Test case 23 - data with multiple lines per span (no differences).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases multi_span_row on server1 and multi_span_row on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    pass   
+
+# Databases are consistent.
+#
+# ...done
+Test case 24 - data with multiple lines per span (with changed rows).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases multi_span_row on server1 and multi_span_row on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    FAIL    
+#
+# Data differences found among rows:
+--- `multi_span_row`.`t`
++++ `multi_span_row`.`t`
+@@ -1,7 +1,7 @@
+ +----------+-------+
+ | id       | data  |
+ +----------+-------+
+-| 1908449  | 1     |
+-| 94092    | 1     |
+-| 171607   | 1     |
++| 1908449  | 2     |
++| 94092    | 2     |
++| 171607   | 2     |
+ +----------+-------+
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 25 - data with multiple lines per span (with missing row and CSV format).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases multi_span_row on server1 and multi_span_row on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    FAIL    FAIL    
+#
+# Row counts are not the same among `multi_span_row`.`t` and `multi_span_row`.`t`.
+#
+# Data differences found among rows:
+--- `multi_span_row`.`t`
++++ `multi_span_row`.`t`
+@@ -1,4 +1,3 @@
+ id,data
+-94092,1
+-171607,1
+-1908449,1
++94092,2
++171607,2
+
+
+# Database consistency check failed.
+#
+# ...done

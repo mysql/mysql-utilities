@@ -477,6 +477,44 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Test with data that yields the same span key (size 8).
+        test_num += 1
+        comment = ("Test case {0} - data with multiple lines per span "
+                   "(no differences).".format(test_num))
+        cmd_arg = 'multi_span_row:multi_span_row --run-all-tests'
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Change data to detect all changed rows within the same span.
+        self.server2.exec_query(
+            'UPDATE multi_span_row.t SET data = 2 WHERE id != 1651723'
+        )
+
+        test_num += 1
+        comment = ("Test case {0} - data with multiple lines per span "
+                   "(with changed rows).".format(test_num))
+        cmd_arg = 'multi_span_row:multi_span_row --run-all-tests'
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Change data to detect missing rows within the same span.
+        self.server2.exec_query(
+            'DELETE FROM multi_span_row.t WHERE id = 1908449'
+        )
+
+        test_num += 1
+        comment = ("Test case {0} - data with multiple lines per span "
+                   "(with missing row and CSV format).".format(test_num))
+        cmd_arg = 'multi_span_row:multi_span_row --run-all-tests --format=csv'
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.do_replacements()
 
         return True
@@ -522,6 +560,8 @@ class test(mutlib.System_test):
         self.drop_db(self.server2, "empty_db")
         self.drop_db(self.server1, "no_primary_keys")
         self.drop_db(self.server2, "no_primary_keys")
+        self.drop_db(self.server1, "multi_span_row")
+        self.drop_db(self.server2, "multi_span_row")
         return True
 
     def cleanup(self):
