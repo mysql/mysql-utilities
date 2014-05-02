@@ -26,7 +26,8 @@ import rpl_admin
 
 from mysql.utilities.exception import MUTLibError
 
-
+_DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --report-host=localhost '
+                       '--report-port={0} "')
 _LOGNAME = "temp_log.txt"
 _LOG_ENTRIES = [
     "2012-03-11 15:55:33 PM INFO TEST MESSAGE 1.\n",
@@ -53,7 +54,8 @@ class test(rpl_admin.test):
 
     def setup(self):
         self.server0 = self.servers.get_server(0)
-        self.server5 = self.spawn_server("no_slaved")
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+        self.server5 = self.servers.spawn_server("no_slaved", mysqld)
         return rpl_admin.test.setup(self)
 
     def run(self):

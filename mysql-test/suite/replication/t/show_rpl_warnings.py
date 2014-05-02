@@ -42,8 +42,8 @@ class test(rpl_admin.test):
     def setup(self):
         res = rpl_admin.test.setup(self)
 
-        self.server5 = rpl_admin.test.spawn_server(self, "rep_slave4",
-                                                   "--log-bin=mysql-bin")
+        self.server5 = self.servers.spawn_server("rep_slave4",
+                                                 "--log-bin=mysql-bin")
 
         self.s4_port = self.server5.port
 

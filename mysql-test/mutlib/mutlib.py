@@ -238,7 +238,7 @@ class ServerList(object):
         - manage ports and server_ids
     """
 
-    def __init__(self, servers, startport, utildir, verbose=False):
+    def __init__(self, servers, startport, utildir, verbosity=0):
         """Constructor
 
         servers[in]        List of existing servers (may be None)
@@ -249,17 +249,18 @@ class ServerList(object):
         """
 
         self.cloning_host = "localhost"
-        self.utildir = utildir       # Location of utilities being tested
-        self.new_port = startport    # Starting port for spawned servers
-        self.verbose = verbose       # Option for verbosity
-        self.new_id = 100            # Starting server id for spawned servers
-        self.server_list = servers   # List of servers available
-        self.cleanup_list = []       # List of files to remove at shutdown
-        self.ports_in_use = []       # List of port numbers in use
-        self.ports_freed = []        # List of ports that were used, but are
-                                     # now free to use again
-        self._next_port = startport  # port number to start looking for new
-                                     # unused ports
+        self.utildir = utildir         # Location of utilities being tested
+        self.new_port = startport      # Starting port for spawned servers
+        self.verbose = verbosity >= 3  # Option for verbosity
+        self.debug = verbosity >= 2    # Option for debug
+        self.new_id = 100              # Starting server id for spawned servers
+        self.server_list = servers     # List of servers available
+        self.cleanup_list = []         # List of files to remove at shutdown
+        self.ports_in_use = []         # List of port numbers in use
+        self.ports_freed = []          # List of ports that were used, but are
+                                       # now free to use again
+        self._next_port = startport    # port number to start looking for new
+                                       # unused ports
 
         if servers is None:
             self.server_list = []
@@ -282,7 +283,7 @@ class ServerList(object):
         else:
             # pylint: disable=W0120
             # Start looking for new free ports starting at _next_port
-            for port_number in itertools.count(self._next_port):
+            for port_number in itertools.count(self._next_port + 1):
                 self._next_port = port_number
                 if is_port_free(port_number):
                     return port_number
@@ -292,13 +293,7 @@ class ServerList(object):
         servers and adds it to the list of ports in use.
         Also updates the instance variable for the next free port.
         """
-        # Check if port is still free
-        if is_port_free(self.new_port):
-            new_port = self.new_port
-        else:
-            # If it is not get a new free port
-            new_port = self.get_free_port()
-
+        new_port = self.new_port
         # Add port to the list of ports in use
         self.ports_in_use.append(new_port)
 
@@ -366,18 +361,10 @@ class ServerList(object):
                     msg = None or error message if error
         """
         full_datadir = os.path.join(os.getcwd(), "temp_{0}".format(port))
-
-        # if port is in use, try to get another one which isn't to spawn the
-        # new server.
-        for i in xrange(port, port + MAX_NUM_RETRIES):
-            if check_port_in_use("localhost", i):
-                self.new_port = i + 1
-                port = i
-                break
-        else:
-            raise UtilError("Ports {0} through {1} are in use. Please choose "
-                            "an available port"
-                            ".".format(port, port + MAX_NUM_RETRIES))
+        # Check if port is in use
+        if not check_port_in_use("localhost", port):
+            raise MUTLibError("Port {0} is in use. Please choose "
+                              "an available port.".format(port))
 
         clone_options = {
             'new_data': full_datadir,
@@ -477,6 +464,53 @@ class ServerList(object):
             datadir = server[0].show_server_variable('datadir')[0][1]
             self.server_list.append((server[0], True,
                                      self.get_process_id(datadir)))
+
+    def spawn_server(self, name, mysqld=None, kill=False):
+        """Spawns a server.
+
+        name[in]              Name of the server.
+        mysqld[in]            MySQL server options, it needs to be a string
+                              E.g " '--log-bin=mysql-bin ' "
+        kill[in]              If True and server with same name already exists
+                              kill it first, before spawning a new one.
+        """
+        index = self.find_server_by_name(name)
+        if index >= 0 and kill:
+            server = self.get_server(index)
+            if self.debug:
+                print("# Killing server {0}.".format(server.role))
+            self.stop_server(server)
+            self.remove_server(server.role)
+            index = -1
+        if self.debug:
+            print("# Spawning {0}".format(name))
+        if index >= 0:
+            if self.debug:
+                print("# Found it in the servers list.")
+            server = self.get_server(index)
+            try:
+                server.show_server_variable("server_id")
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get server 'server_id': "
+                                  "{0}".format(err.errmsg))
+        else:
+            origin_server = self.server_list[0][0]
+            if self.debug:
+                print("# Cloning server {0}@{1}".format(origin_server.role,
+                                                        origin_server.port))
+            serverid = self.get_next_id()
+
+            # Test if mysqld is a string
+            if mysqld and not isinstance(mysqld, str):
+                raise MUTLibError("mysqld option must be a string.")
+            res = self.spawn_new_server(origin_server, serverid,
+                                        name, mysqld)
+            if not res:
+                raise MUTLibError("Cannot spawn server '{0}'.".format(name))
+            self.add_new_server(res[0], True)
+            server = res[0]
+
+        return server
 
     def spawn_new_server(self, orig_server, server_id, name, mysqld=None):
         """Spawn a new server with options.

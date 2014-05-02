@@ -77,27 +77,34 @@ class test(rpl_admin.test):
         self.server0 = self.servers.get_server(0)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_gtid", mysqld,
+                                                 True)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_gtid", mysqld,
+                                                 True)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_gtid", mysqld,
+                                                 True)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave3_gtid", mysqld,
+                                                 True)
         # Server without --report-host and --report-port
         mysqld = _MYSQL_OPTS_NO_REPORT
-        self.server5 = self.spawn_server("rep_slave4_gtid", mysqld, True)
+        self.server5 = self.servers.spawn_server("rep_slave4_gtid", mysqld,
+                                                 True)
         # Master --gtid-mode=off
         srv_port = self.servers.view_next_port()
         mysqld = _MYSQL_OPTS_GTID_OFF.format(report_port=srv_port)
-        self.server6 = self.spawn_server("rep_master_gtid_off", mysqld, True)
+        self.server6 = self.servers.spawn_server("rep_master_gtid_off", mysqld,
+                                                 True)
         # Slave --gtid-mode=off
         srv_port = self.servers.view_next_port()
         mysqld = _MYSQL_OPTS_GTID_OFF.format(report_port=srv_port)
-        self.server7 = self.spawn_server("rep_slave_gtid_off", mysqld, True)
+        self.server7 = self.servers.spawn_server("rep_slave_gtid_off", mysqld,
+                                                 True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master([self.server1, self.server2, self.server3,

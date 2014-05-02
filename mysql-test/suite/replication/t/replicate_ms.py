@@ -63,11 +63,11 @@ class test(rpl_admin.test):
         # Spawn servers
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS.format(port=self.servers.view_next_port())
-        self.server1 = self.spawn_server("rep_slave", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_slave", mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(port=self.servers.view_next_port())
-        self.server2 = self.spawn_server("rep_master1", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_master1", mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(port=self.servers.view_next_port())
-        self.server3 = self.spawn_server("rep_master2", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_master2", mysqld, True)
         self.total_masters = 2
 
         # Drop all

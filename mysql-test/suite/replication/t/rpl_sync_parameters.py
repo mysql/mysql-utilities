@@ -46,19 +46,23 @@ class test(rpl_sync.test):
         mysqld = rpl_sync.MYSQL_OPTS_DEFAULT.format(
             port=self.servers.view_next_port()
         )
-        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_gtid", mysqld,
+                                                 True)
         mysqld = rpl_sync.MYSQL_OPTS_DEFAULT.format(
             port=self.servers.view_next_port()
         )
-        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_gtid", mysqld,
+                                                 True)
         mysqld = rpl_sync.MYSQL_OPTS_DEFAULT.format(
             port=self.servers.view_next_port()
         )
-        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_gtid", mysqld,
+                                                 True)
         mysqld = _MYSQL_OPTS_GTID_OFF.format(
             port=self.servers.view_next_port()
         )
-        self.server4 = self.spawn_server("rep_slave3_no_gtid", mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave3_no_gtid", mysqld,
+                                                 True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set).
         self.reset_master([self.server1, self.server2, self.server3])

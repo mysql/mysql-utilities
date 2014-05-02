@@ -46,10 +46,10 @@ class test(rpl_admin.test):
             return False
 
         # Spawn an independent server
-        self.server5 = self.spawn_server("alone_srv", kill=True,
-                                         mysqld="--sql_mode="
-                                         "NO_AUTO_CREATE_USER "
-                                         "--log-bin=mysqlbin")
+        self.server5 = self.servers.spawn_server("alone_srv", kill=True,
+                                                 mysqld="--sql_mode="
+                                                 "NO_AUTO_CREATE_USER "
+                                                 "--log-bin=mysqlbin")
 
         return True
 
