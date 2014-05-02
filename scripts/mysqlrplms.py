@@ -355,7 +355,8 @@ if __name__ == '__main__':
     except UtilError:
         _, e, _ = sys.exc_info()
         errmsg = e.errmsg.strip(" ")
-        logging.log(logging.CRITICAL, errmsg)
+        if opt.log_file:
+            logging.log(logging.CRITICAL, errmsg)
         print("ERROR: {0}".format(errmsg))
         sys.exit(1)
 

@@ -139,3 +139,7 @@ SCRIPT_THRESHOLD_WARNING = ("WARNING: You have chosen to use external script "
 HOST_IP_WARNING = ("You may be mixing host names and IP addresses. This may "
                    "result in negative status reporting if your DNS services "
                    "do not support reverse name lookup.")
+
+ERROR_MIN_SERVER_VERSIONS = ("The {utility} requires server versions greater "
+                             "or equal than {min_version}. Server version for "
+                             "'{host}:{port}' is not supported.")
