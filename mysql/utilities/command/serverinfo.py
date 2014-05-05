@@ -489,9 +489,14 @@ def show_server_info(servers, options):
             # given socket.
             if util_error.errno == CR_CONNECTION_ERROR:
                 socket = conn_dict.get("unix_socket", "")
-                if socket and os.path.isfile(socket):
-                    err_msg = ["Unable to connect to server using "
-                               "socket '{0}'".format(socket)]
+                if socket:
+                    msg = ("Unable to connect to server using socket "
+                           "'{0}'.".format(socket))
+                    if os.path.isfile(socket):
+                        err_msg = ["{0} Socket file is not valid.".format(msg)]
+                    else:
+                        err_msg = ["{0} Socket file does not "
+                                   "exist.".format(msg)]
             # If we got errno 2003 and we do not have
             # socket, instead we check if server is localhost.
             elif (util_error.errno == CR_CONN_HOST_ERROR and
