@@ -7,7 +7,6 @@ Test case 1 - no grants
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
-# Copying TABLE util_test.tt
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
@@ -18,11 +17,10 @@ Test case 1 - no grants
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying data for TABLE util_test.tt
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
-OBJECT COUNTS: tables = 6, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test case 2 - no events
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
@@ -32,7 +30,6 @@ Test case 2 - no events
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
-# Copying TABLE util_test.tt
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
@@ -43,10 +40,9 @@ Test case 2 - no events
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying data for TABLE util_test.tt
 # Copying TRIGGER util_test.trg
 #...done.
-OBJECT COUNTS: tables = 6, views = 2, triggers = 1, procedures = 1, functions = 2, events = 0 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 0 
 Test case 3 - no triggers
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
@@ -56,7 +52,6 @@ Test case 3 - no triggers
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
-# Copying TABLE util_test.tt
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
@@ -67,9 +62,8 @@ Test case 3 - no triggers
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying data for TABLE util_test.tt
 #...done.
-OBJECT COUNTS: tables = 6, views = 2, triggers = 0, procedures = 1, functions = 2, events = 0 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 0, procedures = 1, functions = 2, events = 0 
 Test case 4 - no views
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
@@ -79,7 +73,6 @@ Test case 4 - no views
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
-# Copying TABLE util_test.tt
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
@@ -88,9 +81,8 @@ Test case 4 - no views
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying data for TABLE util_test.tt
 #...done.
-OBJECT COUNTS: tables = 6, views = 0, triggers = 0, procedures = 1, functions = 2, events = 0 
+OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 1, functions = 2, events = 0 
 Test case 5 - no procedures
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
@@ -100,7 +92,6 @@ Test case 5 - no procedures
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
-# Copying TABLE util_test.tt
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying data for TABLE util_test.t1
@@ -108,9 +99,8 @@ Test case 5 - no procedures
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying data for TABLE util_test.tt
 #...done.
-OBJECT COUNTS: tables = 6, views = 0, triggers = 0, procedures = 0, functions = 2, events = 0 
+OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 0, functions = 2, events = 0 
 Test case 6 - no functions
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
@@ -120,15 +110,13 @@ Test case 6 - no functions
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
-# Copying TABLE util_test.tt
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying data for TABLE util_test.tt
 #...done.
-OBJECT COUNTS: tables = 6, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 5, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 7 - no tables
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
@@ -144,7 +132,6 @@ Test case 8 - skip create db
 # Copying TABLE util_test.t3
 # Copying TABLE util_test.t4
 # Copying TABLE util_test.t5
-# Copying TABLE util_test.tt
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
@@ -156,11 +143,10 @@ Test case 8 - skip create db
 # Copying data for TABLE util_test.t3
 # Copying data for TABLE util_test.t4
 # Copying data for TABLE util_test.t5
-# Copying data for TABLE util_test.tt
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
-OBJECT COUNTS: tables = 6, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
+OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
 Test case 9 - skip tables only - will fail
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.

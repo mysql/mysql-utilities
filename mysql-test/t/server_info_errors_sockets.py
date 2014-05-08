@@ -32,6 +32,7 @@ class test(mutlib.System_test):
     parameters. It uses the server_info test as a parent for setup and teardown
     methods.
     """
+    server1 = None
 
     def check_prerequisites(self):
         if os.name != "posix":
