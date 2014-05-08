@@ -31,7 +31,7 @@ from mutlib.mutlib import stop_process
 
 _RPLMS_LOG = "{0}rplms_log.txt"
 _TIMEOUT = 30
-_SWITCHOVER_TIMEOUT = 60
+_SWITCHOVER_TIMEOUT = 120
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
                        '--enforce-gtid-consistency --report-host=127.0.0.1 '
@@ -377,9 +377,11 @@ class test(rpl_admin.test):
         """
         self.drop_db(self.server1, "empty_db")
         self.drop_db(self.server1, "inventory")
+        self.drop_db(self.server1, "multi_span_row")
         self.drop_db(self.server1, "import_test")
         self.drop_db(self.server2, "empty_db")
         self.drop_db(self.server2, "inventory")
+        self.drop_db(self.server2, "multi_span_row")
         self.drop_db(self.server3, "import_test")
 
     def cleanup_logs(self):
