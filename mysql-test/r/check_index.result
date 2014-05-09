@@ -20,7 +20,7 @@ CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32))
 CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #
 # Getting indexes for util_test_c.t5
-#   Table `util_test_c`.`t5` does not contain a PRIMARY key.
+# Table `util_test_c`.`t5` does not contain neither a PRIMARY nor UNIQUE key.
 # The following indexes are duplicates or redundant for table util_test_c.t5:
 #
 CREATE FULLTEXT INDEX `ft1` ON `util_test_c`.`t5` (`y`) 
@@ -39,11 +39,11 @@ CREATE FULLTEXT INDEX `ft4` ON `util_test_c`.`t5` (`a`, `b`, `y`)
 # Table `util_test_c`.`t6` is not indexed.
 #
 # Getting indexes for util_test_b.t3
-#   Table `util_test_b`.`t3` does not contain a PRIMARY key.
+# Table `util_test_b`.`t3` does not contain neither a PRIMARY nor UNIQUE key.
 # Table util_test_b.t3 has no duplicate nor redundant indexes.
 #
 # Getting indexes for util_test_b.t4
-#   Table `util_test_b`.`t4` does not contain a PRIMARY key.
+# Table `util_test_b`.`t4` does not contain neither a PRIMARY nor UNIQUE key.
 # Table util_test_b.t4 has no duplicate nor redundant indexes.
 #
 # ...done.
@@ -62,7 +62,7 @@ CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32))
 CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 #
 # Getting indexes for util_test_a.t2
-#   Table `util_test_a`.`t2` does not contain a PRIMARY key.
+# Table `util_test_a`.`t2` does not contain neither a PRIMARY nor UNIQUE key.
 # Table util_test_a.t2 has no duplicate nor redundant indexes.
 #
 # ...done.
@@ -120,7 +120,7 @@ Test case 8 - check PRIMARY key against unique index with more columns, show dro
 # Source on XXXX-XXXX: ... connected.
 # Checking indexes...
 # Getting indexes for util_test_f.qted_`2_quoted_`2
-#   Table `util_test_f`.`qted_``2_quoted_``2` does not contain a PRIMARY key.
+# Table `util_test_f`.`qted_``2_quoted_``2` does not contain a PRIMARY key.
 # The following indexes are duplicates or redundant for table util_test_f.qted_`2_quoted_`2:
 #
 CREATE INDEX `ix_no``nulls_``2` ON `util_test_f`.`qted_``2_quoted_``2` (`c``2`, `c6`) USING BTREE

@@ -87,6 +87,12 @@ if __name__ == '__main__':
                       dest="worst", default=None,
                       help="limit index statistics to the worst N indexes")
 
+    # Report for tables without Primary keys or Unique keys
+    parser.add_option("--report-indexes", "-r", action="store_true",
+                      dest="report_indexes", default=False,
+                      help="reports if a table has neither UNIQUE indexes nor"
+                           " a PRIMARY key")
+
     # Add verbosity mode
     add_verbosity(parser, False)
 
@@ -148,7 +154,8 @@ if __name__ == '__main__':
         "index-format": opt.format,
         "stats": opt.stats,
         "best": best,
-        "worst": worst
+        "worst": worst,
+        "report-indexes": opt.report_indexes
     }
 
     try:

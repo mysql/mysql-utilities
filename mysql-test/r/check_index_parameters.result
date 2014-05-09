@@ -21,6 +21,8 @@ Options:
   --stats               show index performance statistics
   --best=BEST           limit index statistics to the best N indexes
   --worst=WORST         limit index statistics to the worst N indexes
+  -r, --report-indexes  reports if a table has neither UNIQUE indexes nor a
+                        PRIMARY key
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
 Test case 2 - show drops for a table with dupe (-vv) indexes
@@ -133,8 +135,6 @@ CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32))
 CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 Test case 9 - find redundancy with the clustered index (InnoDB)
 # Source on XXXX-XXXX: ... connected.
-# Checking indexes...
-# Getting indexes for util_test_d.cluster_idx
 # Showing indexes from util_test_d.cluster_idx:
 #
 +--------------+--------------+------------+--------+-----------+
@@ -164,12 +164,8 @@ CREATE INDEX `redundant` ON `util_test_d`.`cluster_idx` (`col2`, `id`) USING BTR
 ALTER TABLE `util_test_d`.`cluster_idx` DROP INDEX `redundant`, ADD INDEX `redundant` (col2);
 #
 # WARNING: Not enough data to calculate best/worst indexes.
-#
-# ...done.
 Test case 10 - not find redundancy with the clustered index (not InnoDB)
 # Source on XXXX-XXXX: ... connected.
-# Checking indexes...
-# Getting indexes for util_test_d.no_cluster_idx
 # Showing indexes from util_test_d.no_cluster_idx:
 #
 +--------------+-----------------+------------+--------+-----------+
@@ -191,12 +187,8 @@ CREATE INDEX `redundant` ON `util_test_d`.`no_cluster_idx` (`col2`, `id`) USING 
 ALTER TABLE `util_test_d`.`no_cluster_idx` DROP INDEX `col2`;
 #
 # WARNING: Not enough data to calculate best/worst indexes.
-#
-# ...done.
 Test case 11 - find various redundancies (and duplicates) with the clustered index (InnoDB)
 # Source on XXXX-XXXX: ... connected.
-# Checking indexes...
-# Getting indexes for util_test_d.various_cluster_idx
 # Showing indexes from util_test_d.various_cluster_idx:
 #
 +--------------+----------------------+--------------------+--------+-----------+
@@ -236,5 +228,78 @@ ALTER TABLE `util_test_d`.`various_cluster_idx` DROP INDEX `redundant`, ADD INDE
 ALTER TABLE `util_test_d`.`various_cluster_idx` DROP INDEX `another_redundant`, ADD INDEX `another_redundant` (col3);
 #
 # WARNING: Not enough data to calculate best/worst indexes.
+Test case 12 - report tables without PRIMARY or UNIQUE key.
+# Source on XXXX-XXXX: ... connected.
+# Table `util_test_e`.`t1` is not indexed.
+# Table `util_test_e`.`t2` does not contain neither a PRIMARY nor UNIQUE key.
+# The following index for table util_test_e.t2 contains the clustered index and might be redundant:
+#
+CREATE INDEX `b` ON `util_test_e`.`t2` (`b`) USING BTREE
+# Table `util_test_e`.`t3` does not contain a PRIMARY key.
+# The following index for table util_test_e.t3 contains the clustered index and might be redundant:
+#
+CREATE UNIQUE INDEX `b` ON `util_test_e`.`t3` (`b`) USING BTREE
+# Table `util_test_e`.`t5` does not contain a PRIMARY key.
+# The following index for table util_test_e.t5 contains the clustered index and might be redundant:
+#
+CREATE UNIQUE INDEX `a` ON `util_test_e`.`t5` (`a`) USING BTREE
+Test case 13 - show indexes with -vv
+# Source on XXXX-XXXX: ... connected.
+# Checking indexes...
+# Getting indexes for util_test_e.t1
+# Table `util_test_e`.`t1` is not indexed.
+#
+# Getting indexes for util_test_e.t2
+# Showing indexes from util_test_e.t2:
+#
++--------------+--------+-------+--------+---------+----------------+----------+
+| database     | table  | name  | type   | unique  | accepts nulls  | columns  |
++--------------+--------+-------+--------+---------+----------------+----------+
+| util_test_e  | t2     | b     | BTREE  | False   | True           | b        |
++--------------+--------+-------+--------+---------+----------------+----------+
+#
+# Table `util_test_e`.`t2` does not contain neither a PRIMARY nor UNIQUE key.
+# The following index for table util_test_e.t2 contains the clustered index and might be redundant:
+#
+CREATE INDEX `b` ON `util_test_e`.`t2` (`b`) USING BTREE
+#
+# Getting indexes for util_test_e.t3
+# Showing indexes from util_test_e.t3:
+#
++--------------+--------+-------+--------+---------+----------------+----------+
+| database     | table  | name  | type   | unique  | accepts nulls  | columns  |
++--------------+--------+-------+--------+---------+----------------+----------+
+| util_test_e  | t3     | b     | BTREE  | True    | True           | b        |
++--------------+--------+-------+--------+---------+----------------+----------+
+#
+# Table `util_test_e`.`t3` does not contain a PRIMARY key.
+# The following index for table util_test_e.t3 contains the clustered index and might be redundant:
+#
+CREATE UNIQUE INDEX `b` ON `util_test_e`.`t3` (`b`) USING BTREE
+#
+# Getting indexes for util_test_e.t4
+# Showing indexes from util_test_e.t4:
+#
++--------------+--------+----------+--------+---------+----------------+----------+
+| database     | table  | name     | type   | unique  | accepts nulls  | columns  |
++--------------+--------+----------+--------+---------+----------------+----------+
+| util_test_e  | t4     | PRIMARY  | BTREE  | True    | False          | b        |
++--------------+--------+----------+--------+---------+----------------+----------+
+#
+# Table util_test_e.t4 has no duplicate nor redundant indexes.
+#
+# Getting indexes for util_test_e.t5
+# Showing indexes from util_test_e.t5:
+#
++--------------+--------+-------+--------+---------+----------------+----------+
+| database     | table  | name  | type   | unique  | accepts nulls  | columns  |
++--------------+--------+-------+--------+---------+----------------+----------+
+| util_test_e  | t5     | a     | BTREE  | True    | False          | a        |
++--------------+--------+-------+--------+---------+----------------+----------+
+#
+# Table `util_test_e`.`t5` does not contain a PRIMARY key.
+# The following index for table util_test_e.t5 contains the clustered index and might be redundant:
+#
+CREATE UNIQUE INDEX `a` ON `util_test_e`.`t5` (`a`) USING BTREE
 #
 # ...done.

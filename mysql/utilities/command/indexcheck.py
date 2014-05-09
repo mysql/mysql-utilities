@@ -48,6 +48,7 @@ def check_index(src_val, table_args, options):
                          index-format : index format = sql, table, tab, csv
                          worst        : show worst performing indexes
                          best         : show best performing indexes
+                         report-indexes : reports tables without PK or UK
 
     Returns bool True = success, raises UtilError if error
     """
@@ -61,6 +62,7 @@ def check_index(src_val, table_args, options):
     stats = options.get("stats", False)
     first_indexes = options.get("best", None)
     last_indexes = options.get("worst", None)
+    report_indexes = options.get("report-indexes", False)
 
     # Try to connect to the MySQL database server.
     conn_options = {
@@ -121,16 +123,20 @@ def check_index(src_val, table_args, options):
                             "to skip missing tables." % table_name)
         if exists:
             if not tbl.get_indexes():
-                if verbosity > 1:
+                if verbosity > 1 or report_indexes:
                     print "# Table %s is not indexed." % (table_name)
             else:
                 if show_indexes:
-                    tbl.print_indexes(index_format)
+                    tbl.print_indexes(index_format, verbosity)
                     # Show if table has primary key
-                if not tbl.has_primary_key():
-                    if verbosity > 1:
-                        print("#   Table {0} does not contain a PRIMARY key."
-                              "".format(table_name))
+                if verbosity > 1 or report_indexes:
+                    if not tbl.has_primary_key():
+                        if not tbl.has_unique_key():
+                            print("# Table {0} does not contain neither a "
+                                  "PRIMARY nor UNIQUE key.".format(table_name))
+                        else:
+                            print("# Table {0} does not contain a PRIMARY key."
+                                  "".format(table_name))
                 tbl.check_indexes(show_drops)
 
             # Show best and/or worst indexes

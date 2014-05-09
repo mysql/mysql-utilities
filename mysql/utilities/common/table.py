@@ -293,10 +293,13 @@ class Index(object):
                                     cols=self.__get_column_list(),
                                     using=using_str))
 
-    def get_row(self):
+    def get_row(self, verbosity=0):
         """Return index information as a list of columns for tabular output.
         """
         cols = self.__get_column_list(backtick_quoting=False)
+        if verbosity > 0:
+            return (self.db, self.table, self.name, self.type, self.unique,
+                    self.accept_nulls, cols)
         return (self.db, self.table, self.name, self.type, cols)
 
 
@@ -1089,9 +1092,9 @@ class Table(object):
                         idx.compared = True
                     if idx not in master_list:
                         duplicates_found = True
-                        # PRIMARY key be identified as redundant of an unique
-                        # index with more columns, in that case always mark
-                        # the other as the duplicate.
+                        # PRIMARY key can be identified as redundant of an
+                        # unique index with more columns, in that case always
+                        # mark the other as the duplicate.
                         if idx.name == "PRIMARY":
                             index.duplicate_of = idx
                             duplicate_list.append(index)
@@ -1389,7 +1392,7 @@ class Table(object):
                   "best/worst indexes.")
 
     @staticmethod
-    def __print_index_list(indexes, fmt, no_header=False):
+    def __print_index_list(indexes, fmt, no_header=False, verbosity=0):
         """Print the list of indexes
 
         indexes[in]        list of indexes to print
@@ -1400,13 +1403,18 @@ class Table(object):
             for index in indexes:
                 index.print_index_sql()
         else:
-            cols = ("database", "table", "name", "type", "columns")
+            if verbosity > 0:
+                cols = ("database", "table", "name", "type", "unique",
+                        "accepts nulls", "columns")
+            else:
+                cols = ("database", "table", "name", "type", "columns")
+
             rows = []
             for index in indexes:
-                rows.append(index.get_row())
+                rows.append(index.get_row(verbosity))
             print_list(sys.stdout, fmt, cols, rows, no_header)
 
-    def print_indexes(self, fmt):
+    def print_indexes(self, fmt, verbosity):
         """Print all indexes for this table
 
         fmt[in]         format out output = sql, table, tab, csv
@@ -1414,17 +1422,22 @@ class Table(object):
 
         print "# Showing indexes from %s:\n#" % (self.table)
         if fmt == "sql":
-            self.__print_index_list(self.btree_indexes, fmt)
-            self.__print_index_list(self.hash_indexes, fmt, False)
-            self.__print_index_list(self.rtree_indexes, fmt, False)
-            self.__print_index_list(self.fulltext_indexes, fmt, False)
+            self.__print_index_list(self.btree_indexes, fmt,
+                                    verbosity=verbosity)
+            self.__print_index_list(self.hash_indexes, fmt, False,
+                                    verbosity=verbosity)
+            self.__print_index_list(self.rtree_indexes, fmt, False,
+                                    verbosity=verbosity)
+            self.__print_index_list(self.fulltext_indexes, fmt, False,
+                                    verbosity=verbosity)
         else:
             master_indexes = []
             master_indexes.extend(self.btree_indexes)
             master_indexes.extend(self.hash_indexes)
             master_indexes.extend(self.rtree_indexes)
             master_indexes.extend(self.fulltext_indexes)
-            self.__print_index_list(master_indexes, fmt)
+            self.__print_index_list(master_indexes, fmt,
+                                    verbosity=verbosity)
         print "#"
 
     def has_primary_key(self):
@@ -1438,3 +1451,15 @@ class Table(object):
             if row[2] == "PRIMARY":
                 primary_key = True
         return primary_key
+
+    def has_unique_key(self):
+        """Check to see if there is a unique key.
+        Returns bool - True - a unique key was found,
+                       False - no unique key.
+        """
+        unique_key = False
+        rows = self._get_index_list()
+        for row in rows:
+            if row[1] == '0':
+                unique_key = True
+        return unique_key
