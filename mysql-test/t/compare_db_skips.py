@@ -23,7 +23,8 @@ import compare_db
 
 from mysql.utilities.exception import MUTLibError
 
-_SKIPS = ['object-compare', 'row-count', 'diff', 'data-check']
+_SKIPS = ['object-compare', 'row-count', 'diff', 'checksum-table',
+          'data-check']
 
 
 class test(compare_db.test):

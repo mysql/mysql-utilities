@@ -6,8 +6,10 @@ Test case 1 - check a sample database generate SQL
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    pass    pass    
-# TABLE     supplies                                pass    pass    pass    
+# TABLE     supplier                                pass    pass    -       
+#           - Compare table checksum                                pass    
+# TABLE     supplies                                pass    pass    -       
+#           - Compare table checksum                                pass    
 # VIEW      cleaning                                pass    -       -       
 # VIEW      finishing_up                            pass    -       -       
 # VIEW      tools                                   pass    -       -      
@@ -27,7 +29,9 @@ Test case 2 - check database with known differences generate SQL direction = ser
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -39,7 +43,9 @@ UPDATE `inventory`.`supplier` SET `name` = 'Wesayso Corporation' WHERE `code` = 
 INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('3', 'Never Enough Inc.');
 
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -86,7 +92,9 @@ Test case 3 - check database with known differences generate SQL direction = ser
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -98,7 +106,9 @@ UPDATE `inventory`.`supplier` SET `name` = 'Never Enough Inc.' WHERE `code` = '2
 DELETE FROM `inventory`.`supplier` WHERE `code` = '3';
 
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -145,7 +155,11 @@ Test case 4 - check database with known differences generate SQL direction = ser
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -165,7 +179,11 @@ INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('3', 'Never Enough In
 #
 
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -237,7 +255,11 @@ Test case 5 - check database with known differences generate SQL direction = ser
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -257,7 +279,11 @@ DELETE FROM `inventory`.`supplier` WHERE `code` = '3';
 #
 
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -325,7 +351,8 @@ Test case 6 - data with multiple lines per span (no differences).
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     t                                       pass    pass    pass   
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass   
 
 # Databases are consistent.
 #
@@ -338,7 +365,9 @@ Test case 7 - data with multiple lines per span (changed rows).
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     t                                       pass    pass    FAIL    
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Transformation for --changes-for=server1:
 #
@@ -361,7 +390,9 @@ Test case 8 - data with multiple lines per span (missing row).
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     t                                       pass    FAIL    FAIL    
+# TABLE     t                                       pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `multi_span_row`.`t` and `multi_span_row`.`t`.
 #
@@ -386,7 +417,9 @@ Test case 9 - data with multiple lines per span (missing row; changes for server
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     t                                       pass    FAIL    FAIL    
+# TABLE     t                                       pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `multi_span_row`.`t` and `multi_span_row`.`t`.
 #

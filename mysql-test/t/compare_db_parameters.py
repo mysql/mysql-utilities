@@ -104,7 +104,7 @@ class test(compare_db.test):
 
         test_num += 1
         cmd_opts = " --format=csv -a"
-        cmd_opts += " --width=55"
+        cmd_opts += " --width=60"  # Minimum width for data check results.
         comment = "Test case {0} - {1}".format(test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:

@@ -6,7 +6,9 @@ Test case 1 -  --skip-object-compare --format=csv -a
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -22,7 +24,9 @@ Test case 1 -  --skip-object-compare --format=csv -a
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -80,7 +84,9 @@ Test case 2 -  --skip-row-count --format=csv -a
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    SKIP    FAIL    
+# TABLE     supplier                                pass    SKIP    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Data differences found among rows:
 --- `inventory`.`supplier`
@@ -94,7 +100,9 @@ Test case 2 -  --skip-row-count --format=csv -a
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    SKIP    FAIL    
+# TABLE     supplies                                pass    SKIP    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Data differences found among rows:
 --- `inventory`.`supplies`
@@ -150,7 +158,9 @@ Test case 3 -  --skip-diff --format=csv -a
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                SKIP    FAIL    FAIL    
+# TABLE     supplier                                SKIP    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -166,7 +176,9 @@ Test case 3 -  --skip-diff --format=csv -a
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                SKIP    FAIL    FAIL    
+# TABLE     supplies                                SKIP    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -202,7 +214,85 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 4 -  --skip-data-check --format=csv -a 
+Test case 4 -  --skip-checksum-table --format=csv -a 
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+#
+# WARNING: Objects in server1.inventory but not in server2.inventory:
+#         VIEW: finishing_up
+#         VIEW: cleaning
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  FAIL    
+#
+# Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
+#
+# Data differences found among rows:
+--- `inventory`.`supplier`
++++ `inventory`.`supplier`
+@@ -1,2 +1,2 @@
+ code,name
+-2,Never Enough Inc.
++2,Wesayso Corporation
+
+# Rows in `inventory`.`supplier` not in `inventory`.`supplier`
+code,name
+3,Never Enough Inc.
+
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  FAIL    
+#
+# Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
+#
+# Data differences found among rows:
+--- `inventory`.`supplies`
++++ `inventory`.`supplies`
+@@ -1,4 +1,4 @@
+ stock_number,description,qty,cost,type,notes,supplier
+-11146,Speed shine,1,9.99,repair,,1
+-11186,Plastic polish,1,9.99,polishing,,1
+-11040,Leather care,1,9.99,other,,1
++11146,Speed shine,1,10.00,repair,,1
++11186,Plastic polish,1,10.00,polishing,,1
++11040,Leather care,1,10.00,other,,1
+
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
+stock_number,description,qty,cost,type,notes,supplier
+11270,Carpet cleaner,1,9.99,cleaning,,1
+11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
+11104,Interior cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11106,Wheel cleaner,1,9.99,cleaning,,1
+
+# Rows in `inventory`.`supplies` not in `inventory`.`supplies`
+stock_number,description,qty,cost,type,notes,supplier
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
+10665,Glass polish pad,3,10.00,polishing,,1
+11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+
+# VIEW      tools                                   FAIL    -       -       
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- `inventory`.`tools`
++++ `inventory`.`tools`
+@@ -1,1 +1,1 @@
+-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` = 'tool')
++CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tools` AS select `supplies`.`stock_number` AS `stock_number`,`supplies`.`description` AS `description`,`supplies`.`qty` AS `qty`,`supplies`.`cost` AS `cost`,`supplies`.`type` AS `type`,`supplies`.`notes` AS `notes`,`supplies`.`supplier` AS `supplier` from `supplies` where (`supplies`.`type` in ('tool','other'))
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 5 -  --skip-data-check --format=csv -a 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -239,7 +329,7 @@ Test case 4 -  --skip-data-check --format=csv -a
 # Database consistency check failed.
 #
 # ...done
-Test case 5 -   --skip-object-compare --skip-row-count --skip-diff --skip-data-check --format=csv -a 
+Test case 6 -   --skip-object-compare --skip-row-count --skip-diff --skip-checksum-table --skip-data-check --format=csv -a 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2

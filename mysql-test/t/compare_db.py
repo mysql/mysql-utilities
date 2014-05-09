@@ -358,9 +358,10 @@ class test(mutlib.System_test):
         # Tests for tables with no primary keys but with unique indexes
         # nullable and not nullable columns
 
-        # Test automatically pick up the not nullable unique indexes
-        # Note: All previews test had primary keys.
-        cmd_arg = ("no_primary_keys -a")
+        # Test automatically pick up the not nullable unique indexes.
+        # Note: All previews test had primary keys. Skip checksum table
+        # otherwise no indexes are used if there are no differences.
+        cmd_arg = "no_primary_keys -a --skip-checksum-table"
         test_num += 1
         comment = ("Test case {0} - Test automatically picks up the not "
                    "nullable unique index (No differences)".format(test_num))
@@ -370,9 +371,12 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Test given a real not nullable unique index for a specific table
-        # using --use-indexes, unique key with one column
+        # using --use-indexes, unique key with one column.
+        # Note: skip checksum table otherwise no indexes are used if there are
+        # no differences.
         cmd_arg = ("no_primary_keys "
-                   "--use-indexes=nonix_1_simple.uk_nonullclmns -a ")
+                   "--use-indexes=nonix_1_simple.uk_nonullclmns -a "
+                   "--skip-checksum-table")
         test_num += 1
         comment = ("Test case {0} - real not nullable unique index for a "
                    "specific table using --use-indexes "
@@ -384,9 +388,11 @@ class test(mutlib.System_test):
 
         # Test given a real not nullable index for a specific table
         # using --use-indexes for two tables, unique keys with 2 columns
+        # Note: skip checksum table otherwise no indexes are used if there are
+        # no differences.
         cmd_arg = ('no_primary_keys '
                    '--use-indexes="nonix_1_nix_2.uk_nonulls;'
-                   'nonix_2_nix_2.uk2_nonulls" -a')
+                   'nonix_2_nix_2.uk2_nonulls" -a --skip-checksum-table')
         test_num += 1
         comment = ("Test case {0} - compare using--use-indexes for two tables "
                    "(No differences)".format(test_num))
@@ -396,11 +402,14 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Test given a real not nullable index for a specific table
-        # using --use-indexes for same table and other for dif table
+        # using --use-indexes for same table and other for dif table.
+        # Note: skip checksum table otherwise no indexes are used if there are
+        # no differences.
         cmd_arg = ('no_primary_keys '
                    '--use-indexes="nonix_2_nix_2.uk2_nonulls;'
                    'nonix_2_nix_2.uk_nonulls;'
-                   'nonix_1_nix_2.uk_nonulls;nonix_1_simple.ix_nonull" -a')
+                   'nonix_1_nix_2.uk_nonulls;nonix_1_simple.ix_nonull" -a '
+                   '--skip-checksum-table')
         test_num += 1
         comment = ("Test case {0} - using --use-indexes for same table "
                    "(No differences)".format(test_num))
@@ -410,11 +419,13 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Test given a real not nullable index for a specific table
-        # using --use-indexes for same table and other for dif table vvv
+        # using --use-indexes for same table and other for dif table vvv.
+        # Note: skip checksum table to show index info.
         cmd_arg = (
             'no_primary_keys --use-indexes="nonix_2_nix_2.uk2_nonulls;'
             'nonix_2_nix_2.uk_nonulls;nonix_1_nix_2.uk_nonulls;'
-            'nonix_2_nix_2_pk.uk2_nonulls;nonix_1_simple.ix_nonull" -a -vvv'
+            'nonix_2_nix_2_pk.uk2_nonulls;nonix_1_simple.ix_nonull" -a -vvv '
+            '--skip-checksum-table'
         )
         test_num += 1
         comment = ("Test case {0} - using --use-indexes for same table "
@@ -428,12 +439,13 @@ class test(mutlib.System_test):
 
         # Test given a real not nullable index for a specific table
         # using --use-indexes with backticks verbose debug
+        # Note: skip checksum table to show index info.
         if os.name == 'posix':
             cmd_arg = ("no_primary_keys --use-indexes='`nonix_``2_nix_``2`."
-                       "`uk_no``nulls`' -a -vvv")
+                       "`uk_no``nulls`' -a -vvv --skip-checksum-table")
         else:
             cmd_arg = ('no_primary_keys --use-indexes="`nonix_``2_nix_``2`.'
-                       '`uk_no``nulls`" -a -vvv')
+                       '`uk_no``nulls`" -a -vvv --skip-checksum-table')
         test_num += 1
         comment = ("Test case {0} - using --use-indexes with backticks "
                    "verbose (No differences)".format(test_num))

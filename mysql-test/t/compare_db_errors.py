@@ -197,7 +197,7 @@ class test(compare_db.test):
                                 "(2, 1, 4, 3)")
 
         test_num += 1
-        cmd_str = ("mysqldbcompare.py {0} {1} {2} "
+        cmd_str = ("mysqldbcompare.py {0} {1} {2} --skip-checksum-table "
                    "--use-indexes=box_3.invalid_index --skip-diff"
                    "".format(s1_conn, s2_conn, "inventory:inventory -a"))
         comment = ("Test case {0} - Invalid --use-indexes and different "

@@ -51,32 +51,34 @@ _COMPARE_TABLE_DROP = """
 # the key length could be calculated by the number of rows.
 DEFAULT_SPAN_KEY_SIZE = 8
 
+# Note: Use a composed index (span, pk_hash) instead of only for column "span"
+# due to the "ORDER BY pk_hash" in the _COMPARE_DIFF query.
 _COMPARE_TABLE = """
     CREATE TEMPORARY TABLE {db}.{compare_tbl} (
-        compare_sign char(32) NOT NULL PRIMARY KEY,
-        pk_hash char(32) NOT NULL,
+        compare_sign binary(16) NOT NULL,
+        pk_hash binary(16) NOT NULL,
         {pkdef}
-        span char(8) NOT NULL,
-        KEY span_key (pk_hash({span_key_size})));
+        span binary({span_key_size}) NOT NULL,
+        INDEX span_key (span, pk_hash)) ENGINE=MyISAM
 """
 
 _COMPARE_INSERT = """
     INSERT INTO {db}.{compare_tbl}
         (compare_sign, pk_hash, {pkstr}, span)
     SELECT
-        MD5(CONCAT_WS('/', {colstr})),
-        MD5(CONCAT_WS('/', {pkstr})),
+        UNHEX(MD5(CONCAT_WS('/', {colstr}))),
+        UNHEX(MD5(CONCAT_WS('/', {pkstr}))),
         {pkstr},
-        LEFT(MD5(CONCAT_WS('/', {pkstr})), {span_key_size})
+        UNHEX(LEFT(MD5(CONCAT_WS('/', {pkstr})), {span_key_size}))
     FROM {db}.{table}
 """
 
 _COMPARE_SUM = """
-    SELECT span, COUNT(*) as cnt,
-        CONCAT(SUM(CONV(SUBSTRING(compare_sign,1,8),16,10)),
-        SUM(CONV(SUBSTRING(compare_sign,9,8),16,10)),
-        SUM(CONV(SUBSTRING(compare_sign,17,8),16,10)),
-        SUM(CONV(SUBSTRING(compare_sign,25,8),16,10))) as sig
+    SELECT HEX(span), COUNT(*) as cnt,
+        CONCAT(SUM(CONV(SUBSTRING(HEX(compare_sign),1,8),16,10)),
+        SUM(CONV(SUBSTRING(HEX(compare_sign),9,8),16,10)),
+        SUM(CONV(SUBSTRING(HEX(compare_sign),17,8),16,10)),
+        SUM(CONV(SUBSTRING(HEX(compare_sign),25,8),16,10))) as sig
     FROM {db}.{compare_tbl}
     GROUP BY span
 """
@@ -87,7 +89,7 @@ _COMPARE_SUM = """
 # incorrect SQL diff statements (UPDATES).
 _COMPARE_DIFF = """
     SELECT * FROM {db}.{compare_tbl}
-    WHERE span = '{span}' ORDER BY pk_hash
+    WHERE span = UNHEX('{span}') ORDER BY pk_hash
 """
 
 _COMPARE_SPAN_QUERY = """
@@ -765,7 +767,7 @@ def _get_compare_objects(index_cols, table1,
         table = _COMPARE_TABLE.format(db=table1.q_db_name,
                                       compare_tbl=q_tbl_name,
                                       pkdef=index_defn,
-                                      span_key_size=span_key_size)
+                                      span_key_size=span_key_size/2)
 
     return (table, index_str)
 
@@ -1137,42 +1139,53 @@ def _get_formatted_rows(rows, table, fmt='GRID'):
 
 
 def check_consistency(server1, server2, table1_name, table2_name,
-                      options=None, diag_msgs=None):
+                      options=None, diag_msgs=None, reporter=None):
     """Check the data consistency of two tables
 
     This method performs a comparison of the data in two tables.
 
     Algorithm:
 
-    This procedure uses a separate compare database containing a table that
+    This procedure uses a separate temporary compare table that
     contains an MD5 hash of the concatenated values of a row along with a
     MD5 hash of the concatenation of the primary key, the primary key columns,
-    and a grouping column named span.
+    and a grouping column named span. By default, before executing this
+    procedure the result of CHECKSUM TABLE is compared (which is faster when
+    no differences are expected). The remaining algorithm to find row
+    differences is only executed if this checksum table test fails or if it is
+    skipped by the user.
 
     The process to calculate differences in table data is as follows:
 
-    0. If binary log on for the client (sql_log_bin = 1), turn it off.
+    0. Compare the result of CHECKSUM TABLE for both tables. If the checksums
+       match None is returned and the algorithm ends, otherwise the next steps
+       to find row differences are executed.
 
-    1. Create the compare database and the compare table for each
-       database (db1.table1, db2.table2)
+       Note: The following steps are only executed if the table checksums are
+             different or if this preliminary step is skipped by the user.
 
-    2. For each table, populate the compare table using an INSERT statement
+    1. If binary log on for the client (sql_log_bin = 1), turn it off.
+
+    2. Create the temporary compare table for each table to compare
+       (db1.table1, db2.table2)
+
+    3. For each table, populate the compare table using an INSERT statement
        that calculates the MD5 hash for the row.
 
-    3. For each table, a summary result is formed by summing the MD5 hash
+    4. For each table, a summary result is formed by summing the MD5 hash
        values broken into four parts. The MD5 hash is converted to decimal for
        a numerical sum. This summary query also groups the rows in the compare
        table by the span column which is formed from the first 4 positions of
        the primary key hash.
 
-    4. The summary tables are compared using set methods to find rows (spans)
+    5. The summary tables are compared using set methods to find rows (spans)
        that appear in both tables, those only in table1, and those only in
        table2. A set operation that does not match the rows means the summed
        hash is different therefore meaning one or more rows in the span have
        either a missing row in the other table or the data is different. If no
-       differences found, skip to (8).
+       differences found, skip to (9).
 
-    5. The span values from the sets that contain rows that are different are
+    6. The span values from the sets that contain rows that are different are
        then compared again using set operations. Those spans that are in both
        sets contain rows that have changed while the set of rows in one but not
        the other (and vice-versa) contain rows that are missing.
@@ -1181,18 +1194,18 @@ def check_consistency(server1, server2, table1_name, table2_name,
              changed rows span to contain missing rows. This is Ok because the
              output of the difference will still present the data as missing.
 
-    6. The output of (5) that contain the same spans (changed rows) is then
+    7. The output of (6) that contain the same spans (changed rows) is then
        used to form a difference and this is saved for presentation to the
        user.
 
-    7. The output of (6) that contain missing spans (missing rows) is then
+    8. The output of (7) that contain missing spans (missing rows) is then
        used to form a formatted list of the results for presentation to the
        user.
 
-    8. The compare databases are destroyed and differences (if any) are
+    9. The compare databases are destroyed and differences (if any) are
        returned. A return value of None indicates the data is consistent.
 
-    9. Turn binary logging on if turned off in step (0).
+    10. Turn binary logging on if turned off in step (1).
 
     Exceptions:
 
@@ -1205,6 +1218,7 @@ def check_consistency(server1, server2, table1_name, table2_name,
                         'difftype'  : type of difference to show
                         'unique_key': column name for pseudo-key
     diag_msgs[out]    a list of diagnostic and warning messages.
+    reporter[in]      Instance of the database compare reporter class.
 
     Returns tuple - string representations of the primary index columns
 
@@ -1218,6 +1232,33 @@ def check_consistency(server1, server2, table1_name, table2_name,
     span_key_size = options.get('span_key_size', DEFAULT_SPAN_KEY_SIZE)
     compact_diff = options.get("compact", False)
     use_indexes = options.get('use_indexes', None)
+
+    table1 = Table(server1, table1_name)
+    table2 = Table(server2, table2_name)
+
+    # First, check full table checksum if step is not skipped.
+    if reporter:
+        reporter.report_object("", "- Compare table checksum")
+        reporter.report_state("")
+        reporter.report_state("")
+    if not options['no_checksum_table']:
+        checksum1, err1 = server1.checksum_table(table1.q_table)
+        checksum2, err2 = server2.checksum_table(table2.q_table)
+        if err1 or err2:
+            err_data = (server1.host, server1.port, err1) if err1 \
+                else (server2.host, server2.port, err2)
+            raise UtilError("Error executing CHECKSUM TABLE on '{0}@{1}': "
+                            "{2}".format(*err_data))
+        if checksum1 == checksum2:
+            if reporter:
+                reporter.report_state("pass")
+            return None  # No data diffs
+        else:
+            if reporter:
+                reporter.report_state("FAIL")
+    else:
+        if reporter:
+            reporter.report_state("SKIP")
 
     # if given get the unique_key for table_name
     table1_use_indexes = []
@@ -1250,9 +1291,11 @@ def check_consistency(server1, server2, table1_name, table2_name,
 
     data_diffs = None
 
-    table1 = Table(server1, table1_name)
-    table2 = Table(server2, table2_name)
-
+    # Now, execute algorithm to find row differences.
+    if reporter:
+        reporter.report_object("", "- Find row differences")
+        reporter.report_state("")
+        reporter.report_state("")
     # Setup the comparative tables and calculate the hashes
     pri_idx_str1, pri_idx_str2, used_index, used_index_name, msgs = (
         _setup_compare(table1, table2,
@@ -1356,4 +1399,9 @@ def check_consistency(server1, server2, table1_name, table2_name,
         server2.commit()
         server2.toggle_binlog("ENABLE")
 
+    if reporter:
+        if data_diffs:
+            reporter.report_state('FAIL')
+        else:
+            reporter.report_state('pass')
     return data_diffs

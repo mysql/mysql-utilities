@@ -89,21 +89,26 @@ if __name__ == '__main__':
                               "tab, csv, or vertical format", "grid")
 
     # Add skips
+    parser.add_option("--skip-checksum-table", action="store_true",
+                      dest="no_checksum_table",
+                      help="skip CHECKSUM TABLE step in data consistency "
+                           "check.")
+
     parser.add_option("--skip-object-compare", action="store_true",
                       dest="no_object_check",
-                      help="skip object comparison step")
+                      help="skip object comparison step.")
 
     parser.add_option("--skip-row-count", action="store_true",
                       dest="no_row_count",
-                      help="skip row count step")
+                      help="skip row count step.")
 
     parser.add_option("--skip-diff", action="store_true",
                       dest="no_diff",
-                      help="skip the object diff step")
+                      help="skip the object diff step.")
 
     parser.add_option("--skip-data-check", action="store_true",
                       dest="no_data",
-                      help="skip data consistency check")
+                      help="skip data consistency check.")
 
     # Skip check of table options.
     parser.add_option("--skip-table-options", action="store_true",
@@ -196,6 +201,7 @@ if __name__ == '__main__':
         "difftype": opt.difftype,
         "run_all_tests": opt.run_all_tests,
         "width": opt.width,
+        "no_checksum_table": opt.no_checksum_table,
         "no_object_check": opt.no_object_check,
         "no_diff": opt.no_diff,
         "no_row_count": opt.no_row_count,
