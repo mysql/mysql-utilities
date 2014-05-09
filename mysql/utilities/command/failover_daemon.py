@@ -570,8 +570,8 @@ class FailoverDaemon(Daemon):
                 failover_mode = self.register_instance()
 
             # discover slaves if option was specified at startup
-            elif self.options.get("discover", None) is not None and \
-                    (not first_pass or self.options.get("rediscover", False)):
+            elif (self.options.get("discover", None) is not None
+                  and not first_pass):
                 # Force refresh of health list if new slaves found
                 if self.rpl.topology.discover_slaves():
                     self.list_data = None

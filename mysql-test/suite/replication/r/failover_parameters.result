@@ -70,8 +70,6 @@ Test case 1 - show help
   --exec-post-failover=EXEC_POST_FAIL
                         name of script to execute after failover is complete
                         and the utility has refreshed the health report.
-  --rediscover          rediscover slaves on interval. Allows console to
-                        detect when slaves have been removed or added.
   -p, --pedantic        fail if some inconsistencies are found (e.g. errant
                         transactions on slaves).
   --no-keyboard         start with no keyboard input support.

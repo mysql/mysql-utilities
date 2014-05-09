@@ -162,11 +162,6 @@ if __name__ == '__main__':
                            "complete and the utility has refreshed the "
                            "health report.")
 
-    # Add rediscover on interval
-    parser.add_option("--rediscover", action="store_true", dest="rediscover",
-                      help="rediscover slaves on interval. Allows console to "
-                           "detect when slaves have been removed or added.")
-
     # Pedantic mode for failing if some inconsistencies are found
     parser.add_option("-p", "--pedantic", action="store_true", default=False,
                       dest="pedantic",
@@ -274,7 +269,6 @@ if __name__ == '__main__':
         'force': opt.force,
         'post_fail': opt.exec_post_fail,
         'rpl_user': opt.rpl_user,
-        'rediscover': opt.rediscover,
         'pedantic': opt.pedantic,
         'no_keyboard': opt.no_keyboard,
         'daemon': opt.daemon,
