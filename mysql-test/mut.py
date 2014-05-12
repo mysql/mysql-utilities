@@ -21,6 +21,7 @@ tests on the MySQL Utilities.
 """
 
 import sys
+
 from mysql.utilities.common.tools import (check_python_version,
                                           check_connector_python)
 
@@ -178,9 +179,10 @@ def _report_error(message, test_name, mode, start_test, error=True):
         skipped_tests.append(test)
 
 
-# Helper method to manage exception handling
 def _exec_and_report(procedure, default_message, test_name, action,
                      start_test_time, exception_procedure=None):
+    """Helper method to manage exception handling.
+    """
     extra_message = None
     try:
         res = procedure()
@@ -199,8 +201,9 @@ def _exec_and_report(procedure, default_message, test_name, action,
     return False
 
 
-# Helper method to read CSV file
 def _read_disabled_tests():
+    """Helper method to read CSV file.
+    """
     disabled_tests = []
     with open("disabled") as f:
         csv_reader = csv.reader(f)
@@ -210,12 +213,15 @@ def _read_disabled_tests():
     return disabled_tests
 
 
-# Find test files
 def find_tests(path):
+    """Find test files.
+
+    path[in]    Path to find tests.
+    """
     test_files = []
     suites_found = []
     # Build the list of tests from suites to execute
-    for root, dirs, files in os.walk(path):
+    for root, _, files in os.walk(path):
         for f in files:
             # Check --suites list. Skip if we have suites and dir is in list
             start = len(path) + 1
@@ -460,7 +466,7 @@ else:
 if opt.stop_test:
     print("  Stop test           = '{0}%%'".format(opt.stop_test))
 
-server_list = ServerList([], opt.start_port, opt.utildir, opt.verbosity >= 3)
+server_list = ServerList([], opt.start_port, opt.utildir, opt.verbosity)
 basedir = None
 
 # Print status of connections
@@ -511,7 +517,7 @@ else:
         # Here we capture any exception and print the error message.
         # Since all util errors (exceptions) derive from Exception, this is
         # safe.
-        except Exception:
+        except:
             _, err, _ = sys.exc_info()
             print("{0}FAILED{1}".format(BOLD_ON, BOLD_OFF))
             if conn.connect_error is not None:

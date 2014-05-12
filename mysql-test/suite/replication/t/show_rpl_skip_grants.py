@@ -15,7 +15,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+show_rpl_skip_grants test.
+"""
+
 import show_rpl
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 MASTER_MYSQLD = "--skip-grant-tables --log-bin"
@@ -86,7 +91,7 @@ class test(show_rpl.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         show_rpl.test.do_replacements(self)
-        
+
         return True
 
     def get_result(self):

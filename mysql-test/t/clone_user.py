@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+clone_user test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.common.user import User
 from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
 
@@ -24,6 +31,8 @@ class test(mutlib.System_test):
     """clone user
     This test clones a user on a single server copying all grants.
     """
+
+    server1 = None
 
     def check_prerequisites(self):
         return self.check_num_servers(1)
@@ -50,6 +59,10 @@ class test(mutlib.System_test):
         return True
 
     def show_user_grants(self, user):
+        """Show user grants.
+
+        user[in]    Database user.
+        """
         query = "SHOW GRANTS FOR {0}".format(user)
         try:
             res = self.server1.exec_query(query)
@@ -207,7 +220,13 @@ class test(mutlib.System_test):
     def record(self):
         return self.save_result_file(__name__, self.results)
 
-    def drop_user(self, user_name, server):
+    @staticmethod
+    def drop_user(user_name, server):
+        """Drop user from database.
+
+        user_name[in]   Database user.
+        server[in]      Server instance.
+        """
         user = User(server, user_name)
         if user.exists():
             res = user.drop()
@@ -220,7 +239,7 @@ class test(mutlib.System_test):
             os.unlink(self.res_fname)
         query = "DROP DATABASE util_test"
         try:
-            res = self.server1.exec_query(query)
+            self.server1.exec_query(query)
         except UtilError:
             return False
         users = ["'joe_pass'@'%'", "joe_pass@user", "'joe_nopass'@'user'",

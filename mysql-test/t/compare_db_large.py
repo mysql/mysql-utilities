@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+compare_db_large test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.exception import MUTLibError
@@ -32,6 +38,11 @@ class test(mutlib.System_test):
 
     Note: Test requires the world_innodb sample database loaded in server1.
     """
+
+    server1 = None
+    server2 = None
+    db_test_name = None
+    setup_temp_file = None
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -158,7 +169,8 @@ class test(mutlib.System_test):
         return self.compare(__name__, self.results)
 
     def do_replacements(self):
-        # Mask inconsistent Python 2.7 behavior
+        """Mask inconsistent Python 2.7 behavior.
+        """
         self.replace_result("@@ -1 +1 @@", "@@ -1,1 +1,1 @@\n")
         self.replace_result("# @@ -1 +1 @@", "# @@ -1,1 +1,1 @@\n")
 

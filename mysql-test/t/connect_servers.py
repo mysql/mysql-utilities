@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,11 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-import os
+
+"""
+connect_servers test.
+"""
+
 import mutlib
-from mysql.utilities.exception import UtilError, MUTLibError, FormatError
-from mysql.utilities.common.server import get_connection_dictionary, \
-    connect_servers
+
+from mysql.utilities.exception import UtilError, FormatError
+from mysql.utilities.common.server import connect_servers
 
 
 class test(mutlib.System_test):
@@ -27,12 +31,15 @@ class test(mutlib.System_test):
     parameter types for connection (dictionary, connection string, class).
     """
 
+    server0 = None
+    connect_str = None
+    connect_dict = None
+    test_cases = None
+
     def check_prerequisites(self):
         return self.check_num_servers(1)
 
     def setup(self):
-        self.server_options = {'quiet': True, 'version': None,
-                               'src_name': "test 1", 'dest_name': "test 2", }
         # We need a Server instance, a dictionary list, and a connection string
         self.server0 = self.servers.get_server(0)
         self.connect_str = self.build_connection_string(self.server0)
@@ -64,11 +71,12 @@ class test(mutlib.System_test):
         return True
 
     def run(self):
+        server_options = {'quiet': True, 'version': None,
+                          'src_name': "test 1", 'dest_name': "test 2", }
         # Test mixes of the valid parameter types for server
         for i, test_case in enumerate(self.test_cases):
             try:
-                s = connect_servers(test_case[1], test_case[2],
-                                    self.server_options)
+                connect_servers(test_case[1], test_case[2], server_options)
             except UtilError as err:
                 self.results.append((test_case[0], True, err.errmsg))
             except FormatError as err:
@@ -79,6 +87,7 @@ class test(mutlib.System_test):
         if self.debug:
             print "\nTest Results (test case, actual result, expected result):"
             for i in range(0, len(self.test_cases)):
+                # pylint: disable=W0631
                 print("{0}, {1}, {2}".format(
                     self.results[i][0], self.results[i][2], test_case[3]))
 

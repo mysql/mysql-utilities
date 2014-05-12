@@ -87,6 +87,8 @@ PARSE_ERR_OPT_REQ_NON_NEGATIVE_VALUE = ("Option '{opt}' requires a "
 PARSE_ERR_OPT_REQ_GREATER_VALUE = ("Option '{opt}' requires a value greater "
                                    "than {val}.")
 
+PARSE_ERR_OPT_REQ_VALUE = "Option '{opt}' requires a non-empty value."
+
 PARSE_ERR_OPTS_REQ = "Option '{opt}' is required."
 
 PARSE_ERR_OPTS_REQ_BY_CMD = ("'{cmd}' requires the following option(s): "
@@ -137,3 +139,7 @@ SCRIPT_THRESHOLD_WARNING = ("WARNING: You have chosen to use external script "
 HOST_IP_WARNING = ("You may be mixing host names and IP addresses. This may "
                    "result in negative status reporting if your DNS services "
                    "do not support reverse name lookup.")
+
+ERROR_MIN_SERVER_VERSIONS = ("The {utility} requires server versions greater "
+                             "or equal than {min_version}. Server version for "
+                             "'{host}:{port}' is not supported.")

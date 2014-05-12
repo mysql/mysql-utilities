@@ -65,4 +65,12 @@ CREATE VIEW `tools` AS SELECT * FROM inventory.supplies WHERE type in ('tool', '
 CREATE VIEW `cleaning` AS SELECT * FROM inventory.supplies WHERE type in ('cleaning','washing');
 CREATE VIEW `finishing_up` AS SELECT * FROM inventory.supplies WHERE type in ('waxing','polishing','drying');
 
-
+#
+# Test data that will have the same 8-character span key value.
+#
+CREATE DATABASE multi_span_row;
+CREATE TABLE multi_span_row.t (id int primary key, data int) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+# id: 94092 and 171607 -> span: 26f5128d
+INSERT INTO multi_span_row.t VALUES (94092, 1), (171607, 1);
+# id: 1651723 and 1908449 -> span: 01ae4dc7
+INSERT INTO multi_span_row.t VALUES (1651723, 1), (1908449, 1);

@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+clone_db_parameters test.
+"""
+
 import clone_db
 
 from mysql.utilities.exception import MUTLibError
@@ -128,11 +132,9 @@ class test(clone_db.test):
                                        "ON SCHEDULE EVERY 1 YEAR STARTS "
                                        "'YYYY-MM-DD HH:MI:SS' ON COMPLETION")
 
-        self.replace_result(
-                "MySQL Utilities mysqldbcopy version",
-                "MySQL Utilities mysqldbcopy version X.Y.Z "
-                "(part of MySQL Workbench ... XXXXXX)\n"
-        )
+        self.replace_result("MySQL Utilities mysqldbcopy version",
+                            "MySQL Utilities mysqldbcopy version X.Y.Z "
+                            "(part of MySQL Workbench ... XXXXXX)\n")
 
         return True
 

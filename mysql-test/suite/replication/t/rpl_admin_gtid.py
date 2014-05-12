@@ -15,10 +15,17 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_admin_gtid test.
+"""
+
 import time
+
 import mutlib
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError, UtilDBError
+
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
@@ -51,6 +58,9 @@ class test(rpl_admin.test):
     Note: this test requires GTID enabled servers.
     """
 
+    server5 = None
+    s4_port = None
+
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 9):
             raise MUTLibError("Test requires server version 5.6.9")
@@ -62,22 +72,27 @@ class test(rpl_admin.test):
         # Spawn servers
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS.format(port=self.servers.view_next_port())
-        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_gtid", mysqld,
+                                                 True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(port=self.servers.view_next_port())
-        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_gtid", mysqld,
+                                                 True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(port=self.servers.view_next_port())
-        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_gtid", mysqld,
+                                                 True)
         # Spawn server with --master-info-repository=TABLE and
         # --relay-log-info-repository=TABLE.
         mysqld = _MYSQL_OPTS_INFO_REPO_TABLE.format(
             port=self.servers.view_next_port()
         )
-        self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave3_gtid", mysqld,
+                                                 True)
         # Spawn a server with MIR=FILE
         mysqld = _DEFAULT_MYSQL_OPTS_FILE.format(
             port=self.servers.view_next_port()
         )
-        self.server5 = self.spawn_server("rep_slave4_gtid", mysqld, True)
+        self.server5 = self.servers.spawn_server("rep_slave4_gtid", mysqld,
+                                                 True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master([self.server1, self.server2, self.server3,
@@ -114,7 +129,7 @@ class test(rpl_admin.test):
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
         cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
         cmd_opts = " --candidates={0} --slaves={0} elect".format(slaves)
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -124,7 +139,7 @@ class test(rpl_admin.test):
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
         cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
         cmd_opts = " --slaves={0} gtid --format=csv ".format(slaves)
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -141,7 +156,7 @@ class test(rpl_admin.test):
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
         cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
         cmd_opts = " --discover-slaves-login=root:root health --format=csv "
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -154,7 +169,7 @@ class test(rpl_admin.test):
         cmd_str = "mysqlrpladmin.py "
         cmd_opts = " --candidates={0}  --slaves={1} failover".format(
             slave3_conn, slaves)
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -164,7 +179,7 @@ class test(rpl_admin.test):
         cmd_str = "mysqlrpladmin.py --master={0} ".format(slave3_conn)
         comment = "Test case {0} - show health after failover".format(test_num)
         cmd_opts = " --slaves={0} --format=vertical health".format(slaves)
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -179,7 +194,7 @@ class test(rpl_admin.test):
             test_num)
         cmd_opts = " --slaves={0} elect -vvv --candidates={1} ".format(
             slaves, slave1_conn)
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -200,9 +215,9 @@ class test(rpl_admin.test):
                    "--rpl-user".format(test_num))
         cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
         cmd_opts = (" --discover-slaves-login=root:root switchover "
-                    "--new-master=root:root@localhost:{0}".format(
-                    self.s4_port))
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
+                    "--new-master=root:root@localhost:{0}"
+                    "".format(self.s4_port))
+        res = mutlib.System_test.run_test_case(self, 1, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -214,7 +229,7 @@ class test(rpl_admin.test):
         cmd_opts = (" --discover-slaves-login=root:root switchover "
                     "--new-master=root:root@localhost:{0} "
                     "--rpl-user=rpl:rpl ".format(self.s4_port))
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -282,14 +297,13 @@ class test(rpl_admin.test):
                 # Use rollback to close transaction and read fresh data
                 # data in next select.
                 self.server2.rollback()
+                if isinstance(res, list) and int(res[0][0]) == last_val:
+                    break
             except UtilDBError:  # database may not exist yet
                 pass
             finally:
-                if isinstance(res, list) and int(res[0][0]) == last_val:
-                    break
-                else:
-                    time.sleep(3)
-                    round_ += 1
+                round_ += 1
+                time.sleep(3)
         else:
             raise MUTLibError("{0}: failed - waiting for slave to sync "
                               "with master".format(comment))

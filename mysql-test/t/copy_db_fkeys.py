@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+copy_db_fkeys test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
 
 
@@ -24,6 +31,9 @@ class test(mutlib.System_test):
     This test executes copy database test cases among two servers with
     foreign keys defined.
     """
+
+    server1 = None
+    server2 = None
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -46,7 +56,7 @@ class test(mutlib.System_test):
         self.server1.disable_foreign_key_checks(True)
         data_file = os.path.normpath("./std_data/fkeys.sql")
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file"
                               " {0}: {1}".format((data_file, err.errmsg)))
@@ -94,6 +104,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases created.
+        """
         drop_dbs_s1 = ["util_test_fk2", "util_test_fk", "util_test_fk3"]
         drop_dbs_s2 = ["util_test_fk2_copy"]
         drop_results_s1 = []

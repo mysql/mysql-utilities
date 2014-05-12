@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+replicate_ms test.
+"""
+
 import os
 import shlex
 import subprocess
@@ -27,7 +31,7 @@ from mutlib.mutlib import stop_process
 
 _RPLMS_LOG = "{0}rplms_log.txt"
 _TIMEOUT = 30
-_SWITCHOVER_TIMEOUT = 60
+_SWITCHOVER_TIMEOUT = 120
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
                        '--enforce-gtid-consistency --report-host=127.0.0.1 '
@@ -43,6 +47,10 @@ class test(rpl_admin.test):
 
     log_range = range(1, 2)
     total_masters = 2
+    server0 = None
+    server1 = None
+    server2 = None
+    server3 = None
 
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 9):
@@ -55,11 +63,11 @@ class test(rpl_admin.test):
         # Spawn servers
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS.format(port=self.servers.view_next_port())
-        self.server1 = self.spawn_server("rep_slave", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_slave", mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(port=self.servers.view_next_port())
-        self.server2 = self.spawn_server("rep_master1", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_master1", mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(port=self.servers.view_next_port())
-        self.server3 = self.spawn_server("rep_master2", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_master2", mysqld, True)
         self.total_masters = 2
 
         # Drop all
@@ -369,9 +377,11 @@ class test(rpl_admin.test):
         """
         self.drop_db(self.server1, "empty_db")
         self.drop_db(self.server1, "inventory")
+        self.drop_db(self.server1, "multi_span_row")
         self.drop_db(self.server1, "import_test")
         self.drop_db(self.server2, "empty_db")
         self.drop_db(self.server2, "inventory")
+        self.drop_db(self.server2, "multi_span_row")
         self.drop_db(self.server3, "import_test")
 
     def cleanup_logs(self):

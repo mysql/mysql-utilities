@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+diff_sql_routines test.
+"""
+
 import test_sql_template
 
 
@@ -73,9 +77,11 @@ _ROUTINE_TESTS = [
 
 class test(test_sql_template.test):
     """test mysqldiff --difftype=sql generation for routines
-    
+
     This test uses the test_sql_template for testing routines.
     """
+
+    utility = None
 
     def check_prerequisites(self):
         return test_sql_template.test.check_prerequisites(self)

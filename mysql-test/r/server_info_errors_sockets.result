@@ -1,0 +1,8 @@
+Test case 1 - Socket file does not exist
+# Source on localhost: ... connected.
+ERROR: Unable to connect to server using socket XXXX. Socket file does not exist.
+
+Test case 2 - Socket file is not valid
+# Source on localhost: ... connected.
+ERROR: Unable to connect to server using socket XXXX. Socket file is not valid.
+

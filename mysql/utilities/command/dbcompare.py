@@ -307,19 +307,21 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
     debug_msgs = []
     diff_server1 = []
     diff_server2 = []
-    diff_list = []
     # For each table, do row data consistency check
     if not options['no_data']:
+        reporter.report_state('-')
         try:
             # Do the comparison based on direction
             if direction == 'server1' or reverse:
                 diff_server1 = check_consistency(server1, server2,
                                                  obj1, obj2, options,
-                                                 diag_msgs=debug_msgs)
+                                                 diag_msgs=debug_msgs,
+                                                 reporter=reporter)
             if direction == 'server2' or reverse:
                 diff_server2 = check_consistency(server2, server1,
                                                  obj2, obj1, options,
-                                                 diag_msgs=debug_msgs)
+                                                 diag_msgs=debug_msgs,
+                                                 reporter=reporter)
 
             # if no differences, return
             if (diff_server1 is None and diff_server2 is None) or \
@@ -327,7 +329,6 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
                      diff_server1 is None) or \
                     (not reverse and direction == 'server2' and
                      diff_server2 is None):
-                reporter.report_state('pass')
                 return errors, debug_msgs
 
             # Build diff list
@@ -341,10 +342,7 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
                 diff_list = build_diff_list(diff_server2, diff_server1,
                                             diff_server2, diff_server1,
                                             'server2', 'server1', new_opts)
-            if len(diff_list) == 0:
-                reporter.report_state('pass')
-            else:
-                reporter.report_state('FAIL')
+            if diff_list:
                 errors = diff_list
         except UtilError, e:
             if e.errmsg.endswith("not have an usable Index or primary key."):
@@ -456,8 +454,6 @@ def database_compare(server1_val, server2_val, db1, db2, options):
         # Set the object type
         obj_type = item[0]
 
-        obj1 = "{0}.{1}".format(db1, item[1][0])
-        obj2 = "{0}.{1}".format(db2, item[1][0])
         q_obj1 = "{0}.{1}".format(quote_with_backticks(db1),
                                   quote_with_backticks(item[1][0]))
         q_obj2 = "{0}.{1}".format(quote_with_backticks(db2),

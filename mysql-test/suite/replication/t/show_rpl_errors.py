@@ -14,9 +14,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+show_rpl_errors test.
+"""
+
 import os
+
 import show_rpl
 import mutlib
+
 from mysql.utilities.exception import UtilError, MUTLibError
 
 
@@ -38,7 +45,7 @@ class test(show_rpl.test):
         self.server_list[2] = self.get_server("rep_master_show")
         if self.server_list[2] is None:
             return False
-            
+
         self.port_repl = []
         self.port_repl.append(self.server_list[1].port)
         self.port_repl.append(self.server_list[2].port)
@@ -69,23 +76,23 @@ class test(show_rpl.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        show_rpl.test.stop_replication(self, self.server_list[4])
-        show_rpl.test.stop_replication(self, self.server_list[3])
-        show_rpl.test.stop_replication(self, self.server_list[2])
-        show_rpl.test.stop_replication(self, self.server_list[1])
+        show_rpl.test.stop_replication(self.server_list[4])
+        show_rpl.test.stop_replication(self.server_list[3])
+        show_rpl.test.stop_replication(self.server_list[2])
+        show_rpl.test.stop_replication(self.server_list[1])
 
-        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl " 
+        cmd = "mysqlreplicate.py --rpl-user=rpl:rpl "
         try:
-            self.exec_util(cmd+master_str+slave_str,
+            self.exec_util(cmd + master_str + slave_str,
                            self.res_fname)
         except UtilError as err:
             raise MUTLibError(err.errmsg)
-        
+
         test_num += 1
         cmd_str = "mysqlrplshow.py --disco=root:root ".format(master_str)
         comment = "Test case {0} - show topology - bad format".format(test_num)
         cmd_opts = "  --show-list --recurse --format=XXXXXX"
-        res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -98,22 +105,22 @@ class test(show_rpl.test):
                    "{0}".format(self.server_list[2].port))
         if not self.server_list[2].socket is None:
             cmd_str = "{0}:{1}".format(cmd_str, self.server_list[2].socket)
-            
+
         comment = ("Test case {0}a - show topology - not enough "
                    "permissions".format(test_num))
         cmd_opts = "  --show-list --recurse "
-        res = mutlib.System_test.run_test_case(self, 1, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 1, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-            
+
         self.server_list[2].exec_query("GRANT REPLICATION SLAVE ON *.* TO "
                                        "'josh'@'localhost'")
 
         comment = ("Test case {0}b - show topology - not enough "
                    "permissions".format(test_num))
         cmd_opts = "  --show-list --recurse "
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -122,7 +129,7 @@ class test(show_rpl.test):
         comment = ("Test case {0} - show topology - bad "
                    "max-depth".format(test_num))
         cmd_opts = "  --show-list --recurse --max-depth=-1"
-        res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -131,7 +138,7 @@ class test(show_rpl.test):
         comment = ("Test case {0} - show topology - large "
                    "max-depth".format(test_num))
         cmd_opts = "  --show-list --recurse --max-depth=9999"
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -142,11 +149,11 @@ class test(show_rpl.test):
         cmd_str = "mysqlrplshow.py --master=josh@localhost:{0}".format(
             self.server_list[2].port)
         cmd_opts = "  --show-list --recurse --max-depth=9999"
-        res = mutlib.System_test.run_test_case(self, 2, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-            
+
         show_rpl.test.do_replacements(self)
 
         self.replace_substring("Error 1045:", "Error")
@@ -156,16 +163,16 @@ class test(show_rpl.test):
                             "mysqlrplshow: error: Master connection "
                             "values invalid\n")
 
-        show_rpl.test.stop_replication(self, self.server_list[1])
+        show_rpl.test.stop_replication(self.server_list[1])
 
         return True
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         self.server_list[2].exec_query("DROP USER 'josh'@'localhost'")
         if self.res_fname:

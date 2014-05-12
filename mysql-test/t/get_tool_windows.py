@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+get_tool_windows test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.common import tools
 from mysql.utilities.exception import UtilError
@@ -27,6 +34,9 @@ class test(mutlib.System_test):
     It test the message for the unsupported version of the First server passed
     as parameter..
     """
+
+    server1 = None
+    old_server = None
 
     def check_prerequisites(self):
         fail = None
@@ -56,9 +66,9 @@ class test(mutlib.System_test):
         self.results.append(comment)
         try:
             basedir = self.server1.show_server_variable("basedir")
-            #setting required=False to verify it founds mysqld-nt.exe 
+            # setting required=False to verify it founds mysqld-nt.exe
             res = tools.get_tool_path(basedir[0][1], "mysqld", required=False)
-            #ensuring it founds mysqld-nt.exe.           
+            # ensuring it founds mysqld-nt.exe
             if "mysqld-nt.exe" in res and not "Cannot find location of" in res:
                 self.results.append("Pass\n")
         except UtilError:

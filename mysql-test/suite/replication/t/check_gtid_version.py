@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+check_gtid_version test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import UtilError, MUTLibError
+
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
@@ -27,8 +35,12 @@ _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
 class test(mutlib.System_test):
     """check gtid version
     This test exercises the code to check gtid version compatibility.
-    It requires a pre-5.6.9 GTID enabled server. 
+    It requires a pre-5.6.9 GTID enabled server.
     """
+
+    server0 = None
+    server1 = None
+    s1_serverid = None
 
     def check_prerequisites(self):
         # Check MySQL server version - Must be between 5.5.6 and 5.6.8
@@ -67,12 +79,12 @@ class test(mutlib.System_test):
         self.server1.exec_query("INSERT INTO gtid_version.t1 VALUES (1)")
 
         return True
-    
+
     def run(self):
         self.res_fname = "result.txt"
 
         export_cmd_str = ("mysqldbexport.py gtid_version --export=both "
-                          "--skip=events,grants,procedures,functions,views " 
+                          "--skip=events,grants,procedures,functions,views "
                           "--format=SQL ")
 
         conn1 = "--server=" + self.build_connection_string(self.server1)
@@ -105,8 +117,10 @@ class test(mutlib.System_test):
         except OSError:
             pass
         return self.drop_all()
-        
+
     def drop_all(self):
+        """Drops all databases created.
+        """
         try:
             self.server1.exec_query("DROP DATABASE `gtid_version`")
         except UtilError:

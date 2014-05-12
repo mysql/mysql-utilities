@@ -15,8 +15,13 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
-import mutlib
+"""
+mylogin_errors_port_socket test.
+"""
+
 import os
+
+import mutlib
 
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.exception import UtilError, MUTLibError
@@ -74,7 +79,7 @@ class test(mutlib.System_test):
             else:
                 parse_connection("test_host_only:3306")
         except UtilError as err:
-                self.results.append("{0}\n".format(err.errmsg))
+            self.results.append("{0}\n".format(err.errmsg))
 
         # on posix systems if we use socket, and there is no hostname,
         # hostname is assumed to be "localhost". So it is equivalent
@@ -85,7 +90,7 @@ class test(mutlib.System_test):
             else:
                 parse_connection("test_host_only:3306")
         except UtilError as err:
-                self.results.append("{0}\n".format(err.errmsg))
+            self.results.append("{0}\n".format(err.errmsg))
 
         # remove socket warnings to have same output
         # on both posix and windows operating systems.

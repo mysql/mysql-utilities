@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+import_file_per_table test.
+"""
+
 import os
+
 import import_basic
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -119,6 +126,8 @@ class test(import_basic.test):
         return True
 
     def delete_data(self, tbl):
+        """Deletes all data created.
+        """
         try:
             self.server2.exec_query("SET foreign_key_checks = OFF")
             self.server2.exec_query("DELETE FROM {0}".format(tbl))

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+diff_sql_tables_constr test.
+"""
+
 import test_sql_template
+
 
 _PARENT_TABLE = ("CREATE TABLE diff_table.t2 (a_i INT NOT NULL PRIMARY KEY) "
                  "ENGINE=INNODB;")
@@ -52,9 +58,11 @@ _TABLE_TESTS = [("Table constraints primary key",
 
 class test(test_sql_template.test):
     """test mysqldiff --difftype=sql generation for table constraint changes
-    
+
     This test uses the test_sql_template for testing tables.
     """
+
+    utility = None
 
     def check_prerequisites(self):
         return test_sql_template.test.check_prerequisites(self)

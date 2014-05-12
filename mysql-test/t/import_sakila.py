@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+import_sakila test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.exception import MUTLibError
@@ -32,6 +38,8 @@ class test(mutlib.System_test):
     Note: The sakila database files are imported from the 'support' folder
     since these files should not be distributed with mysql-utilities.
     """
+
+    server1 = None
 
     def check_prerequisites(self):
         # Check if sakila database files are available.

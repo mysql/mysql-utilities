@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+export_parameters_data test.
+"""
+
+import os
+
 import export_parameters_def
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -29,6 +37,7 @@ class test(export_parameters_def.test):
         return export_parameters_def.test.check_prerequisites(self)
 
     def setup(self):
+
         res = export_parameters_def.test.setup(self)
         if not res:
             return False
@@ -42,9 +51,17 @@ class test(export_parameters_def.test):
         try:
             self.server1.exec_query("UPDATE util_test.t2 SET x_blob = "
                                     "'This is a blob.' ")
-
         except UtilError as err:
             raise MUTLibError("Cannot update rows: {0}".format(err.errmsg))
+
+        # Load a database with different blob tables, with and without
+        # NOT NULL UNIQUE INDEXES
+        data_file_import = os.path.normpath("./std_data/blob_data.sql")
+        try:
+            self.server1.read_and_exec_SQL(data_file_import, self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file_import, err.errmsg))
 
         return True
 
@@ -92,6 +109,14 @@ class test(export_parameters_def.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - tables with BLOBS with and without NOT "
+                   "NULL UNIQUE INDEXES").format(test_num)
+        cmd_opts = "{0} blob_test --format=SQL --export=data".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         ## Mask known source.
         self.replace_result("# Source on localhost: ... connected.",
                             "# Source on XXXX-XXXX: ... connected.\n")
@@ -109,4 +134,5 @@ class test(export_parameters_def.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        return export_parameters_def.test.cleanup(self)
+        return (self.drop_db(self.server1, 'blob_test') and
+                export_parameters_def.test.cleanup(self))

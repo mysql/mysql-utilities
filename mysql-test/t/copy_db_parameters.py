@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+copy_db_parameters test.
+"""
+
 import os
+
 import copy_db
+
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError
 
@@ -28,6 +35,8 @@ class test(copy_db.test):
     server using a variety of parameters. It uses the copy_db test
     as a parent for setup and teardown methods.
     """
+
+    server3 = None
 
     def check_prerequisites(self):
         # Check MySQL server version - Must be 5.1.0 or higher
@@ -73,7 +82,7 @@ class test(copy_db.test):
             rows = self.server3.exec_query("SHOW DATABASES")
             for row in rows:
                 if not row[0].upper() in _SYSTEM_DATABASES:
-                    self.server3.exec_query("DROP DATABASE {0}".format(row[0]))
+                    self.drop_db(self.server3, row[0])
             self.server3.exec_query("CREATE DATABASE wesaysocorp")
         except UtilError as err:
             raise MUTLibError("Failed to drop databases: "
@@ -157,7 +166,7 @@ class test(copy_db.test):
 
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",
-        "# Destination: root@localhost:[] ... connected\n")
+                            "# Destination: root@localhost:[] ... connected\n")
 
         # Mask known source and destination host name.
         self.replace_result("# Source on ",
@@ -170,9 +179,9 @@ class test(copy_db.test):
 
         # Mask version
         self.replace_result(
-                "MySQL Utilities mysqldbcopy version",
-                "MySQL Utilities mysqldbcopy version X.Y.Z "
-                "(part of MySQL Workbench ... XXXXXX)\n"
+            "MySQL Utilities mysqldbcopy version",
+            "MySQL Utilities mysqldbcopy version X.Y.Z "
+            "(part of MySQL Workbench ... XXXXXX)\n"
         )
 
         return True

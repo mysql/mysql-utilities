@@ -14,12 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+rpl_admin test.
+"""
+
 import os
 import time
 
 import mutlib
 
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --report-host=localhost '
                        '--report-port={0} "')
@@ -33,6 +39,17 @@ class test(mutlib.System_test):
     See rpl_admin_gtid test for test cases for GTID enabled servers.
     """
 
+    server0 = None
+    server1 = None
+    server2 = None
+    server3 = None
+    server4 = None
+    s1_port = None
+    s2_port = None
+    s3_port = None
+    m_port = None
+    master_str = None
+
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 5, 30):
             raise MUTLibError("Test requires server version 5.5.30 or later.")
@@ -40,52 +57,23 @@ class test(mutlib.System_test):
             raise MUTLibError("Test requires servers without GTID enabled.")
         return self.check_num_servers(1)
 
-    def spawn_server(self, name, mysqld=None, kill=False):
-        index = self.servers.find_server_by_name(name)
-        if index >= 0 and kill:
-            server = self.servers.get_server(index)
-            if self.debug:
-                print "# Killing server {0}.".format(server.role)
-            self.servers.stop_server(server)
-            self.servers.remove_server(server.role)
-            index = -1
-        if self.debug:
-            print "# Spawning {0}".format(name)
-        if index >= 0:
-            if self.debug:
-                print "# Found it in the servers list."
-            server = self.servers.get_server(index)
-            try:
-                server.show_server_variable("server_id")
-            except MUTLibError as err:
-                raise MUTLibError("Cannot get replication server 'server_id': "
-                                  "{0}".format(err.errmsg))
-        else:
-            if self.debug:
-                print "# Cloning server0."
-            serverid = self.servers.get_next_id()
-            if mysqld is None:
-                mysqld = _DEFAULT_MYSQL_OPTS.format(
-                    self.servers.view_next_port())
-            res = self.servers.spawn_new_server(self.server0, serverid,
-                                                name, mysqld)
-            if not res:
-                raise MUTLibError("Cannot spawn replication server "
-                                  "'{0}'.".format(name))
-            self.servers.add_new_server(res[0], True)
-            server = res[0]
-
-        return server
-
     def setup(self):
         self.res_fname = "result.txt"
 
         # Spawn servers
         self.server0 = self.servers.get_server(0)
-        self.server1 = self.spawn_server("rep_master", kill=True)
-        self.server2 = self.spawn_server("rep_slave1", kill=True)
-        self.server3 = self.spawn_server("rep_slave2", kill=True)
-        self.server4 = self.spawn_server("rep_slave3", kill=True)
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+        self.server1 = self.servers.spawn_server("rep_master", kill=True,
+                                                 mysqld=mysqld)
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+        self.server2 = self.servers.spawn_server("rep_slave1", kill=True,
+                                                 mysqld=mysqld)
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+        self.server3 = self.servers.spawn_server("rep_slave2", kill=True,
+                                                 mysqld=mysqld)
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+        self.server4 = self.servers.spawn_server("rep_slave3", kill=True,
+                                                 mysqld=mysqld)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master()
@@ -105,7 +93,6 @@ class test(mutlib.System_test):
         return self.reset_topology()
 
     def run(self):
-
         cmd_str = "mysqlrpladmin.py {0} ".format(self.master_str)
 
         master_conn = self.build_connection_string(self.server1).strip(' ')
@@ -119,13 +106,12 @@ class test(mutlib.System_test):
         comment = "Test case {0} - show health before switchover".format(
             test_num)
         cmd_opts = " --slaves={0} --format=vertical health".format(slaves_str)
-        res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         # Build connection string with loopback address instead of localhost
-        slave_ports = [self.server2.port, self.server3.port, self.server4.port]
         slaves_loopback = ("root:root@127.0.0.1:{0},root:root@127.0.0.1:{1},"
                            "root:root@127.0.0.1:{2}".format(self.server2.port,
                                                             self.server3.port,
@@ -155,7 +141,7 @@ class test(mutlib.System_test):
                        "--rpl-user=rpl:rpl ".format(case[0]))
             cmd_opts = (" --new-master={0} --demote-master --slaves={1} "
                         "switchover".format(case[2], slaves_str))
-            res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+            res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                    comment)
             if not res:
                 raise MUTLibError("{0}: failed".format(comment))
@@ -166,7 +152,7 @@ class test(mutlib.System_test):
                 test_num)
             cmd_opts = " --slaves={0} --format=vertical health".format(
                 slaves_str)
-            res = mutlib.System_test.run_test_case(self, 0, cmd_str+cmd_opts,
+            res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                    comment)
             if not res:
                 raise MUTLibError("{0}: failed".format(comment))
@@ -248,6 +234,8 @@ class test(mutlib.System_test):
         return True
 
     def do_masks(self):
+        """Apply masks in the result.
+        """
         self.replace_substring(str(self.m_port), "PORT1")
         self.replace_substring(str(self.s1_port), "PORT2")
         self.replace_substring(str(self.s2_port), "PORT3")
@@ -276,6 +264,10 @@ class test(mutlib.System_test):
                                        "| OK      |")
 
     def reset_master(self, servers_list=None):
+        """Resets a list of masters.
+
+        server_list[in]     List with the server instances.
+        """
         servers_list = [] if servers_list is None else servers_list
         # Clear binary log and GTID_EXECUTED of given servers
         if servers_list:
@@ -292,6 +284,13 @@ class test(mutlib.System_test):
 
     def reset_topology(self, slaves_list=None, rpl_user='rpl',
                        rpl_passwd='rpl', master=None):
+        """Reset topology.
+
+        server_list[in]     List with the server instances.
+        rpl_user[in]        Replication user. Default=rpl.
+        rpl_passwd[in]      Replication password. Default=rpl
+        master[in]          Master server instance.
+        """
         if slaves_list:
             slaves = slaves_list
         else:
@@ -309,7 +308,8 @@ class test(mutlib.System_test):
         # Check if all servers are alive, and if they are not,
         # spawn a new instance
         for index, server in enumerate(servers[:]):
-            servers[index] = self.spawn_server(server.role)
+            mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+            servers[index] = self.servers.spawn_server(server.role, mysqld)
 
         for slave in servers:
             try:
@@ -331,6 +331,10 @@ class test(mutlib.System_test):
         return True
 
     def stop_slaves(self, slaves_list=None):
+        """Stops a list of slaves.
+
+        server_list[in]     List with the server instances.
+        """
         if slaves_list:
             slaves = slaves_list
         else:
@@ -345,6 +349,10 @@ class test(mutlib.System_test):
                                   "{2}".format(slave.host, slave.port, err))
 
     def reset_slaves(self, slaves_list=None):
+        """Resets a list of slaves.
+
+        server_list[in]     List with the server instances.
+        """
         if slaves_list:
             slaves = slaves_list
         else:

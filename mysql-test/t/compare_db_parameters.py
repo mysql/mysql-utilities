@@ -15,7 +15,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+compare_db_parameters test.
+"""
+
 import compare_db
+
 from mysql.utilities.exception import MUTLibError
 
 _COMPACT_OUTPUT = ['', ' --compact']
@@ -99,7 +104,7 @@ class test(compare_db.test):
 
         test_num += 1
         cmd_opts = " --format=csv -a"
-        cmd_opts += " --width=55"
+        cmd_opts += " --width=60"  # Minimum width for data check results.
         comment = "Test case {0} - {1}".format(test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
@@ -122,7 +127,7 @@ class test(compare_db.test):
         test_num += 1
         cmd_opts = " --format=csv -vvv -a --span-key-size=16"
         comment = "Test case {0} - {1}".format(test_num, cmd_opts)
-        cmd = "{0}{1}".format(cmd_str, cmd_opts) 
+        cmd = "{0}{1}".format(cmd_str, cmd_opts)
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -171,9 +176,9 @@ class test(compare_db.test):
 
         # Mask version
         self.replace_result(
-                "MySQL Utilities mysqldbcompare version",
-                "MySQL Utilities mysqldbcompare version X.Y.Z "
-                "(part of MySQL Workbench ... XXXXXX)\n"
+            "MySQL Utilities mysqldbcompare version",
+            "MySQL Utilities mysqldbcompare version X.Y.Z "
+            "(part of MySQL Workbench ... XXXXXX)\n"
         )
 
         compare_db.test.do_replacements(self)

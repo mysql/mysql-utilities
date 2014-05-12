@@ -38,11 +38,15 @@ Test case 9 - No pri key
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     box                                     pass    pass    SKIP    
+# TABLE     box                                     pass    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  SKIP    
 #
 # The table box does not have an usable Index or primary key.
 
-# TABLE     box_2                                   pass    pass    SKIP    
+# TABLE     box_2                                   pass    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  SKIP    
 #
 # The table box_2 does not have an usable Index or primary key.
 
@@ -61,19 +65,27 @@ Test case 11 - Invalid --use-indexes and different indexes
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     box                                     SKIP    pass    SKIP    
+# TABLE     box                                     SKIP    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  SKIP    
 #
 # The table box does not have an usable Index or primary key.
 
-# TABLE     box_2                                   SKIP    pass    SKIP    
+# TABLE     box_2                                   SKIP    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  SKIP    
 #
 # The table box_2 does not have an usable Index or primary key.
 
-# TABLE     box_3                                   SKIP    pass    FAIL    
+# TABLE     box_3                                   SKIP    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  FAIL    
 #
 The specified index `invalid_index` was not found in table inventory.box_3
 
-# TABLE     box_4                                   SKIP    pass    FAIL    
+# TABLE     box_4                                   SKIP    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  FAIL    
 #
 Indexes are not the same.
 

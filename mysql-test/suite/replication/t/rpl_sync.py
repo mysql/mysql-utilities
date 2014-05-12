@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_sync test.
+"""
+
 import os
 import random
 import string
@@ -105,13 +109,13 @@ def load_test_data(server, db_num=1):
         )
         # Insert random data on all tables.
         random_values = string.letters + string.digits
-        for row_index in xrange(TEST_DB_NUM_ROWS):
+        for _ in xrange(TEST_DB_NUM_ROWS):
             columns = []
             values = []
             for table_index in xrange(TEST_DB_NUM_TABLES):
                 columns.append('rnd_txt{0}'.format(table_index))
                 rnd_text = "".join(
-                    [random.choice(random_values) for i in xrange(20)]
+                    [random.choice(random_values) for _ in xrange(20)]
                 )
                 values.append("'{0}'".format(rnd_text))
                 insert = ("INSERT INTO {0}.`t{1}` ({2}) VALUES ({3})"
@@ -144,11 +148,14 @@ class test(rpl_admin.test):
         # Spawn servers
         self.server0 = self.servers.get_server(0)
         mysqld = MYSQL_OPTS_DEFAULT.format(port=self.servers.view_next_port())
-        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_gtid", mysqld,
+                                                 True)
         mysqld = MYSQL_OPTS_DEFAULT.format(port=self.servers.view_next_port())
-        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_gtid", mysqld,
+                                                 True)
         mysqld = MYSQL_OPTS_DEFAULT.format(port=self.servers.view_next_port())
-        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_gtid", mysqld,
+                                                 True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master([self.server1, self.server2, self.server3])

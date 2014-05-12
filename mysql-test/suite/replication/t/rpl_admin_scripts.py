@@ -14,10 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+rpl_admin_scripts test.
+"""
+
 import os
+
 import rpl_admin
 import rpl_admin_gtid
+
 from mysql.utilities.exception import MUTLibError
+
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '

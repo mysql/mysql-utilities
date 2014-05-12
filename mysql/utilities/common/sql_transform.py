@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ _VIEW_DB, _VIEW_NAME, _VIEW_BODY, _VIEW_CHECK, _VIEW_DEFINER, \
 
 # Define trigger INFORMATION_SCHEMA column numbers
 _TRIGGER_DB, _TRIGGER_NAME, _TRIGGER_EVENT, _TRIGGER_TABLE, _TRIGGER_BODY, \
-    _TRIGGER_TIME,  _TRIGGER_DEFINER = range(0, 7)
+    _TRIGGER_TIME, _TRIGGER_DEFINER = range(0, 7)
 
 # Define routine INFORMATION_SCHEMA column numbers
 _ROUTINE_DB, _ROUTINE_NAME, _ROUTINE_BODY, _ROUTINE_SQL_DATA_ACCESS, \

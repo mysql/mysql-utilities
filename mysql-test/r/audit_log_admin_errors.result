@@ -76,7 +76,7 @@ Test case 20 - Value option requires a valid command
 Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
 mysqlauditadmin: error: The --value option must be used with a valid command.
-Test case 21 - Additional audit log name option\command missing
+Test case 21 - Additional audit log name option/command missing
 Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
 mysqlauditadmin: error: The --audit-log-name option requires --file-stats and/or a valid command.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+export_parameters_def test.
+"""
+
 import export_basic
+
 from mysql.utilities.exception import MUTLibError
 
 
@@ -25,6 +30,8 @@ class test(export_basic.test):
     server using a variety of parameters. It uses the export_basic test
     as a parent for setup and teardown methods.
     """
+
+    server0 = None
 
     def check_prerequisites(self):
         self.server0 = self.servers.get_server(0)
@@ -136,7 +143,15 @@ class test(export_basic.test):
     def test_format_and_display_values(self, cmd_opts, starting_case_num,
                                        full_format=True, no_headers=True,
                                        abbrev=True, displays=True):
+        """Test format and display values.
 
+        cmd_opts[in]            Commands options.
+        starting_case_num[in]   Starting case number.
+        full_format[in]         True for full format.
+        no_headers[in]          True for no header.
+        abbrev[in]              True for abbrev.
+        displays[in]            True for displays.
+        """
         _FORMATS = ("sql", "csv", "tab", "GRID", "VERTICAL")
         _FORMATS_ABBREV = ("SQ", "CS", "ta", "g", "v")
 
@@ -196,9 +211,9 @@ class test(export_basic.test):
 
         # Mask version
         self.replace_result(
-                "MySQL Utilities mysqldbexport version",
-                "MySQL Utilities mysqldbexport version X.Y.Z "
-                "(part of MySQL Workbench ... XXXXXX)\n"
+            "MySQL Utilities mysqldbexport version",
+            "MySQL Utilities mysqldbexport version X.Y.Z "
+            "(part of MySQL Workbench ... XXXXXX)\n"
         )
 
         self.replace_result("CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR",
@@ -223,6 +238,8 @@ class test(export_basic.test):
         return True
 
     def _mask_grid(self):
+        """Masks grid.
+        """
         self.mask_column_result("| def ", "|", 2, " None           ")
         self.mask_column_result("| None           | util_test       | trg",
                                 "|", 2, " None             ")
@@ -267,6 +284,8 @@ class test(export_basic.test):
                                 " XXXX-XX-XX XX:XX:XX  ")
 
     def _mask_csv(self):
+        """Masks CSV.
+        """
         self.mask_column_result("`e1`,root@localhost,", ",", 5,
                                 "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("`e1`,root@localhost,", ",", 9,
@@ -305,6 +324,8 @@ class test(export_basic.test):
         self.mask_column_result("`util_test`,`e1`", ",", 17, "XX")
 
     def _mask_tab(self):
+        """Masks tab.
+        """
         self.mask_column_result("`e1`	root@localhost", "\t", 5,
                                 "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("`e1`	root@localhost", "\t", 9,
@@ -343,6 +364,8 @@ class test(export_basic.test):
                                 "XXXX-XX-XX XX:XX:XX")
 
     def _mask_vertical(self):
+        """Masks vertical.
+        """
         self.replace_result("                   UPDATE_TIME:",
                             "                   UPDATE_TIME: "
                             "XXXX-XX-XX XX:XX:XX\n")

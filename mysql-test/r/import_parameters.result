@@ -280,11 +280,10 @@ GRANT TRIGGER ON `util_test`.* TO 'joe_wildcard'@'%'
 GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%'
 INSERT INTO `util_test`.`t1` VALUES  ('01 Test Basic database example'),  ('02 Test Basic database example'),  ('03 Test Basic database example'),  ('04 Test Basic database example'),  ('05 Test Basic database example'),  ('06 Test Basic database example'),  ('07 Test Basic database example')
 INSERT INTO `util_test`.`t2` VALUES  ('11 Test Basic database example'),  ('12 Test Basic database example'),  ('13 Test Basic database example'),  (NULL)
-INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys', NULL),  (2, '15 test fkeys', NULL),  (3, '16 test fkeys', NULL),  (4, NULL, NULL)
-UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '1' AND `b` = '14 test fkeys';
-UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '2' AND `b` = '15 test fkeys';
-UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '3' AND `b` = '16 test fkeys';
-UPDATE `util_test`.`t3` SET `me_blob` = 'This, is a BLOB!' WHERE `a` = '4' AND `b` = NULL;
+INSERT INTO `util_test`.`t3` VALUES  (1, '14 test fkeys', 'This, is a BLOB!');
+INSERT INTO `util_test`.`t3` VALUES  (2, '15 test fkeys', 'This, is a BLOB!');
+INSERT INTO `util_test`.`t3` VALUES  (3, '16 test fkeys', 'This, is a BLOB!');
+INSERT INTO `util_test`.`t3` VALUES  (4, NULL, 'This, is a BLOB!');
 INSERT INTO `util_test`.`t4` VALUES (3, 2)
 INSERT INTO `util_test`.`t5` VALUES  (1, 'kitkat', 0.99, 19),  (2, 'M&M', 5.99, 19),  (3, 'milk', 0.67, 5),  (4, 'Dr. Pepper', 0.99, 19)
 SET FOREIGN_KEY_CHECKS=1;

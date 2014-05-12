@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+replicate_log_file test.
+"""
+
 import replicate
 
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 # Setup expected results.
 _EXPECTED_RESULTS = [
@@ -38,7 +43,7 @@ class test(replicate.test):
     # There are four scenarios that need to be tested. This test shall include
     # test cases for (2)-(4) since (1) is covered in the existing replicate*
     # tests.
-    # 
+    #
     #   1) Start replication from current location of master log file
     #
     #   2) Start replication from the beginning (no log file info passed to CM)
@@ -48,12 +53,19 @@ class test(replicate.test):
     #   4) Start replication from a specific log file.
     #
 
+    master_log_info = None
+
     def check_prerequisites(self):
         self.check_gtid_unsafe()
         return replicate.test.check_prerequisites(self)
-        
-    def stop_slave(self, comment, slave):
-        # Stop and flush the slave to disconnect are reset
+
+    @staticmethod
+    def stop_slave(comment, slave):
+        """Stop and flush the slave to disconnect are reset.
+
+        comment[in]      Comment.
+        slave[in]        Slave instance.
+        """
         try:
             slave.exec_query("STOP SLAVE")
             slave.exec_query("RESET SLAVE")
@@ -64,7 +76,7 @@ class test(replicate.test):
     def setup(self):
         self.master_log_info = []
 
-        # Setup master and slave 
+        # Setup master and slave
         self.server0 = self.servers.get_server(0)
         self.server1 = None
         self.server2 = None
@@ -107,7 +119,7 @@ class test(replicate.test):
                 raise MUTLibError("Cannot spawn replication slave server.")
             self.server2 = res[0]
             self.servers.add_new_server(self.server2, True)
-        
+
         self.drop_all()
 
         # Create a database
@@ -124,11 +136,14 @@ class test(replicate.test):
             return False
         if not self.insert_row_rotate(("002a", "002b")):
             return False
-        
+
         return True
 
     def insert_row_rotate(self, rows):
-        # Insert a row, rotate the logs, and save master position, repeat
+        """Insert a row, rotate the logs, and save master position, repeat.
+
+        rows[in]    Rows to be inserted.
+        """
         try:
             for row in rows:
                 self.server2.exec_query('INSERT INTO log_test.t1 '
@@ -140,18 +155,24 @@ class test(replicate.test):
         except UtilError:
             return False
         return True
-    
+
     def get_table_rows(self, comment):
-        # Get list of rows from the slave
+        """Get list of rows from the slave.
+
+        comment[in]     Comment.
+        """
         try:
             res = self.server1.exec_query("SELECT * FROM log_test.t1")
             self.results.append(res)
         except UtilError as err:
             raise MUTLibError("{0}: Query failed. {1}".format(comment,
                                                               err.errmsg))
-    
+
     def wait_for_slave(self, attempts):
-        # Wait for slave to read the master log file
+        """Wait for slave to read the master log file.
+
+        attempts[in]     Number of attempts.
+        """
         i = 0
         while i < attempts:
             try:
@@ -163,9 +184,13 @@ class test(replicate.test):
                 return
             i += 1
         return
-    
+
     def run_and_record_test(self, comment, options):
-        # Execute the test and record the results
+        """Execute the test and record the results.
+
+        comment[in]     Comment.
+        options[in]     Options for running rpl test.
+        """
         res = replicate.test.run_rpl_test(self, self.server1, self.server2,
                                           self.s1_serverid, comment, options,
                                           False, 0, False)
@@ -176,7 +201,7 @@ class test(replicate.test):
 
         # Record the results
         self.get_table_rows(comment)
-        
+
         # Stop slave
         self.stop_slave(comment, self.server1)
 
@@ -189,7 +214,7 @@ class test(replicate.test):
         self.run_and_record_test("Test case {0} - start from "
                                  "beginning".format(test_num),
                                  "--start-from-beginning --quiet")
-        
+
         self.server1.exec_query("DELETE FROM log_test.t1")
 
         test_num += 1
@@ -212,7 +237,7 @@ class test(replicate.test):
             print "\nTest Results: (test_case_num, result)"
             for result in _EXPECTED_RESULTS:
                 print "Expected:", result
-                if i+2 > len(self.results):
+                if i + 2 > len(self.results):
                     print "Not enough actual results for this test case."
                 else:
                     i += 1
@@ -226,13 +251,13 @@ class test(replicate.test):
         # Check results
         i = 0
         for result in _EXPECTED_RESULTS:
-            if i+2 > len(self.results):
+            if i + 2 > len(self.results):
                 raise MUTLibError("Not enough results to compare test cases.")
             test_case = self.results[i]
             i += 1
             post_rpl = self.results[i]
             i += 1
-            
+
             result_msg = "Result: {0} ? {1}".format(result[1], post_rpl)
 
             if not result[1] == post_rpl:
@@ -241,16 +266,18 @@ class test(replicate.test):
             if self.debug:
                 print "{0}:\n{1}".format(test_case, result_msg)
         return True, None
-    
+
     def record(self):
         # Not a comparative test, returning True
         return True
-    
+
     def drop_all(self):
+        """Drops all databases created.
+        """
         res1 = self.drop_db(self.server1, "log_test")
         res2 = self.drop_db(self.server2, "log_test")
         return res1 and res2
-            
+
     def cleanup(self):
         # Kill servers that are only used in this test
         kill_list = ['rep_slave_log']

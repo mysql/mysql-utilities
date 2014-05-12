@@ -524,11 +524,11 @@ def check_connector_python(print_error=True,
         return True
     else:
         if print_error:
-                print("ERROR: The MYSQL Connector/Python module was found "
-                      "but it is either not properly installed or it is an "
-                      "old version. MySQL Utilities requires Connector/Python "
-                      "version > '{0}'. Download and install Connector/Python "
-                      "from http://dev.mysql.com.".format(min_version))
+            print("ERROR: The MYSQL Connector/Python module was found "
+                  "but it is either not properly installed or it is an "
+                  "old version. MySQL Utilities requires Connector/Python "
+                  "version > '{0}'. Download and install Connector/Python "
+                  "from http://dev.mysql.com.".format(min_version))
         return False
 
 

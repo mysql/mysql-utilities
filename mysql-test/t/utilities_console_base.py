@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+utilities_console_base test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
+
 
 _BASE_COMMENT = "Test Case {0}: "
 
@@ -49,12 +57,22 @@ class test(mutlib.System_test):
         return True
 
     def do_test(self, test_num, comment, command):
+        """Do test.
+
+        test_num[in]    Test number.
+        comment[in]     Comment.
+        command[in]     Command.
+        """
         res = self.run_test_case(0, command,
                                  _BASE_COMMENT.format(test_num) + comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
     def do_coverage_tests(self, base_command):
+        """Converge tests.
+
+        base_command[in]    Base command.
+        """
         test_num = 1
 
         # Simple single-command tests

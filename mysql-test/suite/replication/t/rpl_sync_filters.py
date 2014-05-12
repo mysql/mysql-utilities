@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_sync_filters test.
+"""
+
 import os
 
 import rpl_sync
@@ -53,6 +57,10 @@ class test(rpl_sync.test):
     NOTE: Test extend the base rpl_sync test and it has the same prerequisites.
     """
 
+    server5 = None
+    server6 = None
+    server7 = None
+
     def setup(self):
         self.res_fname = "result.txt"
 
@@ -62,13 +70,15 @@ class test(rpl_sync.test):
             port=self.servers.view_next_port(),
             rpl_filter_opt=OPT_BINLOG_DO_DB
         )
-        self.server1 = self.spawn_server("rpl_master1_gtid", mysqld, True)
+        self.server1 = self.servers.spawn_server("rpl_master1_gtid", mysqld,
+                                                 True)
 
         mysqld = MYSQL_OPTS_RPL_FILTERS.format(
             port=self.servers.view_next_port(),
             rpl_filter_opt=OPT_BINLOG_IGNORE_DB
         )
-        self.server2 = self.spawn_server("rpl_master2_gtid", mysqld, True)
+        self.server2 = self.servers.spawn_server("rpl_master2_gtid", mysqld,
+                                                 True)
 
         # Note: option replicate-wild-do-table cannot be used here because it
         # has known issues.
@@ -76,7 +86,8 @@ class test(rpl_sync.test):
             port=self.servers.view_next_port(),
             rpl_filter_opt=OPT_REPLICATE_DO_TABLE
         )
-        self.server3 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave1_gtid", mysqld,
+                                                 True)
 
         rpl_filter = "{0} {1}".format(
             OPT_REPLICATE_IGNORE_TABLE,
@@ -86,26 +97,30 @@ class test(rpl_sync.test):
             port=self.servers.view_next_port(),
             rpl_filter_opt=rpl_filter
         )
-        self.server4 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave2_gtid", mysqld,
+                                                 True)
 
         # Spawn servers with not supported replication filter options.
         mysqld = MYSQL_OPTS_RPL_FILTERS.format(
             port=self.servers.view_next_port(),
             rpl_filter_opt=OPT_REPLICATE_DO_DB
         )
-        self.server5 = self.spawn_server("rep_slave3_gtid", mysqld, True)
+        self.server5 = self.servers.spawn_server("rep_slave3_gtid", mysqld,
+                                                 True)
 
         mysqld = MYSQL_OPTS_RPL_FILTERS.format(
             port=self.servers.view_next_port(),
             rpl_filter_opt=OPT_REPLICATE_IGNORE_DB
         )
-        self.server6 = self.spawn_server("rep_slave4_gtid", mysqld, True)
+        self.server6 = self.servers.spawn_server("rep_slave4_gtid", mysqld,
+                                                 True)
 
         mysqld = MYSQL_OPTS_RPL_FILTERS.format(
             port=self.servers.view_next_port(),
             rpl_filter_opt=OPT_REPLICATE_WILD_DO_TABLE
         )
-        self.server7 = self.spawn_server("rep_slave5_gtid", mysqld, True)
+        self.server7 = self.servers.spawn_server("rep_slave5_gtid", mysqld,
+                                                 True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         # with supported filter options (first topology).
@@ -252,6 +267,7 @@ class test(rpl_sync.test):
         self.replace_substring(str(self.server7.port), "PORT7")
 
         # Force order of filters results (non-deterministic dictionary order).
+        # pylint: disable=W1401
         self.force_lines_order(
             ("# Slave 'localhost@PORT3':\n",
              "#   - replicate_do_table: test_rplsync_db1.t1\n",
@@ -261,6 +277,7 @@ class test(rpl_sync.test):
         )
 
         # Force order of checksum results (due to multiprocessing).
+        # pylint: disable=W1401
         self.force_lines_order(
             ("#   [OK] `test_rplsync_db1`.`t1` checksum for server "
              "'localhost@PORT3'.\n",

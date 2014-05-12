@@ -15,8 +15,13 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+show_rpl_warnings test.
+"""
+
 import mutlib
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -26,6 +31,9 @@ class test(rpl_admin.test):
     It uses the rpl_admin test for setup and teardown methods.
     """
 
+    server5 = None
+    s4_port = None
+
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 5):
             raise MUTLibError("Test requires server version 5.6.5 or higher")
@@ -34,8 +42,8 @@ class test(rpl_admin.test):
     def setup(self):
         res = rpl_admin.test.setup(self)
 
-        self.server5 = rpl_admin.test.spawn_server(self, "rep_slave4",
-                                                   "--log-bin=mysql-bin")
+        self.server5 = self.servers.spawn_server("rep_slave4",
+                                                 "--log-bin=mysql-bin")
 
         self.s4_port = self.server5.port
 

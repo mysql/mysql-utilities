@@ -14,6 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+compare_db test.
+"""
+
 import os
 
 import mutlib
@@ -27,6 +32,10 @@ class test(mutlib.System_test):
     This test executes a consistency check of two databases on
     separate servers.
     """
+
+    server1 = None
+    server2 = None
+    need_server = False
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -57,15 +66,15 @@ class test(mutlib.System_test):
         ]
         for data_file in data_files:
             try:
-                res = self.server1.read_and_exec_SQL(data_file, self.debug)
-                res = self.server2.read_and_exec_SQL(data_file, self.debug)
+                self.server1.read_and_exec_SQL(data_file, self.debug)
+                self.server2.read_and_exec_SQL(data_file, self.debug)
             except UtilError as err:
                 raise MUTLibError("Failed to read commands from file"
                                   " {0}: {1}".format(data_file, err.errmsg))
 
         # Add some data to server1 to change AUTO_INCREMENT value.
         try:
-            for count in range(5):
+            for _ in range(5):
                 self.server1.exec_query("INSERT INTO "
                                         "`db_diff_test`.`table-dash` "
                                         "VALUES (NULL)")
@@ -86,11 +95,13 @@ class test(mutlib.System_test):
                         " VALUES ({v}, {v}{v}, {v}0{v}, {v}00{v},"
                         " {v}000{v}, {v}0000{v});".format(db=db, tb=tb, v=n))
                 server.exec_query(
-                        "select * from {db}.{tb}".format(db=db, tb=tb,))
+                    "select * from {db}.{tb}".format(db=db, tb=tb,))
 
         return True
 
     def create_extra_table(self):
+        """Creates an extra table.
+        """
         try:
             self.server2.exec_query("USE inventory;")
             create_table = ("CREATE TABLE `inventory`.`extra_table` ("
@@ -104,6 +115,8 @@ class test(mutlib.System_test):
                               "{0}".format(err.errmsg))
 
     def drop_extra_table(self):
+        """Drops the extra table created.
+        """
         try:
             self.server2.exec_query("DROP TABLE `inventory`.`extra_table`")
         except UtilError as err:
@@ -111,59 +124,61 @@ class test(mutlib.System_test):
                               "{0}".format(err.errmsg))
 
     def alter_data(self):
+        """Alters data.
+        """
         try:
             # Now do some alterations...
-            res = self.server1.exec_query("USE inventory;")
-            res = self.server1.exec_query("DROP VIEW inventory.tools")
-            res = self.server1.exec_query("CREATE VIEW inventory.tools AS "
-                                          "SELECT * FROM inventory.supplies "
-                                          "WHERE type = 'tool'")
-            res = self.server1.exec_query("DELETE FROM inventory.supplies "
-                                          "WHERE qty > 2")
-            res = self.server1.exec_query("INSERT INTO inventory.supplier "
-                                          "VALUES (2, 'Never Enough Inc.')")
+            self.server1.exec_query("USE inventory;")
+            self.server1.exec_query("DROP VIEW inventory.tools")
+            self.server1.exec_query("CREATE VIEW inventory.tools AS "
+                                    "SELECT * FROM inventory.supplies "
+                                    "WHERE type = 'tool'")
+            self.server1.exec_query("DELETE FROM inventory.supplies "
+                                    "WHERE qty > 2")
+            self.server1.exec_query("INSERT INTO inventory.supplier "
+                                    "VALUES (2, 'Never Enough Inc.')")
 
-            res = self.server2.exec_query("USE inventory;")
-            res = self.server2.exec_query("DROP VIEW inventory.cleaning")
-            res = self.server2.exec_query("DROP VIEW inventory.finishing_up")
-            res = self.server2.exec_query("UPDATE inventory.supplies SET "
-                                          "cost = 10.00 WHERE cost = 9.99")
-            res = self.server2.exec_query("INSERT INTO inventory.supplier "
-                                          "VALUES (2, 'Wesayso Corporation')")
-            res = self.server2.exec_query("INSERT INTO inventory.supplier "
-                                          "VALUES (3, 'Never Enough Inc.')")
-            res = self.server2.exec_query("DELETE FROM inventory.supplies "
-                                          "WHERE cost = 10.00 AND "
-                                          "type = 'cleaning'")
+            self.server2.exec_query("USE inventory;")
+            self.server2.exec_query("DROP VIEW inventory.cleaning")
+            self.server2.exec_query("DROP VIEW inventory.finishing_up")
+            self.server2.exec_query("UPDATE inventory.supplies SET "
+                                    "cost = 10.00 WHERE cost = 9.99")
+            self.server2.exec_query("INSERT INTO inventory.supplier "
+                                    "VALUES (2, 'Wesayso Corporation')")
+            self.server2.exec_query("INSERT INTO inventory.supplier "
+                                    "VALUES (3, 'Never Enough Inc.')")
+            self.server2.exec_query("DELETE FROM inventory.supplies "
+                                    "WHERE cost = 10.00 AND "
+                                    "type = 'cleaning'")
         except UtilError as err:
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
 
     def alter_data_2(self):
+        """Alters data.
+        """
         try:
             # Now do some alterations...
-            res = self.server1.exec_query("USE no_primary_keys")
-            res = self.server1.exec_query(
+            self.server1.exec_query("USE no_primary_keys")
+            self.server1.exec_query(
                 "UPDATE nonix_1_simple "
                 "SET c1 = c1 + 10, c2 = c2 + 10, c3 = c3 + 10, c5 = c5 + 10"
             )
-            res = self.server1.exec_query(
+            self.server1.exec_query(
                 "UPDATE nonix_1_nix_2 "
                 "SET c1 = c1 + 10, c2 = c2 + 10, c5 = c5 + 10, c6 = c6 + 10"
             )
-            res = self.server1.exec_query(
+            self.server1.exec_query(
                 "UPDATE `nonix_``2_nix_``2` "
                 "SET `c``1` = `c``1` + 10, c3 = c3 + 10, c4 = c4 + 10, "
                 "c5 = c5 + 10"
             )
-            res = self.server1.exec_query(
+            self.server1.exec_query(
                 "UPDATE nonix_2_nix_2_pk "
                 "SET c1 = c1 + 10, c2 = c2 + 10, c5 = c5 + 10, c6 = c6 + 10"
             )
-
         except UtilError as err:
-            print("Failed to execute query: "
-                              "{0}".format(err.errmsg))
+            print("Failed to execute query: {0}".format(err.errmsg))
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
 
@@ -340,12 +355,13 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        # Tests for tables with no primary keys but with unique indexes 
+        # Tests for tables with no primary keys but with unique indexes
         # nullable and not nullable columns
 
-        # Test automatically pick up the not nullable unique indexes
-        # Note: All previews test had primary keys.
-        cmd_arg = ("no_primary_keys -a")
+        # Test automatically pick up the not nullable unique indexes.
+        # Note: All previews test had primary keys. Skip checksum table
+        # otherwise no indexes are used if there are no differences.
+        cmd_arg = "no_primary_keys -a --skip-checksum-table"
         test_num += 1
         comment = ("Test case {0} - Test automatically picks up the not "
                    "nullable unique index (No differences)".format(test_num))
@@ -355,9 +371,12 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Test given a real not nullable unique index for a specific table
-        # using --use-indexes, unique key with one column
+        # using --use-indexes, unique key with one column.
+        # Note: skip checksum table otherwise no indexes are used if there are
+        # no differences.
         cmd_arg = ("no_primary_keys "
-                   "--use-indexes=nonix_1_simple.uk_nonullclmns -a ")
+                   "--use-indexes=nonix_1_simple.uk_nonullclmns -a "
+                   "--skip-checksum-table")
         test_num += 1
         comment = ("Test case {0} - real not nullable unique index for a "
                    "specific table using --use-indexes "
@@ -369,9 +388,11 @@ class test(mutlib.System_test):
 
         # Test given a real not nullable index for a specific table
         # using --use-indexes for two tables, unique keys with 2 columns
+        # Note: skip checksum table otherwise no indexes are used if there are
+        # no differences.
         cmd_arg = ('no_primary_keys '
                    '--use-indexes="nonix_1_nix_2.uk_nonulls;'
-                   'nonix_2_nix_2.uk2_nonulls" -a')
+                   'nonix_2_nix_2.uk2_nonulls" -a --skip-checksum-table')
         test_num += 1
         comment = ("Test case {0} - compare using--use-indexes for two tables "
                    "(No differences)".format(test_num))
@@ -381,11 +402,14 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Test given a real not nullable index for a specific table
-        # using --use-indexes for same table and other for dif table
+        # using --use-indexes for same table and other for dif table.
+        # Note: skip checksum table otherwise no indexes are used if there are
+        # no differences.
         cmd_arg = ('no_primary_keys '
                    '--use-indexes="nonix_2_nix_2.uk2_nonulls;'
                    'nonix_2_nix_2.uk_nonulls;'
-                   'nonix_1_nix_2.uk_nonulls;nonix_1_simple.ix_nonull" -a')
+                   'nonix_1_nix_2.uk_nonulls;nonix_1_simple.ix_nonull" -a '
+                   '--skip-checksum-table')
         test_num += 1
         comment = ("Test case {0} - using --use-indexes for same table "
                    "(No differences)".format(test_num))
@@ -395,11 +419,13 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Test given a real not nullable index for a specific table
-        # using --use-indexes for same table and other for dif table vvv
+        # using --use-indexes for same table and other for dif table vvv.
+        # Note: skip checksum table to show index info.
         cmd_arg = (
             'no_primary_keys --use-indexes="nonix_2_nix_2.uk2_nonulls;'
             'nonix_2_nix_2.uk_nonulls;nonix_1_nix_2.uk_nonulls;'
-            'nonix_2_nix_2_pk.uk2_nonulls;nonix_1_simple.ix_nonull" -a -vvv'
+            'nonix_2_nix_2_pk.uk2_nonulls;nonix_1_simple.ix_nonull" -a -vvv '
+            '--skip-checksum-table'
         )
         test_num += 1
         comment = ("Test case {0} - using --use-indexes for same table "
@@ -413,12 +439,13 @@ class test(mutlib.System_test):
 
         # Test given a real not nullable index for a specific table
         # using --use-indexes with backticks verbose debug
+        # Note: skip checksum table to show index info.
         if os.name == 'posix':
             cmd_arg = ("no_primary_keys --use-indexes='`nonix_``2_nix_``2`."
-                       "`uk_no``nulls`' -a -vvv")
+                       "`uk_no``nulls`' -a -vvv --skip-checksum-table")
         else:
             cmd_arg = ('no_primary_keys --use-indexes="`nonix_``2_nix_``2`.'
-                       '`uk_no``nulls`" -a -vvv')
+                       '`uk_no``nulls`" -a -vvv --skip-checksum-table')
         test_num += 1
         comment = ("Test case {0} - using --use-indexes with backticks "
                    "verbose (No differences)".format(test_num))
@@ -445,6 +472,61 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Clone inventory database with a different name
+        cmd = ("mysqldbcopy.py --skip-gtid --source={0} --destination={1} {2}"
+               "".format(self.build_connection_string(self.server1),
+                         self.build_connection_string(self.server2),
+                         "inventory:inventory_clone"))
+        res = self.exec_util(cmd, self.res_fname)
+        if res:
+            raise MUTLibError("'{0}' failed. Return code: {1}"
+                              "".format(cmd, res))
+        test_num += 1
+        comment = ("Test case {0} - compare two equal databases with "
+                   "different names (including VIEWS)").format(test_num)
+        cmd = "{0} inventory:inventory_clone -a".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Test with data that yields the same span key (size 8).
+        test_num += 1
+        comment = ("Test case {0} - data with multiple lines per span "
+                   "(no differences).".format(test_num))
+        cmd_arg = 'multi_span_row:multi_span_row --run-all-tests'
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Change data to detect all changed rows within the same span.
+        self.server2.exec_query(
+            'UPDATE multi_span_row.t SET data = 2 WHERE id != 1651723'
+        )
+
+        test_num += 1
+        comment = ("Test case {0} - data with multiple lines per span "
+                   "(with changed rows).".format(test_num))
+        cmd_arg = 'multi_span_row:multi_span_row --run-all-tests'
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Change data to detect missing rows within the same span.
+        self.server2.exec_query(
+            'DELETE FROM multi_span_row.t WHERE id = 1908449'
+        )
+
+        test_num += 1
+        comment = ("Test case {0} - data with multiple lines per span "
+                   "(with missing row and CSV format).".format(test_num))
+        cmd_arg = 'multi_span_row:multi_span_row --run-all-tests --format=csv'
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.do_replacements()
 
         return True
@@ -453,8 +535,11 @@ class test(mutlib.System_test):
         return self.compare(__name__, self.results)
 
     def do_replacements(self):
-        # The following are necessary due to changes in character spaces
-        # introduced with Python 2.7.X in the difflib.
+        """Do replacements in the result.
+
+        The following are necessary due to changes in character spaces
+        introduced with Python 2.7.X in the difflib.
+        """
         prefixes = ['***', '---', '+++']
         names = ['supplies', 'supplier', 'tools']
         for prefix in prefixes:
@@ -472,10 +557,13 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def drop_all(self):
+        """Drops all databases created.
+        """
         self.drop_db(self.server1, "inventory")
         self.drop_db(self.server1, "inventory1")
         self.drop_db(self.server1, "inventory2")
         self.drop_db(self.server2, "inventory")
+        self.drop_db(self.server2, "inventory_clone")
         self.drop_db(self.server1, 'db.`:db')
         self.drop_db(self.server2, 'db.`:db')
         self.drop_db(self.server1, 'db_diff_test')
@@ -484,6 +572,8 @@ class test(mutlib.System_test):
         self.drop_db(self.server2, "empty_db")
         self.drop_db(self.server1, "no_primary_keys")
         self.drop_db(self.server2, "no_primary_keys")
+        self.drop_db(self.server1, "multi_span_row")
+        self.drop_db(self.server2, "multi_span_row")
         return True
 
     def cleanup(self):

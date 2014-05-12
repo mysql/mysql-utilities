@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+check_index_best_worst_large test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -24,6 +31,8 @@ class test(mutlib.System_test):
     This test executes the check index utility on a single server displaying
     the best and worst indexes from a large database - employees.
     """
+
+    server1 = None
 
     def check_prerequisites(self):
         # Need non-Windows platform
@@ -105,5 +114,3 @@ class test(mutlib.System_test):
 
     def cleanup(self):
         return True    # No cleanup needed
-
-

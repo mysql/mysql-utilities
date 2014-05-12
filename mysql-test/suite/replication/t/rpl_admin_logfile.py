@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,13 +14,22 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+rpl_admin_logfile test.
+"""
+
 import os
 import stat
+
 import mutlib
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError
 
+
 _LOGNAME = "temp_log.txt"
+
 
 class test(rpl_admin.test):
     """test replication administration commands
@@ -35,15 +44,15 @@ class test(rpl_admin.test):
     def setup(self):
         self.res_fname = "result.txt"
         return rpl_admin.test.setup(self)
-        
+
     def run(self):
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave_conn = self.build_connection_string(self.server2).strip(' ')
-        
+
         # For this test, it's OK when master and slave are the same
         master_str = "--master={0}".format(master_conn)
         slave_str = "--slave={0}".format(slave_conn)
-        
+
         # command used in test cases: replace 3 element with location of
         # log file.
         cmd = [
@@ -53,7 +62,7 @@ class test(rpl_admin.test):
             "--log={0}".format(_LOGNAME),
             "health",
         ]
-        
+
         # Test Case 1
         test_num = 1
         comment = "Test Case {0} - Log file is newly created".format(test_num)
@@ -61,7 +70,7 @@ class test(rpl_admin.test):
             self, 0, ' '.join(cmd), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        
+
         # Test Case 2
         test_num += 1
         comment = "Test Case {0} - Log file is reopened".format(test_num)
@@ -69,7 +78,7 @@ class test(rpl_admin.test):
             self, 0, ' '.join(cmd), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        
+
         # Test Case 3
         test_num += 1
         comment = ("Test Case {0} - Log file can not be "
@@ -89,10 +98,10 @@ class test(rpl_admin.test):
 
     def get_result(self):
         return self.compare(__name__, self.results)
-    
+
     def record(self):
         return self.save_result_file(__name__, self.results)
-    
+
     def cleanup(self):
         try:
             os.chmod(_LOGNAME, stat.S_IWRITE)

@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+copy_db test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.common.sql_transform import quote_with_backticks
@@ -22,17 +28,15 @@ from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
 
-BLOB_TEXT_TABLE = ("CREATE TABLE `util_test`.`tt` ("
-                   "`a` INT(11) NOT NULL AUTO_INCREMENT, "
-                   "`b` TEXT, `c` BLOB, PRIMARY KEY (`a`)) ENGINE=InnoDB")
-BLOB_TEXT_DATA = "INSERT INTO `util_test`.`tt` VALUES (NULL, 'test', 0xff0e)"
-BLOB_TEXT_DROP = "DROP TABLE `util_test`.`tt`"
-
 
 class test(mutlib.System_test):
     """simple db copy
     This test executes copy database test cases among two servers.
     """
+
+    server1 = None
+    server2 = None
+    need_server = False
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -77,12 +81,13 @@ class test(mutlib.System_test):
             raise MUTLibError("Failed to read commands from file "
                               "{0}: {1}".format(data_file_views, err.errmsg))
 
-        # Create table with blobs and insert data
+        # Load database with with blobs and insert data.
+        data_file_blobs = os.path.normpath("./std_data/blob_data.sql")
         try:
-            self.server1.exec_query(BLOB_TEXT_TABLE)
-            self.server1.exec_query(BLOB_TEXT_DATA)
-        except UtilError:
-            raise MUTLibError("Failed to create table with blobs.")
+            self.server1.read_and_exec_SQL(data_file_blobs, self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file {0}: {1}"
+                              "".format(data_file_blobs, err.errmsg))
 
         # Create user 'joe'@'localhost' in source server
         try:
@@ -127,8 +132,14 @@ class test(mutlib.System_test):
         if res != 0:
             raise MUTLibError("{0}: failed".format(comment))
 
-        # drop the blob table first - memory doesn't support blobs
-        self.server1.exec_query(BLOB_TEXT_DROP)
+        test_num += 1
+        comment = ("Test case {0} - copy a sample database with blobs "
+                   "X:Y".format(test_num))
+        cmd_str = "{0} blob_test:blob_test_clone".format(cmd)
+        res = self.exec_util(cmd_str, self.res_fname)
+        self.results.append(res)
+        if res != 0:
+            raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - copy using different engine"
@@ -144,6 +155,15 @@ class test(mutlib.System_test):
         comment = ("Test case {0} - copy using "
                    "multiprocessing").format(test_num)
         cmd_str = "{0} util_test:util_test_multi --multiprocess=2".format(cmd)
+        res = self.exec_util(cmd_str, self.res_fname)
+        self.results.append(res)
+        if res != 0:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - copy blobs using "
+                   "multiprocessing").format(test_num)
+        cmd_str = "{0} blob_test:blob_test_multi --multiprocess=2".format(cmd)
         res = self.exec_util(cmd_str, self.res_fname)
         self.results.append(res)
         if res != 0:
@@ -292,7 +312,8 @@ class test(mutlib.System_test):
         copied_db_on_server2 = ['util_db_clone', 'util_test',
                                 'util_test_multi', 'db`:db_clone',
                                 'db`:db', 'views_test_clone',
-                                'util_db_privileges']
+                                'util_db_privileges', 'blob_test_clone',
+                                'blob_test_multi']
         copied_db_on_server1 = ["util_test_default_collation_copy",
                                 "util_test_default_charset_copy"]
 
@@ -323,31 +344,32 @@ class test(mutlib.System_test):
             except UtilDBError as err:
                 raise MUTLibError(err.errmsg)
 
-        # Compare number of copied rows.
+        # Compare table checksums.
         dbs2compare = [
             ('`util_test`', ('`util_test`', '`util_db_clone`',
                              '`util_test_multi`', '`util_db_privileges`')),
             ('`db``:db`', ('`db``:db`', '`db``:db_clone`')),
-            ('`views_test`', ('`views_test_clone`',))
+            ('`views_test`', ('`views_test_clone`',)),
+            ('blob_test', ('blob_test_clone', 'blob_test_multi'))
         ]
         for cmp_data in dbs2compare:
             self.server1.exec_query("USE {0}".format(cmp_data[0]))
             res = self.server1.exec_query("SHOW TABLES")
             for row in res:
                 table = quote_with_backticks(row[0])
-                base_count = self.server1.exec_query(
-                    "SELECT COUNT(*) FROM {0}".format(table)
-                )[0][0]
+                base_checksum = self.server1.exec_query(
+                    "CHECKSUM TABLE {0}".format(table)
+                )[0][1]
                 for i in range(len(cmp_data[1])):
-                    tbl_count = self.server2.exec_query(
-                        "SELECT COUNT(*) FROM {0}.{1}".format(cmp_data[1][i],
-                                                              table)
-                    )[0][0]
-                    if tbl_count != base_count:
-                        msg.append("Different row count for table {0}.{1}, "
-                                   "got {2} expected "
+                    tbl_checksum = self.server2.exec_query(
+                        "CHECKSUM TABLE {0}.{1}".format(cmp_data[1][i],
+                                                        table)
+                    )[0][1]
+                    if tbl_checksum != base_checksum:
+                        msg.append("Different table checksum for table "
+                                   "{0}.{1}, got {2} expected "
                                    "{3}.".format(cmp_data[1][i], table,
-                                                 tbl_count, base_count))
+                                                 tbl_checksum, base_checksum))
 
         # Check attributes (character set and collation).
         qry_db = ("SELECT {0} FROM INFORMATION_SCHEMA.SCHEMATA "
@@ -396,17 +418,21 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         # this DBs may not be created on subclasses.
         db_drops_on_server1 = ["util_test", 'db`:db', 'views_test',
                                "util_test_default_charset",
                                "util_test_default_collation",
                                "util_test_default_charset_copy",
-                               "util_test_default_collation_copy"]
+                               "util_test_default_collation_copy",
+                               "blob_test"]
         for db in db_drops_on_server1:
             self.drop_db(self.server1, db)
 
         db_drops_on_server2 = ["util_test", 'db`:db', "util_db_clone",
-                               'db`:db_clone', "views_test_clone"]
+                               'db`:db_clone', "views_test_clone",
+                               "blob_test_clone"]
         for db in db_drops_on_server2:
             self.drop_db(self.server2, db)
 

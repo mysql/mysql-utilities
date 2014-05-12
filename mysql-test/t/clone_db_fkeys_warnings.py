@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+clone_db_fkeys_warnings test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
@@ -24,6 +31,8 @@ class test(mutlib.System_test):
     foreign key dependencies are cloned.
 
     """
+
+    server1 = None
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -44,7 +53,7 @@ class test(mutlib.System_test):
         self.drop_all()
         self.server1.disable_foreign_key_checks(True)
         try:
-            res = self.server1.read_and_exec_SQL(data_file, self.debug)
+            self.server1.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file {0}: "
                               "{1}".format(data_file, err.errmsg))
@@ -112,6 +121,8 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def drop_all(self):
+        """Drops all databases.
+        """
         drop_dbs = ["util_test_fk2", "util_test_fk2_clone", "util_test_fk",
                     "util_test_fk_clone", "util_test_fk3"]
         drop_results = []

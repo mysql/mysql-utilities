@@ -15,8 +15,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_admin_errant_transactions test.
+"""
+
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError
+
 
 _DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin',
                                 '--skip-slave-start',
@@ -37,6 +43,11 @@ class test(rpl_admin.test):
     Note: this test requires GTID enabled servers.
     """
 
+    master_conn = None
+    slave1_conn = None
+    slave2_conn = None
+    slave3_conn = None
+
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 9):
             raise MUTLibError("Test requires server version 5.6.9")
@@ -49,16 +60,20 @@ class test(rpl_admin.test):
         self.server0 = self.servers.get_server(0)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_gtid", mysqld,
+                                                 True)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_gtid", mysqld,
+                                                 True)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_gtid", mysqld,
+                                                 True)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave3_gtid", mysqld,
+                                                 True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master()

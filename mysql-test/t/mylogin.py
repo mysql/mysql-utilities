@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+mylogin test.
+"""
+
 import mutlib
 
 from mysql.utilities.common.ip_parser import parse_connection

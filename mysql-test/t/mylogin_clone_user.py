@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+mylogin_clone_user test.
+"""
+
 import os
 
 import mutlib
@@ -28,6 +32,9 @@ class test(mutlib.System_test):
     """clone user
     This test clones a user on a single server copying all grants.
     """
+
+    server1 = None
+    server1_con_str = None
 
     def check_prerequisites(self):
         # Check if the required tools are accessible
@@ -70,6 +77,10 @@ class test(mutlib.System_test):
         return True
 
     def show_user_grants(self, user):
+        """Show user grants.
+
+        user[in]    User name.
+        """
         query = "SHOW GRANTS FOR {0}".format(user)
         try:
             res = self.server1.exec_query(query)
@@ -135,7 +146,13 @@ class test(mutlib.System_test):
     def record(self):
         return self.save_result_file(__name__, self.results)
 
-    def drop_user(self, user_name, server):
+    @staticmethod
+    def drop_user(user_name, server):
+        """Drops user.
+
+        user_name[in]   User name.
+        server[in]      Server instance.
+        """
         user = User(server, user_name)
         if user.exists():
             res = user.drop()

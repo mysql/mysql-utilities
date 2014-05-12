@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+clone_db_apostrophe test.
+"""
+
 import os
 import sys
 
@@ -40,6 +45,8 @@ class test(mutlib.System_test):
     contains a table with apostrophes in the text.
     """
 
+    server1 = None
+
     def check_prerequisites(self):
         return self.check_num_servers(1)
 
@@ -48,7 +55,7 @@ class test(mutlib.System_test):
         self.drop_all()
         try:
             for command in _DATA_SQL:
-                res = self.server1.exec_query(command)
+                self.server1.exec_query(command)
         except UtilError as err:
             raise MUTLibError("Failed to create test data: "
                               "{0}".format(err.errmsg))
@@ -102,6 +109,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases.
+        """
         res1 = self.drop_db(self.server1, "apostrophe")
         res2 = self.drop_db(self.server1, "apostrophe_clone")
         return res1 and res2

@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_sync_parameters test.
+"""
+
 import os
 
 import rpl_sync
@@ -42,19 +46,23 @@ class test(rpl_sync.test):
         mysqld = rpl_sync.MYSQL_OPTS_DEFAULT.format(
             port=self.servers.view_next_port()
         )
-        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_gtid", mysqld,
+                                                 True)
         mysqld = rpl_sync.MYSQL_OPTS_DEFAULT.format(
             port=self.servers.view_next_port()
         )
-        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_gtid", mysqld,
+                                                 True)
         mysqld = rpl_sync.MYSQL_OPTS_DEFAULT.format(
             port=self.servers.view_next_port()
         )
-        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_gtid", mysqld,
+                                                 True)
         mysqld = _MYSQL_OPTS_GTID_OFF.format(
             port=self.servers.view_next_port()
         )
-        self.server4 = self.spawn_server("rep_slave3_no_gtid", mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave3_no_gtid", mysqld,
+                                                 True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set).
         self.reset_master([self.server1, self.server2, self.server3])
@@ -156,7 +164,7 @@ class test(rpl_sync.test):
 
         if self.debug:
             print("\nRemove tables on master and slave.")
-        last_tbl = '`t{0}`'.format(rpl_sync.TEST_DB_NUM_TABLES-1)
+        last_tbl = '`t{0}`'.format(rpl_sync.TEST_DB_NUM_TABLES - 1)
         self.server1.exec_query('SET SQL_LOG_BIN=0')
         self.server1.exec_query('DROP TABLE `test_rplsync_db`.'
                                 '{0}'.format(last_tbl))

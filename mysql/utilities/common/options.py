@@ -92,11 +92,12 @@ def prefix_check_choice(option, opt, value):
     raise OptionValueError("option %s: invalid choice: %r (choose from %s)"
                            % (opt, value, choices))
 
+
 def license_callback(self, opt, value, parser, *args, **kwargs):
-        """Show license information and exit.
-        """
-        print(LICENSE_FRM.format(program=parser.prog))
-        parser.exit()
+    """Show license information and exit.
+    """
+    print(LICENSE_FRM.format(program=parser.prog))
+    parser.exit()
 
 
 class CaseInsensitiveChoicesOption(CustomOption):
@@ -483,10 +484,10 @@ def add_rpl_mode(parser, do_both=True, add_file=True):
     parser.add_option("--rpl", "--replication", dest="rpl_mode",
                       action="store", help="include replication information. "
                       "Choices: 'master' = include the CHANGE MASTER command "
-                      "for the source server's master (itself if it is a "
-                      "master or its master if it is a slave), 'slave' = "
-                      "include the CHANGE MASTER command for the source "
-                      "server if it is a slave{0}.".format(rpl_mode_both),
+                      "using the source server as the master, "
+                      "'slave' = include the CHANGE MASTER command for "
+                      "the source server's master (only works if the source "
+                      "server is a slave){0}.".format(rpl_mode_both),
                       choices=rpl_mode_options)
     if add_file:
         parser.add_option("--rpl-file", "--replication-file", dest="rpl_file",

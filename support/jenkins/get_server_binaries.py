@@ -21,14 +21,13 @@ import os
 import urllib
 import urllib2
 import time
-import socket
 import platform
 import sys
 import shutil
 from support.jenkins.common import working_path
 
-HOSTS = {
-    "blade03": {
+OS = {
+    "Linux": {
         #"5.1":   ("mysql-5.1", "binary-max-linux-x86_64-tar-gz"),
         #"5.5":   ("daily-5.5",
         #           "binary-release-community_el6-x86-64bit_tar-gz"),
@@ -37,7 +36,7 @@ HOSTS = {
         "trunk": ("daily-trunk",
                   "binary-release-advanced_el6-x86-64bit_tar-gz"),
     },
-    "blade23": {
+    "Windows": {
         #"5.1":   ("mysql-5.1",   "tree-max-win-x86_64-zip"),
         #"5.5":   ("daily-5.5",
         #          "binary-release-community_windows-x86-64bit_zip"),
@@ -76,10 +75,6 @@ LATEST_GA_WIN = {
 }
 
 
-def get_hostname():
-    return socket.gethostname()
-
-
 def download_binary(uri, download_dir, filename):
     # download, try 3 times before error
     with working_path(download_dir):
@@ -101,8 +96,8 @@ def download_binary(uri, download_dir, filename):
                 # sleep for 5 minutes
                 time.sleep(300)
         else:
-            print("ERROR: Downloading '{0}' for host '{1}' "
-                  "FAILED".format(uri, get_hostname()))
+            print("ERROR: Downloading '{0}' for OS '{1}' "
+                  "FAILED".format(uri, platform.system()))
             sys.exit(1)
 
 
@@ -116,9 +111,9 @@ def get_filename(uri):
     return fname
 
 
-def get_latest_uris(h_dict):
+def get_latest_uris(os_dict):
     uri_list = []
-    for _, info_tuple in h_dict.items():
+    for _, info_tuple in os_dict.items():
         branch = info_tuple[0]
         product = info_tuple[1]
         # download, try 3 times before error
@@ -129,8 +124,9 @@ def get_latest_uris(h_dict):
                        "count=1&skip=50&branch={0}"
                        "&product={1}".format(branch, product))
                 latest = urllib2.urlopen(url).read().strip()
-                print("Getting URIs for host '{1}' "
-                      "(attempt: {2})".format(latest, get_hostname(), attempt))
+                print("Getting URIs for OS '{1}' "
+                      "(attempt: {2})".format(latest, platform.system(),
+                                              attempt))
                 url = latest.split(" ")[0]
                 uri_list.append(url)
                 break
@@ -139,24 +135,23 @@ def get_latest_uris(h_dict):
                 # sleep for 5 minutes
                 time.sleep(300)
         else:
-            print("ERROR: Retrieving URIs for host '{0}' "
-                  "FAILED".format(get_hostname()))
+            print("ERROR: Retrieving URIs for Operating System '{0}' "
+                  "FAILED".format(platform.system()))
             sys.exit(1)
 
     return uri_list
 
 if __name__ == "__main__":
-    hostname = get_hostname()
     try:
         outdir = os.environ["BINARIES_HOME"]
     except KeyError:
         print("ERROR: Please set the BINARIES_HOME environment variable")
         sys.exit(1)
     try:
-        host_dict = HOSTS[hostname]
+        os_dict = OS[platform.system()]
     except KeyError:
-        print("There is no information regarding hostname '{0}' "
-              "in the hosts dict".format(hostname))
+        print("There is no information regarding Operating System '{0}' "
+              "in the hosts dict".format(platform.system()))
         sys.exit(1)
 
     # CLEANUP existing BINARIES
@@ -176,7 +171,7 @@ if __name__ == "__main__":
         print("ERROR: '{0}' is not a valid path".format(outdir))
 
     uri_to_retrieve = []
-    uri_to_retrieve.extend(get_latest_uris(host_dict))
+    uri_to_retrieve.extend(get_latest_uris(os_dict))
     if platform.system() == 'Windows':
         uri_to_retrieve.extend(LATEST_GA_WIN.values())
     elif platform.system() == 'Linux':

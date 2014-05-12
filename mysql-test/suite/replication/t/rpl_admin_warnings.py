@@ -15,8 +15,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_admin_warnings test.
+"""
+
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError
+
 
 _DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin',
                                 '--log-slave-updates',
@@ -55,6 +61,10 @@ class test(rpl_admin.test):
     It uses the rpl_admin test for setup and teardown methods.
     """
 
+    server5 = None
+    server6 = None
+    server7 = None
+
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 9):
             raise MUTLibError("Test requires server version 5.6.9 or higher")
@@ -67,27 +77,34 @@ class test(rpl_admin.test):
         self.server0 = self.servers.get_server(0)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_gtid", mysqld,
+                                                 True)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_gtid", mysqld,
+                                                 True)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_gtid", mysqld,
+                                                 True)
         srv_port = self.servers.view_next_port()
         mysqld = _DEFAULT_MYSQL_OPTS.format(report_port=srv_port)
-        self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave3_gtid", mysqld,
+                                                 True)
         # Server without --report-host and --report-port
         mysqld = _MYSQL_OPTS_NO_REPORT
-        self.server5 = self.spawn_server("rep_slave4_gtid", mysqld, True)
+        self.server5 = self.servers.spawn_server("rep_slave4_gtid", mysqld,
+                                                 True)
         # Master --gtid-mode=off
         srv_port = self.servers.view_next_port()
         mysqld = _MYSQL_OPTS_GTID_OFF.format(report_port=srv_port)
-        self.server6 = self.spawn_server("rep_master_gtid_off", mysqld, True)
+        self.server6 = self.servers.spawn_server("rep_master_gtid_off", mysqld,
+                                                 True)
         # Slave --gtid-mode=off
         srv_port = self.servers.view_next_port()
         mysqld = _MYSQL_OPTS_GTID_OFF.format(report_port=srv_port)
-        self.server7 = self.spawn_server("rep_slave_gtid_off", mysqld, True)
+        self.server7 = self.servers.spawn_server("rep_slave_gtid_off", mysqld,
+                                                 True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master([self.server1, self.server2, self.server3,

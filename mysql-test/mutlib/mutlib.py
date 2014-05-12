@@ -22,7 +22,6 @@ This module contains a test framework for testing MySQL Utilities.
 # TODO: Make it possible to stop and delete a specific server from the Server
 #       class.
 
-from abc import abstractmethod, ABCMeta
 import commands
 import difflib
 import itertools
@@ -34,13 +33,14 @@ import string
 import subprocess
 import tempfile
 
+from abc import abstractmethod, ABCMeta
+
 from mysql.utilities.common.database import Database
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
 from mysql.utilities.common.server import stop_running_server, Server
 from mysql.utilities.common.table import quote_with_backticks
 from mysql.utilities.common.tools import get_tool_path, check_port_in_use
 from mysql.utilities.command.serverclone import clone_server
-
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.exception import UtilError
 
@@ -219,6 +219,7 @@ def get_port(process_id):
                 except IndexError:  # we might be reading some warning messages
                     pass
             else:
+                # pylint: disable=W0120
                 # Unable to find the port number
                 raise MUTLibError("# ERROR: Unable to retrieve port "
                                   "information")
@@ -237,7 +238,7 @@ class ServerList(object):
         - manage ports and server_ids
     """
 
-    def __init__(self, servers, startport, utildir, verbose=False):
+    def __init__(self, servers, startport, utildir, verbosity=0):
         """Constructor
 
         servers[in]        List of existing servers (may be None)
@@ -248,17 +249,18 @@ class ServerList(object):
         """
 
         self.cloning_host = "localhost"
-        self.utildir = utildir       # Location of utilities being tested
-        self.new_port = startport    # Starting port for spawned servers
-        self.verbose = verbose       # Option for verbosity
-        self.new_id = 100            # Starting server id for spawned servers
-        self.server_list = servers   # List of servers available
-        self.cleanup_list = []       # List of files to remove at shutdown
-        self.ports_in_use = []       # List of port numbers in use
-        self.ports_freed = []        # List of ports that were used, but are
-                                     # now free to use again
-        self._next_port = startport  # port number to start looking for new
-                                     # unused ports
+        self.utildir = utildir         # Location of utilities being tested
+        self.new_port = startport      # Starting port for spawned servers
+        self.verbose = verbosity >= 3  # Option for verbosity
+        self.debug = verbosity >= 2    # Option for debug
+        self.new_id = 100              # Starting server id for spawned servers
+        self.server_list = servers     # List of servers available
+        self.cleanup_list = []         # List of files to remove at shutdown
+        self.ports_in_use = []         # List of port numbers in use
+        self.ports_freed = []          # List of ports that were used, but are
+                                       # now free to use again
+        self._next_port = startport    # port number to start looking for new
+                                       # unused ports
 
         if servers is None:
             self.server_list = []
@@ -279,8 +281,9 @@ class ServerList(object):
             if is_port_free(port_number):
                 return port_number
         else:
+            # pylint: disable=W0120
             # Start looking for new free ports starting at _next_port
-            for port_number in itertools.count(self._next_port):
+            for port_number in itertools.count(self._next_port + 1):
                 self._next_port = port_number
                 if is_port_free(port_number):
                     return port_number
@@ -290,13 +293,7 @@ class ServerList(object):
         servers and adds it to the list of ports in use.
         Also updates the instance variable for the next free port.
         """
-        # Check if port is still free
-        if is_port_free(self.new_port):
-            new_port = self.new_port
-        else:
-            # If it is not get a new free port
-            new_port = self.get_free_port()
-
+        new_port = self.new_port
         # Add port to the list of ports in use
         self.ports_in_use.append(new_port)
 
@@ -364,18 +361,10 @@ class ServerList(object):
                     msg = None or error message if error
         """
         full_datadir = os.path.join(os.getcwd(), "temp_{0}".format(port))
-
-        # if port is in use, try to get another one which isn't to spawn the
-        # new server.
-        for i in xrange(port, port+MAX_NUM_RETRIES):
-            if check_port_in_use("localhost", i):
-                self.new_port = i+1
-                port = i
-                break
-        else:
-            raise UtilError("Ports {0} through {1} are in use. Please choose "
-                            "an available port"
-                            ".".format(port, port + MAX_NUM_RETRIES))
+        # Check if port is in use
+        if not check_port_in_use("localhost", port):
+            raise MUTLibError("Port {0} is in use. Please choose "
+                              "an available port.".format(port))
 
         clone_options = {
             'new_data': full_datadir,
@@ -434,7 +423,8 @@ class ServerList(object):
         server = (new_server, None)
         return server
 
-    def stop_server(self, server, wait=10, drop=True):
+    @staticmethod
+    def stop_server(server, wait=10, drop=True):
         """Stop a running server.
 
         This method will stop a server using the mysqladmin utility to
@@ -467,15 +457,60 @@ class ServerList(object):
         orig_server = self.server_list[0][0]
         num_to_add = num_servers - len(self.server_list)
 
-        cur_num_servers = self.num_servers()
-        for server_num in range(0, num_to_add):
-            cur_num_servers += 1
+        for _ in range(0, num_to_add):
             server = self.start_new_server(orig_server,
                                            self.get_next_port(),
                                            self.get_next_id(), "root")
             datadir = server[0].show_server_variable('datadir')[0][1]
             self.server_list.append((server[0], True,
                                      self.get_process_id(datadir)))
+
+    def spawn_server(self, name, mysqld=None, kill=False):
+        """Spawns a server.
+
+        name[in]              Name of the server.
+        mysqld[in]            MySQL server options, it needs to be a string
+                              E.g " '--log-bin=mysql-bin ' "
+        kill[in]              If True and server with same name already exists
+                              kill it first, before spawning a new one.
+        """
+        index = self.find_server_by_name(name)
+        if index >= 0 and kill:
+            server = self.get_server(index)
+            if self.debug:
+                print("# Killing server {0}.".format(server.role))
+            self.stop_server(server)
+            self.remove_server(server.role)
+            index = -1
+        if self.debug:
+            print("# Spawning {0}".format(name))
+        if index >= 0:
+            if self.debug:
+                print("# Found it in the servers list.")
+            server = self.get_server(index)
+            try:
+                server.show_server_variable("server_id")
+            except MUTLibError as err:
+                raise MUTLibError("Cannot get server 'server_id': "
+                                  "{0}".format(err.errmsg))
+        else:
+            origin_server = self.server_list[0][0]
+            if self.debug:
+                print("# Cloning server {0}@{1}".format(origin_server.role,
+                                                        origin_server.port))
+            serverid = self.get_next_id()
+
+            # Test if mysqld is a string
+            if mysqld and not isinstance(mysqld, str):
+                raise MUTLibError("mysqld option must be a string.")
+            res = self.spawn_new_server(origin_server, serverid,
+                                        name, mysqld)
+            if not res:
+                raise MUTLibError("Cannot spawn server '{0}'.".format(name))
+            self.add_new_server(res[0], True)
+            server = res[0]
+
+        return server
 
     def spawn_new_server(self, orig_server, server_id, name, mysqld=None):
         """Spawn a new server with options.
@@ -520,7 +555,7 @@ class ServerList(object):
                         else:
                             retval = subprocess.call("taskkill /F /T /PID "
                                                      "{0}".format(server[2],
-                                                     shell=True))
+                                                                  shell=True))
                         if retval in (0, 128):
                             print("success.")
                     else:
@@ -568,7 +603,8 @@ class ServerList(object):
                 num_spawned_servers += 1
         return num_spawned_servers
 
-    def get_connection_values(self, server):
+    @staticmethod
+    def get_connection_values(server):
         """Return a dictionary of connection values for a particular server.
 
         server[in]         A Server object
@@ -577,7 +613,8 @@ class ServerList(object):
         """
         return server.get_connection_values()
 
-    def get_connection_parameters(self, server, aslist=False, asdict=False):
+    @staticmethod
+    def get_connection_parameters(server, aslist=False, asdict=False):
         """Return connection parameters for a server.
 
         Return a string that comprises the normal connection parameters
@@ -619,7 +656,8 @@ class ServerList(object):
         str2 = "--port={0} ".format(server.port)
         return str1 + str2
 
-    def get_connection_string(self, server):
+    @staticmethod
+    def get_connection_string(server):
         """Return a string that comprises the normal connection parameters
         common to MySQL utilities for a particular server in the form of
         user:pass@host:port:socket.
@@ -639,7 +677,8 @@ class ServerList(object):
             conn_str = "{0}:{1} ".format(conn_str, server.socket)
         return conn_str
 
-    def get_process_id(self, datadir):
+    @staticmethod
+    def get_process_id(datadir):
         """Return process id of new process.
 
         datadir[in]        The data directory of the process
@@ -713,6 +752,8 @@ class System_test(object):
         """
 
         self.res_fname = None       # Name of intermediate result file
+        self.edit_tool_path = None  # Editor tool path
+        self.login_reader = None    # Login reader
         self.results = []           # List for storing results
         self.servers = servers      # ServerList class
         self.res_dir = res_dir      # Current test result directory
@@ -742,7 +783,7 @@ class System_test(object):
             # Need servers with DISABLE_GTID_UNSAFE_STATEMENTS
             server0 = self.servers.get_server(0)
             res = server0.show_server_variable("DISABLE_GTID_UNSAFE_"
-                                                "STATEMENTS")
+                                               "STATEMENTS")
             if res != [] and res[0][1] != "ON":
                 raise MUTLibError("Test requires DISABLE_GTID_UNSAFE_"
                                   "STATEMENTS = ON")
@@ -808,12 +849,12 @@ class System_test(object):
         proc = subprocess.Popen([self.edit_tool_path, "--version"],
                                 stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out, err = proc.communicate()
+        out, _ = proc.communicate()
         if out:
             match = re.search(r'mysql_config_editor(?:\.exe)? ver \d+\.\d+ '
                               r'distrib (\d+\.\d+\.\d+)', out, re.IGNORECASE)
             if match:
-                version = map(int, match.group(1).split('.'))
+                version = [int(token) for token in match.group(1).split('.')]
                 assert len(version) == len(minimum_version), \
                     "Unsupported version"
                 # If current version is greater or equal than 5.6.11 then
@@ -897,7 +938,8 @@ class System_test(object):
             return True
         return False
 
-    def get_connection_parameters(self, server):
+    @staticmethod
+    def get_connection_parameters(server):
         """Return a string that comprises the normal connection parameters
         common to MySQL utilities for a particular server.
 
@@ -915,7 +957,8 @@ class System_test(object):
             str2 = "--port={0} ".format(server.port)
         return str1 + str2
 
-    def get_connection_values(self, server):
+    @staticmethod
+    def get_connection_values(server):
         """Return a tuple that comprises the connection parameters for a
         particular server.
 
@@ -940,7 +983,7 @@ class System_test(object):
         if conn_val[1]:
             conn_str = "{0}:{1}".format(conn_str, conn_val[1])
         if ":" in conn_val[2] and not "]" in conn_val[2]:
-            conn_str = "{0}@[{1}]:".format(conn_str,  conn_val[2])
+            conn_str = "{0}@[{1}]:".format(conn_str, conn_val[2])
         else:
             conn_str = "{0}@{1}:".format(conn_str, conn_val[2])
         if conn_val[3]:
@@ -967,7 +1010,7 @@ class System_test(object):
             conn_str = "{0}:{1}".format(conn_str, passwd)
         # Use the server values to build the remaining connection string.
         if ":" in conn_val[2] and not "]" in conn_val[2]:
-            conn_str = "{0}@[{1}]:".format(conn_str,  conn_val[2])
+            conn_str = "{0}@[{1}]:".format(conn_str, conn_val[2])
         else:
             conn_str = "{0}@{1}:".format(conn_str, conn_val[2])
         if conn_val[3]:
@@ -1065,7 +1108,7 @@ class System_test(object):
                 for i in xrange(1, len(lines_tuple)):
                     # Note: same line can be repeatedly matched, i.e. it does
                     # not guarantee that distinct line are matched.
-                    if not self.results[line_num+i].startswith(lines_tuple):
+                    if not self.results[line_num + i].startswith(lines_tuple):
                         match_all = False
                         break
                 if match_all:
@@ -1122,7 +1165,7 @@ class System_test(object):
             index = line.find(prefix)
             if index == 0:
                 linenums.append(int(linenum))
-                for line2rm in range(linenum-lines, linenum):
+                for line2rm in range(linenum - lines, linenum):
                     if line2rm > - 1:
                         linenums.append(int(line2rm))
             linenum += 1
@@ -1262,7 +1305,7 @@ class System_test(object):
                 pos = 0
                 for i in range(0, num_col):
                     loc = line.find(separator, pos)
-                    if i+1 == num_col:
+                    if i + 1 == num_col:
                         next_ = line.find(separator, loc)
                         if next_ < 0:
                             start = len(line)
@@ -1282,7 +1325,8 @@ class System_test(object):
                         break
             linenum += 1
 
-    def check_objects(self, server, db, events=True):
+    @staticmethod
+    def check_objects(server, db, events=True):
         """Check number of objects.
 
         Creates a string containing the number of objects for a given database.
@@ -1391,7 +1435,8 @@ class System_test(object):
             res_file.close()
         return True
 
-    def is_long(self):
+    @staticmethod
+    def is_long():
         """Is test marked as a long running test?
 
         Override this method to specify the test is a long-running test.
@@ -1429,7 +1474,15 @@ class System_test(object):
         kill_results = [self.kill_server(srv_role) for srv_role in servers]
         return all(kill_results)
 
-    def drop_db(self, server, db):
+    @staticmethod
+    def drop_db(server, db):
+        """Drops a database.
+
+        server[in]     Server instance.
+        db[in]         Database name.
+
+        Returns True if success.
+        """
         # Check before you drop to avoid warning
         res = server.exec_query("SHOW DATABASES LIKE '{0}'".format(db))
         if not res:

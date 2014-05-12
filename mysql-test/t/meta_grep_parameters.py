@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+meta_grep_parameters test.
+"""
+
 import meta_grep
+
 from mysql.utilities.exception import MUTLibError
 
 
@@ -77,9 +82,9 @@ class test(meta_grep.test):
 
         # Mask version
         self.replace_result(
-                "MySQL Utilities mysqlmetagrep version",
-                "MySQL Utilities mysqlmetagrep version X.Y.Z "
-                "(part of MySQL Workbench ... XXXXXX)\n"
+            "MySQL Utilities mysqlmetagrep version",
+            "MySQL Utilities mysqlmetagrep version X.Y.Z "
+            "(part of MySQL Workbench ... XXXXXX)\n"
         )
 
         return True

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+frm_reader_base test.
+"""
+
 import difflib
 import os
 import mutlib
@@ -25,6 +30,12 @@ class test(mutlib.System_test):
     """.frm file reader
     This test executes test cases to test the .frm reader.
     """
+
+    server0 = None
+    server1 = None
+    cmd = None
+    frm_output = None
+    s1_serverid = None
 
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 11):
@@ -76,7 +87,13 @@ class test(mutlib.System_test):
         return True
 
     def check_frm_read(self, tablename, frm_file, comment, exp_result=0):
+        """Checks FRM read.
 
+        tablename[in]     Table name.
+        frm_file[in]      FRM file.
+        comment[in]       Comment.
+        exp_result[in]    Expected result.
+        """
         if self.debug:
             print comment
             print "Running test for {0}".format(tablename)
@@ -173,6 +190,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases created.
+        """
         return self.drop_db(self.server1, "frm_test")
 
     def cleanup(self):

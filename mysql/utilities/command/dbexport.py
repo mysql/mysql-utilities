@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -308,15 +308,18 @@ def _export_row(data_rows, cur_table, out_format, single, skip_blobs,
                 data = data_rows[1]
             blob_rows = []
             for row in data:
-                columns = cur_table.get_column_string(row, q_db_name)
+                columns = cur_table.get_column_string(row, q_db_name,
+                                                      skip_blobs)
                 if len(columns[1]) > 0:
                     blob_rows.extend(columns[1])
-                row_str = "INSERT INTO {0} VALUES{1};\n".format(full_name,
-                                                                columns[0])
-                outfile.write(row_str)
+                if columns[0]:
+                    row_str = "INSERT INTO {0} VALUES{1};\n".format(full_name,
+                                                                    columns[0])
+                    outfile.write(row_str)
         else:
             # Generate bulk insert statements
-            data_lists = cur_table.make_bulk_insert(data_rows, q_db_name)
+            data_lists = cur_table.make_bulk_insert(data_rows, q_db_name,
+                                                    skip_blobs=skip_blobs)
             rows = data_lists[0]
             blob_rows = data_lists[1]
 
@@ -577,6 +580,19 @@ def _export_table_data(source_srv, table, output_file, options):
     else:
         retrieval_mode = 1
         first = False
+
+    # Find if we have some UNIQUE NOT NULL column indexes.
+    unique_indexes = len(cur_table.get_not_null_unique_indexes())
+
+    # If all columns are BLOBS or there aren't any UNIQUE NOT NULL indexes
+    # then rows won't be correctly copied using the update statement,
+    # so we must warn the user.
+    if (not skip_blobs and frmt == "sql" and
+            (cur_table.blob_columns == len(cur_table.column_names)
+             or (not unique_indexes and cur_table.blob_columns))):
+        print("# WARNING: Table {0}.{1} contains only BLOB and TEXT "
+              "fields. Rows will be generated with separate INSERT "
+              "statements.".format(cur_table.db_name, cur_table.tbl_name))
 
     for data_rows in cur_table.retrieve_rows(retrieval_mode):
         _export_row(data_rows, cur_table, frmt, single,

@@ -22,11 +22,13 @@ Options:
   -f FORMAT, --format=FORMAT
                         display the output in either grid (default), tab, csv,
                         or vertical format
+  --skip-checksum-table
+                        skip CHECKSUM TABLE step in data consistency check.
   --skip-object-compare
-                        skip object comparison step
-  --skip-row-count      skip row count step
-  --skip-diff           skip the object diff step
-  --skip-data-check     skip data consistency check
+                        skip object comparison step.
+  --skip-row-count      skip row count step.
+  --skip-diff           skip the object diff step.
+  --skip-data-check     skip data consistency check.
   --skip-table-options  skip check of all table options (e.g., AUTO_INCREMENT,
                         ENGINE, CHARSET, etc.).
   --width=WIDTH         display width
@@ -80,7 +82,9 @@ Test case 2 - Use  -a --difftype=unified --format=grid
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -106,7 +110,9 @@ Test case 2 - Use  -a --difftype=unified --format=grid
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -169,7 +175,9 @@ Test case 3 - Use  -a --difftype=unified --format=csv
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -185,7 +193,9 @@ Test case 3 - Use  -a --difftype=unified --format=csv
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -235,7 +245,9 @@ Test case 4 - Use  -a --difftype=unified --format=tab
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -251,7 +263,9 @@ Test case 4 - Use  -a --difftype=unified --format=tab
 code	name
 3	Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -301,7 +315,9 @@ Test case 5 - Use  -a --difftype=unified --format=vertical
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -321,7 +337,9 @@ Test case 5 - Use  -a --difftype=unified --format=vertical
  name: Never Enough Inc.
 1 row.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -453,7 +471,9 @@ Test case 6 - Use  -a --difftype=context --format=grid
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -481,7 +501,9 @@ Test case 6 - Use  -a --difftype=context --format=grid
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -546,7 +568,9 @@ Test case 7 - Use  -a --difftype=context --format=csv
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -565,7 +589,9 @@ Test case 7 - Use  -a --difftype=context --format=csv
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -618,7 +644,9 @@ Test case 8 - Use  -a --difftype=context --format=tab
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -637,7 +665,9 @@ Test case 8 - Use  -a --difftype=context --format=tab
 code	name
 3	Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -690,7 +720,9 @@ Test case 9 - Use  -a --difftype=context --format=vertical
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -715,7 +747,9 @@ Test case 9 - Use  -a --difftype=context --format=vertical
  name: Never Enough Inc.
 1 row.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -871,7 +905,9 @@ Test case 10 - Use  -a --difftype=differ --format=grid
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -898,7 +934,9 @@ Test case 10 - Use  -a --difftype=differ --format=grid
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -968,7 +1006,9 @@ Test case 11 - Use  -a --difftype=differ --format=csv
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -981,7 +1021,9 @@ Test case 11 - Use  -a --difftype=differ --format=csv
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -1034,7 +1076,9 @@ Test case 12 - Use  -a --difftype=differ --format=tab
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -1047,7 +1091,9 @@ Test case 12 - Use  -a --difftype=differ --format=tab
 code	name
 3	Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -1100,7 +1146,9 @@ Test case 13 - Use  -a --difftype=differ --format=vertical
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -1117,7 +1165,9 @@ Test case 13 - Use  -a --difftype=differ --format=vertical
  name: Never Enough Inc.
 1 row.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -1316,7 +1366,9 @@ Test case 16 -  --format=csv -a --width=65
 #                                         Defn    Row     Data   
 # Type      Object Name                   Diff    Count   Check  
 # --------------------------------------------------------------- 
-# TABLE     supplier                      pass    FAIL    FAIL    
+# TABLE     supplier                      pass    FAIL    -       
+#           - Compare table checksum                      FAIL    
+#           - Find row differences                        FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -1332,7 +1384,9 @@ Test case 16 -  --format=csv -a --width=65
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                      pass    FAIL    FAIL    
+# TABLE     supplies                      pass    FAIL    -       
+#           - Compare table checksum                      FAIL    
+#           - Find row differences                        FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -1367,7 +1421,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 17 -  --format=csv -a --width=55
+Test case 17 -  --format=csv -a --width=60
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -1379,10 +1433,12 @@ Test case 17 -  --format=csv -a --width=55
 # WARNING: Objects in server2.inventory but not in server1.inventory:
 #         VIEW: tools
 #
-#                               Defn    Row     Data   
-# Type      Object Name         Diff    Count   Check  
-# ----------------------------------------------------- 
-# TABLE     supplier            pass    FAIL    FAIL    
+#                                    Defn    Row     Data   
+# Type      Object Name              Diff    Count   Check  
+# ---------------------------------------------------------- 
+# TABLE     supplier                 pass    FAIL    -       
+#           - Compare table checksum                 FAIL    
+#           - Find row differences                   FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -1398,7 +1454,9 @@ Test case 17 -  --format=csv -a --width=55
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies            pass    FAIL    FAIL    
+# TABLE     supplies                 pass    FAIL    -       
+#           - Compare table checksum                 FAIL    
+#           - Find row differences                   FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -1456,7 +1514,9 @@ Object types found common to both databases:
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL   
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL   
 
 # Definition for object inventory.supplier:
 CREATE TABLE `supplier` (
@@ -1490,7 +1550,9 @@ CREATE TABLE `supplier` (
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL   
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL   
 
 # Definition for object inventory.supplies:
 CREATE TABLE `supplies` (
@@ -1576,7 +1638,9 @@ Object types found common to both databases:
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL   
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL   
 
 # Definition for object inventory.supplier:
 CREATE TABLE `supplier` (
@@ -1610,7 +1674,9 @@ CREATE TABLE `supplier` (
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL   
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL   
 
 # Definition for object inventory.supplies:
 CREATE TABLE `supplies` (
@@ -1696,7 +1762,9 @@ Object types found common to both databases:
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL   
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL   
 
 # Definition for object inventory.supplier:
 CREATE TABLE `supplier` (
@@ -1730,7 +1798,9 @@ CREATE TABLE `supplier` (
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL   
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL   
 
 # Definition for object inventory.supplies:
 CREATE TABLE `supplies` (
@@ -1768,25 +1838,25 @@ CREATE TABLE `supplies` (
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
 -11146,Speed shine,1,9.99,repair,,1
--11186,Plastic polish,1,9.99,polishing,,1
 -11040,Leather care,1,9.99,other,,1
+-11186,Plastic polish,1,9.99,polishing,,1
 +11146,Speed shine,1,10.00,repair,,1
-+11186,Plastic polish,1,10.00,polishing,,1
 +11040,Leather care,1,10.00,other,,1
++11186,Plastic polish,1,10.00,polishing,,1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
 11270,Carpet cleaner,1,9.99,cleaning,,1
 11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
 11106,Wheel cleaner,1,9.99,cleaning,,1
+11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
+11104,Interior cleaner,1,9.99,cleaning,,1
+11136,Rubber cleaner,1,9.99,cleaning,,1
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
 10665,Glass polish pad,3,10.00,polishing,,1
+11116,Microfiber wax removal towel,3,16.99,waxing,,1
 11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
 
 
@@ -2046,7 +2116,9 @@ Test case 27 - Use  -a --difftype=unified --format=grid --compact
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -2069,7 +2141,9 @@ Test case 27 - Use  -a --difftype=unified --format=grid --compact
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -2129,7 +2203,9 @@ Test case 28 - Use  -a --difftype=unified --format=csv --compact
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -2142,7 +2218,9 @@ Test case 28 - Use  -a --difftype=unified --format=csv --compact
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -2189,7 +2267,9 @@ Test case 29 - Use  -a --difftype=unified --format=tab --compact
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -2202,7 +2282,9 @@ Test case 29 - Use  -a --difftype=unified --format=tab --compact
 code	name
 3	Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -2249,7 +2331,9 @@ Test case 30 - Use  -a --difftype=unified --format=vertical --compact
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -2266,7 +2350,9 @@ Test case 30 - Use  -a --difftype=unified --format=vertical --compact
  name: Never Enough Inc.
 1 row.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -2393,7 +2479,9 @@ Test case 31 - Use  -a --difftype=context --format=grid --compact
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -2418,7 +2506,9 @@ Test case 31 - Use  -a --difftype=context --format=grid --compact
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -2480,7 +2570,9 @@ Test case 32 - Use  -a --difftype=context --format=csv --compact
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -2496,7 +2588,9 @@ Test case 32 - Use  -a --difftype=context --format=csv --compact
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -2546,7 +2640,9 @@ Test case 33 - Use  -a --difftype=context --format=tab --compact
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -2562,7 +2658,9 @@ Test case 33 - Use  -a --difftype=context --format=tab --compact
 code	name
 3	Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -2612,7 +2710,9 @@ Test case 34 - Use  -a --difftype=context --format=vertical --compact
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -2634,7 +2734,9 @@ Test case 34 - Use  -a --difftype=context --format=vertical --compact
  name: Never Enough Inc.
 1 row.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #

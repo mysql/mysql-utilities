@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+import_keys test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.exception import MUTLibError
@@ -26,6 +32,15 @@ class test(mutlib.System_test):
     This test executes the import utility on a single server.
     It uses the mysqldbexport utility to generate files for importing.
     """
+
+    server0 = None
+    server1 = None
+    server2 = None
+    need_servers = False
+    export_import_file = None
+    tables = None
+    s1_serverid = None
+    s2_serverid = None
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -110,6 +125,8 @@ class test(mutlib.System_test):
         return True
 
     def _check_tables(self, server, db):
+        """Check tables.
+        """
         for tbl in self.tables:
             res = server.exec_query("SHOW CREATE TABLE "
                                     "{0}.{1}".format(db, tbl))
@@ -118,7 +135,18 @@ class test(mutlib.System_test):
     def run_import_test(self, expected_res, from_conn, to_conn, db, frmt,
                         imp_type, comment, export_options=None,
                         import_options=None):
+        """Runs import test.
 
+        expected_res[in]     Expected result.
+        from_conn[in]        Connection string.
+        to_conn[in]          Connection string.
+        db[in]               Database name.
+        frmt[in]             Format.
+        imp_type[in]         Import type.
+        comment[in]          Comment.
+        export_options[in]   Export options.
+        import_options[in]   Import options.
+        """
         # Set command with appropriate quotes for the OS
         if os.name == 'posix':
             export_cmd = ("mysqldbexport.py  --skip-gtid {0} '{1}' "
@@ -200,7 +228,6 @@ class test(mutlib.System_test):
                                                      "Cannot add foreign key "
                                                      "constraint\n")
 
-
         return True
 
     def get_result(self):
@@ -210,6 +237,8 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def drop_all(self):
+        """Drops all databases created.
+        """
         self.drop_db(self.server1, "util_test_keys")
         self.drop_db(self.server2, "util_test_keys")
         self.drop_db(self.server1, "util_test_fk")

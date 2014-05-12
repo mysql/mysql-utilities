@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+clone_server test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.common.server import Server
@@ -26,16 +32,23 @@ class test(mutlib.System_test):
     This test clones a server from a single server.
     """
 
+    server0 = None
+    new_server = None
+
     def check_prerequisites(self):
         return self.check_num_servers(1)
 
     def setup(self):
         # No setup needed
-        self.new_server = None
         return True
 
     @staticmethod
     def check_connect(port, name="cloned_server"):
+        """Check connection.
+
+        port[in]    Server port.
+        name[in]    Server name.
+        """
         conn = {"user": "root", "passwd": "root", "host": "localhost",
                 "port": port}
 
@@ -67,7 +80,7 @@ class test(mutlib.System_test):
         # Create a new-dir whose size with socket file is > 107 chars
         o_path_size = 108 - (len(os.getcwd()) + 22 + len(str(port1)))
         full_datadir = os.path.join(os.getcwd(), "temp_{0}_lo{1}ng".format(
-            port1, 'o'*o_path_size))
+            port1, 'o' * o_path_size))
         cmd_str = "{0}--new-data={1} ".format(cmd_str, full_datadir)
         res = self.exec_util(cmd_str, "start.txt")
         with open("start.txt") as f:

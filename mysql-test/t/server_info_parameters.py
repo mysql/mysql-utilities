@@ -14,9 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+server_info_parameters test.
+"""
+
 import server_info
 
 from mysql.utilities.exception import MUTLibError
+
 
 _FORMATS = ['GRID', 'CSV', 'TAB', 'VERTICAL']
 

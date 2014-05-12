@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+audit_log_admin_errors test.
+"""
+
 import os
 
 import audit_log_admin
+
 from mysql.utilities.exception import MUTLibError
 
 
@@ -205,7 +211,7 @@ class test(audit_log_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         num_test += 1
-        comment = ("Test case {0} - Additional audit log name option\command "
+        comment = ("Test case {0} - Additional audit log name option/command "
                    "missing".format(num_test))
         cmd_opts = "--audit-log-name={0}".format(audit_log_name)
         res = self.run_test_case(2, cmd_base + cmd_opts, comment)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,11 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+export_gtid test.
+"""
+
 import os
 
 import mutlib
 
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
@@ -33,6 +39,16 @@ class test(mutlib.System_test):
     This test executes a series of export database operations using a variety
     of --skip-gtid and gtid and non-gtid servers.
     """
+
+    server0 = None
+    server1 = None
+    server2 = None
+    server3 = None
+    s1_serverid = None
+    s2_serverid = None
+    s3_serverid = None
+    data_file = ""
+    export_file = ""
 
     def check_prerequisites(self):
         # Check MySQL server version - Must be 5.6.9 or higher
@@ -108,6 +124,18 @@ class test(mutlib.System_test):
     def exec_export_import(self, server1, server2, exp_cmd, imp_cmd,
                            test_num, test_case, ret_val=True, reset=True,
                            load_data=True):
+        """Execute export import.
+
+        server1[in]     Server instance.
+        server2[in]     Server instance.
+        exp_cmd[in]     Export command.
+        imp_cmd[in]     Import command.
+        test_num[in]    Test number.
+        test_case[in]   Test case.
+        ret_val[in]     Return value.
+        reset[in]       True for reset.
+        load_data[in]   True for load data.
+        """
         conn1 = "--server={0}".format(self.build_connection_string(server1))
         conn2 = "--server={0}".format(self.build_connection_string(server2))
         if load_data:
@@ -220,20 +248,24 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        try:
-            os.unlink(self.res_fname)
-        except (OSError, AttributeError):
-            pass
-        try:
-            os.unlink(self.export_file)
-        except (OSError, AttributeError):
-            pass
+        if self.res_fname:
+            try:
+                os.unlink(self.res_fname)
+            except (OSError, AttributeError):
+                pass
+        if self.export_file:
+            try:
+                os.unlink(self.export_file)
+            except (OSError, AttributeError):
+                pass
 
         # Kill the servers that are no longer used
         kill_list = ['with_gtids_1', 'with_gtids_2', 'no_gtids']
         return self.drop_all() and self.kill_server_list(kill_list)
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         servers = [self.server1, self.server2, self.server3]
         for server in servers:
             try:

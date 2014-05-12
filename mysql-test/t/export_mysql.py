@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+export_mysql test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.exception import MUTLibError, UtilError
@@ -26,6 +32,12 @@ class test(mutlib.System_test):
     This test executes the export utility on a single server and demonstrates
     how to import the result into mysql using the mysql monitor.
     """
+
+    server1 = None
+    server2 = None
+    server2_conn = None
+    mysql_path = None
+    need_servers = None
 
     def check_prerequisites(self):
         # Check MySQL server version - Must be 5.1.0 or higher
@@ -72,6 +84,10 @@ class test(mutlib.System_test):
         return True
 
     def show_data(self, tbl):
+        """Shows data for table.
+
+        tbl[in]    Table name.
+        """
         comment = "Showing data for table {0} \n".format(tbl)
         self.results.append(comment)
         if os.name == "posix":
@@ -169,6 +185,8 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         self.drop_db(self.server1, "util_test")
 
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]

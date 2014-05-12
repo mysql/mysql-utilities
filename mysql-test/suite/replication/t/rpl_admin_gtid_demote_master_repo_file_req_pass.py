@@ -15,8 +15,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_admin_gtid_demote_master_repo_file_req_pass test.
+"""
+
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError
+
 
 _DEFAULT_MYSQL_OPTS_FILE = ('"--log-bin=mysql-bin --skip-slave-start '
                             '--log-slave-updates --gtid-mode=on '
@@ -29,7 +35,7 @@ class test(rpl_admin.test):
     """test replication administration commands
     This test runs the mysqlrpladmin utility on a known topology.
     It test the behavior of switchover demote master repository File
-    Unrecoverable password. 
+    Unrecoverable password.
 
     Note: this test requires GTID enabled servers.
     """
@@ -45,13 +51,17 @@ class test(rpl_admin.test):
         # Spawn servers
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS_FILE.format(self.servers.view_next_port())
-        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_gtid", mysqld,
+                                                 True)
         mysqld = _DEFAULT_MYSQL_OPTS_FILE.format(self.servers.view_next_port())
-        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_gtid", mysqld,
+                                                 True)
         mysqld = _DEFAULT_MYSQL_OPTS_FILE.format(self.servers.view_next_port())
-        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_gtid", mysqld,
+                                                 True)
         mysqld = _DEFAULT_MYSQL_OPTS_FILE.format(self.servers.view_next_port())
-        self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave3_gtid", mysqld,
+                                                 True)
 
         self.m_port = self.server1.port
         self.s1_port = self.server2.port
@@ -79,26 +89,26 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        # mysqlrpladmin --master=root:root@localhost:13091 
-        # --new-master=root:root@localhost:13094 
-        # --discover-slaves-login=root:root --demote-master  switchover 
-        # --rpl-user=rpl:not-rpl-good-pass 
+        # mysqlrpladmin --master=root:root@localhost:13091
+        # --new-master=root:root@localhost:13094
+        # --discover-slaves-login=root:root --demote-master  switchover
+        # --rpl-user=rpl:not-rpl-good-pass
         comment = ("Test case {0} - demote-master switchover "
                    "same user but different password given".format(test_num))
         cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
         cmd_opts = (" --new-master={0} --discover-slaves={1} "
                     "--rpl-user=rpl:not-rpl-good-pass --demote-master "
-                    "switchover --no-health ".format(
-                    slave1_conn, master_conn.split('@')[0]))
+                    "switchover --no-health "
+                    "".format(slave1_conn, master_conn.split('@')[0]))
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
-        # mysqlrpladmin --master=root:root@localhost:13091 
-        # --new-master=root:root@localhost:13094 
-        # --discover-slaves-login=root:root --demote-master  switchover 
+        # mysqlrpladmin --master=root:root@localhost:13091
+        # --new-master=root:root@localhost:13094
+        # --discover-slaves-login=root:root --demote-master  switchover
         # --rpl-user=rpl --no-health
         comment = ("Test case {0} - demote-master switchover same user but "
                    "missing password".format(test_num))
@@ -113,35 +123,35 @@ class test(rpl_admin.test):
         self.results.append("\n")
 
         test_num += 1
-        # mysqlrpladmin --master=root:root@localhost:13091 
-        # --new-master=root:root@localhost:13094 
-        # --discover-slaves-login=root:root --demote-master  switchover 
+        # mysqlrpladmin --master=root:root@localhost:13091
+        # --new-master=root:root@localhost:13094
+        # --discover-slaves-login=root:root --demote-master  switchover
         # --rpl-user=not-rpl-user:not-rplpass --no-health
         comment = ("Test case {0} - demote-master switchover different user "
                    "and password given".format(test_num))
         cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
         cmd_opts = (" --new-master={0} --discover-slaves={1} "
                     "--rpl-user=not-rpl-user:not-rplpass "
-                    "--demote-master switchover --no-health".format(
-                    slave1_conn, master_conn.split('@')[0]))
+                    "--demote-master switchover --no-health"
+                    "".format(slave1_conn, master_conn.split('@')[0]))
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
-        # mysqlrpladmin --master=root:root@localhost:13091 
-        # --new-master=root:root@localhost:13094 
-        # --discover-slaves-login=root:root --demote-master  switchover 
-        # --rpl-user=not-rpl-user:not-rplpass --no-health --force 
+        # mysqlrpladmin --master=root:root@localhost:13091
+        # --new-master=root:root@localhost:13094
+        # --discover-slaves-login=root:root --demote-master  switchover
+        # --rpl-user=not-rpl-user:not-rplpass --no-health --force
         comment = ("Test case {0} - demote-master switchover different user "
                    "and password given, now using the "
                    "--force".format(test_num))
         cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
         cmd_opts = (" --new-master={0} --discover-slaves={1} "
                     "--rpl-user=other_user:other_pass --demote-master "
-                    "switchover  --force --no-health".format(
-                    slave1_conn, master_conn.split('@')[0]))
+                    "switchover  --force --no-health"
+                    "".format(slave1_conn, master_conn.split('@')[0]))
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -156,10 +166,10 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        # mysqlrpladmin --master=root:root@localhost:13091 
-        # --new-master=root:root@localhost:13094 
-        # --discover-slaves-login=root:root --demote-master  switchover 
-        # --rpl-user=user_wopass --no-health --force 
+        # mysqlrpladmin --master=root:root@localhost:13091
+        # --new-master=root:root@localhost:13094
+        # --discover-slaves-login=root:root --demote-master  switchover
+        # --rpl-user=user_wopass --no-health --force
         comment = ("Test case {0} - demote-master switchover "
                    "different user and no password is given, now using the "
                    "--force".format(test_num))
@@ -183,9 +193,9 @@ class test(rpl_admin.test):
         self.results.append("\n")
 
         test_num += 1
-        # mysqlrpladmin --master=root:root@localhost:13091 
-        # --new-master=root:root@localhost:13094 
-        # --discover-slaves-login=root:root --demote-master  switchover 
+        # mysqlrpladmin --master=root:root@localhost:13091
+        # --new-master=root:root@localhost:13094
+        # --discover-slaves-login=root:root --demote-master  switchover
         # --rpl-user=user_wopass --no-health
         comment = ("Test case {0} - demote-master switchover existing user "
                    "with no password and no password "

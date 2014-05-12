@@ -1,5 +1,6 @@
+
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,7 +45,6 @@ _COMMAND_KEY = {
     '\x1b[D': 'ARROW_LT',
     '\t': 'TAB',
     '\xe0': 'SPECIAL_WIN',
-    '\x7f': 'BACKSPACE_POSIX',
     '\x08': 'BACKSPACE_WIN'
 }
 
@@ -145,7 +145,7 @@ class _CommandHistory(object):
         options[in]        Options for the class member variables
         """
         if options is None:
-            options = []
+            options = {}
         self.position = 0
         self.commands = []
         self.max_size = options.get('max_size', 40)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+compare_db_sql test.
+"""
+
 import compare_db
+
 from mysql.utilities.exception import MUTLibError
 
 
@@ -90,6 +96,54 @@ class test(compare_db.test):
                                               "--changes-for=server2 "
                                               "--show-reverse",
                                  comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Test with data that yields the same span key (size 8).
+        test_num += 1
+        comment = ("Test case {0} - data with multiple lines per span "
+                   "(no differences).".format(test_num))
+        cmd_arg = 'multi_span_row:multi_span_row -a --difftype=sql'
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Change data to detect all changed rows within the same span.
+        self.server2.exec_query(
+            'UPDATE multi_span_row.t SET data = 2 WHERE id != 1651723'
+        )
+
+        test_num += 1
+        comment = ("Test case {0} - data with multiple lines per span "
+                   "(changed rows).".format(test_num))
+        cmd_arg = 'multi_span_row:multi_span_row -a --difftype=sql'
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Change data to detect missing rows within the same span.
+        self.server2.exec_query(
+            'DELETE FROM multi_span_row.t WHERE id = 1908449'
+        )
+
+        test_num += 1
+        comment = ("Test case {0} - data with multiple lines per span "
+                   "(missing row).".format(test_num))
+        cmd_arg = 'multi_span_row:multi_span_row -a --difftype=sql'
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - data with multiple lines per span "
+                   "(missing row; changes for server2).".format(test_num))
+        cmd_arg = ('multi_span_row:multi_span_row -a --difftype=sql '
+                   '--changes-for=server2')
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

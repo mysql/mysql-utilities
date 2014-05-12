@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+diff test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.exception import MUTLibError, UtilError
@@ -24,6 +30,10 @@ class test(mutlib.System_test):
     """simple db diff
     This test executes a simple diff of two databases on separate servers.
     """
+
+    server1 = None
+    server2 = None
+    need_server = False
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -78,7 +88,7 @@ class test(mutlib.System_test):
 
         # Add some data to server1 to change AUTO_INCREMENT value.
         try:
-            for count in range(5):
+            for _ in range(5):
                 self.server1.exec_query("INSERT INTO "
                                         "`db_diff_test`.`table-dash` "
                                         "VALUES (NULL)")
@@ -287,6 +297,8 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server1, "util_test1")
         self.drop_db(self.server2, "util_test")

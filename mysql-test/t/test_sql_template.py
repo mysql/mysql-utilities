@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,12 +14,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+test_sql_template test.
+"""
+
 import os
 import sys
 
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities.common.tools import get_tool_path
+
 
 _TRANSFORM_FILE = "diff_output.txt"
 
@@ -77,9 +84,9 @@ class test(mutlib.System_test):
     """Template for diff_<object>_sql tests
     This test executes a set of test cases for a given object definition pair.
     It is a value result test.
-    
+
     The pair is stored as list of dictionary items in the following format:
-  
+
         test_object = {
             'db1'             : <name of first database>,
             'db2'             : <name of second database>,
@@ -98,10 +105,10 @@ class test(mutlib.System_test):
             'server2_data'    : <array of insert commands for server2>
         }
         self.test_objects.append(test_object)
-    
+
     For item in the dictionary of test objects, the following test cases are
     executed:
-    
+
         - operation generated with --difftype=sql option, changes-for=server1
         - SQL consumed
         - operation rerun and check result against 'expected_result'
@@ -112,24 +119,31 @@ class test(mutlib.System_test):
           changes-for=server1 with show-reverse
         - operation generated with --difftype=sql option,
           changes-for=server2 with show-reverse
-        
+
     To specify a new test object, do so in the setup method as described above
     and call the template setup method. You can add multiple object pairs to
     the list self.test_objects so that you can test different variants of the
     CREATE statement to check for the various mechanisms of how diff generates
     the SQL statements.
-    
+
     Note: the expected result for all test cases is 1 (errors found). It
           shall be considered an error if this returns 0. Similarly, all
           consumption runs is expected to generate a result of 0 and any other
           value is considered an error.
-          
+
     You must supply the utility name via self.utility. Set it to either
     'mysqldiff.py' for diff_sql* tests or 'mysqldbcompare.py' for
     db_compare_sql* tests. Set it in the setup *before* calling
     test_sql_template.test.setup().
-          
+
     """
+
+    server1 = None
+    server2 = None
+    need_server = False
+    mysql_path = None
+    base_cmd = None
+    test_objects = None
 
     def check_prerequisites(self):
     #        if self.servers.get_server(0).check_version_compat(5, 6, 5):
@@ -161,6 +175,7 @@ class test(mutlib.System_test):
         s2_conn = "--server2={0}".format(
             self.build_connection_string(self.server2))
 
+        # pylint: disable=E1101
         self.base_cmd = "{0} {1} {2} ".format(self.utility, s1_conn, s2_conn)
 
         rows = self.server1.exec_query("SHOW VARIABLES LIKE 'basedir'")
@@ -201,7 +216,7 @@ class test(mutlib.System_test):
                         if obj['server2_object'] != '':
                             self.server2.exec_query(obj['server2_object'])
 
-                        # Do data loads                 
+                        # Do data loads
                         for cmd in obj.get('server1_data', []):
                             self.server1.exec_query(cmd)
                         for cmd in obj.get('server2_data', []):
@@ -301,6 +316,8 @@ class test(mutlib.System_test):
         return True  # Not a comparative test
 
     def _drop_all(self, test_object):
+        """Drops all databases created.
+        """
         self.drop_db(self.server1, test_object["db1"])
         self.drop_db(self.server2, test_object["db2"])
         return True

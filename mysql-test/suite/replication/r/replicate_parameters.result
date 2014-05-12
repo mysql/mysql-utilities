@@ -29,7 +29,7 @@ Test case 2 - show the help
                         the slave.
   -b, --start-from-beginning
                         start replication from the first event recorded in the
-                        binary logging of the master.Not valid with --master-
+                        binary logging of the master. Not valid with --master-
                         log-file or --master-log-pos.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug

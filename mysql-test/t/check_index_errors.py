@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+check_index_errors test.
+"""
+
 import check_index
+
 from mysql.utilities.exception import MUTLibError
 
 
@@ -32,7 +38,6 @@ class test(check_index.test):
 
     def run(self):
         self.res_fname = "result.txt"
-        from_conn = "--server=" + self.build_connection_string(self.server1)
 
         test_num = 1
         comment = "Test case {0} - error: no db specified".format(test_num)

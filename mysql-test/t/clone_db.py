@@ -14,7 +14,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+clone_db test.
+"""
+
 import os
+
 import mutlib
 
 from mysql.utilities.exception import MUTLibError
@@ -26,6 +32,8 @@ class test(mutlib.System_test):
     """simple db clone
     This test executes a simple clone of a database on a single server.
     """
+
+    server1 = None
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -176,6 +184,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         res = self.drop_db(self.server1, "util_test")
         res = res and self.drop_db(self.server1, 'db`:db')
         res = res and self.drop_db(self.server1, "util_db_clone")

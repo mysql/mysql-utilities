@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+rpl_admin_errors test.
+"""
 
 import os
 import socket
@@ -32,6 +36,8 @@ class test(rpl_admin.test):
     It uses the rpl_admin test for setup and teardown methods.
     """
 
+    server5 = None
+
     def check_prerequisites(self):
         return self.check_num_servers(1)
 
@@ -40,10 +46,10 @@ class test(rpl_admin.test):
             return False
 
         # Spawn an independent server
-        self.server5 = self.spawn_server("alone_srv", kill=True,
-                                         mysqld="--sql_mode="
-                                         "NO_AUTO_CREATE_USER "
-                                         "--log-bin=mysqlbin")
+        self.server5 = self.servers.spawn_server("alone_srv", kill=True,
+                                                 mysqld="--sql_mode="
+                                                 "NO_AUTO_CREATE_USER "
+                                                 "--log-bin=mysqlbin")
 
         return True
 
@@ -300,7 +306,7 @@ class test(rpl_admin.test):
                             "| NO         | OK      |",
                             "| localhost  | PORT5  | SLAVE   | UP     "
                             "| OFF        | OK      |\n")
-        
+
         self.remove_result("NOTE: Log file")
 
         return True

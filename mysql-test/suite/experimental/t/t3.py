@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+t3 test.
+"""
+
 import mutlib
 
 
@@ -30,20 +35,20 @@ class test(mutlib.System_test):
     def setup(self):
         return True
         #return False
-    
+
     def run(self):
         return True
         #return False
-  
+
     def get_result(self):
         return True, None
         #return (False, "Test message\nAnother test message\n")
-    
+
     def record(self):
         # Not a comparative test, returning True
         return True
         #return False
-    
+
     def cleanup(self):
         return True
         #return False

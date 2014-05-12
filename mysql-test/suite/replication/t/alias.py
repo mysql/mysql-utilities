@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,10 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+alias test.
+"""
+
 import socket
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 _MASTER_ALIASES = ['127.0.0.1', 'localhost']
 
@@ -28,6 +36,12 @@ class test(mutlib.System_test):
     the is_alias() method of the server class for comparing slave's master
     host to the master's alias list.
     """
+
+    server0 = None
+    server1 = None
+    server2 = None
+    s1_serverid = None
+    s2_serverid = None
 
     def check_prerequisites(self):
         return self.check_num_servers(1)
@@ -100,6 +114,7 @@ class test(mutlib.System_test):
 
         return True
 
+    # pylint: disable=W0221
     def run_test_case(self, master_host, comment):
 
         master_str = "--master=root:root@{0}:{1}".format(master_host,

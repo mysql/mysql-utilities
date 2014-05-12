@@ -15,9 +15,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
-import mutlib
+"""
+rpl_admin_gtid_demote_master_repo_table test.
+"""
+
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError
+
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '
                        '--log-slave-updates --gtid-mode=on '
@@ -44,13 +49,17 @@ class test(rpl_admin.test):
         # Spawn servers
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
-        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_gtid", mysqld,
+                                                 True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
-        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_gtid", mysqld,
+                                                 True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
-        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_gtid", mysqld,
+                                                 True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
-        self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave3_gtid", mysqld,
+                                                 True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master()
@@ -69,8 +78,6 @@ class test(rpl_admin.test):
 
         master_conn = self.build_connection_string(self.server1).strip(' ')
         slave1_conn = self.build_connection_string(self.server2).strip(' ')
-        slave2_conn = self.build_connection_string(self.server3).strip(' ')
-        slave3_conn = self.build_connection_string(self.server4).strip(' ')
 
         comment = ("Test case {0} - mysqlrplshow OLD Master before "
                    "demote".format(test_num))

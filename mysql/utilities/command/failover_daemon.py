@@ -23,10 +23,9 @@ mechanism for the automatic failover feature for replication.
 import os
 import sys
 import time
-import atexit
-import signal
 import logging
 
+from mysql.utilities.common.daemon import Daemon
 from mysql.utilities.common.tools import ping_host, execute_script
 from mysql.utilities.common.messages import HOST_IP_WARNING
 from mysql.utilities.exception import UtilRplError
@@ -52,7 +51,7 @@ _FAILOVER_ERRNO = 911
 _ERRANT_TNX_ERROR = "Errant transaction(s) found on slave(s)."
 
 
-class FailoverDaemon(object):
+class FailoverDaemon(Daemon):
     """Automatic Failover Daemon
 
     This class implements a POSIX daemon, that logs information about the
@@ -69,6 +68,11 @@ class FailoverDaemon(object):
         stdout[in]  standard output object
         stderr[in]  standard error object
         """
+        pidfile = rpl.options.get("pidfile", None)
+        if pidfile is None:
+            pidfile = "./failover_daemon.pid"
+        super(FailoverDaemon, self).__init__(pidfile)
+
         self.rpl = rpl
         self.options = rpl.options
         self.interval = int(self.options.get("interval", 15))
@@ -92,18 +96,6 @@ class FailoverDaemon(object):
             report.lower() for report in
             self.options["report_values"].split(",")
         ]
-
-        # Daemon attributes
-        self.pid = None
-        self.pidfile = self.options.get("pidfile", None)
-        if not self.pidfile:
-            self.pidfile = "./failover_daemon.pid"
-        self.pidfile = os.path.realpath(os.path.normpath(self.pidfile))
-        self.umask = umask
-        self.chdir = chdir
-        self.stdin = stdin
-        self.stdout = stdout
-        self.stderr = stderr
 
     def _report(self, message, level=logging.INFO, print_msg=True):
         """Log message if logging is on.
@@ -578,8 +570,8 @@ class FailoverDaemon(object):
                 failover_mode = self.register_instance()
 
             # discover slaves if option was specified at startup
-            elif self.options.get("discover", None) is not None and \
-                    (not first_pass or self.options.get("rediscover", False)):
+            elif (self.options.get("discover", None) is not None
+                  and not first_pass):
                 # Force refresh of health list if new slaves found
                 if self.rpl.topology.discover_slaves():
                     self.list_data = None
@@ -660,7 +652,6 @@ class FailoverDaemon(object):
         Runs the automatic failover, it will start the daemon if detach_process
         is True.
         """
-
         # Check privileges
         self._report("# Checking privileges.")
         errors = self.rpl.topology.check_privileges(self.mode != "fail")
@@ -675,141 +666,5 @@ class FailoverDaemon(object):
         # Check failover instances running
         self.check_instance()
 
-        if detach_process:
-            # Check for a pidfile presence
-            try:
-                with open(self.pidfile, "rb") as f:
-                    self.pid = int(f.read().strip())
-            except IOError:
-                self.pid = None
-            except SystemExit:
-                self.pid = None
-            except ValueError:
-                self.pid = None
-
-            if self.pid:
-                # Daemon already runs
-                msg = ("pidfile {0} already exists. The daemon is already "
-                       "running?".format(self.pidfile))
-                self._report(msg, logging.CRITICAL)
-                raise UtilRplError(msg)
-
-            # Start the daemon
-            self.daemonize()
-
-        # Run automatic failover
-        return self.run()
-
-    def stop(self):
-        """Stops the daemon.
-
-        It will stop the daemon by sending a signal.SIGTERM to the process.
-        """
-        # Get the pid from the pidfile
-        try:
-            with open(self.pidfile, "rb") as f:
-                self.pid = int(f.read().strip())
-        except IOError:
-            self._report("pidfile {0} does not exist.".format(self.pidfile),
-                         logging.ERROR)
-            return False
-        except ValueError:
-            self._report("Invalid pid in pidfile {0}.".format(self.pidfile),
-                         logging.ERROR)
-            return False
-
-        # Kill the daemon process
-        try:
-            while 1:
-                os.kill(self.pid, signal.SIGTERM)
-                time.sleep(0.1)
-        except OSError as err:
-            strerror = err.strerror
-            if err.errno == 3:  # No such process
-                if os.path.exists(self.pidfile):
-                    self.delete_pidfile()
-            else:
-                msg = "Unable to delete pidfile: {0}".format(strerror)
-                self._report(msg, logging.ERROR)
-                raise UtilRplError(msg)
-
-        return True
-
-    def restart(self):
-        """Restarts the daemon.
-
-        It will execute a stop and start on the daemon.
-        """
-        self.stop()
-        return self.start()
-
-    def daemonize(self):
-        """Creates the daemon.
-
-        It will fork a child process and then exit parent. By performing a
-        double fork, set the current process's user id, change the current
-        working directory, set the current numeric umask, redirect standard
-        streams and write the pid to a file.
-        """
-        def redirect_stream(system_stream, target_stream):
-            """Redirect a system stream to a specified file.
-            """
-            if target_stream is None:
-                target_f = os.open(os.devnull, os.O_RDWR)
-            else:
-                target_f = target_stream.fileno()
-            os.dup2(target_f, system_stream.fileno())
-
-        def fork_then_exit_parent(error_message):
-            """Fork a child process, then exit the parent process.
-            """
-            try:
-                pid = os.fork()
-                if pid > 0:
-                    os._exit(0)  # pylint: disable=W0212
-            except OSError as err:
-                msg = "{0}: [{1}] {2}".format(error_message, err.errno,
-                                              err.strerror)
-                self._report(msg, logging.CRITICAL)
-                raise UtilRplError(msg)
-
-        # Fork
-        fork_then_exit_parent("Failed first fork.")
-
-        try:
-            os.setsid()
-            os.chdir(self.chdir)
-            os.umask(self.umask)
-        except Exception as err:
-            msg = "Unable to change directory ({0})".format(err)
-            self._report(msg, logging.CRITICAL)
-            raise UtilRplError(msg)
-
-        # Double fork
-        fork_then_exit_parent("Failed second fork.")
-
-        # Redirect streams
-        redirect_stream(sys.stdin, self.stdin)
-        redirect_stream(sys.stdout, self.stdout)
-        redirect_stream(sys.stderr, self.stderr)
-
-        # write pidfile
-        atexit.register(self.delete_pidfile)
-        pid = str(os.getpid())
-        try:
-            with open(self.pidfile, "w") as f:
-                f.write("{0}\n".format(pid))
-        except IOError as err:
-            msg = "Unable to write pidfile: {0}".format(err.strerror)
-            self._report(msg, logging.CRITICAL)
-            raise UtilRplError(msg)
-
-    def delete_pidfile(self):
-        """Delete pidfile
-        """
-        try:
-            os.remove(self.pidfile)
-        except (OSError, IOError) as err:
-            msg = "Unable to delete pidfile: {0}".format(err.strerror)
-            self._report(msg, logging.ERROR)
-            raise UtilRplError(msg)
+        # Start the daemon
+        return super(FailoverDaemon, self).start(detach_process)

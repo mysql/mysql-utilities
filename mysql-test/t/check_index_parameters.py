@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+check_index_parameters test.
+"""
+
 import check_index
+
 from mysql.utilities.exception import MUTLibError
 
 
@@ -106,7 +111,7 @@ class test(check_index.test):
         test_num += 1
         comment = ("Test case {0} - find redundancy with the clustered "
                    "index (InnoDB)".format(test_num))
-        cmd = "{0} util_test_d.cluster_idx -d -i --stats -vvv".format(cmd_str)
+        cmd = "{0} util_test_d.cluster_idx -d -i --stats ".format(cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -114,7 +119,7 @@ class test(check_index.test):
         test_num += 1
         comment = ("Test case {0} - not find redundancy with the clustered "
                    "index (not InnoDB)".format(test_num))
-        cmd = "{0} util_test_d.no_cluster_idx -d -i --stats -vvv".format(
+        cmd = "{0} util_test_d.no_cluster_idx -d -i --stats ".format(
             cmd_str)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -124,7 +129,25 @@ class test(check_index.test):
         comment = ("Test case {0} - find various redundancies (and duplicates)"
                    " with the clustered index (InnoDB)".format(test_num))
         cmd = ("{0} util_test_d.various_cluster_idx -d -i --stats "
-               "-vvv".format(cmd_str))
+               "".format(cmd_str))
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - report tables without PRIMARY or UNIQUE"
+                   " key.".format(test_num))
+        cmd = ("{0} util_test_e -r"
+               "".format(cmd_str))
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - show indexes with -vv"
+                   "".format(test_num))
+        cmd = ("{0} util_test_e -i -vv"
+               "".format(cmd_str))
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -135,9 +158,9 @@ class test(check_index.test):
 
         # Mask version
         self.replace_result(
-                "MySQL Utilities mysqlindexcheck version",
-                "MySQL Utilities mysqlindexcheck version X.Y.Z "
-                "(part of MySQL Workbench ... XXXXXX)\n"
+            "MySQL Utilities mysqlindexcheck version",
+            "MySQL Utilities mysqlindexcheck version X.Y.Z "
+            "(part of MySQL Workbench ... XXXXXX)\n"
         )
 
         return True

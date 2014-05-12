@@ -6,8 +6,10 @@ Test case 1 - check a sample database
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    pass    pass    
-# TABLE     supplies                                pass    pass    pass    
+# TABLE     supplier                                pass    pass    -       
+#           - Compare table checksum                                pass    
+# TABLE     supplies                                pass    pass    -       
+#           - Compare table checksum                                pass    
 # VIEW      cleaning                                pass    -       -       
 # VIEW      finishing_up                            pass    -       -       
 # VIEW      tools                                   pass    -       -      
@@ -26,8 +28,10 @@ Test case 2 - check database with known differences (extra table)
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    pass    pass    
-# TABLE     supplies                                pass    pass    pass    
+# TABLE     supplier                                pass    pass    -       
+#           - Compare table checksum                                pass    
+# TABLE     supplies                                pass    pass    -       
+#           - Compare table checksum                                pass    
 # VIEW      cleaning                                pass    -       -       
 # VIEW      finishing_up                            pass    -       -       
 # VIEW      tools                                   pass    -       -      
@@ -47,7 +51,9 @@ Test case 3 - check database with known differences direction = server1 (default
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -63,7 +69,9 @@ Test case 3 - check database with known differences direction = server1 (default
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -121,7 +129,9 @@ Test case 4 - check database with known differences direction = server2
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -137,7 +147,9 @@ Test case 4 - check database with known differences direction = server2
 code,name
 3,Never Enough Inc.
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -195,7 +207,11 @@ Test case 5 - check database with known differences direction = server1 and reve
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -225,7 +241,11 @@ code,name
 #
 
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -323,7 +343,11 @@ Test case 6 - check database with known differences direction = server2 and reve
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     supplier                                pass    FAIL    FAIL    
+# TABLE     supplier                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -353,7 +377,11 @@ code,name
 #
 
 
-# TABLE     supplies                                pass    FAIL    FAIL    
+# TABLE     supplies                                pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
@@ -502,8 +530,10 @@ Test case 9 - compare a database with weird names (backticks)
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     `t`.`export_2                           pass    pass    pass    
-# TABLE     `t`export_1                             pass    pass    pass    
+# TABLE     `t`.`export_2                           pass    pass    -       
+#           - Compare table checksum                                pass    
+# TABLE     `t`export_1                             pass    pass    -       
+#           - Compare table checksum                                pass    
 # VIEW      `v`export_1                             pass    -       -      
 
 # Databases are consistent.
@@ -569,8 +599,10 @@ Test case 13 - compare a database with objects of different types with the same 
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # PROCEDURE `t`export_1                             pass    -       -       
-# TABLE     `t`.`export_2                           pass    pass    pass    
-# TABLE     `t`export_1                             pass    pass    pass    
+# TABLE     `t`.`export_2                           pass    pass    -       
+#           - Compare table checksum                                pass    
+# TABLE     `t`export_1                             pass    pass    -       
+#           - Compare table checksum                                pass    
 # VIEW      `v`export_1                             pass    -       -      
 
 # Databases are consistent.
@@ -596,8 +628,10 @@ Test case 14 - compare a database with objects of different types with the same 
 -SELECT 1
 +SELECT 2
 
-# TABLE     `t`.`export_2                           pass    pass    pass    
-# TABLE     `t`export_1                             pass    pass    pass    
+# TABLE     `t`.`export_2                           pass    pass    -       
+#           - Compare table checksum                                pass    
+# TABLE     `t`export_1                             pass    pass    -       
+#           - Compare table checksum                                pass    
 # VIEW      `v`export_1                             pass    -       -      
 
 # Database consistency check failed.
@@ -611,11 +645,21 @@ Test case 15 - Test automatically picks up the not nullable unique index (No dif
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     nonix_1_nix_2                           pass    pass    pass    
-# TABLE     nonix_1_simple                          pass    pass    pass    
-# TABLE     nonix_2_nix_2                           pass    pass    pass    
-# TABLE     nonix_2_nix_2_pk                        pass    pass    pass    
-# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+# TABLE     nonix_1_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_1_simple                          pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_2_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_2_nix_2_pk                        pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_`2_nix_`2                         pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Databases are consistent.
 #
@@ -628,11 +672,21 @@ Test case 16 - real not nullable unique index for a specific table using --use-i
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     nonix_1_nix_2                           pass    pass    pass    
-# TABLE     nonix_1_simple                          pass    pass    pass    
-# TABLE     nonix_2_nix_2                           pass    pass    pass    
-# TABLE     nonix_2_nix_2_pk                        pass    pass    pass    
-# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+# TABLE     nonix_1_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_1_simple                          pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_2_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_2_nix_2_pk                        pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_`2_nix_`2                         pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Databases are consistent.
 #
@@ -645,11 +699,21 @@ Test case 17 - compare using--use-indexes for two tables (No differences)
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     nonix_1_nix_2                           pass    pass    pass    
-# TABLE     nonix_1_simple                          pass    pass    pass    
-# TABLE     nonix_2_nix_2                           pass    pass    pass    
-# TABLE     nonix_2_nix_2_pk                        pass    pass    pass    
-# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+# TABLE     nonix_1_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_1_simple                          pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_2_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_2_nix_2_pk                        pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_`2_nix_`2                         pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Databases are consistent.
 #
@@ -662,11 +726,21 @@ Test case 18 - using --use-indexes for same table (No differences)
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     nonix_1_nix_2                           pass    pass    pass    
-# TABLE     nonix_1_simple                          pass    pass    pass    
-# TABLE     nonix_2_nix_2                           pass    pass    pass    
-# TABLE     nonix_2_nix_2_pk                        pass    pass    pass    
-# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+# TABLE     nonix_1_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_1_simple                          pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_2_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_2_nix_2_pk                        pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass    
+# TABLE     nonix_`2_nix_`2                         pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Databases are consistent.
 #
@@ -687,7 +761,9 @@ Object types found common to both databases:
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     nonix_1_nix_2                           pass    pass    pass   
+# TABLE     nonix_1_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Definition for object no_primary_keys.nonix_1_nix_2:
 CREATE TABLE `nonix_1_nix_2` (
@@ -726,7 +802,9 @@ CREATE TABLE `nonix_1_nix_2` (
 #
 # INFO: for table nonix_1_nix_2 the index `uk_nonulls` is used to compare.
 
-# TABLE     nonix_1_simple                          pass    pass    pass   
+# TABLE     nonix_1_simple                          pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Definition for object no_primary_keys.nonix_1_simple:
 CREATE TABLE `nonix_1_simple` (
@@ -757,7 +835,9 @@ CREATE TABLE `nonix_1_simple` (
 # Warning: Specified index `ix_nonull` for table no_primary_keys.nonix_1_simple cannot be used. It contains at least one column that accepts null values.
 # INFO: for table nonix_1_simple the index uk_nonullclmns is used to compare.
 
-# TABLE     nonix_2_nix_2                           pass    pass    pass   
+# TABLE     nonix_2_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Definition for object no_primary_keys.nonix_2_nix_2:
 CREATE TABLE `nonix_2_nix_2` (
@@ -800,7 +880,9 @@ CREATE TABLE `nonix_2_nix_2` (
 #
 # INFO: for table nonix_2_nix_2 the index `uk2_nonulls` is used to compare.
 
-# TABLE     nonix_2_nix_2_pk                        pass    pass    pass   
+# TABLE     nonix_2_nix_2_pk                        pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Definition for object no_primary_keys.nonix_2_nix_2_pk:
 CREATE TABLE `nonix_2_nix_2_pk` (
@@ -843,7 +925,9 @@ CREATE TABLE `nonix_2_nix_2_pk` (
 #
 # INFO: for table nonix_2_nix_2_pk the index `uk2_nonulls` is used to compare.
 
-# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+# TABLE     nonix_`2_nix_`2                         pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Definition for object no_primary_keys.nonix_`2_nix_`2:
 CREATE TABLE `nonix_``2_nix_``2` (
@@ -904,7 +988,9 @@ Object types found common to both databases:
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     nonix_1_nix_2                           pass    pass    pass   
+# TABLE     nonix_1_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Definition for object no_primary_keys.nonix_1_nix_2:
 CREATE TABLE `nonix_1_nix_2` (
@@ -943,7 +1029,9 @@ CREATE TABLE `nonix_1_nix_2` (
 #
 # INFO: for table nonix_1_nix_2 the index uk_nonulls is used to compare.
 
-# TABLE     nonix_1_simple                          pass    pass    pass   
+# TABLE     nonix_1_simple                          pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Definition for object no_primary_keys.nonix_1_simple:
 CREATE TABLE `nonix_1_simple` (
@@ -972,7 +1060,9 @@ CREATE TABLE `nonix_1_simple` (
 #
 # INFO: for table nonix_1_simple the index uk_nonullclmns is used to compare.
 
-# TABLE     nonix_2_nix_2                           pass    pass    pass   
+# TABLE     nonix_2_nix_2                           pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Definition for object no_primary_keys.nonix_2_nix_2:
 CREATE TABLE `nonix_2_nix_2` (
@@ -1015,7 +1105,9 @@ CREATE TABLE `nonix_2_nix_2` (
 #
 # INFO: for table nonix_2_nix_2 the index uk_nonulls is used to compare.
 
-# TABLE     nonix_2_nix_2_pk                        pass    pass    pass   
+# TABLE     nonix_2_nix_2_pk                        pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Definition for object no_primary_keys.nonix_2_nix_2_pk:
 CREATE TABLE `nonix_2_nix_2_pk` (
@@ -1058,7 +1150,9 @@ CREATE TABLE `nonix_2_nix_2_pk` (
 #
 # INFO: for table nonix_2_nix_2_pk the index PRIMARY is used to compare.
 
-# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+# TABLE     nonix_`2_nix_`2                         pass    pass    -       
+#           - Compare table checksum                                SKIP    
+#           - Find row differences                                  pass   
 
 # Definition for object no_primary_keys.nonix_`2_nix_`2:
 CREATE TABLE `nonix_``2_nix_``2` (
@@ -1111,7 +1205,9 @@ Test case 21 - using --use-indexes with backticks verbose (Differences)
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     nonix_1_nix_2                           pass    pass    FAIL    
+# TABLE     nonix_1_nix_2                           pass    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 
 # Rows in `no_primary_keys`.`nonix_1_nix_2` not in `no_primary_keys`.`nonix_1_nix_2`
@@ -1134,7 +1230,9 @@ Test case 21 - using --use-indexes with backticks verbose (Differences)
 | 1   | 11  | 101  | 1001  | 10001  | 100001  |
 +-----+-----+------+-------+--------+---------+
 
-# TABLE     nonix_1_simple                          pass    pass    FAIL    
+# TABLE     nonix_1_simple                          pass    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 # Data differences found among rows:
 --- `no_primary_keys`.`nonix_1_simple`
@@ -1153,8 +1251,11 @@ Test case 21 - using --use-indexes with backticks verbose (Differences)
 +| 4   | 44  | 404  | 4004  | 40004  | 400004  |
  +-----+-----+------+-------+--------+---------+
 
-# TABLE     nonix_2_nix_2                           pass    pass    pass    
-# TABLE     nonix_2_nix_2_pk                        pass    pass    FAIL    
+# TABLE     nonix_2_nix_2                           pass    pass    -       
+#           - Compare table checksum                                pass    
+# TABLE     nonix_2_nix_2_pk                        pass    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
 #
 
 # Rows in `no_primary_keys`.`nonix_2_nix_2_pk` not in `no_primary_keys`.`nonix_2_nix_2_pk`
@@ -1177,7 +1278,112 @@ Test case 21 - using --use-indexes with backticks verbose (Differences)
 | 1   | 11  | 101  | 1001  | 10001  | 100001  |
 +-----+-----+------+-------+--------+---------+
 
-# TABLE     nonix_`2_nix_`2                         pass    pass    pass   
+# TABLE     nonix_`2_nix_`2                         pass    pass    -       
+#           - Compare table checksum                                pass   
+
+# Database consistency check failed.
+#
+# ...done
+Test case 22 - compare two equal databases with different names (including VIEWS)
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory_clone on server2
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- `inventory`
++++ `inventory_clone`
+@@ -1,1 +1,1 @@
+-CREATE DATABASE `inventory` /*!40100 DEFAULT CHARACTER SET latin1 */
++CREATE DATABASE `inventory_clone` /*!40100 DEFAULT CHARACTER SET latin1 */
+
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     supplier                                pass    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  pass    
+# TABLE     supplies                                pass    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  pass    
+# VIEW      cleaning                                pass    -       -       
+# VIEW      finishing_up                            pass    -       -       
+# VIEW      tools                                   pass    -       -      
+
+# Databases are consistent.
+#
+# ...done
+Test case 23 - data with multiple lines per span (no differences).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases multi_span_row on server1 and multi_span_row on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass   
+
+# Databases are consistent.
+#
+# ...done
+Test case 24 - data with multiple lines per span (with changed rows).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases multi_span_row on server1 and multi_span_row on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#
+# Data differences found among rows:
+--- `multi_span_row`.`t`
++++ `multi_span_row`.`t`
+@@ -1,7 +1,7 @@
+ +----------+-------+
+ | id       | data  |
+ +----------+-------+
+-| 1908449  | 1     |
+-| 94092    | 1     |
+-| 171607   | 1     |
++| 1908449  | 2     |
++| 94092    | 2     |
++| 171607   | 2     |
+ +----------+-------+
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 25 - data with multiple lines per span (with missing row and CSV format).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases multi_span_row on server1 and multi_span_row on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#
+# Row counts are not the same among `multi_span_row`.`t` and `multi_span_row`.`t`.
+#
+# Data differences found among rows:
+--- `multi_span_row`.`t`
++++ `multi_span_row`.`t`
+@@ -1,4 +1,3 @@
+ id,data
+-94092,1
+-171607,1
+-1908449,1
++94092,2
++171607,2
+
 
 # Database consistency check failed.
 #

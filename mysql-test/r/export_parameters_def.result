@@ -64,12 +64,11 @@ Options:
                         <login-path>. E.g. rpl:passwd - By default = none
   --rpl=RPL_MODE, --replication=RPL_MODE
                         include replication information. Choices: 'master' =
-                        include the CHANGE MASTER command for the source
-                        server's master (itself if it is a master or its
-                        master if it is a slave), 'slave' = include the CHANGE
-                        MASTER command for the source server if it is a slave,
-                        and 'both' = include 'master' and 'slave' options
-                        where applicable.
+                        include the CHANGE MASTER command using the source
+                        server as the master, 'slave' = include the CHANGE
+                        MASTER command for the source server's master (only
+                        works if the source server is a slave), and 'both' =
+                        include 'master' and 'slave' options where applicable.
   --rpl-file=RPL_FILE, --replication-file=RPL_FILE
                         path and file name to place the replication
                         information generated. Valid on if the --rpl option is

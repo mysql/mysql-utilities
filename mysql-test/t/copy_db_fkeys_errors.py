@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+copy_db_fkeys_errors test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError, UtilError, UtilDBError
 
 
@@ -24,6 +31,9 @@ class test(mutlib.System_test):
     This test executes a simple clone of a database on a single server with
     foreign keys enabled.
     """
+
+    server1 = None
+    server2 = None
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -99,6 +109,8 @@ class test(mutlib.System_test):
         return True
 
     def drop_all(self):
+        """Drops all databases created.
+        """
         drop_dbs_s1 = ["util_test_fk2", "util_test_fk3", "util_test_fk"]
         drop_dbs_s2 = ["util_test_fk_copy"]
         drop_results_s1 = []

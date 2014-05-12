@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +14,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+diskusage_paths test.
+"""
+
 import os
+
 import diskusage_basic
+
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 _MYSQLD = ('--log-bin="{0}" --general-log --slow-query-log '
            '--slow-query-log-file="{1}" --general-log-file="{2}" '
@@ -29,6 +37,8 @@ class test(diskusage_basic.test):
     It requires a 5.6.2 or later server for setting binary log and
     relay log paths. It uses diskusage_basic for cleanup.
     """
+
+    binlog = None
 
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 2):
@@ -109,7 +119,7 @@ class test(diskusage_basic.test):
     def cleanup(self):
         folder = os.getcwd()
         for item in os.listdir(folder):
-            name, ext = os.path.splitext(item)
+            name, _ = os.path.splitext(item)
             if name.upper() == "MYSQL-BIN":
                 os.unlink(item)
 

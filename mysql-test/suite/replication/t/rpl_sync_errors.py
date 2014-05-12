@@ -15,6 +15,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_sync_errors test.
+"""
+
 import os
 
 import mutlib
@@ -141,13 +145,22 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - value for --exclude cannot be "
+                   "empty.").format(test_num)
+        cmd = "{0} --exclude=".format(cmd_base)
+        res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask out non-deterministic data
         self.do_masks()
 
         return True
 
     def do_masks(self):
-        # Mask non deterministic connection error code.
+        """Masks non deterministic connection error code.
+        """
         self.replace_any_result(
             ["Error 2003: Can't connect to MySQL server on 'localhost'",
              "Error Can't connect to MySQL server on 'localhost:999999'"],

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +15,14 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""
+rpl_admin_loopback test.
+"""
+
 import rpl_admin
+
 from mysql.utilities.exception import MUTLibError
+
 
 _IPv4_LOOPBACK = "127.0.0.1"
 
@@ -31,6 +37,8 @@ class test(rpl_admin.test):
     This test runs the mysqlrpladmin utility on a known topology with
     loopback address (127.0.0.1).
     """
+
+    old_cloning_host = None
 
     def check_prerequisites(self):
         # Check if GTID_MODE is disabled (required for this test)
@@ -49,20 +57,20 @@ class test(rpl_admin.test):
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
                                             self.servers.view_next_port())
-        self.server1 = self.spawn_server("rep_master_loopback",
-                                         mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_loopback",
+                                                 mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
                                             self.servers.view_next_port())
-        self.server2 = self.spawn_server("rep_slave1_loopback",
-                                         mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_loopback",
+                                                 mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
                                             self.servers.view_next_port())
-        self.server3 = self.spawn_server("rep_slave2_loopback",
-                                         mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_loopback",
+                                                 mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
                                             self.servers.view_next_port())
-        self.server4 = self.spawn_server("rep_slave3_loopback",
-                                         mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave3_loopback",
+                                                 mysqld, True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master()
@@ -71,7 +79,7 @@ class test(rpl_admin.test):
         self.s1_port = self.server2.port
         self.s2_port = self.server3.port
         self.s3_port = self.server4.port
-        
+
         rpl_admin.test.reset_topology(self)
 
         return True

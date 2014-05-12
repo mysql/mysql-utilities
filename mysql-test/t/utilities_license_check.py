@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,10 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+utilities_license_check test.
+"""
+
 import os
+
 import mutlib
+
 from mysql.utilities.exception import MUTLibError
 from mysql.utilities import AVAILABLE_UTILITIES
+
 
 _BASE_COMMENT = "Test Case {0}: {1}"
 
@@ -28,8 +36,9 @@ class test(mutlib.System_test):
     parameter by passing the --license parameter and verify the print values.
     """
 
+    server0 = None
+
     def check_prerequisites(self):
-        self.server0 = None
         return self.check_num_servers(0)
 
     def setup(self):
@@ -37,6 +46,12 @@ class test(mutlib.System_test):
         return True
 
     def do_test(self, test_num, comment, command):
+        """Do test.
+
+        test_num[in]    Test number.
+        comment[in]     Comment.
+        command[in]     Command.
+        """
         res = self.run_test_case(0, command,
                                  _BASE_COMMENT.format(test_num, comment))
         if not res:

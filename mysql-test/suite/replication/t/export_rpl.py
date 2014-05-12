@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,12 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+export_rpl test.
+"""
+
 import os
 
 import mutlib
 import replicate
 
 from mysql.utilities.exception import MUTLibError, UtilError
+
 
 _RPL_MODES = ["master", "slave", "both"]
 _LOCKTYPES = ['no-locks', 'lock-all', 'snapshot']
@@ -31,6 +37,9 @@ class test(replicate.test):
     server using a variety of --rpl and --locking options. It uses the
     replicate test as a parent for setup and teardown methods.
     """
+
+    server3 = None
+    s3_serverid = None
 
     def check_prerequisites(self):
         # Check MySQL server version - Must be 5.1.0 or higher
@@ -75,7 +84,7 @@ class test(replicate.test):
         self.server2.exec_query("RESET SLAVE")
         self.server3.exec_query("STOP SLAVE")
         self.server3.exec_query("RESET SLAVE")
-        
+
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
@@ -87,8 +96,7 @@ class test(replicate.test):
             self.server3.read_and_exec_SQL(data_file, self.debug)
         except MUTLibError as err:
             raise MUTLibError("Failed to read commands from file {0}: "
-                              "{1}".format(data_file,  err.errmsg))
-
+                              "{1}".format(data_file, err.errmsg))
 
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
         try:
@@ -103,7 +111,7 @@ class test(replicate.test):
         conn_str = master_str + slave_str
         self.server3.exec_query("STOP SLAVE")
         self.server3.exec_query("RESET SLAVE")
-        
+
         cmd = "mysqlreplicate.py --rpl-user=rpl:rpl {0}".format(conn_str)
         try:
             self.exec_util(cmd, self.res_fname)
@@ -143,7 +151,7 @@ class test(replicate.test):
                 if not res:
                     raise MUTLibError("{0}: failed".format(comment))
                 test_num += 1
-                
+
         self.replace_result("CHANGE MASTER", "CHANGE MASTER <goes here>\n")
         self.replace_result("# CHANGE MASTER", "# CHANGE MASTER <goes here>\n")
 
@@ -159,6 +167,8 @@ class test(replicate.test):
         return replicate.test.cleanup(self)
 
     def drop_all(self):
+        """Drops all databases and users created.
+        """
         self.drop_db(self.server1, "util_test")
         self.drop_db(self.server1, "master_db1")
         self.drop_db(self.server2, "util_test")

@@ -14,8 +14,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+
+"""
+diff_parameters test.
+"""
+
 import diff
+
 from mysql.utilities.exception import MUTLibError
+
 
 _FORMATS = ['unified', 'context', 'differ']
 _DIRECTIONS = ['server1', 'server2']
@@ -62,7 +69,7 @@ class test(diff.test):
                 test_num += 1
                 cmd_opts = "--difftype={0}{1}".format(frmt, compacted)
                 comment = "Test case {0} - Use diff {1}".format(test_num,
-                                                                   cmd_opts)
+                                                                cmd_opts)
                 cmd = "{0} {1}".format(cmd_base, cmd_opts)
                 res = self.run_test_case(1, cmd, comment)
                 if not res:
@@ -163,9 +170,9 @@ class test(diff.test):
 
         # Mask version
         self.replace_result(
-                "MySQL Utilities mysqldiff version",
-                "MySQL Utilities mysqldiff version X.Y.Z "
-                "(part of MySQL Workbench ... XXXXXX)\n"
+            "MySQL Utilities mysqldiff version",
+            "MySQL Utilities mysqldiff version X.Y.Z "
+            "(part of MySQL Workbench ... XXXXXX)\n"
         )
 
         return True
