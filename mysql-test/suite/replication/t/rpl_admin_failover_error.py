@@ -82,15 +82,20 @@ class test(rpl_admin.test):
         # Spawn servers
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
-        self.server1 = self.spawn_server("rep_master_gtid", mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_gtid", mysqld,
+                                                 True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
-        self.server2 = self.spawn_server("rep_slave1_gtid", mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_gtid", mysqld,
+                                                 True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
-        self.server3 = self.spawn_server("rep_slave2_gtid", mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_gtid", mysqld,
+                                                 True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
-        self.server4 = self.spawn_server("rep_slave3_gtid", mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave3_gtid", mysqld,
+                                                 True)
         mysqld = _MYSQL_OPTS_GTID_OFF.format(self.servers.view_next_port())
-        self.server5 = self.spawn_server("rep_slave4_gtid_off", mysqld, True)
+        self.server5 = self.servers.spawn_server("rep_slave4_gtid_off", mysqld,
+                                                 True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master()

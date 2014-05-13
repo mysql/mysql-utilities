@@ -22,7 +22,7 @@ This module contains abstractions of a MySQL table and an index.
 import multiprocessing
 import sys
 
-from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.connector.conversion import MySQLConverter
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.database import Database
@@ -129,11 +129,11 @@ class Index(object):
         Returns True if column list is a subset of index.
         """
 
-        # Uniqueness counts - can't be duplicate if uniquess differs
-        #                     except for primary keys which are always unique
-        if index.name != "PRIMARY":
-            if self.unique != index.unique:
-                return False
+#        # Uniqueness counts - can't be duplicate if uniquess differs
+#        #                     except for primary keys which are always unique
+#        if index.name != "PRIMARY": # or self.name != "PRIMARY":
+#            if self.unique != index.unique:
+#                return False
         num_cols_this = len(self.columns)
         num_cols_that = len(index.columns)
         num_cols_same = 0
@@ -293,10 +293,13 @@ class Index(object):
                                     cols=self.__get_column_list(),
                                     using=using_str))
 
-    def get_row(self):
+    def get_row(self, verbosity=0):
         """Return index information as a list of columns for tabular output.
         """
         cols = self.__get_column_list(backtick_quoting=False)
+        if verbosity > 0:
+            return (self.db, self.table, self.name, self.type, self.unique,
+                    self.accept_nulls, cols)
         return (self.db, self.table, self.name, self.type, cols)
 
 
@@ -353,6 +356,7 @@ class Table(object):
         self.hash_indexes = []
         self.rtree_indexes = []
         self.fulltext_indexes = []
+        self.unique_not_null_indexes = None
         self.text_columns = []
         self.blob_columns = []
         self.column_format = None
@@ -433,14 +437,15 @@ class Table(object):
                     self.column_names.append(columns[col][0])
                     self.q_column_names.append(
                         quote_with_backticks(columns[col][0]))
-                col_type_prefix = columns[col][1][0:4].lower()
-                if col_type_prefix in ('varc', 'char', 'enum', 'set('):
+                col_type = columns[col][1].lower()
+                if ('char' in col_type or 'enum' in col_type
+                        or 'set' in col_type or 'binary' in col_type):
                     self.text_columns.append(col)
                     col_format_values[col] = "'%s'"
-                elif col_type_prefix in ("blob", "text"):
+                elif 'blob' in col_type or 'text'in col_type:
                     self.blob_columns.append(col)
                     col_format_values[col] = "%s"
-                elif col_type_prefix in ("date", "time"):
+                elif "date" in col_type or "time" in col_type:
                     col_format_values[col] = "'%s'"
                 else:
                     col_format_values[col] = "%s"
@@ -501,41 +506,51 @@ class Table(object):
             return True
         return False
 
-    def get_not_null_unique_indexes(self):
+    def get_not_null_unique_indexes(self, refresh=False):
         """get all the unique indexes which columns does not accepts null
         values.
+        refresh[in] Boolean value used to force the method to read index
+                    information directly from the server, instead of using
+                    cached values.
 
-        Note: You must call get_indexes() prior to calling this method.
-        Returns (list) indexes
+        Returns list of indexes.
         """
-        no_null_idxes = []
-        no_null_idxes.extend(
-            [idx for idx in self.btree_indexes if not idx.accept_nulls and
-             idx.unique]
-        )
-        no_null_idxes.extend(
-            [idx for idx in self.hash_indexes if not idx.accept_nulls and
-             idx.unique]
-        )
-        no_null_idxes.extend(
-            [idx for idx in self.rtree_indexes if not idx.accept_nulls and
-             idx.unique]
-        )
-        no_null_idxes.extend(
-            [idx for idx in self.fulltext_indexes if not idx.accept_nulls and
-             idx.unique]
-        )
-        return no_null_idxes
+        # First check if the instance variable exists.
+        if self.unique_not_null_indexes is None or refresh:
+            # Get the indexes for the table.
+            try:
+                self.get_indexes()
+            except UtilDBError:
+                # Table may not exist yet. Happens on import operations.
+                pass
+            # Now for each of them, check if they are UNIQUE and NOT NULL.
+            no_null_idxes = []
+            no_null_idxes.extend(
+                [idx for idx in self.btree_indexes if not idx.accept_nulls and
+                 idx.unique]
+            )
+            no_null_idxes.extend(
+                [idx for idx in self.hash_indexes if not idx.accept_nulls and
+                 idx.unique]
+            )
+            no_null_idxes.extend(
+                [idx for idx in self.rtree_indexes if not idx.accept_nulls and
+                 idx.unique]
+            )
+            no_null_idxes.extend(
+                [idx for idx in self.fulltext_indexes if not idx.accept_nulls
+                 and idx.unique]
+            )
+            self.unique_not_null_indexes = no_null_idxes
 
-    def _build_update_blob(self, row, new_db, name, blob_col):
+        return self.unique_not_null_indexes
+
+    def _build_update_blob(self, row, new_db, name):
         """Build an UPDATE statement to update blob fields.
 
         row[in]            a row to process
         new_db[in]         new database name
         name[in]           name of the table
-        conn_val[in]       connection information for the destination server
-        query[in]          the INSERT string for executemany()
-        blob_col[in]       number of the column containing the blob
 
         Returns UPDATE string
         """
@@ -565,14 +580,55 @@ class Table(object):
                     value = "'{0}'".format(row[col])
                 where_values.append("{0} = {1}".format(col_name, value))
         if has_data:
-            return blob_insert + " WHERE " + " AND ".join(where_values) + ";"
+            return "{0} WHERE {1};".format(blob_insert,
+                   " AND ".join(where_values))
         return None
 
-    def get_column_string(self, row, new_db):
+    def _build_insert_blob(self, row, new_db, tbl_name):
+        """Build an INSERT statement for the given row.
+
+        row[in]                a row to process
+        new_db[in]             new database name
+        tbl_name[in]           name of the table
+
+        Returns INSERT string.
+        """
+        if self.column_format is None:
+            self.get_column_metadata()
+
+        converter = MySQLConverter()
+        row_vals = []
+        # Deal with blob, special characters and NULL values.
+        for index, column in enumerate(row):
+            if index in self.blob_columns:
+                row_vals.append(converter.quote(column))
+            elif index in self.text_columns:
+                if column is None:
+                    row_vals.append("NULL")
+                else:
+                    row_vals.append(convert_special_characters(column))
+            else:
+                if column is None:
+                    row_vals.append("NULL")
+                else:
+                    row_vals.append(column)
+
+        # Create the insert statement.
+        insert_stm = ("INSERT INTO {0}.{1} VALUES {2};"
+                      "".format(new_db, tbl_name,
+                                self.column_format % tuple(row_vals)))
+
+        # Replace 'NULL' occurrences with NULL values.
+        insert_stm = insert_stm.replace("'NULL'", "NULL")
+
+        return insert_stm
+
+    def get_column_string(self, row, new_db, skip_blobs=False):
         """Return a formatted list of column data.
 
         row[in]            a row to process
         new_db[in]         new database name
+        skip_blobs[in]     boolean value, if True, blob columns are skipped
 
         Returns (string) column list
         """
@@ -582,37 +638,55 @@ class Table(object):
 
         blob_inserts = []
         values = list(row)
+        is_blob_insert = False
+        # find if we have some unique column indexes
+        unique_indexes = len(self.get_not_null_unique_indexes())
+        # If all columns are blobs or there aren't any UNIQUE NOT NULL indexes
+        # then rows won't be correctly copied using the update statement,
+        # so we must use insert statements instead.
+        if not skip_blobs and (len(self.blob_columns) == len(self.column_names)
+                               or self.blob_columns and not unique_indexes):
+            blob_inserts.append(self._build_insert_blob(row, new_db,
+                                                        self.q_tbl_name))
+            is_blob_insert = True
+        else:
+            # Find blobs
+            if self.blob_columns:
+                # Save blob updates for later...
+                blob = self._build_update_blob(row, new_db, self.q_tbl_name)
+                if blob is not None:
+                    blob_inserts.append(blob)
+                for col in self.blob_columns:
+                    values[col] = "NULL"
 
-        # Find blobs
-        for col in self.blob_columns:
-            # Save blob updates for later...
-            blob = self._build_update_blob(row, new_db, self.q_tbl_name, col)
-            if blob is not None:
-                blob_inserts.append(blob)
-            values[col] = "NULL"
+        if not is_blob_insert:
+            # Replace single quotes located in the value for a text field with
+            # the correct special character escape sequence. This fixes SQL
+            # errors related to using single quotes in a string value that is
+            # single quoted. For example, 'this' is it' is changed to
+            # 'this\' is it'.
+            for col in self.text_columns:
+                #Check if the value is not None before replacing quotes
+                if values[col]:
+                    # Apply escape sequences to special characters
+                    values[col] = convert_special_characters(values[col])
 
-        # Replace single quotes located in the value for a text field with the
-        # correct special character escape sequence. This fixes SQL errors
-        # related to using single quotes in a string value that is single
-        # quoted. For example, 'this' is it' is changed to 'this\' is it'
-        for col in self.text_columns:
-            #Check if the value is not None before replacing quotes
-            if values[col]:
-                # Apply escape sequences to special characters
-                values[col] = convert_special_characters(values[col])
+            # Build string (add quotes to "string" like types)
+            val_str = self.column_format % tuple(values)
 
-        # Build string (add quotes to "string" like types)
-        val_str = self.column_format % tuple(values)
+            # Change 'None' occurrences with "NULL"
+            val_str = val_str.replace(", None", ", NULL")
+            val_str = val_str.replace("(None", "(NULL")
+            val_str = val_str.replace(", 'None'", ", NULL")
+            val_str = val_str.replace("('None'", "(NULL")
 
-        # Change 'None' occurrences with "NULL"
-        val_str = val_str.replace(", None", ", NULL")
-        val_str = val_str.replace("(None", "(NULL")
-        val_str = val_str.replace(", 'None'", ", NULL")
-        val_str = val_str.replace("('None'", "(NULL")
+        else:
+            val_str = None
 
-        return (val_str, blob_inserts)
+        return val_str, blob_inserts
 
-    def make_bulk_insert(self, rows, new_db, columns_names=None):
+    def make_bulk_insert(self, rows, new_db, columns_names=None,
+                         skip_blobs=False):
         """Create bulk insert statements for the data
 
         Reads data from a table (rows) and builds group INSERT statements for
@@ -622,6 +696,7 @@ class Table(object):
 
         rows[in]           a list of rows to process
         new_db[in]         new database name
+        skip_blobs[in]     boolean value, if True, blob columns are skipped
 
         Returns (tuple) - (bulk insert statements, blob data inserts)
         """
@@ -634,6 +709,7 @@ class Table(object):
         row_count = 0
         data_size = 0
         val_str = None
+
         for row in rows:
             if row_count == 0:
                 if columns_names:
@@ -647,29 +723,30 @@ class Table(object):
                     insert_str += val_str
                 data_size = len(insert_str)
 
-            col_data = self.get_column_string(row, new_db)
-            val_str = col_data[0]
-
+            col_data = self.get_column_string(row, new_db, skip_blobs)
             if len(col_data[1]) > 0:
                 blob_inserts.extend(col_data[1])
+            if col_data[0]:
+                val_str = col_data[0]
 
-            row_size = len(val_str)
-            next_size = data_size + row_size + 3
-            if (row_count >= _MAXBULK_VALUES) or \
-               (next_size > (int(self.max_packet_size) - 512)):  # add buffer
-                data_inserts.append(insert_str)
-                row_count = 0
-            else:
-                row_count += 1
-                if row_count > 1:
-                    insert_str += ", "
-                insert_str += val_str
-                data_size += row_size + 3
+                row_size = len(val_str)
+                next_size = data_size + row_size + 3
+                if ((row_count >= _MAXBULK_VALUES) or
+                        (next_size > (int(self.max_packet_size) - 512))):
+                   # add to buffer
+                    data_inserts.append(insert_str)
+                    row_count = 0
+                else:
+                    row_count += 1
+                    if row_count > 1:
+                        insert_str += ", "
+                    insert_str += val_str
+                    data_size += row_size + 3
 
         if row_count > 0:
             data_inserts.append(insert_str)
 
-        return (data_inserts, blob_inserts)
+        return data_inserts, blob_inserts
 
     def get_storage_engine(self):
         """Get the storage engine (in UPPERCASE) for the table.
@@ -1006,15 +1083,24 @@ class Table(object):
         duplicate_list = []
         if indexes and index:
             for idx in indexes:
+                if index == idx:
+                    continue
                 # Don't compare b == a when a == b has already occurred
                 if not index.compared and idx.is_duplicate(index):
                     # make sure we haven't already found this match
                     if not idx.column_subparts:
                         idx.compared = True
-                    if not (idx in master_list):
+                    if idx not in master_list:
                         duplicates_found = True
-                        idx.duplicate_of = index
-                        duplicate_list.append(idx)
+                        # PRIMARY key can be identified as redundant of an
+                        # unique index with more columns, in that case always
+                        # mark the other as the duplicate.
+                        if idx.name == "PRIMARY":
+                            index.duplicate_of = idx
+                            duplicate_list.append(index)
+                        else:
+                            idx.duplicate_of = index
+                            duplicate_list.append(idx)
         return (duplicates_found, duplicate_list)
 
     def __check_index_list(self, indexes):
@@ -1306,7 +1392,7 @@ class Table(object):
                   "best/worst indexes.")
 
     @staticmethod
-    def __print_index_list(indexes, fmt, no_header=False):
+    def __print_index_list(indexes, fmt, no_header=False, verbosity=0):
         """Print the list of indexes
 
         indexes[in]        list of indexes to print
@@ -1317,13 +1403,18 @@ class Table(object):
             for index in indexes:
                 index.print_index_sql()
         else:
-            cols = ("database", "table", "name", "type", "columns")
+            if verbosity > 0:
+                cols = ("database", "table", "name", "type", "unique",
+                        "accepts nulls", "columns")
+            else:
+                cols = ("database", "table", "name", "type", "columns")
+
             rows = []
             for index in indexes:
-                rows.append(index.get_row())
+                rows.append(index.get_row(verbosity))
             print_list(sys.stdout, fmt, cols, rows, no_header)
 
-    def print_indexes(self, fmt):
+    def print_indexes(self, fmt, verbosity):
         """Print all indexes for this table
 
         fmt[in]         format out output = sql, table, tab, csv
@@ -1331,17 +1422,22 @@ class Table(object):
 
         print "# Showing indexes from %s:\n#" % (self.table)
         if fmt == "sql":
-            self.__print_index_list(self.btree_indexes, fmt)
-            self.__print_index_list(self.hash_indexes, fmt, False)
-            self.__print_index_list(self.rtree_indexes, fmt, False)
-            self.__print_index_list(self.fulltext_indexes, fmt, False)
+            self.__print_index_list(self.btree_indexes, fmt,
+                                    verbosity=verbosity)
+            self.__print_index_list(self.hash_indexes, fmt, False,
+                                    verbosity=verbosity)
+            self.__print_index_list(self.rtree_indexes, fmt, False,
+                                    verbosity=verbosity)
+            self.__print_index_list(self.fulltext_indexes, fmt, False,
+                                    verbosity=verbosity)
         else:
             master_indexes = []
             master_indexes.extend(self.btree_indexes)
             master_indexes.extend(self.hash_indexes)
             master_indexes.extend(self.rtree_indexes)
             master_indexes.extend(self.fulltext_indexes)
-            self.__print_index_list(master_indexes, fmt)
+            self.__print_index_list(master_indexes, fmt,
+                                    verbosity=verbosity)
         print "#"
 
     def has_primary_key(self):
@@ -1355,3 +1451,15 @@ class Table(object):
             if row[2] == "PRIMARY":
                 primary_key = True
         return primary_key
+
+    def has_unique_key(self):
+        """Check to see if there is a unique key.
+        Returns bool - True - a unique key was found,
+                       False - no unique key.
+        """
+        unique_key = False
+        rows = self._get_index_list()
+        for row in rows:
+            if row[1] == '0':
+                unique_key = True
+        return unique_key

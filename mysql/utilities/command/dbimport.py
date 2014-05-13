@@ -940,7 +940,10 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
 
     # Process all statements.
     for statement in statements:
-        if ((new_engine is not None or def_engine is not None)
+        # Each statement can be either a string or a list of strings (BLOB
+        # statements).
+        if (isinstance(statement, str)
+                and (new_engine is not None or def_engine is not None)
                 and statement[0:12].upper() == "CREATE TABLE"):
             # Add statements to substitute engine.
             i = statement.find(' ', 13)
@@ -950,7 +953,9 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
                                                     quiet)
         elif bulk_insert:
             # Bulk insert (if possible) to execute as a single statement.
-            if statement[0:6].upper().startswith('INSERT'):
+            # Need to guard against lists of BLOB statements.
+            if (isinstance(statement, str)
+                    and statement[0:6].upper().startswith('INSERT')):
                 # Parse INSERT statement.
                 insert_start, values = _parse_insert_statement(statement,
                                                                re_value_split)
@@ -998,7 +1003,8 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
                     count += 1
                     st_list = []
             else:
-                # Not an INSERT statement.
+                # Can be a regular statement or a list of BLOB statements
+                # that must not be bundled together.
                 if bulk_values:
                     # Existing bulk insert to process.
                     st_list = [",".join(bulk_values)]
@@ -1006,7 +1012,11 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
                     count = 0
                 else:
                     st_list = []
-                st_list.append(statement)
+                if isinstance(statement, list):
+                    # list of BLOB data statements, either updates or inserts.
+                    st_list.extend(statement)
+                else:  # Other statements.
+                    st_list.append(statement)
         else:
             # Common statement, just add it to be executed.
             st_list = [statement]
@@ -1223,12 +1233,14 @@ def import_file(dest_val, file_name, options):
                             "the table definition.")
         columns_names = columns[:] if use_columns_names else None
         ins_strs = tbl.make_bulk_insert(table_rows, tbl.q_db_name,
-                                        columns_names)
+                                        columns_names, skip_blobs=skip_blobs)
         if len(ins_strs[0]) > 0:
             statements.extend(ins_strs[0])
+        # If we have BLOB statements, lets put them in a list together, to
+        # distinguish them from normal statements and prevent them from being
+        # bundled together later in the _exec_statements function.
         if len(ins_strs[1]) > 0 and not skip_blobs:
-            for update in ins_strs[1]:
-                statements.append(update)
+            statements.extend([ins_strs[1]])
 
     # Gather options
     fmt = options.get("format", "sql")
@@ -1474,7 +1486,6 @@ def import_file(dest_val, file_name, options):
                                 statements.append(text)
 
                                 has_data = True
-
     # Process remaining definitions
     if len(definitions) > 0:
         _process_definitions(statements, table_col_list, db_name)

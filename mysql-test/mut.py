@@ -466,7 +466,7 @@ else:
 if opt.stop_test:
     print("  Stop test           = '{0}%%'".format(opt.stop_test))
 
-server_list = ServerList([], opt.start_port, opt.utildir, opt.verbosity >= 3)
+server_list = ServerList([], opt.start_port, opt.utildir, opt.verbosity)
 basedir = None
 
 # Print status of connections

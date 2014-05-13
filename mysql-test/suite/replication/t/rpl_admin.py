@@ -57,58 +57,23 @@ class test(mutlib.System_test):
             raise MUTLibError("Test requires servers without GTID enabled.")
         return self.check_num_servers(1)
 
-    def spawn_server(self, name, mysqld=None, kill=False):
-        """Spawns a server.
-
-        name[in]       Name of the server.
-        mysqld[in]     MySQL server options.
-        kill[in]       True for kill.
-        """
-        index = self.servers.find_server_by_name(name)
-        if index >= 0 and kill:
-            server = self.servers.get_server(index)
-            if self.debug:
-                print "# Killing server {0}.".format(server.role)
-            self.servers.stop_server(server)
-            self.servers.remove_server(server.role)
-            index = -1
-        if self.debug:
-            print "# Spawning {0}".format(name)
-        if index >= 0:
-            if self.debug:
-                print "# Found it in the servers list."
-            server = self.servers.get_server(index)
-            try:
-                server.show_server_variable("server_id")
-            except MUTLibError as err:
-                raise MUTLibError("Cannot get replication server 'server_id': "
-                                  "{0}".format(err.errmsg))
-        else:
-            if self.debug:
-                print "# Cloning server0."
-            serverid = self.servers.get_next_id()
-            if mysqld is None:
-                mysqld = _DEFAULT_MYSQL_OPTS.format(
-                    self.servers.view_next_port())
-            res = self.servers.spawn_new_server(self.server0, serverid,
-                                                name, mysqld)
-            if not res:
-                raise MUTLibError("Cannot spawn replication server "
-                                  "'{0}'.".format(name))
-            self.servers.add_new_server(res[0], True)
-            server = res[0]
-
-        return server
-
     def setup(self):
         self.res_fname = "result.txt"
 
         # Spawn servers
         self.server0 = self.servers.get_server(0)
-        self.server1 = self.spawn_server("rep_master", kill=True)
-        self.server2 = self.spawn_server("rep_slave1", kill=True)
-        self.server3 = self.spawn_server("rep_slave2", kill=True)
-        self.server4 = self.spawn_server("rep_slave3", kill=True)
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+        self.server1 = self.servers.spawn_server("rep_master", kill=True,
+                                                 mysqld=mysqld)
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+        self.server2 = self.servers.spawn_server("rep_slave1", kill=True,
+                                                 mysqld=mysqld)
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+        self.server3 = self.servers.spawn_server("rep_slave2", kill=True,
+                                                 mysqld=mysqld)
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+        self.server4 = self.servers.spawn_server("rep_slave3", kill=True,
+                                                 mysqld=mysqld)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master()
@@ -343,7 +308,8 @@ class test(mutlib.System_test):
         # Check if all servers are alive, and if they are not,
         # spawn a new instance
         for index, server in enumerate(servers[:]):
-            servers[index] = self.spawn_server(server.role)
+            mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+            servers[index] = self.servers.spawn_server(server.role, mysqld)
 
         for slave in servers:
             try:

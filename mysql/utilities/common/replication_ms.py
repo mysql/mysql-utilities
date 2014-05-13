@@ -31,6 +31,7 @@ from mysql.utilities.common.daemon import Daemon
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.ip_parser import hostname_is_ip
 from mysql.utilities.common.messages import (ERROR_USER_WITHOUT_PRIVILEGES,
+                                             ERROR_MIN_SERVER_VERSIONS,
                                              HOST_IP_WARNING)
 from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.common.server import connect_servers, get_server_state
@@ -39,6 +40,7 @@ from mysql.utilities.common.topology import Topology
 from mysql.utilities.common.user import User
 
 
+_MIN_SERVER_VERSION = (5, 6, 9)
 _GTID_LISTS = ["Transactions executed on the servers:",
                "Transactions purged from the servers:",
                "Transactions owned by another server:"]
@@ -106,6 +108,12 @@ class ReplicationMultiSource(Daemon):
                          logging.INFO)
             print("# Press CTRL+C to quit.")
 
+        # Check server versions
+        try:
+            self._check_server_versions()
+        except UtilError as err:
+            raise UtilRplError(err.errmsg)
+
         # Check user privileges
         try:
             self._check_privileges()
@@ -153,6 +161,52 @@ class ReplicationMultiSource(Daemon):
         topology.
         """
         return self.topology.master
+
+    def _check_server_versions(self):
+        """Checks the server versions.
+        """
+        if self.verbosity > 0:
+            print("# Checking server versions.\n#")
+
+        # Connection dictionary
+        conn_dict = {
+            "conn_info": None,
+            "quiet": True,
+            "verbose": self.verbosity > 0,
+        }
+
+        # Check masters version
+        for master_vals in self.masters_vals:
+            conn_dict["conn_info"] = master_vals
+            master = Master(conn_dict)
+            master.connect()
+            if not master.check_version_compat(*_MIN_SERVER_VERSION):
+                raise UtilRplError(
+                    ERROR_MIN_SERVER_VERSIONS.format(
+                        utility="mysqlrplms",
+                        min_version=".".join([str(val) for val in
+                                              _MIN_SERVER_VERSION]),
+                        host=master.host,
+                        port=master.port
+                    )
+                )
+            master.disconnect()
+
+        # Check slave version
+        conn_dict["conn_info"] = self.slave_vals
+        slave = Slave(conn_dict)
+        slave.connect()
+        if not slave.check_version_compat(*_MIN_SERVER_VERSION):
+            raise UtilRplError(
+                ERROR_MIN_SERVER_VERSIONS.format(
+                    utility="mysqlrplms",
+                    min_version=".".join([str(val) for val in
+                                          _MIN_SERVER_VERSION]),
+                    host=slave.host,
+                    port=slave.port
+                )
+            )
+        slave.disconnect()
 
     def _check_privileges(self):
         """Check required privileges to perform the multi-source replication.

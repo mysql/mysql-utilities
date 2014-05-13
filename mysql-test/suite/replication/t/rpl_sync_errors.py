@@ -145,6 +145,14 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - value for --exclude cannot be "
+                   "empty.").format(test_num)
+        cmd = "{0} --exclude=".format(cmd_base)
+        res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask out non-deterministic data
         self.do_masks()
 

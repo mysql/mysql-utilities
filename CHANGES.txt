@@ -1,3 +1,27 @@
+Release 1.4.3 (Released May 12, 2014)
+-------------------------------------
+
+- BUG#17864081: mysqldbcompare fails check on same view on different schema name
+- BUG#18241174: indexcheck Option to report on tables w/o PRIMARY or UNIQUE key
+- BUG#18262507: mysqlserverinfo throws python exception with non existing sockets
+- BUG#18281513: mysqlindexcheck shows None instead of the drop statement
+- BUG#18314951: mysqlauditgrep does not support new audit log format
+- BUG#18338321: mysqldbcopy throws python internal errors
+- BUG#18373190: mysqldbcopy exits with sql syntax error during copy
+- BUG#18376793: add missing __main__ attribute check for scripts directly executed
+- BUG#18381748: validate --exclude option with no value for mysqlrplsync
+- BUG#18383839: the pylint_tests script doesn't allow getting specific output
+- BUG#18388846: mysqlrplsync utility crashes when used with exclude option
+- BUG#18413200: using utilities with old versions of c/python throws an exception
+- BUG#18434209: mysqlrplms does not check version of mysql server
+- BUG#18439226: Copyright year information needs to be updated
+- BUG#18477410: mysqldbcompare reports only one difference per span
+- BUG#18483844: index 'span' for mysqldbcompare
+- BUG#18546744: refactoring failover_daemon command to use the daemon class
+- BUG#71724: mysqlfailover tool failed when executing a 2nd failover
+- BUG#71851: general query log not handles blanklines with multi-line queries
+- WL#7447: MUT PEP-8 Compliance
+
 Release 1.4.2 (Released March 12, 2014)
 ---------------------------------------
 

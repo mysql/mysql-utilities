@@ -111,6 +111,14 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - check PRIMARY key against unique index "
+                   "with more columns, show drops".format(test_num))
+        cmd = "{0} util_test_f -vv -d".format(cmd_str)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask known source host name.
         self.replace_result("# Source on ",
                             "# Source on XXXX-XXXX: ... connected.\n")
@@ -127,7 +135,7 @@ class test(mutlib.System_test):
         """Drops all databases.
         """
         databases = ["util_test_a", "util_test_b", "util_test_c",
-                     "util_test_d"]
+                     "util_test_d", "util_test_e", "util_test_f"]
         for db in databases:
             try:
                 self.server1.exec_query("DROP DATABASE IF EXISTS "

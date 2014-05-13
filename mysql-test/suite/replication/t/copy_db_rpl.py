@@ -53,6 +53,7 @@ _TEST_CASE_RESULTS = [
      '5'],
     [0, None, False, None, False, 'util_test', '7', 'master_db1', '5', '7'],
     [0, None, False, None, False, 'util_test', '7', 'master_db1', '7', '9'],
+    [0, None, False, None, False, 'util_test', '7', 'master_db1', '9', '11'],
 ]
 
 _MAX_ATTEMPTS = 10   # Max tries to wait for slave before failing.
@@ -73,17 +74,11 @@ class test(replicate.test):
 
     server3 = None
     s3_serverid = None
-    need_server = False
 
     def check_prerequisites(self):
-        if self.servers.get_server(0).check_version_compat(5, 6, 5):
-            raise MUTLibError("Test requires server version prior to 5.6.5")
         # Need at least one server.
         self.server1 = None
         self.server2 = None
-        self.need_server = False
-        if not self.check_num_servers(3):
-            self.need_server = True
         return self.check_num_servers(1)
 
     def setup(self):
@@ -93,23 +88,8 @@ class test(replicate.test):
         # Note: server1 is master, server2, server3 are slaves.
         #       server3 is a new slave with nothing on it.
 
-        index = self.servers.find_server_by_name("new_slave")
-        if index >= 0:
-            self.server3 = self.servers.get_server(index)
-            try:
-                res = self.server3.show_server_variable("server_id")
-            except UtilError as err:
-                raise MUTLibError("Cannot get new replication slave "
-                                  "server_id: {0}".format(err.errmsg))
-            self.s3_serverid = int(res[0][1])
-        else:
-            self.s3_serverid = self.servers.get_next_id()
-            res = self.servers.spawn_new_server(self.server0, self.s3_serverid,
-                                                "new_slave")
-            if not res:
-                raise MUTLibError("Cannot spawn new replication slave server.")
-            self.server3 = res[0]
-            self.servers.add_new_server(self.server3, True)
+        self.server3 = self.servers.spawn_server(
+            "new_slave", kill=True, mysqld='"--log-bin=mysql-bin"')
 
         self._drop_all()
 
@@ -232,23 +212,23 @@ class test(replicate.test):
             except MUTLibError:
                 raise
 
-            # Convert object instance of master server to Master, if needed
-            if not isinstance(master, Master):
-                master = Master.fromServer(master)
-                try:
-                    master.connect()
-                except UtilError as err:
-                    raise MUTLibError("Cannot connect to spawned "
-                                      "server: {0}".format(err.errmsg))
+        # Convert object instance of master server to Master, if needed
+        if not isinstance(master, Master):
+            master = Master.fromServer(master)
+            try:
+                master.connect()
+            except UtilError as err:
+                raise MUTLibError("Cannot connect to spawned "
+                                  "server: {0}".format(err.errmsg))
 
-            # Convert object instance of destination server to Slave, if needed
-            if not isinstance(destination, Slave):
-                destination = Slave.fromServer(destination)
-                try:
-                    destination.connect()
-                except UtilError as err:
-                    raise MUTLibError("Cannot connect to spawned "
-                                      "server: {0}".format(err.errmsg))
+        # Convert object instance of destination server to Slave, if needed
+        if not isinstance(destination, Slave):
+            destination = Slave.fromServer(destination)
+            try:
+                destination.connect()
+            except UtilError as err:
+                raise MUTLibError("Cannot connect to spawned "
+                                  "server: {0}".format(err.errmsg))
 
         # Check databases on slave and save results for 'BEFORE' check
         results.append(self._check_result(destination, "SHOW DATABASES "
@@ -384,6 +364,30 @@ class test(replicate.test):
         res = self.run_test_case(0, test_num, self.server1, self.server2,
                                  self.server3, [cmd_str], db_list,
                                  cmd_opts, comment, _TEST_CASE_RESULTS, True)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        # reset server3 removing it from the topology, in order to add it again
+        # using the --rpl=slave option without specifying the rpl-user
+        # BUG#18338321
+        self.server3 = self.servers.spawn_server(
+            "new_slave", kill=True, mysqld='"--log-bin=mysql-bin"')
+        from_conn = "--source={0}".format(
+            self.build_connection_string(self.server2))
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server3))
+
+        cmd_str = ("mysqldbcopy.py {0} --skip-gtid {1} "
+                   "{2} ".format(" ".join(db_list), from_conn, to_conn))
+
+        # Provision a new slave from existing slave without --rpl-user
+        comment = ("Test case {0} - Provision a new slave from existing "
+                   "slave without --rpl-user".format(test_num))
+        cmd_opts = "--rpl=slave "
+        res = self.run_test_case(0, test_num, self.server1, self.server2,
+                                 self.server3, [cmd_str], db_list,
+                                 cmd_opts, comment, _TEST_CASE_RESULTS, False)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

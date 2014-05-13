@@ -59,20 +59,20 @@ class test(rpl_admin.test):
         self.server0 = self.servers.get_server(0)
         mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
                                             self.servers.view_next_port())
-        self.server1 = self.spawn_server("rep_master_gtid_loopback",
-                                         mysqld, True)
+        self.server1 = self.servers.spawn_server("rep_master_gtid_loopback",
+                                                 mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
                                             self.servers.view_next_port())
-        self.server2 = self.spawn_server("rep_slave1_gtid_loopback",
-                                         mysqld, True)
+        self.server2 = self.servers.spawn_server("rep_slave1_gtid_loopback",
+                                                 mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
                                             self.servers.view_next_port())
-        self.server3 = self.spawn_server("rep_slave2_gtid_loopback",
-                                         mysqld, True)
+        self.server3 = self.servers.spawn_server("rep_slave2_gtid_loopback",
+                                                 mysqld, True)
         mysqld = _DEFAULT_MYSQL_OPTS.format(_IPv4_LOOPBACK,
                                             self.servers.view_next_port())
-        self.server4 = self.spawn_server("rep_slave3_gtid_loopback",
-                                         mysqld, True)
+        self.server4 = self.servers.spawn_server("rep_slave3_gtid_loopback",
+                                                 mysqld, True)
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         self.reset_master()

@@ -82,7 +82,7 @@ class test(copy_db.test):
             rows = self.server3.exec_query("SHOW DATABASES")
             for row in rows:
                 if not row[0].upper() in _SYSTEM_DATABASES:
-                    self.server3.exec_query("DROP DATABASE {0}".format(row[0]))
+                    self.drop_db(self.server3, row[0])
             self.server3.exec_query("CREATE DATABASE wesaysocorp")
         except UtilError as err:
             raise MUTLibError("Failed to drop databases: "

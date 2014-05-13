@@ -34,7 +34,8 @@ from mysql.utilities.command.rpl_sync_check import check_data_consistency
 from mysql.utilities.common.messages import (
     ERROR_MASTER_IN_SLAVES, PARSE_ERR_DISCO_REQ_MASTER,
     PARSE_ERR_OPT_REQ_NON_NEGATIVE_VALUE, PARSE_ERR_OPT_REQ_GREATER_VALUE,
-    PARSE_ERR_SLAVE_DISCO_EXC, PARSE_ERR_SLAVE_DISCO_REQ
+    PARSE_ERR_OPT_REQ_VALUE, PARSE_ERR_SLAVE_DISCO_EXC,
+    PARSE_ERR_SLAVE_DISCO_REQ
 )
 from mysql.utilities.common.options import (add_discover_slaves_option,
                                             add_master_option,
@@ -234,6 +235,9 @@ if __name__ == '__main__':
         exclude_list = [val for val in opt.exclude.split(',') if val]
         data_to_exclude = db_objects_list_to_dictionary(parser, exclude_list,
                                                         'the --exclude option')
+    elif opt.exclude == '':
+        # Issue an error if --exclude is used with no value.
+        parser.error(PARSE_ERR_OPT_REQ_VALUE.format(opt='--exclude'))
 
     # Process list of databases/tables to include (check format errors).
     data_to_include = {}

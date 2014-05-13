@@ -16,7 +16,7 @@ Options:
                         separated with semi-colons. Note: some platforms may
                         require double quotes around command list.
   --add-utility=ADD_UTIL
-                        append an utility in the formatmysql<utility_name>.
+                        append an utility in the format mysql<utility_name>.
                         The mysql<utility_name> must be located inside the
                         folder given by the utildir option
   --hide-utils          when this option is given, the default utilities will

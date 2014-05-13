@@ -9,7 +9,7 @@
 
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
 Name:          mysql-utilities%{product_suffix}
-Version:       1.4.2
+Version:       1.4.3
 Release:       1%{?dist}
 License:       %{copyright} Use is subject to license terms.  Under %{license_type} license as shown in the Description field.
 Group:         Development/Libraries

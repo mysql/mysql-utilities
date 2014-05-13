@@ -34,8 +34,6 @@ class test(export_rpl_errors.test):
     """
 
     def check_prerequisites(self):
-        if self.servers.get_server(0).check_version_compat(5, 6, 5):
-            raise MUTLibError("Test requires server version prior to 5.6.5")
         return export_rpl_errors.test.check_prerequisites(self)
 
     def setup(self):

@@ -6,7 +6,8 @@ Test case 1 - no differences.
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     t1                                      pass    pass    pass   
+# TABLE     t1                                      pass    pass    -       
+#           - Compare table checksum                                pass   
 
 # Databases are consistent.
 #
@@ -34,7 +35,8 @@ DELIMITER ;
 
 
 
-# TABLE     t1                                      pass    pass    pass   
+# TABLE     t1                                      pass    pass    -       
+#           - Compare table checksum                                pass   
 
 # Database consistency check failed.
 #
@@ -48,7 +50,8 @@ Test case 2b - difference: PROCEDURE with ';' (compare).
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # PROCEDURE p1                                      pass    -       -       
-# TABLE     t1                                      pass    pass    pass   
+# TABLE     t1                                      pass    pass    -       
+#           - Compare table checksum                                pass   
 
 # Databases are consistent.
 #
@@ -76,7 +79,8 @@ DELIMITER ;
 
 
 
-# TABLE     t1                                      pass    pass    pass   
+# TABLE     t1                                      pass    pass    -       
+#           - Compare table checksum                                pass   
 
 # Database consistency check failed.
 #
@@ -90,7 +94,8 @@ Test case 3b - difference: PROCEDURE DEFINER with wildcard (%) (compare).
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # PROCEDURE p1                                      pass    -       -       
-# TABLE     t1                                      pass    pass    pass   
+# TABLE     t1                                      pass    pass    -       
+#           - Compare table checksum                                pass   
 
 # Databases are consistent.
 #

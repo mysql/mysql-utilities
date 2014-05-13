@@ -50,107 +50,110 @@ PRINT_WIDTH = 75
 if not check_connector_python():
     sys.exit(1)
 
-# Setup the command parser
-parser = setup_common_options(os.path.basename(sys.argv[0]),
-                              DESCRIPTION, USAGE, True, False)
+if __name__ == '__main__':
+    # Setup the command parser
+    parser = setup_common_options(os.path.basename(sys.argv[0]),
+                                  DESCRIPTION, USAGE, True, False)
 
-# Setup utility-specific options:
+    # Setup utility-specific options:
 
-# Connection information for the source server
-parser.add_option('--master', action="store", dest="master",
-                  type="string", default=None,
-                  help="connection information for master server in "
-                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
-                  " or <login-path>[:<port>][:<socket>].")
+    # Connection information for the source server
+    parser.add_option('--master', action="store", dest="master",
+                      type="string", default=None,
+                      help="connection information for master server in the "
+                           "form: <user>[:<password>]@<host>[:<port>]"
+                           "[:<socket>] or <login-path>[:<port>][:<socket>].")
 
-# Connection information for the destination server
-parser.add_option('--slave', action="store", dest="slave",
-                  type="string", default=None,
-                  help="connection information for slave server in "
-                  "the form: <user>[:<password>]@<host>[:<port>][:<socket>]"
-                  " or <login-path>[:<port>][:<socket>]")
+    # Connection information for the destination server
+    parser.add_option('--slave', action="store", dest="slave",
+                      type="string", default=None,
+                      help="connection information for slave server in the "
+                           "form: <user>[:<password>]@<host>[:<port>]"
+                           "[:<socket>] or <login-path>[:<port>][:<socket>]")
 
-# Add --master-info-file
-parser.add_option("--master-info-file", action="store", dest="master_info",
-                  type="string", default="master.info",
-                  help="the name of the master information file on the slave."
-                       "default = 'master.info' read from the data directory."
-                       " Note: this option requires that the utility run on "
-                       "the slave with appropriate file read access to the "
-                       "data directory.")
+    # Add --master-info-file
+    parser.add_option("--master-info-file", action="store", dest="master_info",
+                      type="string", default="master.info",
+                      help="the name of the master information file on the "
+                           "slave. Default = 'master.info' read from the data "
+                           "directory. Note: this option requires that the "
+                           "utility run on the slave with appropriate file "
+                           "read access to the data directory.")
 
-# Add --show-slave-status
-parser.add_option("--show-slave-status", "-s", action="store_true",
-                  dest="slave_status", default=False, help="show slave status")
+    # Add --show-slave-status
+    parser.add_option("--show-slave-status", "-s", action="store_true",
+                      dest="slave_status", default=False,
+                      help="show slave status")
 
-# Add display width option
-parser.add_option("--width", action="store", dest="width",
-                  type="int", help="display width",
-                  default=PRINT_WIDTH)
+    # Add display width option
+    parser.add_option("--width", action="store", dest="width",
+                      type="int", help="display width",
+                      default=PRINT_WIDTH)
 
-# Add suppress to suppress warning messages
-parser.add_option("--suppress", action="store_true", dest="suppress",
-                  default=False, help="suppress warning messages")
+    # Add suppress to suppress warning messages
+    parser.add_option("--suppress", action="store_true", dest="suppress",
+                      default=False, help="suppress warning messages")
 
-# Add verbosity
-add_verbosity(parser, True)
+    # Add verbosity
+    add_verbosity(parser, True)
 
-# Now we process the rest of the arguments.
-opt, args = parser.parse_args()
+    # Now we process the rest of the arguments.
+    opt, args = parser.parse_args()
 
-# option --master is required (mandatory)
-if not opt.master:
-    default_val = 'root@localhost:3306'
-    print(WARN_OPT_USING_DEFAULT.format(default=default_val, opt='--master'))
-    # Print the WARNING to force determinism if a parser error occurs.
-    sys.stdout.flush()
+    # option --master is required (mandatory)
+    if not opt.master:
+        default_val = 'root@localhost:3306'
+        print(WARN_OPT_USING_DEFAULT.format(default=default_val,
+                                            opt='--master'))
+        # Print the WARNING to force determinism if a parser error occurs.
+        sys.stdout.flush()
 
-# option --slave is required (mandatory)
-if not opt.slave:
-    parser.error(PARSE_ERR_OPTS_REQ.format(opt='--slave'))
+    # option --slave is required (mandatory)
+    if not opt.slave:
+        parser.error(PARSE_ERR_OPTS_REQ.format(opt='--slave'))
 
-# Parse source connection values
-try:
-    m_values = parse_connection(opt.master)
-except FormatError:
-    _, err, _ = sys.exc_info()
-    parser.error("Master connection values invalid: %s." % err)
-except UtilError:
-    _, err, _ = sys.exc_info()
-    parser.error("Master connection values invalid: %s." % err.errmsg)
+    # Parse source connection values
+    try:
+        m_values = parse_connection(opt.master)
+    except FormatError:
+        _, err, _ = sys.exc_info()
+        parser.error("Master connection values invalid: %s." % err)
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        parser.error("Master connection values invalid: %s." % err.errmsg)
 
-# Parse source connection values
-try:
-    s_values = parse_connection(opt.slave)
-except FormatError:
-    _, err, _ = sys.exc_info()
-    parser.error("Slave connection values invalid: %s." % err)
-except UtilError:
-    _, err, _ = sys.exc_info()
-    parser.error("Slave connection values invalid: %s." % err.errmsg)
+    # Parse source connection values
+    try:
+        s_values = parse_connection(opt.slave)
+    except FormatError:
+        _, err, _ = sys.exc_info()
+        parser.error("Slave connection values invalid: %s." % err)
+    except UtilError:
+        _, err, _ = sys.exc_info()
+        parser.error("Slave connection values invalid: %s." % err.errmsg)
 
-# Check hostname alias
-if check_hostname_alias(m_values, s_values):
-    parser.error("The master and slave are the same host and port.")
+    # Check hostname alias
+    if check_hostname_alias(m_values, s_values):
+        parser.error("The master and slave are the same host and port.")
 
-# Create dictionary of options
-options = {
-    'verbosity': opt.verbosity,
-    'pedantic': False,
-    'quiet': opt.quiet,
-    'suppress': opt.suppress,
-    'master_info': opt.master_info,
-    'slave_status': opt.slave_status,
-    'width': opt.width
-}
+    # Create dictionary of options
+    options = {
+        'verbosity': opt.verbosity,
+        'pedantic': False,
+        'quiet': opt.quiet,
+        'suppress': opt.suppress,
+        'master_info': opt.master_info,
+        'slave_status': opt.slave_status,
+        'width': opt.width
+    }
 
-try:
-    res = check_replication(m_values, s_values, options)
-    if res:
+    try:
+        res = check_replication(m_values, s_values, options)
+        if res:
+            sys.exit(1)
+    except UtilError:
+        _, e, _ = sys.exc_info()
+        print("ERROR: {0}".format(e.errmsg))
         sys.exit(1)
-except UtilError:
-    _, e, _ = sys.exc_info()
-    print("ERROR: %s" % e.errmsg)
-    sys.exit(1)
 
-sys.exit()
+    sys.exit()

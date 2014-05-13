@@ -9,11 +9,11 @@ Test case 1 - show help
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>]
   --master-info-file=MASTER_INFO
-                        the name of the master information file on the
-                        slave.default = 'master.info' read from the data
-                        directory. Note: this option requires that the utility
-                        run on the slave with appropriate file read access to
-                        the data directory.
+                        the name of the master information file on the slave.
+                        Default = 'master.info' read from the data directory.
+                        Note: this option requires that the utility run on the
+                        slave with appropriate file read access to the data
+                        directory.
   -s, --show-slave-status
                         show slave status
   --width=WIDTH         display width

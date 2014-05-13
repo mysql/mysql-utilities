@@ -109,14 +109,26 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        #Read audit log for tests
+        # Audit log for tests (old format).
         audit_log_name = os.path.normpath(
             "./std_data/audit.log.13488316109086370")
 
+        # Audit log for tests (NEW format).
+        new_audit_log_name = os.path.normpath(
+            "./std_data/audit.log.13951424704434196.xml")
+
         num_test += 1
-        comment = ("Test case {0} - Convert all records to the defined "
+        comment = ("Test case {0} - Show all records in the RAW "
                    "format".format(num_test))
         cmd_opts = "{0} --format=RAW".format(audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        comment = ("Test case {0} (NEW) - Show all records in the RAW "
+                   "format".format(num_test))
+        cmd_opts = "{0} --format=RAW".format(new_audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -133,10 +145,26 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        comment = ("Test case {0} (NEW) - Search entries of specific "
+                   "users".format(num_test))
+        cmd_opts = "--users={0} {1} ".format(users, new_audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         num_test += 1
         comment = ("Test case {0} - No entry found for specified "
                    "users".format(num_test))
         cmd_opts = "--users=xpto,,fake, {0} ".format(audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        comment = ("Test case {0} (NEW) - No entry found for specified "
+                   "users".format(num_test))
+        cmd_opts = "--users=xpto,,fake, {0} ".format(new_audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -155,11 +183,32 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        startdate = "2014-03-18T11:34:30"
+        enddate = "2014-03-25"
+
+        comment = ("Test case {0} (NEW) - Search entries for a specific "
+                   "datetime range".format(num_test))
+        cmd_opts = ("--start-date={0} --end-date={1} "
+                    "{2}".format(startdate, enddate, new_audit_log_name))
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         num_test += 1
         comment = ("Test case {0} - No entry found for specified datetime "
                    "range".format(num_test))
         cmd_opts = ("--start-date=2012-01-01 --end-date=2012-01-01T23:59:59 "
                     "{0}".format(audit_log_name))
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        comment = ("Test case {0} (NEW) - No entry found for specified "
+                   "datetime range".format(num_test))
+        cmd_opts = ("--start-date=2012-01-01 --end-date=2012-01-01T23:59:59 "
+                    "{0}".format(new_audit_log_name))
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -176,6 +225,14 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        comment = ("Test case {0} (NEW) - Search entries matching SQL LIKE "
+                   "pattern ".format(num_test))
+        cmd_opts = "--pattern={0} {1}".format(pattern, new_audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         pattern = '".* = ..."'
 
         num_test += 1
@@ -187,10 +244,29 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        comment = ("Test case {0} (NEW) - Search entries matching REGEXP "
+                   "pattern ".format(num_test))
+        cmd_opts = "--pattern={0} --regexp {1}".format(pattern,
+                                                       new_audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         num_test += 1
         comment = ("Test case {0} - No entry found matching specified "
                    "pattern ".format(num_test))
         cmd_opts = '--pattern="%% = ___" --regexp {0}'.format(audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        comment = ("Test case {0} (NEW) - No entry found matching specified "
+                   "pattern ".format(num_test))
+        cmd_opts = '--pattern="%% = ___" --regexp {0}'.format(
+            new_audit_log_name
+        )
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -207,10 +283,27 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        comment = ("Test case {0} (NEW) - Search entries of specific query "
+                   "types".format(num_test))
+        cmd_opts = "--query-type={0} {1}".format(query_types,
+                                                 new_audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         num_test += 1
         comment = ("Test case {0} - No entry found for specified query "
                    "types".format(num_test))
         cmd_opts = "--query-type=GRANT,REVOKE {0}".format(audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        comment = ("Test case {0} (NEW) - No entry found for specified query "
+                   "types".format(num_test))
+        cmd_opts = "--query-type=GRANT,REVOKE {0}".format(new_audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -227,11 +320,29 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        comment = ("Test case {0} (NEW) - Search entries of specific event "
+                   "types".format(num_test))
+        cmd_opts = "--event-type={0} {1}".format(event_types,
+                                                 new_audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         num_test += 1
         comment = ("Test case {0} - No entry found for specified event "
                    "types".format(num_test))
         cmd_opts = ('--event-type="Binlog Dump,NoAudit" '
                     '{0}'.format(audit_log_name))
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        comment = ("Test case {0} (NEW) - No entry found for specified event "
+                   "types".format(num_test))
+        cmd_opts = ('--event-type="Binlog Dump,NoAudit" '
+                    '{0}'.format(new_audit_log_name))
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -247,11 +358,27 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        comment = ("Test case {0} (NEW) - Search entries with specific "
+                   "status".format(num_test))
+        cmd_opts = "--status={0} {1}".format(status, new_audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         status = ",100,500-750,50,25,999,,8000-9000,10-30,,"
         num_test += 1
         comment = ("Test case {0} - No entry found for specific "
                    "status".format(num_test))
         cmd_opts = "--status={0} {1}".format(status, audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        comment = ("Test case {0} (NEW) - No entry found for specific "
+                   "status".format(num_test))
+        cmd_opts = "--status={0} {1}".format(status, new_audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -278,10 +405,33 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        startdate = "2013-03-25"
+        comment = ("Test case {0} (NEW) - Apply all search criteria"
+                   "").format(num_test)
+        cmd_opts = ("--users={0} --start-date={1} --end-date={2} "
+                    "--pattern={3} --regexp --query-type={4} --event-type={5} "
+                    "--status={6} {7}".format(users, startdate, enddate,
+                                              pattern, query_types,
+                                              event_types, status,
+                                              new_audit_log_name))
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         num_test += 1
         comment = ("Test case {0} - Test query-type false "
                    "positives".format(num_test))
         cmd_opts = "--query-type={0} {1}".format(query_types, audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        comment = ("Test case {0} (NEW) - Test query-type false "
+                   "positives".format(num_test))
+        cmd_opts = "--query-type={0} {1}".format(query_types,
+                                                 new_audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -297,6 +447,15 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        comment = ("Test case {0} (NEW) - Test query-type false "
+                   "positives (particular cases)".format(num_test))
+        cmd_opts = "--query-type={0} {1}".format(query_types,
+                                                 new_audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         num_test += 1
         comment = ("Test case {0} - Search entries of "
                    "multi-line log".format(num_test))
@@ -307,10 +466,28 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        comment = ("Test case {0} (NEW) - Search entries of "
+                   "multi-line log".format(num_test))
+        audit_log_name = os.path.normpath("./std_data/multi_sqltext.log.xml")
+        cmd_opts = "--format=csv --query=CREATE {0}".format(audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         num_test += 1
         comment = ("Test case {0} - Search entries of "
                    "single line log".format(num_test))
         audit_log_name = os.path.normpath("./std_data/single.log")
+        cmd_opts = "--format=csv --query=CREATE {0}".format(audit_log_name)
+        cmd = cmd_base.format(cmd_opts)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        comment = ("Test case {0} (NEW) - Search entries of "
+                   "single line log".format(num_test))
+        audit_log_name = os.path.normpath("./std_data/single_sqltext.log.xml")
         cmd_opts = "--format=csv --query=CREATE {0}".format(audit_log_name)
         cmd = cmd_base.format(cmd_opts)
         res = self.run_test_case(0, cmd, comment)

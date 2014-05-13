@@ -854,8 +854,8 @@ class RplCommands(object):
                 failover_mode = console.register_instance()
 
             # discover slaves if option was specified at startup
-            elif self.options.get("discover", None) is not None and \
-                    (not first_pass or self.options.get("rediscover", False)):
+            elif (self.options.get("discover", None) is not None
+                  and not first_pass):
                 # Force refresh of health list if new slaves found
                 if self.topology.discover_slaves():
                     console.list_data = None

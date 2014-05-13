@@ -253,6 +253,7 @@ def negotiate_rpl_connection(server, is_master=True, strict=True,
     new_opts = options.copy()
     new_opts["conn_info"] = server
 
+    uname = None
     master_values = {}
     change_master = []
 
@@ -266,7 +267,7 @@ def negotiate_rpl_connection(server, is_master=True, strict=True,
             raise UtilError("Master must have binary logging turned on.")
         else:
             # Check rpl user
-            if rpl_user is None and not quiet:
+            if rpl_user is None:
                 # Try to find the replication user
                 res = master.get_rpl_users()
                 if len(res) > 1:
@@ -777,7 +778,7 @@ class Replication(object):
                 print "# Waiting for slave to synchronize with master"
             i += 1
         if i == num_tries:
-            print "ERROR: failed to synch slave with master."
+            print "ERROR: failed to sync slave with master."
             result = False
 
         if result is True:

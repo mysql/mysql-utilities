@@ -182,7 +182,8 @@ Comparing tables...
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     customers                               pass    pass    pass   
+# TABLE     customers                               pass    pass    -       
+#           - Compare table checksum                                pass   
 
 # Databases are consistent.
 #
@@ -201,7 +202,8 @@ Comparing tables...
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
-# TABLE     customers                               pass    pass    pass   
+# TABLE     customers                               pass    pass    -       
+#           - Compare table checksum                                pass   
 
 # Databases are consistent.
 #
