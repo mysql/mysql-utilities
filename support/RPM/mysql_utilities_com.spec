@@ -7,9 +7,6 @@
 %define packager        Oracle and/or its affiliates Product Engineering Team <mysql-build@oss.oracle.com>
 %define copyright       Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 
-%global        product_suffix      -commercial
-%global        doctrine             mysql-fabric-doctrine-1.4.0
-
 # Following are given defined from the environment/command line:
 #  version
 #  release_info
@@ -21,7 +18,7 @@
 # Prevent manual pages to be compressed (also does not strip binaries, etc.)
 %global __os_install_post %{nil}
 
-Name:           mysql-utilities%{product_suffix}
+Name:           %{name}
 Version:        %{version}
 Release:        1%{?dist}
 Summary:        %{summary}
@@ -34,9 +31,11 @@ URL:            http://dev.mysql.com/downloads/
 Source0:        %{name}-commercial%{version}-py%{python_version}.tar.gz
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildArch:      noarch
-BuildRequires:  python-devel > 2.6
-Requires:       mysql-connector-python >= 1.2.1
+Requires:       python >= 2.6, mysql-connector-python >= 1.0.9
+Obsoletes:      %{name} <= %{version}, mysql-utilities <= %{version}, 
+Provides:       %{name} = %{version}
 AutoReq:        no
+Conflicts:      mysql-utilities
 
 Prefix:			/usr
 
@@ -60,21 +59,17 @@ this distribution (see the "Licenses for Third-Party Components"
 appendix) or view the online documentation at 
 <http://dev.mysql.com/doc/>
 
-%package       extra
-Summary:       Additional files for mysql-utilities
-Group:         Development/Libraries
-
-%description   extra
-This package contains additional files mysql-utilities such as a MySQL
-Fabric support for Doctrine Object Relational Mapper.
-
 %prep
-
-%setup -q
-unzip data/%{doctrine}*
+#%setup -q -n %{name}-%{version}.linux-%{_arch}
+#cp build/%{egg} %{_builddir}
+#cp build/%{egg_info} %{_builddir}
 
 %install
+#rm -Rf $RPM_BUILD_ROOT
+#cp -a . $RPM_BUILD_ROOT
+#(cd $RPM_BUILD_ROOT ; find -follow -type f -printf "%{findpat}\n") > INSTALLED_FILES
 rm -rf %{buildroot}
+echo %{buildroot}
 mkdir -p %{buildroot}%{python_sitelib}
 mkdir -p %{buildroot}%{_mandir}
 cp -a %{bdist_dir}mysql %{buildroot}%{python_sitelib}
@@ -82,55 +77,29 @@ cp -p %{bdist_dir}*.egg-info %{buildroot}%{python_sitelib}
 cp -a %{bdist_dir}/usr/bin %{buildroot}%{_exec_prefix}/bin
 cp -a %{bdist_dir}/docs %{buildroot}%{_mandir}
 
-# Moved to sub package
-rm  %{buildroot}%{_sysconfdir}/mysql/%{doctrine}*
-cp -a %{doctrine} %{buildroot}%{_datadir}/%{name}/
+if [ -d %{bdist_dir}/etc ];
+then
+    cp -a %{bdist_dir}/etc %{buildroot}
+fi
 
 rm %{buildroot}%{python_sitelib}/mysql/__init__.pyc
+touch ETC
+if [ -d %{buildroot}/etc ];
+then
+    echo "/etc/mysql" > ETC
+fi
 
 
 %clean
-rm -rf %{buildroot}
 
-%files
-%defattr(-, root, root, -)
+%files -f ETC
+%defattr(-,root,root,-)
 %doc %{bdist_dir}README_com.txt
 %doc %{bdist_dir}LICENSE_com.txt
-%config(noreplace) %{_sysconfdir}/mysql/fabric.cfg
-%dir %{_sysconfdir}/mysql
-%{_bindir}/mysqlauditadmin
-%{_bindir}/mysqlauditgrep
-%{_bindir}/mysqldbcompare
-%{_bindir}/mysqldbcopy
-%{_bindir}/mysqldbexport
-%{_bindir}/mysqldbimport
-%{_bindir}/mysqldiff
-%{_bindir}/mysqldiskusage
-%{_bindir}/mysqlfailover
-%{_bindir}/mysqlfabric
-%{_bindir}/mysqlfrm
-%{_bindir}/mysqlindexcheck
-%{_bindir}/mysqlmetagrep
-%{_bindir}/mysqlprocgrep
-%{_bindir}/mysqlreplicate
-%{_bindir}/mysqlrpladmin
-%{_bindir}/mysqlrplcheck
-%{_bindir}/mysqlrplshow
-%{_bindir}/mysqlserverclone
-%{_bindir}/mysqlserverinfo
-%{_bindir}/mysqluc
-%{_bindir}/mysqluserclone
-%{_bindir}/mysqlrplms
-%{_bindir}/mysqlrplsync
-%{python_sitelib}/mysql
-%if 0%{?rhel} > 5 || 0%{?fedora} > 12
-%{python_sitelib}/mysql_utilities-*.egg-info
-%endif
-%{_mandir}/man1/mysql*.1*
-
-%files extra
-%defattr(-, root, root, -)
-%{_datadir}/%{name}
+%{python_sitelib}/mysql*egg-info
+%{python_sitelib}/mysql/
+%{_mandir}/*
+%{_exec_prefix}/bin
 
 %post
 touch %{python_sitelib}/mysql/__init__.py
@@ -150,9 +119,6 @@ then
 fi
 
 %changelog
-* Thu May 22 2014 Balasubramanian Kandasamy <balasubramanian.kandasamy@oracle.com> - 1.4.3-1
-- Updated for commercial package
-
 * Mon Jul 29 2013 Israel Gomez <israel.gomez@oracle.com> - 1.0.0
 
 - Initial implementation, based on Geert Vanderkelen's implementation.
