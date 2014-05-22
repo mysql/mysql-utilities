@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -94,6 +94,9 @@ class BuildDistOSX(bdist):
         osx_pkg_contents = os.path.join(root, osx_pkg_name, 'Contents')
         osx_pkg_resrc = os.path.join(osx_pkg_contents, 'Resources')
         self.mkpath(osx_pkg_resrc)
+        osx_path = os.path.join(root, self.dstroot)
+
+        cwd = os.path.join(os.getcwd())
 
         copy_file_src_dst = [
             (os.path.join("support", "osx", "PkgInfo"),
@@ -104,20 +107,36 @@ class BuildDistOSX(bdist):
              os.path.join(osx_pkg_resrc, "Welcome.rtf"))
         ]
 
+        # No special folder for GPL or commercial. Files inside the directory
+        # will determine what it is.
+        data_path = os.path.join(
+            osx_path, 'usr', 'local',
+            '{0}-{1}'.format(self.name, self.version)
+        )
+        self.mkpath(data_path)
+
         if gpl:
             copy_file_src_dst += [
-                (os.path.join(os.getcwd(), "README.txt"),
+                (os.path.join(cwd, "README.txt"),
                  os.path.join(osx_pkg_resrc, "ReadMe.txt")),
-                (os.path.join(os.getcwd(), "LICENSE.txt"),
-                 os.path.join(osx_pkg_resrc, "License.txt"))
+                (os.path.join(cwd, "LICENSE.txt"),
+                 os.path.join(osx_pkg_resrc, "License.txt")),
+                (os.path.join(cwd, "README.txt"),
+                 os.path.join(data_path, "ReadMe.txt")),
+                (os.path.join(cwd, "LICENSE.txt"),
+                 os.path.join(data_path, "License.txt")),
             ]
         else:
             com_path = os.path.join('support', 'commercial_docs')
             copy_file_src_dst += [
-                (os.path.join(os.getcwd(), com_path, "README_com.txt"),
+                (os.path.join(cwd, com_path, "README_com.txt"),
                  os.path.join(osx_pkg_resrc, "ReadMe.txt")),
-                (os.path.join(os.getcwd(), com_path, "LICENSE_com.txt"),
-                 os.path.join(osx_pkg_resrc, "License.txt"))
+                (os.path.join(cwd, com_path, "LICENSE_com.txt"),
+                 os.path.join(osx_pkg_resrc, "License.txt")),
+                (os.path.join(cwd, com_path, "README_com.txt"),
+                 os.path.join(data_path, "ReadMe.txt")),
+                (os.path.join(cwd, com_path, "LICENSE_com.txt"),
+                 os.path.join(data_path, "License.txt")),
             ]
 
         property_files = [
@@ -407,4 +426,3 @@ class BuildDistOSXcom(BuildDistOSX):
             log.info("current directory: {0}".format(os.getcwd()))
         if not self.keep_temp:
             remove_tree(build_path, dry_run=self.dry_run)
-
