@@ -333,6 +333,7 @@ def clone_server(conn_val, options):
         "port": port_int,
         "unix_socket": new_sock
     }
+
     server2_options = {
         'conn_info': conn,
         'role': "clone",

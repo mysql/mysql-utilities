@@ -40,7 +40,7 @@ import time
 from mysql.utilities.common.server import Server, get_local_servers
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_verbosity
-from mysql.utilities.common.options import setup_common_options
+from mysql.utilities.common.options import get_ssl_dict, setup_common_options
 from mysql.utilities.exception import MUTLibError, UtilError
 from mutlib.mutlib import ServerList, get_port
 
@@ -300,7 +300,7 @@ def find_tests(path):
 
 # Begin 'main' code
 parser = setup_common_options(os.path.basename(sys.argv[0]),
-                              DESCRIPTION, USAGE, False, False)
+                              DESCRIPTION, USAGE, False, False, add_ssl=True)
 
 # Add server option
 parser.add_option("--server", action="append", dest="servers",
@@ -476,8 +476,12 @@ if not opt.servers:
 else:
     i = 0
     for server in opt.servers:
+        # add ssl options values.
+        conn_options = {}
+        conn_options.update(get_ssl_dict(opt))
+
         try:
-            conn_val = parse_connection(server)
+            conn_val = parse_connection(server, options=conn_options)
         except UtilError as err:
             parser.error(err.errmsg)
         except:

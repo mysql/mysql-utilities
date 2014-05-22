@@ -168,13 +168,13 @@ class AuditLog(object):
                 for row in log_rows:
                     sys.stdout.write(row)
             else:
-                #Convert the results to the appropriate format
+                # Convert the results to the appropriate format
                 cols, rows = convert_dictionary_list(log_rows)
                 # Note: No need to sort rows, retrieved with the same order
                 # as read (i.e., sorted by timestamp)
                 print_list(sys.stdout, out_format, cols, rows)
         else:
-            #Print message notifying that no entry was found
+            # Print message notifying that no entry was found
             no_entry_msg = "#\n# No entry found!\n#"
             print no_entry_msg
 

@@ -1,0 +1,22 @@
+Test case 1 - test_user@localhost:3306
+[('host', 'localhost'), ('passwd', ''), ('port', 3306), ('user', 'test_user')]
+Test case 2 - test/slash
+No login credentials found for either login-path: 'test/slash' nor config-path: 'test/slash'. Please review the used connection string: test/slash
+Test case 3 - test_group_simple_login
+No login credentials found for either login-path: 'test_group_simple_login' nor config-path: 'test_group_simple_login'. Please review the used connection string: test_group_simple_login
+Test case 4 - c:\some_config.cnf
+No login credentials found for either login-path: 'c' nor config-path: 'c:\some_config.cnf'. Please review the used connection string: c:\some_config.cnf
+Test case 5 - /etc_etc/some_config.cnf
+No login credentials found for either login-path: '/etc_etc/some_config.cnf' nor config-path: '/etc_etc/some_config.cnf'. Please review the used connection string: /etc_etc/some_config.cnf
+Test case 6 - test-hyphen1234#
+No login credentials found for either login-path: 'test-hyphen1234#' nor config-path: 'test-hyphen1234#'. Please review the used connection string: test-hyphen1234#
+Test case 7 - test_default_group
+No login credentials found for either login-path: 'test_default_group' nor config-path: 'test_default_group'. Please review the used connection string: test_default_group
+Test case 8 - temp_1.cnf
+Missing connection value for port option
+Test case 9 - temp_1.cnf[undeclared]
+The given group: 'undeclared' was not found on the configuration file 'temp_1.cnf'
+Test case 10 - temp_2.cnf
+Missing connection values for user,host and port options
+Test case 11 - temp_2.cnf[missing_values]
+Missing connection values for host and port options

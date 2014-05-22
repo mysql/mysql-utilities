@@ -100,6 +100,60 @@ def license_callback(self, opt, value, parser, *args, **kwargs):
     parser.exit()
 
 
+def path_callback(option, opt, value, parser):
+    """Verify that the given path is an existing file. If it is then add it
+    to the parser values.
+
+    option[in]        option instance
+    opt[in]           option name
+    value[in]         given user value
+    parser[in]        parser instance
+    """
+    if not os.path.exists(value):
+        parser.error("the given path '{0}' in option {1} does not"
+                     " exists or can not be acceded".format(value, opt))
+
+    if not os.path.isfile(value):
+        parser.error("the given path '{0}' in option {1} does not"
+                     " correspond to a file".format(value, opt))
+
+    setattr(parser.values, option.dest, value)
+
+
+def add_config_path_option(parser):
+    """Add the config_path option.
+
+    parser[in]        the parser instance
+    """
+    # --config-path option: config_path
+    parser.add_option("--config-path", action="callback",
+                      callback=path_callback,
+                      type="string", help="The path to a MySQL option file "
+                                          "with the login options")
+
+
+def add_ssl_options(parser):
+    """Add the ssl options.
+
+    parser[in]        the parser instance
+    """
+    # --ssl options: ssl_ca, ssl_cert, ssl_key
+    parser.add_option("--ssl-ca", action="callback",
+                      callback=path_callback,
+                      type="string", help="The path to a file that contains "
+                      "a list of trusted SSL CAs.")
+
+    parser.add_option("--ssl-cert", action="callback",
+                      callback=path_callback,
+                      type="string", help="The name of the SSL certificate "
+                      "file to use for establishing a secure connection.")
+
+    parser.add_option("--ssl-key", action="callback",
+                      callback=path_callback,
+                      type="string", help="The name of the SSL key file to "
+                      "use for establishing a secure connection.")
+
+
 class CaseInsensitiveChoicesOption(CustomOption):
     """Case insensitive choices option class
 
@@ -120,7 +174,8 @@ class CaseInsensitiveChoicesOption(CustomOption):
 def setup_common_options(program_name, desc_str, usage_str,
                          append=False, server=True,
                          server_default="root@localhost:3306",
-                         extended_help=None):
+                         extended_help=None,
+                         add_ssl=False):
     """Setup option parser and options common to all MySQL Utilities.
 
     This method creates an option parser and adds options for user
@@ -137,6 +192,8 @@ def setup_common_options(program_name, desc_str, usage_str,
     server_default[in] Default value for option
                        (default = "root@localhost:3306")
     extended_help[in]  Extended help (by default: None).
+    add_ssl[in]        adds the --ssl-options, however these are added
+                       automatically if server is True, (default = False)
 
     Returns parser object
     """
@@ -163,14 +220,18 @@ def setup_common_options(program_name, desc_str, usage_str,
                               help="connection information for the server in "
                               "the form: <user>[:<password>]@<host>[:<port>]"
                               "[:<socket>] or <login-path>[:<port>]"
-                              "[:<socket>].")
+                              "[:<socket>] or <config-path>[<[group]>].")
+
         else:
             parser.add_option("--server", action="store", dest="server",
                               type="string", default=server_default,
                               help="connection information for the server in "
                               "the form: <user>[:<password>]@<host>[:<port>]"
                               "[:<socket>] or <login-path>[:<port>]"
-                              "[:<socket>].")
+                              "[:<socket>] or <config-path>[<[group]>].")
+
+    if server or add_ssl:
+        add_ssl_options(parser)
 
     return parser
 
@@ -571,7 +632,8 @@ def add_master_option(parser):
     parser.add_option("--master", action="store", dest="master", default=None,
                       type="string", help="connection information for master "
                       "server in the form: <user>[:<password>]@<host>[:<port>]"
-                      "[:<socket>] or <login-path>[:<port>][:<socket>]")
+                      "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                      " or <config-path>[<[group]>].")
 
 
 def add_slaves_option(parser):
@@ -586,7 +648,8 @@ def add_slaves_option(parser):
                       type="string", default=None,
                       help="connection information for slave servers in "
                       "the form: <user>[:<password>]@<host>[:<port>]"
-                      "[:<socket>] or <login-path>[:<port>][:<socket>]. "
+                      "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                      " or <config-path>[<[group]>]."
                       "List multiple slaves in comma-separated list.")
 
 
@@ -615,7 +678,8 @@ def add_failover_options(parser):
                       type="string", default=None,
                       help="connection information for candidate slave servers"
                       " for failover in the form: <user>[:<password>]@<host>[:"
-                      "<port>][:<socket>] or <login-path>[:<port>][:<socket>]."
+                      "<port>][:<socket>] or <login-path>[:<port>][:<socket>]"
+                      " or <config-path>[<[group]>]"
                       " Valid only with failover command. List multiple slaves"
                       " in comma-separated list.")
 
@@ -726,7 +790,7 @@ def parse_user_password(userpass_values, my_defaults_reader=None,
         # is a login-path and quietly try to retrieve the user and password.
         # If it fails, assume a user name is being specified.
 
-        #Check if the login configuration file (.mylogin.cnf) exists
+        # Check if the login configuration file (.mylogin.cnf) exists
         if login_values[0] and not my_login_config_exists():
             return login_values[0], None
 
@@ -852,3 +916,29 @@ def db_objects_list_to_dictionary(parser, obj_list, option_desc):
                 else:
                     db_objs_dict[db_name] = set([obj_name])
     return db_objs_dict
+
+
+def get_ssl_dict(parser_options=None):
+    """Returns a dictionary with the SSL certificates
+
+    parser_options[in]   options instance from the used option/arguments parser
+
+    Returns a dictionary with the SSL certificates, each certificate name as
+    the key with underscore instead of dash. If no certificate has been given
+    by the user in arguments, returns an empty dictionary.
+
+    Note: parser_options is a Values instance, that does not have method get as
+    a dictionary instance.
+    """
+    conn_options = {}
+    if parser_options is not None:
+        certs_paths = {}
+        if 'ssl_ca' in dir(parser_options):
+            certs_paths['ssl_ca'] = parser_options.ssl_ca
+        if 'ssl_cert' in dir(parser_options):
+            certs_paths['ssl_cert'] = parser_options.ssl_cert
+        if 'ssl_key' in dir(parser_options):
+            certs_paths['ssl_key'] = parser_options.ssl_key
+
+        conn_options.update(certs_paths)
+    return conn_options

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ from mysql.utilities.common.options import (
     add_all, add_character_set_option, add_format_option, add_locking,
     add_regexp, add_rpl_mode, add_rpl_user, add_skip_options, add_verbosity,
     check_all, check_rpl_options, check_skip_options, check_verbosity,
-    setup_common_options
+    get_ssl_dict, setup_common_options
 )
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
@@ -293,6 +293,7 @@ if __name__ == '__main__':
 
     # Parse server connection values
     try:
+        options.update(get_ssl_dict(opt))
         server_values = parse_connection(opt.server, None, options)
     except FormatError:
         _, err, _ = sys.exc_info()

@@ -4,7 +4,14 @@ Test case 1 : show help
   --license             display program's license and exit
   --server=SERVER       connection information for the server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>].
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
   --new-data=NEW_DATA   the full path to the location of the data directory
                         for the new instance. The path size must be smaller or
                         equal than 200 characters.

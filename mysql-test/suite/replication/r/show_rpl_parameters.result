@@ -52,7 +52,8 @@ Test case 5 - show topology - help
   --license             display program's license and exit
   --master=MASTER       connection information for master server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>].
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
   -l, --show-list       print a list of the topology.
   -f FORMAT, --format=FORMAT
                         display the list in either grid (default), tab, csv,
@@ -69,6 +70,12 @@ Test case 5 - show topology - help
   -n NUM_RETRIES, --num-retries=NUM_RETRIES
                         number of retries allowed for failed slave login
                         attempt. Valid with --prompt only.
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.

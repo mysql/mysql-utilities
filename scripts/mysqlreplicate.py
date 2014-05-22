@@ -35,7 +35,8 @@ from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (setup_common_options, add_rpl_user,
-                                            add_verbosity)
+                                            add_verbosity, add_ssl_options,
+                                            get_ssl_dict)
 from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
                                              WARN_OPT_USING_DEFAULT)
 
@@ -62,14 +63,16 @@ if __name__ == '__main__':
                       type="string", default=None,
                       help="connection information for master server in the "
                            "form: <user>[:<password>]@<host>[:<port>]"
-                           "[:<socket>] or <login-path>[:<port>][:<socket>].")
+                           "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                           " or <config-path>[<[group]>].")
 
     # Connection information for the destination server
     parser.add_option('--slave', action="store", dest="slave",
                       type="string", default=None,
                       help="connection information for slave server in the "
                            "form: <user>[:<password>]@<host>[:<port>]"
-                           "[:<socket>] or <login-path>[:<port>][:<socket>].")
+                           "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                           " or <config-path>[<[group]>].")
 
     # Replication user and password
     add_rpl_user(parser)
@@ -103,6 +106,9 @@ if __name__ == '__main__':
                       help="start replication from the first event recorded "
                            "in the binary logging of the master. Not valid "
                            "with --master-log-file or --master-log-pos.")
+
+    # Add ssl options
+    add_ssl_options(parser)
 
     # Add verbosity
     add_verbosity(parser)
@@ -166,6 +172,9 @@ if __name__ == '__main__':
         'master_log_pos': opt.master_log_pos,
         'from_beginning': opt.from_beginning,
     }
+
+    # Add ssl Values to options instead of connection.
+    options.update(get_ssl_dict(opt))
 
     try:
         setup_replication(m_values, s_values, opt.rpl_user, options,

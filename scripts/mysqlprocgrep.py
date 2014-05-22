@@ -36,7 +36,8 @@ from mysql.utilities.command.proc import (ProcessGrep, KILL_CONNECTION,
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_regexp, setup_common_options,
                                             add_verbosity, add_format_option,
-                                            add_character_set_option)
+                                            add_character_set_option,
+                                            get_ssl_dict)
 
 
 def add_pattern(option, opt, value, parser, field):
@@ -145,8 +146,9 @@ if __name__ == '__main__':
         if options.print_sql:
             print(command.sql(options.sql_body).strip())
         else:
+            ssl_opts = get_ssl_dict(options)
             command.execute(options.server, format=options.format,
-                            charset=options.charset)
+                            charset=options.charset, ssl_opts=ssl_opts)
     except EmptyResultError:
         _, details, _ = sys.exc_info()
         sys.stderr.write("No matches\n")

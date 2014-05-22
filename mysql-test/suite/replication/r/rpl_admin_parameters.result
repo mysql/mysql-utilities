@@ -6,9 +6,9 @@ Test case 1 - show help
                         connection information for candidate slave servers for
                         failover in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>]. Valid only with
-                        failover command. List multiple slaves in comma-
-                        separated list.
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>] Valid only with failover command.
+                        List multiple slaves in comma-separated list.
   --discover-slaves-login=DISCOVER
                         at startup, query master for all registered slaves and
                         use the user name and password specified to connect.
@@ -28,7 +28,8 @@ Test case 1 - show help
                         days.
   --master=MASTER       connection information for master server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>]
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
   --max-position=MAX_POSITION
                         used to detect slave delay. The maximum difference
                         between the master's log position and the slave's
@@ -42,8 +43,9 @@ Test case 1 - show help
                         considered behind the master. Default is 0.
   --slaves=SLAVES       connection information for slave servers in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>]. List multiple slaves
-                        in comma-separated list.
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].List multiple slaves in comma-
+                        separated list.
   --timeout=TIMEOUT     maximum timeout in seconds to wait for each
                         replication command to complete. For example, timeout
                         for slave waiting to catch up to master. Default =
@@ -56,8 +58,8 @@ Test case 1 - show help
                         connection information for the slave to be used to
                         replace the master for switchover, in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>]. Valid only with
-                        switchover command.
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>]. Valid only with switchover command.
   --force               ignore prerequisite check results or some
                         inconsistencies found (e.g. errant transactions on
                         slaves) and execute action
@@ -72,6 +74,12 @@ Test case 1 - show help
   --rpl-user=RPL_USER   the user and password for the replication user
                         requirement, in the form: <user>[:<password>] or
                         <login-path>. E.g. rpl:passwd - By default = none
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
 
 Available Commands:
 

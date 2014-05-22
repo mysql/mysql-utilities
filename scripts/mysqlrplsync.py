@@ -39,7 +39,8 @@ from mysql.utilities.common.messages import (
 )
 from mysql.utilities.common.options import (add_discover_slaves_option,
                                             add_master_option,
-                                            add_slaves_option, add_verbosity,
+                                            add_slaves_option,
+                                            add_ssl_options, add_verbosity,
                                             check_server_lists,
                                             db_objects_list_to_dictionary,
                                             setup_common_options)
@@ -141,6 +142,9 @@ if __name__ == '__main__':
 
     # Add the --slaves option.
     add_slaves_option(parser)
+
+    # Add the --ssl options
+    add_ssl_options(parser)
 
     # Add verbosity option (no --quite option).
     add_verbosity(parser, False)

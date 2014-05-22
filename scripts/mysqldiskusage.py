@@ -63,7 +63,7 @@ def print_elapsed_time(start_test):
 if __name__ == '__main__':
     # Setup the command parser and setup server, help
     parser = setup_common_options(os.path.basename(sys.argv[0]),
-                                  DESCRIPTION, USAGE)
+                                  DESCRIPTION, USAGE, add_ssl=True)
 
     # Setup utility-specific options:
 

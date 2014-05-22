@@ -30,6 +30,7 @@ import tempfile
 import threading
 
 import mysql.connector
+from mysql.connector.constants import ClientFlag
 
 from mysql.connector.errorcode import CR_SERVER_LOST
 from mysql.utilities.exception import (ConnectionValuesError, UtilError,
@@ -47,7 +48,7 @@ _GTID_ERROR = ("The server %s:%s does not comply to the latest GTID "
                "feature support. Errors:")
 
 
-def get_connection_dictionary(conn_info):
+def get_connection_dictionary(conn_info, ssl_dict=None):
     """Get the connection dictionary.
 
     The method accepts one of the following types for conn_info:
@@ -59,20 +60,29 @@ def get_connection_dictionary(conn_info):
         - an instance of the Server class
 
     conn_info[in]          Connection information
+    ssl_dict[in]           A dictionary with the ssl certificates
+                           (ssl_ca, ssl_cert and ssl_key).
 
     Returns dict - dictionary for connection (user, passwd, host, port, socket)
     """
     if conn_info is None:
         return conn_info
+
     conn_val = {}
     if isinstance(conn_info, dict) and 'host' in conn_info:
+        # Not update conn_info if already has any ssl certificate.
+        if (ssl_dict is not None and
+            not (conn_info.get("ssl_ca", None) or
+                 conn_info.get("ssl_cert", None) or
+                 conn_info.get("ssl_key", None))):
+            conn_info.update(ssl_dict)
         conn_val = conn_info
     elif isinstance(conn_info, Server):
         # get server's dictionary
         conn_val = conn_info.get_connection_values()
     elif isinstance(conn_info, basestring):
         # parse the string
-        conn_val = parse_connection(conn_info, None)
+        conn_val = parse_connection(conn_info, options=ssl_dict)
     else:
         raise ConnectionValuesError("Cannot determine connection information"
                                     " type.")
@@ -282,7 +292,8 @@ def connect_servers(src_val, dest_val, options=None):
         - dictionary containing connection information including:
           (user, passwd, host, port, socket)
         - connection string in the form: user:pass@host:port:socket or
-                                         login-path:port:socket
+                                         login-path:port:socket or
+                                         config-path[group]
         - an instance of the Server class
 
     src_val[in]        source connection information
@@ -314,11 +325,19 @@ def connect_servers(src_val, dest_val, options=None):
     version = options.get("version", None)
     charset = options.get("charset", None)
 
+    ssl_dict = {}
+    if options.get("ssl_cert", None) is not None:
+        ssl_dict['ssl_cert'] = options.get("ssl_cert")
+    if options.get("ssl_ca", None) is not None:
+        ssl_dict['ssl_ca'] = options.get("ssl_ca", None)
+    if options.get("ssl_key", None) is not None:
+        ssl_dict['ssl_key'] = options.get("ssl_key", None)
+
     source = None
     destination = None
 
     # Get connection dictionaries
-    src_dict = get_connection_dictionary(src_val)
+    src_dict = get_connection_dictionary(src_val, ssl_dict)
     if "]" in src_dict['host']:
         src_dict['host'] = clean_IPv6(src_dict['host'])
     dest_dict = get_connection_dictionary(dest_val)
@@ -377,7 +396,7 @@ def connect_servers(src_val, dest_val, options=None):
     return (source, destination)
 
 
-def test_connect(conn_info, throw_errors=False):
+def test_connect(conn_info, throw_errors=False, ssl_dict=None):
     """Test connection to a server.
 
     The method accepts one of the following types for conn_info:
@@ -385,19 +404,22 @@ def test_connect(conn_info, throw_errors=False):
         - dictionary containing connection information including:
           (user, passwd, host, port, socket)
         - connection string in the form: user:pass@host:port:socket or
-                                         login-path:port:socket
+                                         login-path:port:socket or
+                                         config-path[group]
         - an instance of the Server class
 
     conn_info[in]          Connection information
 
     throw_errors           throw any errors found during the test,
                            false by default.
+    ssl_dict[in]           A dictionary with the ssl certificates
+                           (ssl_ca, ssl_cert and ssl_key).
 
     Returns True if connection success, False if error
     """
     # Parse source connection values
     try:
-        src_val = get_connection_dictionary(conn_info)
+        src_val = get_connection_dictionary(conn_info, ssl_dict)
     except Exception as err:
         raise ConnectionValuesError("Server connection values invalid: {0}."
                                     "".format(err))
@@ -470,14 +492,22 @@ def stop_running_server(server, wait=10, drop=True):
     cmd += mysqladmin_path
     if server.socket is None and server.host == 'localhost':
         server.host = '127.0.0.1'
-    cmd += " shutdown --user=%s --host=%s " % (server.user, server.host)
+    cmd += " shutdown --user={0} --host={1} ".format(server.user, server.host)
     if server.passwd:
-        cmd += "--password=%s " % server.passwd
+        cmd = "{0} --password={1} ".format(cmd, server.passwd)
     # Use of server socket only works with 'localhost' (not with 127.0.0.1).
     if server.socket and server.host == 'localhost':
-        cmd += "--socket=%s " % server.socket
+        cmd = "{0} --socket={1} ".format(cmd, server.socket)
     else:
-        cmd += "--port=%s " % server.port
+        cmd = "{0} --port={1} ".format(cmd, server.port)
+    if server.has_ssl:
+        if server.ssl_cert is not None:
+            cmd = "{0} --ssl-cert={1} ".format(cmd, server.ssl_cert)
+        if server.ssl_ca is not None:
+            cmd = "{0} --ssl-ca={1} ".format(cmd, server.ssl_ca)
+        if server.ssl_key is not None:
+            cmd = "{0} --ssl-key={1} ".format(cmd, server.ssl_key)
+
     res = server.show_server_variable("datadir")
     datadir = res[0][1]
 
@@ -561,6 +591,7 @@ class Server(object):
         self.db_conn = None
         self.host = None
         self.role = options.get("role", "Server")
+        self.has_ssl = False
         conn_values = get_connection_dictionary(options.get("conn_info"))
         try:
             self.host = conn_values["host"]
@@ -574,6 +605,12 @@ class Server(object):
                 self.port = int(conn_values["port"])
             self.charset = options.get("charset",
                                        conn_values.get("charset", None))
+            # Optional values
+            self.ssl_ca = conn_values.get('ssl_ca', None)
+            self.ssl_cert = conn_values.get('ssl_cert', None)
+            self.ssl_key = conn_values.get('ssl_key', None)
+            if self.ssl_cert or self.ssl_ca or self.ssl_key:
+                self.has_ssl = True
         except KeyError:
             raise UtilError("Dictionary format not recognized.")
         self.connect_error = None
@@ -587,23 +624,29 @@ class Server(object):
         self._version = None
 
     @classmethod
-    def fromServer(cls, server):
+    def fromServer(cls, server, conn_info=None):
         """ Create a new server instance from an existing one
 
         Factory method that will allow the creation of a new server instance
         from an existing server.
 
-        server[in] - instance object that must be instance of the Server class
-                     or a subclass.
+        server[in]       instance object that must be instance of the Server
+                         class or a subclass.
+        conn_info[in]    A dictionary with the connection information to
+                         connect to the server
 
         Returns an instance of the calling class as a result.
         """
 
         if isinstance(server, Server):
-            options = {"conn_info": server.get_connection_values(),
-                       "role": server.role,
+            options = {"role": server.role,
                        "verbose": server.verbose,
                        "charset": server.charset}
+            if conn_info is not None and isinstance(conn_info, dict):
+                options["conn_info"] = conn_info
+            else:
+                options["conn_info"] = server.get_connection_values()
+
             return cls(options)
         else:
             raise TypeError("The server argument's type is neither Server nor "
@@ -814,6 +857,12 @@ class Server(object):
             conn_vals["socket"] = self.socket
         if self.port:
             conn_vals["port"] = self.port
+        if self.ssl_ca:
+            conn_vals["ssl_ca"] = self.ssl_ca
+        if self.ssl_cert:
+            conn_vals["ssl_cert"] = self.ssl_cert
+        if self.ssl_key:
+            conn_vals["ssl_key"] = self.ssl_key
 
         return conn_vals
 
@@ -867,12 +916,27 @@ class Server(object):
                 parameters['charset'] = self.charset
             parameters['host'] = parameters['host'].replace("[", "")
             parameters['host'] = parameters['host'].replace("]", "")
+
+            # Add SSL parameters ONLY if they are not None
+            if self.ssl_ca is not None:
+                parameters['ssl_ca'] = self.ssl_ca
+            if self.ssl_cert is not None:
+                parameters['ssl_cert'] = self.ssl_cert
+            if self.ssl_key is not None:
+                parameters['ssl_key'] = self.ssl_key
+            if self.has_ssl:
+                cpy_flags = [ClientFlag.SSL, ClientFlag.SSL_VERIFY_SERVER_CERT]
+                parameters['client_flags'] = cpy_flags
+
             db_conn = mysql.connector.connect(**parameters)
             # Return MySQL connection object.
             return db_conn
         except mysql.connector.Error as err:
             raise UtilError("Cannot connect to the {0} server.\n"
                             "Error {1}".format(self.role, err.msg), err.errno)
+        except AttributeError as err:
+            raise UtilError("Cannot connect to the {0} server.\n"
+                            "Error {1}".format(self.role, err.message))
 
     def disconnect(self):
         """Disconnect from the server.

@@ -34,7 +34,8 @@ from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command.show_rpl import show_topology
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.common.options import (add_verbosity, add_format_option,
+from mysql.utilities.common.options import (add_format_option, add_ssl_options,
+                                            add_verbosity,
                                             setup_common_options)
 
 
@@ -61,7 +62,8 @@ if __name__ == '__main__':
                       type="string", default="root@localhost:3306",
                       help="connection information for master server in the "
                            "form: <user>[:<password>]@<host>[:<port>]"
-                           "[:<socket>] or <login-path>[:<port>][:<socket>].")
+                           "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                           " or <config-path>[<[group]>].")
 
     # Show graph option
     parser.add_option("-l", "--show-list", action="store_true",
@@ -100,6 +102,9 @@ if __name__ == '__main__':
                       help="number of retries allowed for failed slave login "
                            "attempt. Valid with --prompt only.",
                       default=0)
+
+    # Add ssl options
+    add_ssl_options(parser)
 
     # Add verbosity mode and quiet option
     add_verbosity(parser, True)

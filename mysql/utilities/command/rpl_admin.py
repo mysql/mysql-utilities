@@ -192,6 +192,11 @@ class RplCommands(object):
         self.candidates = self.options.get("candidates", None)
         self.verbose = self.options.get("verbose", None)
         self.rpl_user = self.options.get("rpl_user", None)
+        self.ssl_ca = options.get("ssl_ca", None)
+        self.ssl_cert = options.get("ssl_cert", None)
+        self.ssl_key = options.get("ssl_key", None)
+        if self.ssl_ca or self.ssl_cert or self.ssl_key:
+            self.ssl = True
 
         try:
             self.topology = Topology(master_vals, slave_vals, self.options,

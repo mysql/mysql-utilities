@@ -412,8 +412,9 @@ class ServerList(object):
             if conn_val.get("passwd") is not None:
                 user_str = "{0}:{1}".format(user_str, conn_val["passwd"])
             user_str = "{0}@{1}".format(user_str, conn_val["host"])
-            cmd = ("mysqluserclone.py -s --source={0} --destination={1} {2} "
-                   "{2}".format(self.get_connection_string(cur_server),
+            cmd = ("mysqluserclone.py --source={0} --destination={1} {2} "
+                   "{2}".format(self.get_connection_string(cur_server,
+                                                           use_ssl=True),
                                 self.get_connection_string(new_server),
                                 user_str))
             res = _exec_util(cmd, "cmd.txt", self.utildir)
@@ -443,10 +444,11 @@ class ServerList(object):
 
         return stop_running_server(server, wait, drop)
 
-    def spawn_new_servers(self, num_servers):
+    def spawn_new_servers(self, num_servers, mysqld=None):
         """Spawn new servers to match the number needed.
 
         num_servers[in]    The minimal number of Server objects required
+        mysqld[in]         The mysqld options to use at startup.
 
         Returns True - servers available, False - not enough servers
         """
@@ -460,7 +462,8 @@ class ServerList(object):
         for _ in range(0, num_to_add):
             server = self.start_new_server(orig_server,
                                            self.get_next_port(),
-                                           self.get_next_id(), "root")
+                                           self.get_next_id(), "root",
+                                           parameters=mysqld)
             datadir = server[0].show_server_variable('datadir')[0][1]
             self.server_list.append((server[0], True,
                                      self.get_process_id(datadir)))
@@ -633,7 +636,10 @@ class ServerList(object):
                 'user': server.user,
                 'passwd': server.passwd,
                 'socket': server.socket,
-                'port': server.port
+                'port': server.port,
+                'ssl_ca': server.ssl_ca,
+                'ssl_cert': server.ssl_cert,
+                'ssl_key': server.ssl_key,
             }
 
         if aslist:
@@ -657,12 +663,15 @@ class ServerList(object):
         return str1 + str2
 
     @staticmethod
-    def get_connection_string(server):
+    def get_connection_string(server, use_ssl=False):
         """Return a string that comprises the normal connection parameters
         common to MySQL utilities for a particular server in the form of
         user:pass@host:port:socket.
 
         server[in]         A Server object
+        use_ssl[in]        If True and given server has ssl certificates,
+                           the returned string will contain the according
+                           ssl options.
 
         Returns string
         """
@@ -675,6 +684,14 @@ class ServerList(object):
             conn_str = "{0}{1}".format(conn_str, server.port)
         if server.socket is not None and server.socket != "":
             conn_str = "{0}:{1} ".format(conn_str, server.socket)
+        if server.has_ssl and use_ssl:
+            if server.ssl_ca is not None:
+                conn_str = "{0} --ssl-ca={1}".format(conn_str, server.ssl_ca)
+            if server.ssl_cert is not None:
+                conn_str = ("{0} --ssl-cert={1}"
+                            ).format(conn_str, server.ssl_cert)
+            if server.ssl_key is not None:
+                conn_str = "{0} --ssl-key={1}".format(conn_str, server.ssl_key)
         return conn_str
 
     @staticmethod
@@ -969,12 +986,16 @@ class System_test(object):
         if server is None:
             raise MUTLibError("Server not initialized!")
         return (server.user, server.passwd, server.host,
-                server.port, server.socket, server.role)
+                server.port, server.socket, server.role,
+                server.ssl_ca, server.ssl_cert, server.ssl_key)
 
-    def build_connection_string(self, server):
+    def build_connection_string(self, server, ssl=False):
         """Return a connection string
 
         server[in]         A Server object
+        ssl[in]            If True and given server has ssl certificates,
+                           the returned string will contain the according
+                           ssl options.
 
         Returns string of the form user:password@host:port
         """
@@ -988,6 +1009,15 @@ class System_test(object):
             conn_str = "{0}@{1}:".format(conn_str, conn_val[2])
         if conn_val[3]:
             conn_str = "{0}{1}".format(conn_str, conn_val[3])
+
+        # Add the ssl options to connection string, if it is required
+        if ssl:
+            if conn_val[6]:
+                conn_str = "{0} --ssl-ca={1}".format(conn_str, conn_val[6])
+            if conn_val[7]:
+                conn_str = "{0} --ssl-cert={1}".format(conn_str, conn_val[7])
+            if conn_val[8]:
+                conn_str = "{0} --ssl-key={1}".format(conn_str, conn_val[8])
 
         return conn_str
 

@@ -67,6 +67,12 @@ Options:
                         set to server1, also generate the transformation for
                         server2. Note: the reverse changes are annotated and
                         marked as comments.
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
 Test case 2 - Use  -a --difftype=unified --format=grid
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.

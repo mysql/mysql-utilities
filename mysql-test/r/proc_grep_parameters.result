@@ -11,7 +11,14 @@ Options:
   --license             display program's license and exit
   --server=SERVER       connection information for the server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>].
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
   --character-set=CHARSET
                         sets the client character set. The default is
                         retrieved from the server variable

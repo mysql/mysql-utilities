@@ -1,0 +1,11 @@
+Test case 1 - indexcheck with ssl connection all tables for a single database: passed
+Test case 2 - basic serverinfo with ssl: passed
+Test case 3 - userclone dump grants with ssl: passed
+Test case 4 - basic dbexport with ssl: passed
+Test case 5 - basic dbimport with ssl: passed
+Test case 6 - basic metagrep with ssl: passed
+Test case 7 - basic procgrep with ssl: passed
+Test case 8 - basic diskusage with ssl: passed
+Test case 9 - basic mysqlfrm with ssl: passed
+Test case 10 - basic mysqldbcopy with ssl: passed
+Test case 11 - basic mysqldiff with ssl: passed

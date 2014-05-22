@@ -12,10 +12,12 @@ Test case 2 - show the help
   --license             display program's license and exit
   --master=MASTER       connection information for master server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>].
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
   --slave=SLAVE         connection information for slave server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>].
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
   --rpl-user=RPL_USER   the user and password for the replication user
                         requirement, in the form: <user>[:<password>] or
                         <login-path>. E.g. rpl:passwd - By default = rpl:rpl
@@ -31,6 +33,12 @@ Test case 2 - show the help
                         start replication from the first event recorded in the
                         binary logging of the master. Not valid with --master-
                         log-file or --master-log-pos.
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.

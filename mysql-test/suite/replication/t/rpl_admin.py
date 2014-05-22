@@ -283,13 +283,15 @@ class test(mutlib.System_test):
                                   "{2}".format(srv.host, srv.port, err))
 
     def reset_topology(self, slaves_list=None, rpl_user='rpl',
-                       rpl_passwd='rpl', master=None):
+                       rpl_passwd='rpl', master=None, ssl=True):
         """Reset topology.
 
         server_list[in]     List with the server instances.
         rpl_user[in]        Replication user. Default=rpl.
         rpl_passwd[in]      Replication password. Default=rpl
         master[in]          Master server instance.
+        ssl[in]             Use the ssl certificates from the master
+                            (default=True).
         """
         if slaves_list:
             slaves = slaves_list
@@ -299,7 +301,10 @@ class test(mutlib.System_test):
         if master is None:
             master = self.server1  # Use server1 as default master.
         self.master_str = " --master={0}".format(
-            self.build_connection_string(master)
+            # Use the ssl certificates from the master, so the rpl user is set
+            # with these certificates in all slaves, and they can connect to
+            # master.
+            self.build_connection_string(master, ssl)
         )
 
         servers = [master]

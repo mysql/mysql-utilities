@@ -180,11 +180,14 @@ def _server_info(server_val, get_defaults=False, options=None):
                 log_file = params_dict[log_tpl.log_name]
 
             # Now get the information about the size of the logs
-            try:
-                params_dict[log_tpl.log_file_size] = "{0} bytes".format(
-                    os.path.getsize(log_file))
 
-            except os.error:
+            try:
+                # Skip 'stderr' occurrences reported by pre-MySQL 5.7 servers
+                if log_file != 'stderr':
+                    params_dict[log_tpl.log_file_size] = "{0} bytes".format(
+                        os.path.getsize(log_file))
+
+            except OSError:
                 # if we are unable to get the log_file_size
                 params_dict[log_tpl.log_file_size] = ''
                 warning_msg = _WARNING_TEMPLATE.format(msg, log_file)
@@ -474,15 +477,20 @@ def show_server_info(servers, options):
         else:
             _show_running_servers()
 
+    ssl_dict = {}
+    ssl_dict['ssl_cert'] = options.get("ssl_cert", None)
+    ssl_dict['ssl_ca'] = options.get("ssl_ca", None)
+    ssl_dict['ssl_key'] = options.get("ssl_key", None)
+
     row_dict_lst = []
     warnings = []
     server_val = {}
     for server in servers:
         new_server = None
         try:
-            test_connect(server, True)
+            test_connect(server, throw_errors=True, ssl_dict=ssl_dict)
         except UtilError as util_error:
-            conn_dict = get_connection_dictionary(server)
+            conn_dict = get_connection_dictionary(server, ssl_dict=ssl_dict)
             server1 = Server(options={'conn_info': conn_dict})
             server_is_off = False
             # If we got errno 2002 it means can not connect through the

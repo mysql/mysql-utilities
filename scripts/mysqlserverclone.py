@@ -35,7 +35,7 @@ from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_basedir_option, add_verbosity,
                                             check_basedir_option,
-                                            setup_common_options)
+                                            get_ssl_dict, setup_common_options)
 from mysql.utilities.common.server import Server
 
 
@@ -184,8 +184,9 @@ if __name__ == '__main__':
 
     # Parse source connection values if we have a running server
     if opt.basedir is None:
+        conn_options = get_ssl_dict(opt)
         try:
-            conn = parse_connection(opt.server)
+            conn = parse_connection(opt.server, options=conn_options)
 
             # Now check for local server
             server = Server({'conn_info': conn})

@@ -184,7 +184,7 @@ class RPLSynchronizer(object):
         defined) and slaves, and set the internal state with the found options
         (to check later).
         """
-         # Get binlog filtering option for the master.
+        # Get binlog filtering option for the master.
         if self._get_master():
             m_filters = self._get_master().get_binlog_exceptions()
             if m_filters:

@@ -43,7 +43,9 @@ from mysql.utilities.common.options import (add_skip_options, add_verbosity,
                                             check_skip_options, add_engines,
                                             add_all, check_all, add_locking,
                                             add_regexp, add_rpl_mode,
-                                            add_rpl_user, setup_common_options,
+                                            add_rpl_user, add_ssl_options,
+                                            get_ssl_dict,
+                                            setup_common_options,
                                             add_character_set_option)
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
@@ -77,14 +79,16 @@ if __name__ == '__main__':
                       type="string", default="root@localhost:3306",
                       help="connection information for source server in the "
                       "form: <user>[:<password>]@<host>[:<port>][:<socket>]"
-                      " or <login-path>[:<port>][:<socket>].")
+                      " or <login-path>[:<port>][:<socket>]"
+                      " or <config-path>[<[group]>].")
 
     # Connection information for the destination server
     parser.add_option("--destination", action="store", dest="destination",
                       type="string",
                       help="connection information for destination server in "
                       "the form: <user>[:<password>]@<host>[:<port>]"
-                      "[:<socket>] or <login-path>[:<port>][:<socket>].")
+                      "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                      " or <config-path>[<[group]>].")
 
     # Add character set option
     add_character_set_option(parser)
@@ -127,6 +131,9 @@ if __name__ == '__main__':
 
     # Add replication options but don't include 'both'
     add_rpl_mode(parser, False, False)
+
+    # Add ssl options
+    add_ssl_options(parser)
 
     # Add option to skip GTID generation
     parser.add_option("--skip-gtid", action="store_true", default=False,
@@ -218,6 +225,8 @@ if __name__ == '__main__':
         "charset": opt.charset,
         "multiprocess": num_cpu if opt.multiprocess == 0 else opt.multiprocess,
     }
+
+    options.update(get_ssl_dict(opt))
 
     # Parse source connection values
     try:

@@ -15,13 +15,21 @@ Options:
   --version             show program's version number and exit
   --help                display a help message and exit
   --license             display program's license and exit
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
   --source=SOURCE       connection information for source server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>].
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
   --destination=DESTINATION
                         connection information for destination server in the
                         form: <user>[:<password>]@<host>[:<port>][:<socket>]
-                        or <login-path>[:<port>][:<socket>].
+                        or <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
   -d, --dump            dump GRANT statements for user - does not require a
                         destination
   --force               drop the new user if it exists

@@ -143,3 +143,6 @@ HOST_IP_WARNING = ("You may be mixing host names and IP addresses. This may "
 ERROR_MIN_SERVER_VERSIONS = ("The {utility} requires server versions greater "
                              "or equal than {min_version}. Server version for "
                              "'{host}:{port}' is not supported.")
+
+PARSE_ERR_SSL_REQ_SERVER = ("Options --ssl-ca, --ssl-cert and --ssl-key "
+                            "requires use of --server.")

@@ -25,6 +25,8 @@ import mutlib
 
 from mysql.utilities.common.server import Server
 from mysql.utilities.exception import UtilError, MUTLibError
+from mutlib.ssl_certs import (CREATE_SSL_USER_2, SSL_CA, SSL_CERT, SSL_KEY,
+                              SSL_OPTS_UTIL, STD_DATA_PATH, ssl_server_opts)
 
 
 class test(mutlib.System_test):
@@ -43,7 +45,7 @@ class test(mutlib.System_test):
         return True
 
     @staticmethod
-    def check_connect(port, name="cloned_server"):
+    def check_connect(port, name="cloned_server", conn_dict=None):
         """Check connection.
 
         port[in]    Server port.
@@ -51,6 +53,9 @@ class test(mutlib.System_test):
         """
         conn = {"user": "root", "passwd": "root", "host": "localhost",
                 "port": port}
+
+        if conn_dict is not None:
+            conn.update(conn_dict)
 
         server_options = {'conn_info': conn, 'role': name, }
         new_server = Server(server_options)
@@ -109,7 +114,7 @@ class test(mutlib.System_test):
                    "basedir".format(test_num))
         self.results.append(comment + "\n")
         full_datadir = os.path.join(os.getcwd(), "temp_{0}".format(port2))
-        cmd_str = "{0}--new-data={1} ".format(cmd_str, full_datadir)
+        cmd_str = "{0} --new-data={1} ".format(cmd_str, full_datadir)
         res = self.exec_util(cmd_str, "start.txt")
         with open("start.txt") as f:
             for line in f:
@@ -121,8 +126,72 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         server = self.check_connect(port2, "cloned_server_basedir")
-
         self.servers.stop_server(server)
+        self.servers.clear_last_port()
+
+        # Test clone server option mysqld with SSL and basedir option
+        # Also Used for next test, clone a running server with SSL
+        test_num += 1
+        comment = ("Test case {0} - clone a server from "
+                   "basedir with SSL".format(test_num))
+        self.results.append(comment + "\n")
+        cmd_str = '{0} --mysqld="{1}"'.format(cmd_str, ssl_server_opts())
+        res = self.exec_util(cmd_str, "start.txt")
+        with open("start.txt") as f:
+            for line in f:
+                # Don't save lines that have [Warning]
+                if "[Warning]" in line:
+                    continue
+                self.results.append(line)
+        if res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        ssl_server = self.check_connect(port2, "cloned_server_basedir")
+        ssl_server.exec_query(CREATE_SSL_USER_2)
+
+        test_num += 1
+        comment = ("Test case {0} - clone a running server with SSL"
+                   ).format(test_num)
+        port3 = int(self.servers.get_next_port())
+        self.results.append(comment + "\n")
+        full_datadir = os.path.join(os.getcwd(), "temp_{0}".format(port3))
+        cmd_str = ("mysqlserverclone.py --server={0} --delete-data "
+                   ).format(self.build_custom_connection_string(ssl_server,
+                                                                "root_ssl",
+                                                                "root_ssl"))
+        cmd_str = "{0} --new-data={1} ".format(cmd_str, full_datadir)
+        cmd_str = ('{0} {1} --new-port={2} --root-password=root --mysqld='
+                   '"{3}"').format(cmd_str,
+                                   SSL_OPTS_UTIL.format(STD_DATA_PATH),
+                                   port3,
+                                   ssl_server_opts())
+        res = self.exec_util(cmd_str, "start.txt")
+        with open("start.txt") as f:
+            for line in f:
+                # Don't save lines that have [Warning]
+                if "[Warning]" in line:
+                    continue
+                self.results.append(line)
+        if res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        new_server = self.check_connect(port3)
+        new_server.exec_query(CREATE_SSL_USER_2)
+
+        conn_ssl = {
+            "user": "root_ssl",
+            "passwd": "root_ssl",
+            "ssl_cert": SSL_CERT.format(STD_DATA_PATH),
+            "ssl_ca": SSL_CA.format(STD_DATA_PATH),
+            "ssl_key": SSL_KEY.format(STD_DATA_PATH),
+        }
+
+        new_server_ssl = self.check_connect(port3, conn_dict=conn_ssl)
+
+        self.servers.stop_server(ssl_server)
+        self.servers.clear_last_port()
+
+        self.servers.stop_server(new_server_ssl)
         self.servers.clear_last_port()
 
         self.replace_result("# Cloning the MySQL server running on",

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,11 +35,11 @@ import re
 from mysql.utilities.command import dbimport
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.messages import WARN_OPT_ONLY_USED_WITH
-from mysql.utilities.common.options import (setup_common_options, add_engines,
-                                            add_skip_options, check_verbosity,
-                                            add_verbosity, check_skip_options,
-                                            add_format_option,
-                                            add_character_set_option)
+from mysql.utilities.common.options import (
+    add_character_set_option, add_engines, add_format_option, add_skip_options,
+    add_verbosity, check_skip_options, check_verbosity, get_ssl_dict,
+    setup_common_options
+)
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.tools import (check_connector_python,
                                           print_elapsed_time)
@@ -240,6 +240,7 @@ if __name__ == '__main__':
 
     # Parse server connection values
     try:
+        options.update(get_ssl_dict(opt))
         server_values = parse_connection(opt.server, None, options)
     except FormatError:
         _, err, _ = sys.exc_info()

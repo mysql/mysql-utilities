@@ -42,7 +42,8 @@ from mysql.utilities.common.messages import (PARSE_ERR_DB_OBJ_MISSING,
 from mysql.utilities.common.options import (add_difftype, add_verbosity,
                                             check_verbosity, add_changes_for,
                                             add_reverse, setup_common_options,
-                                            add_character_set_option)
+                                            add_character_set_option,
+                                            get_ssl_dict)
 
 
 # Constants
@@ -60,21 +61,24 @@ if not check_connector_python():
 if __name__ == '__main__':
     # Setup the command parser
     parser = setup_common_options(os.path.basename(sys.argv[0]),
-                                  DESCRIPTION, USAGE, False, False)
+                                  DESCRIPTION, USAGE, False, False,
+                                  add_ssl=True)
 
     # Connection information for the source server
     parser.add_option("--server1", action="store", dest="server1",
                       type="string", default="root@localhost:3306",
                       help="connection information for first server in the "
                            "form: <user>[:<password>]@<host>[:<port>]"
-                           "[:<socket>] or <login-path>[:<port>][:<socket>].")
+                           "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                           " or <config-path>[<[group]>].")
 
     # Connection information for the destination server
     parser.add_option("--server2", action="store", dest="server2",
                       type="string", default=None,
                       help="connection information for second server in the "
                            "form: <user>[:<password>]@<host>[:<port>]"
-                           "[:<socket>] or <login-path>[:<port>][:<socket>].")
+                           "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                           " or <config-path>[<[group]>].")
 
     # Add character set option
     add_character_set_option(parser)
@@ -129,6 +133,9 @@ if __name__ == '__main__':
         "compact": opt.compact,
         "charset": opt.charset,
     }
+
+    # add ssl options values.
+    options.update(get_ssl_dict(opt))
 
     # Parse server connection values
     try:

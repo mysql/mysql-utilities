@@ -37,8 +37,9 @@ from mysql.utilities.common.messages import (
     PARSE_ERR_OPTS_REQ
 )
 from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import (add_verbosity, add_rpl_user,
-                                            add_format_option)
+from mysql.utilities.common.options import (add_format_option, add_verbosity,
+                                            add_rpl_user, add_ssl_options,
+                                            get_ssl_dict)
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
@@ -153,14 +154,16 @@ if __name__ == '__main__':
                       type="string", default=None,
                       help="connection information for slave server in "
                       "the form: <user>[:<password>]@<host>[:<port>]"
-                      "[:<socket>] or <login-path>[:<port>][:<socket>].")
+                      "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                      " or <config-path>[<[group]>]")
 
     # Connection information for the masters servers
     parser.add_option("--masters", action="store", dest="masters",
                       type="string", default=None, help="connection "
                       "information for master servers in the form: "
                       "<user>[:<password>]@<host>[:<port>][:<socket>] or "
-                      "<login-path>[:<port>][:<socket>]. List multiple master "
+                      "<login-path>[:<port>][:<socket>]"
+                      " or <config-path>[<[group]>]. List multiple master "
                       "in comma-separated list.")
 
     # Replication user and password
@@ -204,6 +207,9 @@ if __name__ == '__main__':
                       type="int", help="specify maximum age of log entries in "
                       "days. Entries older than this will be purged on "
                       "startup. Default = 7 days.")
+
+    # Add ssl options
+    add_ssl_options(parser)
 
     # Add verbosity
     add_verbosity(parser)
@@ -349,6 +355,9 @@ if __name__ == '__main__':
         "logging": opt.log_file is not None,
         "log_file": opt.log_file,
     }
+
+    # Add ssl values to options instead of connection.
+    options.update(get_ssl_dict(opt))
 
     try:
         start_ms_replication(slave_vals, masters_vals, options)

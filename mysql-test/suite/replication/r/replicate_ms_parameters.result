@@ -10,11 +10,13 @@ Test case 1 - show help
                         60 seconds. Lowest value is 30 seconds.
   --slave=SLAVE         connection information for slave server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>].
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>]
   --masters=MASTERS     connection information for master servers in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>]. List multiple master
-                        in comma-separated list.
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>]. List multiple master in comma-
+                        separated list.
   --rpl-user=RPL_USER   the user and password for the replication user
                         requirement, in the form: <user>[:<password>] or
                         <login-path>. E.g. rpl:passwd - By default = rpl:rpl
@@ -35,6 +37,12 @@ Test case 1 - show help
   --log-age=LOG_AGE     specify maximum age of log entries in days. Entries
                         older than this will be purged on startup. Default = 7
                         days.
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.

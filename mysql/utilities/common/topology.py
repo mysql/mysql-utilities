@@ -387,7 +387,10 @@ class Topology(Replication):
                     conn_dict = {
                         'conn_info': {'user': user, 'passwd': password,
                                       'host': host, 'port': port,
-                                      'socket': None},
+                                      'socket': None,
+                                      'ssl_ca': self.master.ssl_ca,
+                                      'ssl_cert': self.master.ssl_cert,
+                                      'ssl_key': self.master.ssl_key},
                         'role': slave,
                         'verbose': self.options.get("verbosity", 0) > 0,
                     }
@@ -516,7 +519,7 @@ class Topology(Replication):
             if self.force and candidate_ok[1] == "RPL_USER":
                 user, passwd = slave.get_rpl_user()
                 res = candidate.create_rpl_user(slave.host, slave.port,
-                                                user, passwd)
+                                                user, passwd, self.ssl)
                 if not res[0]:
                     print("# ERROR: {0}".format(res[1]))
                     self._report(res[1], logging.CRITICAL, False)
@@ -1774,10 +1777,9 @@ class Topology(Replication):
 
         if self.verbose:
             self._report("# Creating replication user if it does not exist.")
-
         res = m_candidate.create_rpl_user(m_candidate.host,
                                           m_candidate.port,
-                                          user, passwd)
+                                          user, passwd, ssl=self.ssl)
         if not res[0]:
             print("# ERROR: {0}".format(res[1]))
             self._report(res[1], logging.CRITICAL, False)
@@ -1878,6 +1880,24 @@ class Topology(Replication):
             'Master_Log_File': new_master_info[0],
             'Read_Master_Log_Pos': new_master_info[1],
         }
+
+        # Use the options SSL certificates if defined,
+        # else use the master SSL certificates if defined.
+        if self.ssl:
+            master_values['Master_SSL_Allowed'] = 1
+            if self.ssl_ca:
+                master_values['Master_SSL_CA_File'] = self.ssl_ca
+            if self.ssl_cert:
+                master_values['Master_SSL_Cert'] = self.ssl_cert
+            if self.ssl_key:
+                master_values['Master_SSL_Key'] = self.ssl_key
+
+        elif m_candidate.has_ssl:
+            master_values['Master_SSL_Allowed'] = 1
+            master_values['Master_SSL_CA_File'] = m_candidate.ssl_ca
+            master_values['Master_SSL_Cert'] = m_candidate.ssl_cert
+            master_values['Master_SSL_Key'] = m_candidate.ssl_key
+
         for slave_dict in self.slaves:
             slave = slave_dict['instance']
             # skip dead or zombie slaves
@@ -2109,7 +2129,8 @@ class Topology(Replication):
 
         # Need Master class instance to check master and replication user
         self.master = self._change_role(new_master, False)
-        res = self.master.create_rpl_user(host, port, user, passwd)
+        res = self.master.create_rpl_user(host, port, user, passwd,
+                                          ssl=self.ssl)
         if not res[0]:
             print("# ERROR: {0}".format(res[1]))
             self._report(res[1], logging.CRITICAL, False)

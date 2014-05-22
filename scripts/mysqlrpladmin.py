@@ -38,8 +38,10 @@ from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.topology import parse_topology_connections
 from mysql.utilities.common.options import (add_format_option, add_verbosity,
                                             add_failover_options, add_rpl_user,
+                                            add_ssl_options,
                                             CaseInsensitiveChoicesOption,
                                             check_server_lists,
+                                            get_ssl_dict,
                                             license_callback, UtilitiesParser)
 from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
                                              PARSE_ERR_OPTS_REQ_BY_CMD,
@@ -104,7 +106,8 @@ if __name__ == '__main__':
                       help="connection information for the slave to be used to"
                            " replace the master for switchover, in the form: "
                            "<user>[:<password>]@<host>[:<port>][:<socket>] or "
-                           "<login-path>[:<port>][:<socket>]. Valid only with "
+                           "<login-path>[:<port>][:<socket>] or "
+                           "<config-path>[<[group]>]. Valid only with "
                            "switchover command.")
 
     # Force the execution of the command, ignoring some errors
@@ -131,6 +134,9 @@ if __name__ == '__main__':
 
     # Replication user and password
     add_rpl_user(parser, None)
+
+    # Add ssl options
+    add_ssl_options(parser)
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
@@ -327,6 +333,9 @@ if __name__ == '__main__':
         'rpl_user': opt.rpl_user,
         'script_threshold': opt.script_threshold,
     }
+
+    # Add ssl options to options instead of connection.
+    options.update(get_ssl_dict(opt))
 
     # If command = HEALTH, turn on --force
     if command == 'health' or command == 'gtid':

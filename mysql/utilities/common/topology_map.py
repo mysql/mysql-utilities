@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,6 +95,16 @@ class TopologyMap(object):
             'version': "5.0.0",
             'unique': True,
         }
+
+        certs_paths = {}
+        if 'ssl_ca' in dir(conn) and conn.ssl_ca is not None:
+            certs_paths['ssl_ca'] = conn.ssl_ca
+        if 'ssl_cert' in dir(conn) and conn.ssl_cert is not None:
+            certs_paths['ssl_cert'] = conn.ssl_cert
+        if 'ssl_key' in dir(conn) and conn.ssl_key is not None:
+            certs_paths['ssl_key'] = conn.ssl_key
+
+        conn_options.update(certs_paths)
 
         master_info = "%s:%s" % (conn['host'],
                                  conn['port'])

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -74,6 +74,16 @@ def check_replication(master_vals, slave_vals, options):
         'version': "5.0.0",
         'unique': True,
     }
+
+    certs_paths = {}
+    if 'ssl_ca' in dir(options) and options.ssl_ca is not None:
+        certs_paths['ssl_ca'] = options.ssl_ca
+    if 'ssl_cert' in dir(options) and options.ssl_cert is not None:
+        certs_paths['ssl_cert'] = options.ssl_cert
+    if 'ssl_key' in dir(options) and options.ssl_key is not None:
+        certs_paths['ssl_key'] = options.ssl_key
+    conn_options.update(certs_paths)
+
     servers = connect_servers(master_vals, slave_vals, conn_options)
 
     rpl_options = options.copy()

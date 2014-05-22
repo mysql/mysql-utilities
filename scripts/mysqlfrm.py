@@ -40,7 +40,8 @@ from mysql.utilities.command.read_frm import (read_frm_files,
                                               read_frm_files_diagnostic)
 from mysql.utilities.common.options import CaseInsensitiveChoicesOption
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.options import (add_verbosity, license_callback,
+from mysql.utilities.common.options import (add_ssl_options, add_verbosity,
+                                            get_ssl_dict, license_callback,
                                             UtilitiesParser)
 from mysql.utilities.common.server import connect_servers
 
@@ -250,6 +251,9 @@ if __name__ == '__main__':
     # Add verbosity mode
     add_verbosity(parser, True)
 
+    # Add ssl options
+    add_ssl_options(parser)
+
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
 
@@ -322,7 +326,8 @@ if __name__ == '__main__':
     # Parse source connection values if --server provided
     if opt.server is not None and not opt.basedir:
         try:
-            source_values = parse_connection(opt.server, None, {})
+            ssl_opts = get_ssl_dict(opt)
+            source_values = parse_connection(opt.server, None, ssl_opts)
         except FormatError as err:
             parser.error("Source connection values invalid: %s." % err)
         except UtilError as err:

@@ -312,6 +312,15 @@ def negotiate_rpl_connection(server, is_master=True, strict=True,
                 'Read_Master_Log_Pos': res[0][1],
             }
 
+            if master.has_ssl:
+                master_values['Master_SSL_Allowed'] = 1
+                if master.ssl_ca:
+                    master_values['Master_SSL_CA_File'] = master.ssl_ca
+                if master.ssl_cert:
+                    master_values['Master_SSL_Cert'] = master.ssl_cert
+                if master.ssl_key:
+                    master_values['Master_SSL_Key'] = master.ssl_key
+
     # Use slave class to get change master command
     slave = Slave(new_opts)
     slave.connect()
@@ -373,6 +382,12 @@ class Replication(object):
         self.master_log_file = options.get("master_log_file", None)
         self.master_log_pos = options.get("master_log_pos", 0)
         self.from_beginning = options.get("from_beginning", False)
+        self.ssl_ca = options.get("ssl_ca", None)
+        self.ssl_cert = options.get("ssl_cert", None)
+        self.ssl_key = options.get("ssl_key", None)
+        self.ssl = False
+        if self.ssl_ca or self.ssl_cert or self.ssl_key:
+            self.ssl = True
         self.master = master
         self.slave = slave
         self.replicating = False
@@ -639,8 +654,11 @@ class Replication(object):
 
         Returns bool - True = success, False = errors
         """
+        ssl = False
+        if self.ssl:
+            ssl = True
         return self.master.create_rpl_user(self.slave.host, self.slave.port,
-                                           r_user, r_pass, self.verbosity)
+                                           r_user, r_pass, self.verbosity, ssl)
 
     def setup(self, rpl_user, num_tries):
         """Setup replication among a slave and master.
@@ -716,6 +734,24 @@ class Replication(object):
             'Master_Log_File': self.master_log_file,
             'Read_Master_Log_Pos': self.master_log_pos,
         }
+
+        # Use the options SSL certificates if defined,
+        # else use the master SSL certificates if defined.
+        if self.ssl:
+            master_values['Master_SSL_Allowed'] = 1
+            if self.ssl_ca:
+                master_values['Master_SSL_CA_File'] = self.ssl_ca
+            if self.ssl_cert:
+                master_values['Master_SSL_Cert'] = self.ssl_cert
+            if self.ssl_key:
+                master_values['Master_SSL_Key'] = self.ssl_key
+
+        elif self.master.has_ssl:
+            master_values['Master_SSL_Allowed'] = 1
+            master_values['Master_SSL_CA_File'] = self.master.ssl_ca
+            master_values['Master_SSL_Cert'] = self.master.ssl_cert
+            master_values['Master_SSL_Key'] = self.master.ssl_key
+
         change_master = self.slave.make_change_master(self.from_beginning,
                                                       master_values)
         res = self.slave.exec_query(change_master, self.query_options)
@@ -911,7 +947,8 @@ class Master(Server):
             options = {}
         return self.exec_query(_RPL_USER_QUERY, options)
 
-    def create_rpl_user(self, host, port, r_user, r_pass=None, verbosity=0):
+    def create_rpl_user(self, host, port, r_user, r_pass=None, verbosity=0,
+                        ssl=False):
         """Create the replication user and grant privileges
 
         If the user exists, check privileges and add privileges as needed.
@@ -922,6 +959,8 @@ class Master(Server):
         r_pass[in]     password for user to create (optional)
         verbosity[in]  verbosity of output
                        Default = 0
+        ssl[in]        If True the grant will include 'REQUIRE SSL'
+                       (Default False).
 
         Returns tuple (bool, str) - (True, None) = success,
                                     (False, <error>) = error
@@ -940,6 +979,9 @@ class Master(Server):
                         (r_user, host)
             if r_pass:
                 query_str += "IDENTIFIED BY '%s'" % r_pass
+
+            if ssl:
+                query_str = "{0} {1}".format(query_str, " REQUIRE SSL")
             try:
                 self.exec_query(query_str)
             except UtilError:
@@ -1048,12 +1090,15 @@ class Master(Server):
         if not res == []:
             # Sort for conformity
             res.sort()  # pylint: disable=E1103
+
             for row in res:
                 info = _get_slave_info(row[1], row[2])
                 conn_dict = {
                     'conn_info': {'user': user, 'passwd': password,
                                   'host': row[1], 'port': row[2],
-                                  'socket': None},
+                                  'socket': None, 'ssl_ca': self.ssl_ca,
+                                  'ssl_cert': self.ssl_cert,
+                                  'ssl_key': self.ssl_key},
                     'role': 'slave',
                     'verbose': self.options.get("verbosity", 0) > 0,
                 }
@@ -1940,6 +1985,10 @@ class Slave(Server):
             master_passwd = master_values['Master_Password']
             master_log_file = master_values['Master_Log_File']
             master_log_pos = master_values['Read_Master_Log_Pos']
+            master_ssl = master_values.get('Master_SSL_Allowed', None)
+            master_ssl_ca = master_values.get('Master_SSL_CA_File', None)
+            master_ssl_cert = master_values.get('Master_SSL_Cert', None)
+            master_ssl_key = master_values.get('Master_SSL_Key', None)
         else:
             master_host = master_values.get('Master_Host',
                                             master_info['Master_Host'])
@@ -1953,7 +2002,24 @@ class Slave(Server):
                                                 master_info['Master_Log_File'])
             master_log_pos = master_values.get(
                 'Read_Master_Log_Pos',
-                master_info['Read_Master_Log_Pos'])
+                master_info['Read_Master_Log_Pos']
+            )
+            master_ssl = master_values.get(
+                'Master_SSL_Allowed',
+                master_info['Master_SSL_Allowed']
+            )
+            master_ssl_ca = master_values.get(
+                'Master_SSL_CA_File',
+                master_info['Master_SSL_CA_File']
+            )
+            master_ssl_cert = master_values.get(
+                'Master_SSL_Cert',
+                master_info['Master_SSL_Cert']
+            )
+            master_ssl_key = master_values.get(
+                'Master_SSL_Key',
+                master_info['Master_SSL_Key']
+            )
 
         change_master = "CHANGE MASTER TO MASTER_HOST = '%s', " % master_host
         if master_user:
@@ -1963,6 +2029,17 @@ class Slave(Server):
         if master_passwd is not None:
             change_master += "MASTER_PASSWORD = '%s', " % master_passwd
         change_master += "MASTER_PORT = %s" % master_port
+        if master_ssl:
+            change_master = "{0}, MASTER_SSL = {1}".format(change_master, 1)
+        if master_ssl_ca:
+            change_master = ("{0}, MASTER_SSL_CA = '{1}'"
+                             ).format(change_master, master_ssl_ca)
+        if master_ssl_cert:
+            change_master = ("{0}, MASTER_SSL_CERT = '{1}'"
+                             ).format(change_master, master_ssl_cert)
+        if master_ssl_key:
+            change_master = ("{0}, MASTER_SSL_KEY = '{1}'"
+                             ).format(change_master, master_ssl_key)
         if self.supports_gtid() == "ON":
             change_master += ", MASTER_AUTO_POSITION=1"
         elif not from_beginning:
@@ -2152,6 +2229,14 @@ class Slave(Server):
             'Master_Log_File': master_log_file,
             'Read_Master_Log_Pos': master_log_pos,
         }
+        if master.has_ssl:
+            master_values['Master_SSL_Allowed'] = 1
+            if master.ssl_ca:
+                master_values['Master_SSL_CA_File'] = master.ssl_ca
+            if master.ssl_cert:
+                master_values['Master_SSL_Cert'] = master.ssl_cert
+            if master.ssl_key:
+                master_values['Master_SSL_Key'] = master.ssl_key
         change_master = self.make_change_master(from_beginning, master_values)
         if show_command:
             print "# Change master command for %s:%s" % (self.host, self.port)

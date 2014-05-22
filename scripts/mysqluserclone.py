@@ -38,6 +38,7 @@ from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
                                              WARN_OPT_NOT_REQUIRED)
 from mysql.utilities.common.options import (add_format_option, add_verbosity,
                                             check_verbosity,
+                                            get_ssl_dict,
                                             setup_common_options)
 
 
@@ -56,7 +57,8 @@ if not check_connector_python():
 if __name__ == '__main__':
     # Setup the command parser
     parser = setup_common_options(os.path.basename(sys.argv[0]),
-                                  DESCRIPTION, USAGE, True, False)
+                                  DESCRIPTION, USAGE, True, False,
+                                  add_ssl=True)
 
     # Setup utility-specific options:
 
@@ -65,14 +67,16 @@ if __name__ == '__main__':
                       type="string", default=None,
                       help="connection information for source server in "
                            "the form: <user>[:<password>]@<host>[:<port>]"
-                           "[:<socket>] or <login-path>[:<port>][:<socket>].")
+                           "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                           " or <config-path>[<[group]>].")
 
     # Connection information for the destination server
     parser.add_option("--destination", action="store", dest="destination",
                       type="string",
                       help="connection information for destination server in "
                            "the form: <user>[:<password>]@<host>[:<port>]"
-                           "[:<socket>] or <login-path>[:<port>][:<socket>].")
+                           "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                           " or <config-path>[<[group]>].")
 
     # Dump mode
     parser.add_option("-d", "--dump", action="store_true",
@@ -176,6 +180,9 @@ if __name__ == '__main__':
             "verbosity": opt.verbosity,
             "global_privs": opt.global_privs
         }
+
+        # test ssl options and add them to options instead of connection.
+        options.update(get_ssl_dict(opt))
 
         try:
             res = userclone.clone_user(source_values, dest_values, base_user,

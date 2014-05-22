@@ -39,11 +39,13 @@ Options:
   --license             display program's license and exit
   --source=SOURCE       connection information for source server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>].
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
   --destination=DESTINATION
                         connection information for destination server in the
                         form: <user>[:<password>]@<host>[:<port>][:<socket>]
-                        or <login-path>[:<port>][:<socket>].
+                        or <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
   --character-set=CHARSET
                         sets the client character set. The default is
                         retrieved from the server variable
@@ -87,6 +89,12 @@ Options:
                         server as the master, 'slave' = include the CHANGE
                         MASTER command for the source server's master (only
                         works if the source server is a slave).
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
   --skip-gtid           skip creation and execution of GTID statements during
                         copy.
   --multiprocess=MULTIPROCESS

@@ -38,7 +38,9 @@ from mysql.utilities.command.audit_log import (AuditLog,
                                                command_requires_value,
                                                command_requires_log_name,
                                                command_requires_server)
-from mysql.utilities.common.options import (add_verbosity, UtilitiesParser,
+from mysql.utilities.common.messages import PARSE_ERR_SSL_REQ_SERVER
+from mysql.utilities.common.options import (add_ssl_options, add_verbosity,
+                                            UtilitiesParser,
                                             CaseInsensitiveChoicesOption,
                                             license_callback)
 from mysql.utilities.common.tools import (check_connector_python,
@@ -89,7 +91,8 @@ if __name__ == '__main__':
                       type="string", default=None,
                       help="connection information for the server in the "
                            "form: <user>[:<password>]@<host>[:<port>]"
-                           "[:<socket>] or <login-path>[:<port>][:<socket>].")
+                           "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                           " or <config-path>[<[group]>].")
 
     # Audit Log name (full path)
     parser.add_option("--audit-log-name", action="store", dest="log_name",
@@ -127,6 +130,9 @@ if __name__ == '__main__':
                       help="value used to set variables based "
                            "on the command specified. See --help for list per "
                            "command.")
+
+    # Add ssl options
+    add_ssl_options(parser)
 
     # Add verbosity mode
     add_verbosity(parser, False)
@@ -188,6 +194,10 @@ if __name__ == '__main__':
                          and not command_requires_log_name(command)):
         parser.error("The --audit-log-name option requires --file-stats "
                      "and/or a valid command.")
+
+    # ssl option requires server
+    if not opt.server and (opt.ssl_ca or opt.ssl_cert or opt.ssl_key):
+        parser.error(PARSE_ERR_SSL_REQ_SERVER)
 
     # Attempt to parse the --server option
     server_values = None

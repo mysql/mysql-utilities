@@ -31,6 +31,7 @@ from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.common.my_print_defaults import (MyDefaultsReader,
                                                       my_login_config_exists,
                                                       my_login_config_path)
+from mysql.utilities.common.options_parser import MySQLOptionsParser
 
 
 log = logging.getLogger('ip_parser')
@@ -68,6 +69,12 @@ _CONN_LOGINPATH = re.compile(
     r"((?:\\\"|[^:])+|(?:\\\'|[^:])+)"  # login-path
     r"(?:\:(\d+))?"                     # Optional port number
     r"(?:\:([\/\\w+.\w+.\-]+))?"        # Optional path to socket
+)
+
+_CONN_CONFIGPATH = re.compile(
+    r"([\w\:]+(?:\\\"|[^[])+|(?:\\\'|[^[])+)"  # config-path
+    r"(?:\[([^]]+))?",                         # group
+    re.U
 )
 
 _CONN_ANY_HOST = re.compile(
@@ -202,6 +209,60 @@ def hostname_is_ip(hostname):
     return True
 
 
+def handle_config_path(config_path, group=None, use_default=True):
+    """Retrieve the data associated to the given group.
+
+    config_path[in]    the path to the configuration file.
+    group[in]          The group name to retrieve the data from, if None
+                       the 'client' group will be use if found and if
+                       use_default is True.
+    use_default[in]    Use the default 'client' group name, True by default,
+                       used if no group is given.
+
+    Returns a dictionary with the options data.
+    """
+    # first verify if the configuration file exist on the given config_path
+    # check config_path as near file as normalized path, then
+    # at the default location file.
+
+    if os.name == 'nt':
+        default_loc = os.path.join('c:\\', config_path)
+    else:
+        default_loc = os.path.join('/etc/mysql/', config_path)
+
+    # default group
+    default_group = 'client'
+    # first look at the given path, if not found look at the default location
+    paths = [os.path.normpath(config_path), os.path.normpath(default_loc)]
+    req_group = group
+    # if not group is given use default.
+    if not req_group and use_default:
+        req_group = default_group
+    for file_loc in paths:
+        if os.path.exists(file_loc) and os.path.isfile(file_loc):
+            opt_par = MySQLOptionsParser(file_loc)
+            dict_grp = opt_par.get_groups_as_dict(req_group)
+            if dict_grp:
+                return dict_grp[req_group]
+            else:
+                if group:
+                    raise UtilError("The given group: '{0}' was not found on "
+                                    "the configuration file '{1}'"
+                                    "".format(group, file_loc))
+                else:
+                    raise UtilError("The default group: '{0}' was not found "
+                                    "on the configuration file: '{1}'"
+                                    "".format(req_group, file_loc))
+
+    # No configuration file was found
+    if paths[0] != paths[1]:
+        raise UtilError('Could not find a configuration file neither in the '
+                        'given path: {0} nor the default path:{1}.'
+                        ''.format(*paths))
+    raise UtilError('Could not find a configuration file neither in the given '
+                    'path: {0}.'.format(paths[0]))
+
+
 def parse_connection(connection_values, my_defaults_reader=None, options=None):
     """Parse connection values.
 
@@ -252,43 +313,125 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
             raise FormatError(_BAD_CONN_FORMAT.format(connection_values))
         return grp.groups()
 
+    # SSL options, must not be overwritten with those from options.
+    ssl_ca = None
+    ssl_cert = None
+    ssl_key = None
+
     # Split on the '@' to determine the connection string format.
     # The user/password may have the '@' character, split by last occurrence.
     conn_format = connection_values.rsplit('@', 1)
 
     if len(conn_format) == 1:
-        # No '@' then handle has in the format: login-path[:port][:socket]
-        login_path, port, socket = _match(_CONN_LOGINPATH, conn_format[0])
+        # No '@' so try config-path and login-path
 
-        #Check if the login configuration file (.mylogin.cnf) exists
-        if login_path and not my_login_config_exists():
-            raise UtilError(".mylogin.cnf was not found at is default "
-                            "location: %s."
-                            "Please configure your login-path data before "
-                            "using it (use the mysql_config_editor tool)."
-                            % my_login_config_path())
+        # The config_path and login-path collide on their first element and
+        # only differs on their secondary optional values.
+        # 1. Try match config_path and his optional value group. If both
+        #    matches and the connection data can be retrieved, return the data.
+        #    If errors occurs in this step raise them immediately.
+        # 2. If config_path matches but group does not, and connection data
+        #    can not be retrieved, do not raise errors and try to math
+        #    login_path on step 4.
+        # 3. If connection data is retrieved on step 2, then try login_path on
+        #    next step to overwrite values from the new configuration.
+        # 4. If login_path matches, check is .mylogin.cnf exists, if it doesn't
+        #    and data configuration was found verify it  for missing values and
+        #    continue if they are not any missing.
+        # 5. If .mylogin.cnf exists and data configuration is found, overwrite
+        #    any previews value from config_path if there is any.
+        # 6. If login_path matches a secondary value but the configuration data
+        #    could not be retrieved, do not continue and raise any error.
+        # 7. In case errors have occurred trying to get data from config_path,
+        #    and group did not matched, and in addition no secondary value,
+        #    matched from login_path (port of socket) mention that config_path
+        #    and login_path were not able to retrieve the connection data.
 
-        # If needed, create a MyDefaultsReader and search for my_print_defaults
-        # tool.
-        if not my_defaults_reader:
-            my_defaults_reader = MyDefaultsReader(options)
-        elif not my_defaults_reader.tool_path:
-            my_defaults_reader.search_my_print_defaults_tool()
+        # try login_path and overwrite the values.
+        # Handle the format: config-path[[group]]
+        config_path, group = _match(_CONN_CONFIGPATH, conn_format[0])
+        port = None
+        socket = None
+        config_path_data = None
+        login_path_data = None
+        config_path_err_msg = None
+        login_path = None
+        if config_path:
+            try:
+                # If errors occurs, and group matched: raise any errors as the
+                # group is exclusive of config_path.
+                config_path_data = handle_config_path(config_path, group)
+            except UtilError as err:
+                if group:
+                    raise
+                else:
+                    config_path_err_msg = err.errmsg
 
-        # Check if the my_print_default tool is able to read a login-path from
-        # the mylogin configuration file
-        if not my_defaults_reader.check_login_path_support():
-            raise UtilError("the used my_print_defaults tool does not "
-                            "support login-path options: %s. "
-                            "Please confirm that the location to a tool with "
-                            "login-path support is included in the PATH "
-                            "(at the beginning)."
-                            % my_defaults_reader.tool_path)
+        if group is None:
+            # the conn_format can still be a login_path so continue
+            # No '@' then handle has in the format: login-path[:port][:socket]
+            login_path, port, socket = _match(_CONN_LOGINPATH, conn_format[0])
 
-        # Read and parse the login-path data (i.e., user, password and host)
-        login_path_data = my_defaults_reader.get_group_data(login_path)
+            # Check if the login configuration file (.mylogin.cnf) exists
+            if login_path and not my_login_config_exists():
+                if not config_path_data:
+                    util_err_msg = (".mylogin.cnf was not found at is default "
+                                    "location: {0}. Please configure your "
+                                    "login-path data before using it (use the "
+                                    "mysql_config_editor tool)."
+                                    "".format(my_login_config_path()))
+                    if config_path_err_msg and not (port or socket):
+                        util_err_msg = ("{0} In addition, {1}"
+                                        "").format(util_err_msg.errmsg,
+                                                   config_path_err_msg)
+                    raise UtilError(util_err_msg)
 
-        if login_path_data:
+            else:
+                # If needed, create a MyDefaultsReader and search for
+                # my_print_defaults tool.
+                if not my_defaults_reader:
+                    try:
+                        my_defaults_reader = MyDefaultsReader(options)
+                    except UtilError as util_err_msg:
+                        if config_path_err_msg and not (port or socket):
+                            util_err_msg = ("{0} In addition, {1}"
+                                            "").format(util_err_msg.errmsg,
+                                                       config_path_err_msg)
+                            raise UtilError(util_err_msg)
+                        else:
+                            raise
+
+                elif not my_defaults_reader.tool_path:
+                    my_defaults_reader.search_my_print_defaults_tool()
+
+                # Check if the my_print_default tool is able to read a
+                # login-path from the mylogin configuration file
+                if not my_defaults_reader.check_login_path_support():
+                    util_err_msg = ("the used my_print_defaults tool does not "
+                                    "support login-path options: {0}. "
+                                    "Please confirm that the location to a "
+                                    "tool with login-path support is included "
+                                    "in the PATH (at the beginning)."
+                                    "".format(my_defaults_reader.tool_path))
+                    if config_path_err_msg and not (port or socket):
+                        util_err_msg = ("{0} In addition, {1}"
+                                        "").format(util_err_msg,
+                                                   config_path_err_msg)
+                    raise UtilError(util_err_msg)
+
+                # Read and parse the login-path data (i.e., user, password and
+                # host)
+                login_path_data = my_defaults_reader.get_group_data(login_path)
+
+        if config_path_data or login_path_data:
+            if config_path_data:
+                if not login_path_data:
+                    login_path_data = config_path_data
+                else:
+                    # Overwrite values from login_path_data
+                    config_path_data.update(login_path_data)
+                    login_path_data = config_path_data
+
             user = login_path_data.get('user', None)
             passwd = login_path_data.get('password', None)
             host = login_path_data.get('host', None)
@@ -327,10 +470,28 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                 pluralize = "s" if len(missing_options) > 1 else ""
                 raise UtilError("Missing connection value{0} for "
                                 "{1} option{0}".format(pluralize, message))
+
+            # optional options, available only on config_path_data
+            if config_path_data:
+                ssl_ca = config_path_data.get('ssl-ca', None)
+                ssl_cert = config_path_data.get('ssl-cert', None)
+                ssl_key = config_path_data.get('ssl-key', None)
+
         else:
-            raise UtilError("No login credentials found for login-path: %s. "
-                            "Please review the used connection string: %s"
-                            % (login_path, connection_values))
+            if login_path and not config_path:
+                raise UtilError("No login credentials found for login-path: "
+                                "{0}. Please review the used connection string"
+                                ": {1}".format(login_path, connection_values))
+            elif not login_path and config_path:
+                raise UtilError("No login credentials found for config-path: "
+                                "{0}. Please review the used connection string"
+                                ": {1}".format(login_path, connection_values))
+            elif login_path and config_path:
+                raise UtilError("No login credentials found for either "
+                                "login-path: '{0}' nor config-path: '{1}'. "
+                                "Please review the used connection string: {2}"
+                                "".format(login_path, config_path,
+                                          connection_values))
 
     elif len(conn_format) == 2:
 
@@ -369,12 +530,32 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
     # Get character-set from options
     if isinstance(options, dict):
         charset = options.get("charset", None)
+        # If one SSL option was found before, not mix with those in options.
+        if not ssl_cert and not ssl_ca and not ssl_key:
+            ssl_cert = options.get("ssl_cert", None)
+            ssl_ca = options.get("ssl_ca", None)
+            ssl_key = options.get("ssl_key", None)
+
     else:
         # options is an instance of optparse.Values
         try:
             charset = options.charset  # pylint: disable=E1103
         except AttributeError:
             charset = None
+        # If one SSL option was found before, not mix with those in options.
+        if not ssl_cert and not ssl_ca and not ssl_key:
+            try:
+                ssl_cert = options.ssl_cert  # pylint: disable=E1103
+            except AttributeError:
+                ssl_cert = None
+            try:
+                ssl_ca = options.ssl_ca  # pylint: disable=E1103
+            except AttributeError:
+                ssl_ca = None
+            try:
+                ssl_key = options.ssl_key  # pylint: disable=E1103
+            except AttributeError:
+                ssl_key = None
 
     # Set parsed connection values
     connection = {
@@ -386,7 +567,12 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
 
     if charset:
         connection["charset"] = charset
-
+    if ssl_cert:
+        connection["ssl_cert"] = ssl_cert
+    if ssl_ca:
+        connection["ssl_ca"] = ssl_ca
+    if ssl_key:
+        connection["ssl_key"] = ssl_key
     # Handle optional parameters. They are only stored in the dict if
     # they were provided in the specifier.
     if socket is not None and os.name == "posix":

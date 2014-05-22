@@ -36,7 +36,7 @@ from mysql.utilities.command import indexcheck
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_verbosity, add_format_option,
-                                            setup_common_options)
+                                            get_ssl_dict, setup_common_options)
 
 
 # Constants
@@ -106,7 +106,8 @@ if __name__ == '__main__':
 
     # Parse source connection values
     try:
-        source_values = parse_connection(opt.server)
+        conn_options = get_ssl_dict(opt)
+        source_values = parse_connection(opt.server, options=conn_options)
     except FormatError:
         _, err, _ = sys.exc_info()
         parser.error("Server connection values invalid: %s." % err)

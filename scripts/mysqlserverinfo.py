@@ -33,7 +33,8 @@ from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_basedir_option, add_verbosity,
                                             add_format_option,
                                             check_basedir_option,
-                                            setup_common_options)
+                                            get_ssl_dict,
+                                            setup_common_options,)
 
 
 # Constants
@@ -135,6 +136,9 @@ if __name__ == '__main__':
 
     if opt.server is None:
         parser.error("You must specify at least one server.")
+
+    # add ssl options values.
+    options.update(get_ssl_dict(opt))
 
     try:
         show_server_info(opt.server, options)

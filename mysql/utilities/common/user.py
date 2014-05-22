@@ -81,6 +81,54 @@ def parse_user_host(user_name):
     return (conn_values['user'], conn_values['passwd'], conn_values['host'])
 
 
+def grant_proxy_ssl_privileges(server, user, passw, at='localhost',
+                               privs="ALL PRIVILEGES", grant_opt=True,
+                               ssl=True, grant_proxy=True):
+    """Grant privileges to an user in a server with GRANT OPTION or/and
+    REQUIRE SSL if required.
+
+    server[in]         Server to execute the grant query at.
+    user_name[in]      New user name.
+    passw[in]          password of the new user.
+    at[in]             Used in GRANT "TO '{0}'@'{1}'".format(user, at),
+                       (default localhost)
+    grant_opt[in]      if True, it will grant with GRANT OPTION (default True).
+    ssl[in]            if True, it will set REQUIRE SSL (default True).
+    grant_proxy[in]    if True, it will grant GRANT PROXY (default True).
+
+    Note: Raises UtilError on any Error.
+    """
+
+    grant = [
+        "GRANT", privs,
+        "ON *.*",
+        "TO '{0}'@'{1}'".format(user, at),
+        "IDENTIFIED BY '{0}'".format(passw) if passw else "",
+        "REQUIRE SSL" if ssl else "",
+        "WITH GRANT OPTION" if grant_opt else ""
+    ]
+
+    try:
+        server.exec_query(" ".join(grant))
+    except UtilDBError as err:
+        raise UtilError("Cannot create new user {0} at {1}:{2} reason:"
+                        "{3}".format(user, server.host, server.host,
+                                     err.errmsg))
+
+    if grant_proxy:
+        grant = [
+            "GRANT PROXY ON ''@''",
+            "TO '{0}'@'{1}'".format(user, at),
+            "WITH GRANT OPTION"
+        ]
+        try:
+            server.exec_query(" ".join(grant))
+        except UtilDBError as err:
+            raise UtilError("Cannot grant proxy to user {0} at {1}:{2} "
+                            "reason:{3}".format(user, server.host,
+                                                server.host, err.errmsg))
+
+
 class User(object):
     """
     The User class can be used to clone the user and its grants to another

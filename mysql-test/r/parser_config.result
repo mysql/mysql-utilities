@@ -1,0 +1,96 @@
+Test case 1 - serverinfo with config_path, simple group name
+# Source on localhost: ... connected.
+*************************       1. row *************************
+                   server: localhost: XXXX
+              config_file: XXXX
+               binary_log: XXXX
+           binary_log_pos: XXXX
+                relay_log: XXXX
+            relay_log_pos: XXXX
+                  version: XXXX
+                  datadir: XXXX
+                  basedir: XXXX
+               plugin_dir: XXXX
+              general_log: XXXX
+         general_log_file: XXXX
+    general_log_file_size: XXXX
+                log_error: XXXX
+      log_error_file_size: XXXX
+           slow_query_log: XXXX
+      slow_query_log_file: XXXX
+ slow_query_log_file_size: XXXX
+1 row.
+#...done.
+
+Test case 2 - serverinfo with config_path, long group name 
+# Source on localhost: ... connected.
+*************************       1. row *************************
+                   server: localhost: XXXX
+              config_file: XXXX
+               binary_log: XXXX
+           binary_log_pos: XXXX
+                relay_log: XXXX
+            relay_log_pos: XXXX
+                  version: XXXX
+                  datadir: XXXX
+                  basedir: XXXX
+               plugin_dir: XXXX
+              general_log: XXXX
+         general_log_file: XXXX
+    general_log_file_size: XXXX
+                log_error: XXXX
+      log_error_file_size: XXXX
+           slow_query_log: XXXX
+      slow_query_log_file: XXXX
+ slow_query_log_file_size: XXXX
+1 row.
+#...done.
+
+Test case 3 - serverinfo with config_path, complicated group name 
+# Source on localhost: ... connected.
+*************************       1. row *************************
+                   server: localhost: XXXX
+              config_file: XXXX
+               binary_log: XXXX
+           binary_log_pos: XXXX
+                relay_log: XXXX
+            relay_log_pos: XXXX
+                  version: XXXX
+                  datadir: XXXX
+                  basedir: XXXX
+               plugin_dir: XXXX
+              general_log: XXXX
+         general_log_file: XXXX
+    general_log_file_size: XXXX
+                log_error: XXXX
+      log_error_file_size: XXXX
+           slow_query_log: XXXX
+      slow_query_log_file: XXXX
+ slow_query_log_file_size: XXXX
+1 row.
+#...done.
+
+Test case 4 - serverinfo with config_path, login with ssl
+# Source on localhost: ... connected.
+*************************       1. row *************************
+                   server: localhost: XXXX
+              config_file: XXXX
+               binary_log: XXXX
+           binary_log_pos: XXXX
+                relay_log: XXXX
+            relay_log_pos: XXXX
+                  version: XXXX
+                  datadir: XXXX
+                  basedir: XXXX
+               plugin_dir: XXXX
+              general_log: XXXX
+         general_log_file: XXXX
+    general_log_file_size: XXXX
+                log_error: XXXX
+      log_error_file_size: XXXX
+           slow_query_log: XXXX
+      slow_query_log_file: XXXX
+ slow_query_log_file_size: XXXX
+1 row.
+#...done.
+

@@ -37,14 +37,22 @@ Option                     Description
 --version                  show program's version number and exit          
 --help                     display a help message and exit                 
 --license                  display program's license and exit              
+--ssl-ca=SSL_CA            The path to a file that contains a list of      
+                           trusted SSL CAs.                                
+--ssl-cert=SSL_CERT        The name of the SSL certificate file to use for 
+                           establishing a secure connection.               
+--ssl-key=SSL_KEY          The name of the SSL key file to use for         
+                           establishing a secure connection.               
 --server1=SERVER1          connection information for first server in the  
                            form:                                           
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
-                           or <login-path>[:<port>][:<socket>].            
+                           or <login-path>[:<port>][:<socket>] or <config- 
+                           path>[<[group]>].                               
 --server2=SERVER2          connection information for second server in the 
                            form:                                           
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
-                           or <login-path>[:<port>][:<socket>].            
+                           or <login-path>[:<port>][:<socket>] or <config- 
+                           path>[<[group]>].                               
 --character-set=CHARSET    sets the client character set. The default is   
                            retrieved from the server variable              
                            'character_set_client'.                         
@@ -87,14 +95,22 @@ Option                     Description
 --version                  show program's version number and exit          
 --help                     display a help message and exit                 
 --license                  display program's license and exit              
+--ssl-ca=SSL_CA            The path to a file that contains a list of      
+                           trusted SSL CAs.                                
+--ssl-cert=SSL_CERT        The name of the SSL certificate file to use for 
+                           establishing a secure connection.               
+--ssl-key=SSL_KEY          The name of the SSL key file to use for         
+                           establishing a secure connection.               
 --server1=SERVER1          connection information for first server in the  
                            form:                                           
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
-                           or <login-path>[:<port>][:<socket>].            
+                           or <login-path>[:<port>][:<socket>] or <config- 
+                           path>[<[group]>].                               
 --server2=SERVER2          connection information for second server in the 
                            form:                                           
                            <user>[:<password>]@<host>[:<port>][:<socket>]  
-                           or <login-path>[:<port>][:<socket>].            
+                           or <login-path>[:<port>][:<socket>] or <config- 
+                           path>[<[group]>].                               
 --character-set=CHARSET    sets the client character set. The default is   
                            retrieved from the server variable              
                            'character_set_client'.                         
@@ -140,16 +156,28 @@ Option                     Description
                            exit                        
 --license                  display program's license   
                            and exit                    
+--ssl-ca=SSL_CA            The path to a file that     
+                           contains a list of trusted  
+                           SSL CAs.                    
+--ssl-cert=SSL_CERT        The name of the SSL         
+                           certificate file to use for 
+                           establishing a secure       
+                           connection.                 
+--ssl-key=SSL_KEY          The name of the SSL key file
+                           to use for establishing a   
+                           secure connection.          
 --server1=SERVER1          connection information for  
                            first server in the form: <u
                            ser>[:<password>]@<host>[:<p
                            ort>][:<socket>] or <login- 
-                           path>[:<port>][:<socket>].  
+                           path>[:<port>][:<socket>] or
+                           <config- path>[<[group]>].  
 --server2=SERVER2          connection information for  
                            second server in the form: <
                            user>[:<password>]@<host>[:<
                            port>][:<socket>] or <login-
-                           path>[:<port>][:<socket>].  
+                           path>[:<port>][:<socket>] or
+                           <config- path>[<[group]>].  
 --character-set=CHARSET    sets the client character   
                            set. The default is         
                            retrieved from the server   
@@ -208,14 +236,23 @@ Option                     Description
 --version                  show program's version number and exit 
 --help                     display a help message and exit        
 --license                  display program's license and exit     
+--ssl-ca=SSL_CA            The path to a file that contains a list
+                           of trusted SSL CAs.                    
+--ssl-cert=SSL_CERT        The name of the SSL certificate file to
+                           use for establishing a secure          
+                           connection.                            
+--ssl-key=SSL_KEY          The name of the SSL key file to use for
+                           establishing a secure connection.      
 --server1=SERVER1          connection information for first server
                            in the form: <user>[:<password>]@<host>
                            [:<port>][:<socket>] or <login-        
-                           path>[:<port>][:<socket>].             
+                           path>[:<port>][:<socket>] or <config-  
+                           path>[<[group]>].                      
 --server2=SERVER2          connection information for second      
                            server in the form: <user>[:<password>]
                            @<host>[:<port>][:<socket>] or <login- 
-                           path>[:<port>][:<socket>].             
+                           path>[:<port>][:<socket>] or <config-  
+                           path>[<[group]>].                      
 --character-set=CHARSET    sets the client character set. The     
                            default is retrieved from the server   
                            variable 'character_set_client'.       

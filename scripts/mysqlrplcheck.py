@@ -31,7 +31,8 @@ import sys
 
 from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command.check_rpl import check_replication
-from mysql.utilities.common.options import add_verbosity, setup_common_options
+from mysql.utilities.common.options import (add_verbosity, add_ssl_options,
+                                            setup_common_options)
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
@@ -62,14 +63,16 @@ if __name__ == '__main__':
                       type="string", default=None,
                       help="connection information for master server in the "
                            "form: <user>[:<password>]@<host>[:<port>]"
-                           "[:<socket>] or <login-path>[:<port>][:<socket>].")
+                           "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                           " or <config-path>[<[group]>].")
 
     # Connection information for the destination server
     parser.add_option('--slave', action="store", dest="slave",
                       type="string", default=None,
                       help="connection information for slave server in the "
                            "form: <user>[:<password>]@<host>[:<port>]"
-                           "[:<socket>] or <login-path>[:<port>][:<socket>]")
+                           "[:<socket>] or <login-path>[:<port>][:<socket>]"
+                           " or <config-path>[<[group]>].")
 
     # Add --master-info-file
     parser.add_option("--master-info-file", action="store", dest="master_info",
@@ -94,6 +97,9 @@ if __name__ == '__main__':
     parser.add_option("--suppress", action="store_true", dest="suppress",
                       default=False, help="suppress warning messages")
 
+    # Add ssl options
+    add_ssl_options(parser)
+
     # Add verbosity
     add_verbosity(parser, True)
 
@@ -114,7 +120,7 @@ if __name__ == '__main__':
 
     # Parse source connection values
     try:
-        m_values = parse_connection(opt.master)
+        m_values = parse_connection(opt.master, options=opt)
     except FormatError:
         _, err, _ = sys.exc_info()
         parser.error("Master connection values invalid: %s." % err)
@@ -124,7 +130,7 @@ if __name__ == '__main__':
 
     # Parse source connection values
     try:
-        s_values = parse_connection(opt.slave)
+        s_values = parse_connection(opt.slave, options=opt)
     except FormatError:
         _, err, _ = sys.exc_info()
         parser.error("Slave connection values invalid: %s." % err)

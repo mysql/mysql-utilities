@@ -45,6 +45,7 @@ from mysql.utilities.common.options import (add_difftype, add_verbosity,
                                             add_changes_for, add_reverse,
                                             add_format_option,
                                             add_character_set_option,
+                                            add_ssl_options, get_ssl_dict,
                                             setup_common_options)
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting,
@@ -168,6 +169,9 @@ if __name__ == '__main__':
     # Add show reverse option
     add_reverse(parser)
 
+    # Add ssl options
+    add_ssl_options(parser)
+
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
 
@@ -216,6 +220,9 @@ if __name__ == '__main__':
         "use_indexes": db_idxes_l,
         "compact": opt.compact
     }
+
+    # Add ssl options to options instead of connection.
+    options.update(get_ssl_dict(opt))
 
     # Parse server connection values
     server2_values = None

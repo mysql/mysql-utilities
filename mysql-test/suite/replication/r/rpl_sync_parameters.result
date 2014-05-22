@@ -13,11 +13,19 @@ Options:
                         discovered slave.
   --master=MASTER       connection information for master server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>]
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
   --slaves=SLAVES       connection information for slave servers in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>]. List multiple slaves
-                        in comma-separated list.
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].List multiple slaves in comma-
+                        separated list.
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   --rpl-timeout=RPL_TIMEOUT

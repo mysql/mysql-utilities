@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import re
 import sys
 
 import mysql.connector
+from mysql.connector.constants import ClientFlag
 
 from mysql.utilities.exception import EmptyResultError, FormatError
 from mysql.utilities.common.format import print_list
@@ -205,6 +206,7 @@ class ProcessGrep(object):
         connector = kwrds.get('connector', mysql.connector)
         fmt = kwrds.get('format', "grid")
         charset = kwrds.get('charset', None)
+        ssl_opts = kwrds.get('ssl_opts', {})
 
         headers = ("Connection", "Id", "User", "Host", "Db",
                    "Command", "Time", "State", "Info")
@@ -218,6 +220,24 @@ class ProcessGrep(object):
             if charset:
                 conn['charset'] = charset
             info = conn
+
+            if connector == mysql.connector:
+                # Add SSL parameters ONLY if they are not None
+                add_ssl_flag = False
+                if ssl_opts.get('ssl_ca') is not None:
+                    info['ssl_ca'] = ssl_opts.get('ssl_ca')
+                    add_ssl_flag = True
+                if ssl_opts.get('ssl_cert') is not None:
+                    info['ssl_cert'] = ssl_opts.get('ssl_cert')
+                    add_ssl_flag = True
+                if ssl_opts.get('ssl_key') is not None:
+                    info['ssl_key'] = ssl_opts.get('ssl_key')
+                    add_ssl_flag = True
+                if add_ssl_flag:
+                    cpy_flags = [ClientFlag.SSL,
+                                 ClientFlag.SSL_VERIFY_SERVER_CERT]
+                    info['client_flags'] = cpy_flags
+
             connection = connector.connect(**info)
 
             if not charset:

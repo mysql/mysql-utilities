@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -126,6 +126,12 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
         'quiet': quiet,
         'version': "5.1.0",
     }
+
+    # Add ssl certs if there are any.
+    conn_options['ssl_cert'] = options.get("ssl_cert", None)
+    conn_options['ssl_ca'] = options.get("ssl_ca", None)
+    conn_options['ssl_key'] = options.get("ssl_key", None)
+
     if dump_sql:
         servers = connect_servers(src_val, None, conn_options)
     else:

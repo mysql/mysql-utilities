@@ -38,8 +38,9 @@ from mysql.utilities.common.messages import SCRIPT_THRESHOLD_WARNING
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.topology import parse_topology_connections
-from mysql.utilities.common.options import (add_verbosity, add_rpl_user,
-                                            add_failover_options,
+from mysql.utilities.common.options import (add_failover_options,
+                                            add_verbosity, add_rpl_user,
+                                            add_ssl_options,
                                             check_server_lists,
                                             license_callback,
                                             UtilitiesParser)
@@ -198,6 +199,9 @@ if __name__ == '__main__':
 
     # Replication user and password
     add_rpl_user(parser, None)
+
+    # Add ssl options
+    add_ssl_options(parser)
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()

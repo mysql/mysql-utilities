@@ -1,0 +1,493 @@
+##############################################################################
+--> No ssl options
+##############################################################################
+Test case 1 - indexcheck with ssl connection all tables for a single database
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 2 - basic serverinfo with ssl
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' using password: YES
+
+Test case 3 - userclone dump grants with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 4 - basic dbexport with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 5 - basic dbimport with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 6 - basic metagrep with ssl
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 7 - basic procgrep with ssl
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 8 - basic diskusage with ssl
+# Source on XXXX-XXXX: ...Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage: error: Cannot connect to the Source server.
+Error Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+
+Test case 9 - basic mysqlfrm with ssl
+# Source on XXXX-XXXX: ...Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm: error: Cannot connect to the Source server.
+Error Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+
+Test case 10 - basic mysqldbcopy with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 11 - basic mysqldiff with ssl
+# server1 on XXXX-XXXX: ... ERROR: Cannot connect to the server1 server.
+Error Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+##############################################################################
+--> --ssl-ca and --ssl-key options only
+##############################################################################
+Test case 12 - indexcheck with ssl connection all tables for a single database
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 13 - basic serverinfo with ssl
+ERROR: Cannot connect to the test server.
+Error Missing ssl certificate(s)
+
+Test case 14 - userclone dump grants with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 15 - basic dbexport with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 16 - basic dbimport with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 17 - basic metagrep with ssl
+Error Missing ssl certificate(s)
+
+Test case 18 - basic procgrep with ssl
+Error Missing ssl certificate(s)
+
+Test case 19 - basic diskusage with ssl
+# Source on XXXX-XXXX: ...Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage: error: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+
+Test case 20 - basic mysqlfrm with ssl
+# Source on XXXX-XXXX: ...Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm: error: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+
+Test case 21 - basic mysqldbcopy with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 22 - basic mysqldiff with ssl
+# server1 on XXXX-XXXX: ... ERROR: Cannot connect to the server1 server.
+Error Missing ssl certificate(s)
+
+##############################################################################
+--> --ssl-key option only
+##############################################################################
+Test case 23 - indexcheck with ssl connection all tables for a single database
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 24 - basic serverinfo with ssl
+ERROR: Cannot connect to the test server.
+Error Missing ssl certificate(s)
+
+Test case 25 - userclone dump grants with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 26 - basic dbexport with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 27 - basic dbimport with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 28 - basic metagrep with ssl
+Error Missing ssl certificate(s)
+
+Test case 29 - basic procgrep with ssl
+Error Missing ssl certificate(s)
+
+Test case 30 - basic diskusage with ssl
+# Source on XXXX-XXXX: ...Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage: error: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+
+Test case 31 - basic mysqlfrm with ssl
+# Source on XXXX-XXXX: ...Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm: error: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+
+Test case 32 - basic mysqldbcopy with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 33 - basic mysqldiff with ssl
+# server1 on XXXX-XXXX: ... ERROR: Cannot connect to the server1 server.
+Error Missing ssl certificate(s)
+
+##############################################################################
+--> --ssl-key and --ssl-cert options only
+##############################################################################
+Test case 34 - indexcheck with ssl connection all tables for a single database
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 35 - basic serverinfo with ssl
+ERROR: Cannot connect to the test server.
+Error Missing ssl certificate(s)
+
+Test case 36 - userclone dump grants with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 37 - basic dbexport with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 38 - basic dbimport with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 39 - basic metagrep with ssl
+Error Missing ssl certificate(s)
+
+Test case 40 - basic procgrep with ssl
+Error Missing ssl certificate(s)
+
+Test case 41 - basic diskusage with ssl
+# Source on XXXX-XXXX: ...Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage: error: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+
+Test case 42 - basic mysqlfrm with ssl
+# Source on XXXX-XXXX: ...Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm: error: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+
+Test case 43 - basic mysqldbcopy with ssl
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error Missing ssl certificate(s)
+
+Test case 44 - basic mysqldiff with ssl
+# server1 on XXXX-XXXX: ... ERROR: Cannot connect to the server1 server.
+Error Missing ssl certificate(s)
+
+##############################################################################
+--> invalid --ssl-ca option
+##############################################################################
+Test case 45 - indexcheck with ssl connection all tables for a single database
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+
+mysqlindexcheck: error: the given path './' in option --ssl-ca does not correspond to a file
+
+Test case 46 - basic serverinfo with ssl
+Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
+
+mysqlserverinfo: error: the given path './' in option --ssl-ca does not correspond to a file
+
+Test case 47 - userclone dump grants with ssl
+Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@XXXX-XXXX sam:secret1@XXXX-XXXX
+
+mysqluserclone: error: the given path './' in option --ssl-ca does not correspond to a file
+
+Test case 48 - basic dbexport with ssl
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
+
+mysqldbexport: error: the given path './' in option --ssl-ca does not correspond to a file
+
+Test case 49 - basic dbimport with ssl
+Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+
+mysqldbimport: error: the given path './' in option --ssl-ca does not correspond to a file
+
+Test case 50 - basic metagrep with ssl
+Usage: mysqlmetagrep --server=user:pass@host:port:socket [options] pattern
+
+mysqlmetagrep: error: the given path './' in option --ssl-ca does not correspond to a file
+
+Test case 51 - basic procgrep with ssl
+Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
+
+mysqlprocgrep: error: the given path './' in option --ssl-ca does not correspond to a file
+
+Test case 52 - basic diskusage with ssl
+Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage: error: the given path './' in option --ssl-ca does not correspond to a file
+
+Test case 53 - basic mysqlfrm with ssl
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm: error: the given path './' in option --ssl-ca does not correspond to a file
+
+Test case 54 - basic mysqldbcopy with ssl
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy: error: the given path './' in option --ssl-ca does not correspond to a file
+
+Test case 55 - basic mysqldiff with ssl
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff: error: the given path './' in option --ssl-ca does not correspond to a file
+
+##############################################################################
+--> invalid --ssl-ca option
+##############################################################################
+Test case 56 - indexcheck with ssl connection all tables for a single database
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+
+mysqlindexcheck: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+Test case 57 - basic serverinfo with ssl
+Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
+
+mysqlserverinfo: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+Test case 58 - userclone dump grants with ssl
+Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@XXXX-XXXX sam:secret1@XXXX-XXXX
+
+mysqluserclone: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+Test case 59 - basic dbexport with ssl
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
+
+mysqldbexport: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+Test case 60 - basic dbimport with ssl
+Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+
+mysqldbimport: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+Test case 61 - basic metagrep with ssl
+Usage: mysqlmetagrep --server=user:pass@host:port:socket [options] pattern
+
+mysqlmetagrep: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+Test case 62 - basic procgrep with ssl
+Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
+
+mysqlprocgrep: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+Test case 63 - basic diskusage with ssl
+Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+Test case 64 - basic mysqlfrm with ssl
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+Test case 65 - basic mysqldbcopy with ssl
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+Test case 66 - basic mysqldiff with ssl
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+##############################################################################
+--> unexisting certificatefile in --ssl-ca option
+##############################################################################
+Test case 67 - indexcheck with ssl connection all tables for a single database
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+
+mysqlindexcheck: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exists or can not be acceded
+
+Test case 68 - basic serverinfo with ssl
+Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
+
+mysqlserverinfo: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exists or can not be acceded
+
+Test case 69 - userclone dump grants with ssl
+Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@XXXX-XXXX sam:secret1@XXXX-XXXX
+
+mysqluserclone: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exists or can not be acceded
+
+Test case 70 - basic dbexport with ssl
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
+
+mysqldbexport: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exists or can not be acceded
+
+Test case 71 - basic dbimport with ssl
+Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+
+mysqldbimport: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exists or can not be acceded
+
+Test case 72 - basic metagrep with ssl
+Usage: mysqlmetagrep --server=user:pass@host:port:socket [options] pattern
+
+mysqlmetagrep: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exists or can not be acceded
+
+Test case 73 - basic procgrep with ssl
+Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
+
+mysqlprocgrep: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exists or can not be acceded
+
+Test case 74 - basic diskusage with ssl
+Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exists or can not be acceded
+
+Test case 75 - basic mysqlfrm with ssl
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exists or can not be acceded
+
+Test case 76 - basic mysqldbcopy with ssl
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exists or can not be acceded
+
+Test case 77 - basic mysqldiff with ssl
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exists or can not be acceded
+
+##############################################################################
+--> unexisting certificatefile in --ssl-cert option
+##############################################################################
+Test case 78 - indexcheck with ssl connection all tables for a single database
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+
+mysqlindexcheck: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exists or can not be acceded
+
+Test case 79 - basic serverinfo with ssl
+Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
+
+mysqlserverinfo: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exists or can not be acceded
+
+Test case 80 - userclone dump grants with ssl
+Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@XXXX-XXXX sam:secret1@XXXX-XXXX
+
+mysqluserclone: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exists or can not be acceded
+
+Test case 81 - basic dbexport with ssl
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
+
+mysqldbexport: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exists or can not be acceded
+
+Test case 82 - basic dbimport with ssl
+Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+
+mysqldbimport: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exists or can not be acceded
+
+Test case 83 - basic metagrep with ssl
+Usage: mysqlmetagrep --server=user:pass@host:port:socket [options] pattern
+
+mysqlmetagrep: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exists or can not be acceded
+
+Test case 84 - basic procgrep with ssl
+Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
+
+mysqlprocgrep: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exists or can not be acceded
+
+Test case 85 - basic diskusage with ssl
+Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exists or can not be acceded
+
+Test case 86 - basic mysqlfrm with ssl
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exists or can not be acceded
+
+Test case 87 - basic mysqldbcopy with ssl
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exists or can not be acceded
+
+Test case 88 - basic mysqldiff with ssl
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exists or can not be acceded
+
+##############################################################################
+--> unexisting certificatefile in --ssl-key option
+##############################################################################
+Test case 89 - indexcheck with ssl connection all tables for a single database
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+
+mysqlindexcheck: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exists or can not be acceded
+
+Test case 90 - basic serverinfo with ssl
+Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
+
+mysqlserverinfo: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exists or can not be acceded
+
+Test case 91 - userclone dump grants with ssl
+Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@XXXX-XXXX sam:secret1@XXXX-XXXX
+
+mysqluserclone: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exists or can not be acceded
+
+Test case 92 - basic dbexport with ssl
+Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
+
+mysqldbexport: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exists or can not be acceded
+
+Test case 93 - basic dbimport with ssl
+Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+
+mysqldbimport: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exists or can not be acceded
+
+Test case 94 - basic metagrep with ssl
+Usage: mysqlmetagrep --server=user:pass@host:port:socket [options] pattern
+
+mysqlmetagrep: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exists or can not be acceded
+
+Test case 95 - basic procgrep with ssl
+Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
+
+mysqlprocgrep: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exists or can not be acceded
+
+Test case 96 - basic diskusage with ssl
+Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exists or can not be acceded
+
+Test case 97 - basic mysqlfrm with ssl
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exists or can not be acceded
+
+Test case 98 - basic mysqldbcopy with ssl
+Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
+
+mysqldbcopy: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exists or can not be acceded
+
+Test case 99 - basic mysqldiff with ssl
+Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
+
+mysqldiff: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exists or can not be acceded
+

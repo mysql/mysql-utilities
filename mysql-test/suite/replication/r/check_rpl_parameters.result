@@ -4,10 +4,12 @@ Test case 1 - show help
   --license             display program's license and exit
   --master=MASTER       connection information for master server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>].
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
   --slave=SLAVE         connection information for slave server in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
-                        <login-path>[:<port>][:<socket>]
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
   --master-info-file=MASTER_INFO
                         the name of the master information file on the slave.
                         Default = 'master.info' read from the data directory.
@@ -18,6 +20,12 @@ Test case 1 - show help
                         show slave status
   --width=WIDTH         display width
   --suppress            suppress warning messages
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.
