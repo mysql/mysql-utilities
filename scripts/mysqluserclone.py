@@ -143,8 +143,14 @@ if __name__ == '__main__':
         opt.destination = None
 
     if opt.list_users:
-        userclone.show_users(source_values, opt.verbosity, opt.format,
-                             opt.dump)
+        try:
+            userclone.show_users(source_values, opt.verbosity, opt.format,
+                                 opt.dump)
+        except UtilError:
+            _, e, _ = sys.exc_info()
+            print("ERROR: {0}".format(e.errmsg))
+            sys.exit(1)
+
     else:
         # Make sure we have the base user plus at least one new user
         if len(args) < 2 and not opt.dump:

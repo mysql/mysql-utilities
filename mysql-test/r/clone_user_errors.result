@@ -1,31 +1,35 @@
 Test case 1 - error: invalid login to source server
 # Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
 Error XXXX: Access denied
-Test case 2 - error: invalid login to destination server
+Test case 2 - error: invalid login to source server with --list option
+WARNING: The --destination option is not required for '--list' (option ignored).
+# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+Error XXXX: Access denied
+Test case 3 - error: invalid login to destination server
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... ERROR: Cannot connect to the Destination server.
 Error XXXX: Access denied
-Test case 3 - error: no arguments
+Test case 4 - error: no arguments
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone: error: No arguments found. Use --help for available options.
-Test case 4 - error: no new user
+Test case 5 - error: no new user
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone: error: Wrong parameter combination or no new users.
-Test case 5 - error: cannot use dump and quiet together
+Test case 6 - error: cannot use dump and quiet together
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone: error: You cannot use --quiet and --dump together.
-Test case 6 - error: cannot parse source connection
+Test case 7 - error: cannot parse source connection
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone: error: Source connection values invalid
-Test case 7 - error: cannot parse destination connection
+Test case 8 - error: cannot parse destination connection
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone: error: Destination connection values invalid
-Test case 8 - error: missing source option
+Test case 9 - error: missing source option
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone: error: Option '--source' is required.

@@ -55,6 +55,13 @@ class test(clone_user.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
+        comment = ("Test case {0} - error: invalid login to source "
+                   "server with --list option".format(test_num))
+        res = self.run_test_case(1, cmd_str + " --list", comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
         cmd_str = ("mysqluserclone.py "
                    "--destination=noone:nope@localhost:3306 "
                    "{0}".format(from_conn))
