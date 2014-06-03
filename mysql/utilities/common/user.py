@@ -208,7 +208,10 @@ class User(object):
                 grants.append(grant)
         except UtilDBError:
             pass  # Error here is ok - no grants found.
-        if globals_privs:
+
+        # If current user is already using global host wildcard '%', there is
+        # no need to run the show grants again.
+        if globals_privs and self.host != '%':
             try:
                 res = self.server1.exec_query("SHOW GRANTS FOR "
                                               "'{0}'{1}".format(self.user,
