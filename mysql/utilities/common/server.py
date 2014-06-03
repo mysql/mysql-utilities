@@ -582,7 +582,7 @@ class Server(object):
         self.fkeys = None
         self.autocommit = None
         self.read_only = False
-        self.aliases = []
+        self.aliases = set()
         self.grants_enabled = None
         self._version = None
 
@@ -630,6 +630,115 @@ class Server(object):
             res = False
         return res
 
+    def _update_alias(self, ip_or_hostname, suffix_list):
+        """Update list of aliases for the given IP or hostname.
+
+        Gets the list of aliases for host *ip_or_hostname*. If any
+        of them matches one of the server's aliases, then update
+        the list of aliases (self.aliases). It also receives a list (tuple)
+        of suffixes that can be ignored when checking if two hostnames are
+        the same.
+
+        ip_or_hostname[in] IP or hostname to test.
+        suffix_list[in]    Tuple with list of suffixes that can be ignored.
+
+        Returns True if ip_or_hostname is a server alias, otherwise False.
+        """
+        host_or_ip_aliases = self._get_aliases(ip_or_hostname)
+        host_or_ip_aliases.add(ip_or_hostname)
+
+        # Check if any of aliases matches with one the servers's aliases
+        common_alias = self.aliases.intersection(host_or_ip_aliases)
+        if common_alias:  # There are common aliases, host is the same
+            self.aliases.update(host_or_ip_aliases)
+            return True
+        else:  # Check with and without suffixes
+            no_suffix_server_aliases = set()
+            no_suffix_host_aliases = set()
+
+            for suffix in suffix_list:
+                # Add alias with and without suffix from self.aliases
+                for alias in self.aliases:
+                    if alias.endswith(suffix):
+                        host, _ = alias.rsplit('.')
+                        no_suffix_server_aliases.add(host)
+                    no_suffix_server_aliases.add(alias)
+                # Add alias with and without suffix from host_aliases
+                for alias in host_or_ip_aliases:
+                    if alias.endswith(suffix):
+                        host, _ = alias.rsplit('.')
+                        no_suffix_host_aliases.add(host)
+                    no_suffix_host_aliases.add(alias)
+            # Check if there is any alias in common
+            common_alias = no_suffix_host_aliases.intersection(
+                no_suffix_server_aliases)
+            if common_alias:  # Same host, so update self.aliases
+                self.aliases.update(
+                    no_suffix_host_aliases.union(no_suffix_server_aliases)
+                )
+                return True
+
+        return False
+
+    def _get_aliases(self, host):
+        """Gets the aliases for the given host
+        """
+        aliases = set([clean_IPv6(host)])
+        if hostname_is_ip(clean_IPv6(host)):  # IP address
+            try:
+                my_host = socket.gethostbyaddr(clean_IPv6(host))
+                aliases.add(my_host[0])
+                # socket.gethostbyname_ex() does not work with ipv6
+                if (not my_host[0].count(":") < 1 or
+                   not my_host[0] == "ip6-localhost"):
+                    host_ip = socket.gethostbyname_ex(my_host[0])
+                else:
+                    addrinfo = socket.getaddrinfo(my_host[0], None)
+                    host_ip = ([socket.gethostbyaddr(addrinfo[0][4][0])],
+                               [fiveple[4][0] for fiveple in addrinfo],
+                               [addrinfo[0][4][0]])
+            except (socket.gaierror, socket.herror,
+                    socket.error) as err:
+                host_ip = ([], [], [])
+                if self.verbose:
+                    print("WARNING: IP lookup by address failed for {0},"
+                          "reason: {1}".format(host, err.strerror))
+        else:
+            try:
+                # server may not really exist.
+                host_ip = socket.gethostbyname_ex(host)
+            except (socket.gaierror, socket.herror,
+                    socket.error) as err:
+                if self.verbose:
+                    print("WARNING: hostname: {0} may not be reachable, "
+                          "reason: {1}".format(host, err.strerror))
+                return aliases
+            aliases.add(host_ip[0])
+            addrinfo = socket.getaddrinfo(host, None)
+            local_ip = None
+            error = None
+            for addr in addrinfo:
+                try:
+                    local_ip = socket.gethostbyaddr(addr[4][0])
+                    break
+                except (socket.gaierror, socket.herror,
+                        socket.error) as err:
+                    error = err
+
+            if local_ip:
+                host_ip = ([local_ip[0]],
+                           [fiveple[4][0] for fiveple in addrinfo],
+                           [addrinfo[0][4][0]])
+            else:
+                host_ip = ([], [], [])
+                if self.verbose:
+                    print("WARNING: IP lookup by name failed for {0},"
+                          "reason: {1}".format(host, error.strerror))
+        aliases.update(set(host_ip[1]))
+        aliases.update(set(host_ip[2]))
+
+        return aliases
+
     def is_alias(self, host_or_ip):
         """Determine if host_or_ip is an alias for this host
 
@@ -637,123 +746,49 @@ class Server(object):
 
         Returns bool - True = host_or_ip is an alias
         """
-        def get_aliases(host):
-            """Gets the aliases for the given host
-            """
-            aliases = [clean_IPv6(host)]
-            if hostname_is_ip(clean_IPv6(host)):  # IP address
-                try:
-                    my_host = socket.gethostbyaddr(clean_IPv6(host))
-                    aliases.append(my_host[0])
-                    # socket.gethostbyname_ex() does not work with ipv6
-                    if (not my_host[0].count(":") < 1 or
-                       not my_host[0] == "ip6-localhost"):
-                        host_ip = socket.gethostbyname_ex(my_host[0])
-                    else:
-                        addrinfo = socket.getaddrinfo(my_host[0], None)
-                        host_ip = ([socket.gethostbyaddr(addrinfo[0][4][0])],
-                                   [fiveple[4][0] for fiveple in addrinfo],
-                                   [addrinfo[0][4][0]])
-                except (socket.gaierror, socket.herror,
-                        socket.error) as err:
-                    host_ip = ([], [], [])
-                    if self.verbose:
-                        print("WARNING: IP lookup by address failed for {0},"
-                              "reason: {1}".format(host, err.strerror))
-            else:
-                try:
-                    # server may not really exist.
-                    host_ip = socket.gethostbyname_ex(host)
-                except (socket.gaierror, socket.herror,
-                        socket.error) as err:
-                    if self.verbose:
-                        print("WARNING: hostname: {0} may not be reachable, "
-                              "reason: {1}".format(host, err.strerror))
-                    return aliases
-                extend_aliases(aliases, [host_ip[0]])
-                addrinfo = socket.getaddrinfo(host, None)
-                local_ip = None
-                error = None
-                for addr in addrinfo:
-                    try:
-                        local_ip = socket.gethostbyaddr(addr[4][0])
-                        break
-                    except (socket.gaierror, socket.herror,
-                            socket.error) as err:
-                        error = err
-
-                if local_ip:
-                    host_ip = ([local_ip[0]],
-                               [fiveple[4][0] for fiveple in addrinfo],
-                               [addrinfo[0][4][0]])
-                else:
-                    host_ip = ([], [], [])
-                    if self.verbose:
-                        print("WARNING: IP lookup by name failed for {0},"
-                              "reason: {1}".format(host, error.strerror))
-            extend_aliases(aliases, host_ip[1])
-            extend_aliases(aliases, host_ip[2])
-
-            return aliases
-
-        def extend_aliases(aliases, als_new):
-            """Does intersection of the two given list.
-            Returns List of no repeated elements from the two list
-            """
-            if als_new:
-                als_new = set(als_new)  # Create a set to remove duplicates.
-                als_new = [alias for alias in als_new if (alias and
-                                                          alias not in aliases
-                                                          )]
-                aliases.extend(als_new)
+        # List of possible suffixes
+        suffixes = ('.local', '.lan', '.localdomain')
 
         host_or_ip = clean_IPv6(host_or_ip.lower())
 
-        # for quickness, verify in the existing  aliases, if they are.
+        # for quickness, verify in the existing  aliases, if they exist.
         if self.aliases:
             if host_or_ip.lower() in self.aliases:
                 return True
             else:
                 # get the alias for the given host_or_ip
-                host_or_ip_aliases = get_aliases(host_or_ip)
-                host_or_ip_aliases.append(host_or_ip)
-                for alias in host_or_ip_aliases:
-                    if alias in self.aliases:
-                        #save the aliases for future
-                        extend_aliases(self.aliases, host_or_ip_aliases)
-                        return True
-                return False
+                return self._update_alias(host_or_ip, suffixes)
 
-        # If not previews aliases save, look for them.
+        # no previous aliases information
         # First, get the local information
+        hostname_ = socket.gethostname()
         try:
-            local_info = socket.gethostbyname_ex(socket.gethostname())
-            local_aliases = [local_info[0].lower()]
+            local_info = socket.gethostbyname_ex(hostname_)
+            local_aliases = set([local_info[0].lower()])
             # if dotted host name, take first part and use as an alias
             try:
-                local_aliases.append(local_info[0].split('.')[0])
+                local_aliases.add(local_info[0].split('.')[0])
             except:
                 pass
-            extend_aliases(local_aliases, ['127.0.0.1', 'localhost',
-                                           '::1', '[::1]'])
-            extend_aliases(local_aliases, local_info[1])
-            extend_aliases(local_aliases, local_info[2])
-            extend_aliases(local_aliases, get_aliases(socket.gethostname()))
-        except (socket.herror, socket.gaierror, socket.error):
+            local_aliases.update(['127.0.0.1', 'localhost', '::1', '[::1]'])
+            local_aliases.update(local_info[1])
+            local_aliases.update(local_info[2])
+            local_aliases.update(self._get_aliases(hostname_))
+        except (socket.herror, socket.gaierror, socket.error) as err:
+            if self.verbose:
+                print("WARNING: Unable to find aliases for hostname"
+                      " '{0}' reason: {1}".format(hostname_, str(err)))
             # Try with the basic local aliases.
-            local_aliases = ['127.0.0.1', 'localhost', '::1', '[::1]']
+            local_aliases = set(['127.0.0.1', 'localhost', '::1', '[::1]'])
 
         # Get the aliases for this server host
-        self.aliases = get_aliases(self.host)
-
-        # List of possible suffixes
-        suffixes = ('.local', '.lan',)
+        self.aliases = self._get_aliases(self.host)
 
         # Check if this server is local
         for host in self.aliases:
             if host in local_aliases:
                 # Is local then save the local aliases for future.
-                extend_aliases(self.aliases, local_aliases)
+                self.aliases.update(local_aliases)
                 break
             # Handle special suffixes in hostnames.
             for suffix in suffixes:
@@ -763,22 +798,16 @@ class Server(object):
                     host, _ = host.rsplit('.', 1)
                     if host in local_aliases:
                         # Is local then save the local aliases for future.
-                        extend_aliases(self.aliases, local_aliases)
+                        self.aliases.update(local_aliases)
                         break
 
         # Check if the given host_or_ip is alias of the server host.
         if host_or_ip in self.aliases:
             return True
 
-        # lastly get the alias for the given host_or_ip
-        host_or_ip_aliases = get_aliases(host_or_ip)
-        extend_aliases(host_or_ip_aliases, [host_or_ip])
-        for alias in host_or_ip_aliases:
-            if alias in self.aliases:
-                #save the aliases for future
-                extend_aliases(self.aliases, host_or_ip_aliases)
-                return True
-        return False
+        # Check if any of the aliases of ip_or_host is also an alias of the
+        # host server.
+        return self._update_alias(host_or_ip, suffixes)
 
     def user_host_exists(self, user, host_or_ip):
         """Check to see if a user, host exists
