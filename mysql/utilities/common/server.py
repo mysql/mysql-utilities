@@ -785,7 +785,7 @@ class Server(object):
         self.aliases = self._get_aliases(self.host)
 
         # Check if this server is local
-        for host in self.aliases:
+        for host in self.aliases.copy():
             if host in local_aliases:
                 # Is local then save the local aliases for future.
                 self.aliases.update(local_aliases)
