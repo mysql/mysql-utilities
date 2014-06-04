@@ -1,35 +1,54 @@
-%if 0%{?rhel} && 0%{?rhel} <= 5
-%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%endif
+%define mysql_license   Commercial
+%define python_version  %(python -c "import distutils.sysconfig as ds; print ds.get_python_version()")
+%define name            mysql-utilities-commercial
+%define version         %(python -c "import mysql.utilities as mu; print('{0}.{1}.{2}'.format(*mu.VERSION[0:3]))")
+%define summary         MySQL Utilities contain a collection of scripts useful for managing and administering MySQL servers
+%define vendor          Oracle
+%define packager        Oracle and/or its affiliates Product Engineering Team <mysql-build@oss.oracle.com>
+%define copyright       Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 
 %global        doctrine mysql-fabric-doctrine-1.4.0
-%global        license_type            Commercial
-%global        copyright       Copyright (c) 2010, 2014, Oracle and/or its affiliates. 
-%global        product_suffix      -commercial
+%global        doctrine_file mysql-fabric-doctrine-1.4.0.zip
+%global        shortname  mysql-utilities
 
-Summary:       Collection of utilities used for maintaining and administering MySQL servers
-Name:          mysql-utilities%{product_suffix}
-Version:       1.4.2
-Release:       1%{?dist}
-License:       %{copyright} Use is subject to license terms.  Under %{license_type} license as shown in the Description field.
-Group:         Development/Libraries
-URL:           https://dev.mysql.com/downloads/tools/utilities/
-Source0:       https://cdn.mysql.com/Downloads/MySQLGUITools/mysql-utilities-commercial-%{version}.zip
-BuildArch:     noarch
+# Following are given defined from the environment/command line:
+#  version
+#  release_info
+#  _topdir
+
+# Hack to use a pattern using %P in the find command
+%define findpat %( echo "/%""P" )
+
+# Prevent manual pages to be compressed (also does not strip binaries, etc.)
+%global __os_install_post %{nil}
+
+Name:           %{name}
+Version:        %{version}
+Release:        1%{?dist}
+Summary:        %{summary}
+
+Group:          Development/Libraries
+License:        %{copyright} Use is subject to license terms.  Under %{mysql_license} license as shown in the Description field.
+Vendor:         %{vendor}
+Packager:       %{packager}
+URL:            https://dev.mysql.com/downloads/tools/utilities/
+Source0:        %{name}-commercial%{version}-py%{python_version}.tar.gz
+BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch:      noarch
 BuildRequires: python-devel > 2.6
 Requires:      mysql-connector-python >= 1.2.1
-BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Obsoletes:      %{name} <= %{version}, mysql-utilities <= %{version},
+AutoReq:        no
+
+
 %description
+%{release_info}
 
-MySQL Utilities provides a collection of command-line utilities that
-are used for maintaining and administering MySQL servers, including:
- o Admin Utilities (Clone, Copy, Compare, Diff, Export, Import)
- o Replication Utilities (Setup, Configuration)
- o General Utilities (Disk Usage, Redundant Indexes, Search Meta Data)
- o And many more.
-
-This particular copy of the software is released under a commercial
-license and the GNU General Public License does not apply.
+This is a release of MySQL Utilities. For the avoidance of
+doubt, this particular copy of the software is released
+under a commercial license and the GNU General Public
+License does not apply.
+MySQL Utilities is brought to you by Oracle.
 
 %{copyright}
 
@@ -39,7 +58,7 @@ This distribution may include materials developed by third
 parties. For license and attribution notices for these
 materials, please refer to the documentation that accompanies
 this distribution (see the "Licenses for Third-Party Components"
-appendix) or view the online documentation at
+appendix) or view the online documentation at 
 <http://dev.mysql.com/doc/>
 
 %package       extra
@@ -51,32 +70,34 @@ This package contains additional files mysql-utilities such as a MySQL
 Fabric support for Doctrine Object Relational Mapper.
 
 %prep
-%setup -q
-unzip data/%{doctrine}*
-
-%build
-%{__python} setup.py build
 
 %install
 rm -rf %{buildroot}
+echo %{buildroot}
+mkdir -p %{buildroot}%{python_sitelib}
+mkdir -p %{buildroot}%{_mandir}
+cp -a %{bdist_dir}mysql %{buildroot}%{python_sitelib}
+cp -p %{bdist_dir}*.egg-info %{buildroot}%{python_sitelib}
+cp -a %{bdist_dir}/usr/bin %{buildroot}%{_exec_prefix}/bin
+cp -a %{bdist_dir}/docs %{buildroot}%{_mandir}
 
-%{__python} setup.py install --skip-build --root %{buildroot}
-install -d %{buildroot}%{_mandir}/man1
-%{__python} setup.py install_man --root %{buildroot}
+if [ -d %{bdist_dir}/etc ];
+then
+    cp -a %{bdist_dir}/etc %{buildroot}
+fi
 
-# Shipped in c/python
-rm -f  %{buildroot}%{python_sitelib}/mysql/__init__.py*
-
-# Moved to sub package
-rm  %{buildroot}%{_sysconfdir}/mysql/%{doctrine}*
-cp -a %{doctrine} %{buildroot}%{_datadir}/%{name}/
+rm %{buildroot}%{python_sitelib}/mysql/__init__.pyc
+unzip  %{buildroot}/etc/mysql/%{doctrine_file} -d %{buildroot}/etc/mysql
+cp -a %{buildroot}/etc/mysql/%{doctrine} %{buildroot}/usr/share/%{shortname}
+rm -rf %{buildroot}/etc/mysql/%{doctrine}*
 
 %clean
 rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, -)
-%doc CHANGES.txt LICENSE.txt README.txt
+%doc %{bdist_dir}README_com.txt
+%doc %{bdist_dir}LICENSE_com.txt
 %config(noreplace) %{_sysconfdir}/mysql/fabric.cfg
 %dir %{_sysconfdir}/mysql
 %{_bindir}/mysqlauditadmin
@@ -107,19 +128,32 @@ rm -rf %{buildroot}
 %if 0%{?rhel} > 5 || 0%{?fedora} > 12
 %{python_sitelib}/mysql_utilities-*.egg-info
 %endif
-%{_mandir}/man1/mysql*.1*
+%{_mandir}/*
 
 %files extra
 %defattr(-, root, root, -)
-%{_datadir}/%{name}
+%{_datadir}/%{shortname}
+
+%post
+touch %{python_sitelib}/mysql/__init__.py
+
+%postun
+if [ $1 == 0 ];
+then
+    # Try to remove the MySQL top package mysql/
+    SUBPKGS=`ls --ignore=*.py{c,o} -m %{python_sitelib}/mysql`
+    if [ "$SUBPKGS" == "__init__.py" ];
+    then
+        rm %{python_sitelib}/mysql/__init__.py* 2>/dev/null 1>&2
+        # This should not fail, but show error if any
+        rmdir %{python_sitelib}/mysql/
+    fi
+    exit 0
+fi
 
 %changelog
-* Wed Mar 26 2014 Balasubramanian Kandasamy <balasubramanian.kandasamy@oracle.com> - 1.4.2-1
+* Fri May 23 2014 Balasubramanian Kandasamy <balasubramanian.kandasamy@oracle.com> - 1.4.3-1
 - Updated for commercial package
 
-* Wed Feb 26 2014  Balasubramanian Kandasamy <balasubramanian.kandasamy@oracle.com> - 1.4.2-1
-- Updated for 1.4.2
-- Add extra subpackage
-
-* Fri Jan 03 2014  Balasubramanian Kandasamy <balasubramanian.kandasamy@oracle.com> - 1.3.6-1
-- initial package
+* Mon Jul 29 2013 Israel Gomez <israel.gomez@oracle.com> - 1.0.0
+- Initial implementation, based on Geert Vanderkelen's implementation.
