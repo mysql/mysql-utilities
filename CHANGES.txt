@@ -1,4 +1,4 @@
-Release 1.5.0 (Released May 23, 2014)
+Release 1.5.0 (Released June 06, 2014)
 -------------------------------------
 
 - WL#7605: Add SSL Support
