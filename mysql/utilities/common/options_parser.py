@@ -26,7 +26,6 @@ C/py v2.0.0 is released and in the meanwhile will be used from here.
 
 import os
 from ConfigParser import SafeConfigParser, MissingSectionHeaderError
-from collections import OrderedDict
 
 DEFAULT_OPTION_FILES = {
     'nt': 'C:\\my.ini',
@@ -178,20 +177,18 @@ class MySQLOptionsParser(SafeConfigParser):
 
     def get_groups_as_dict(self, *args):
         """Returns options from all the groups specified as arguments. For each
-        group the option are contained in a dictionary. The order in which
-        the groups are specified is important as the method returns an
-        OrderedDict which maintains the order of groups. Options are not
+        group the option are contained in a dictionary. Options are not
         overridden in between the groups.
 
         *args[in]    Each group to be returned can be requested by given his
                      name as an argument.
 
-        Returns an OrderedDict of dictionaries
+        Returns a dictionary of dictionaries.
         """
         if len(args) == 0:
             args = self._sections.keys()
 
-        options = OrderedDict()
+        options = {}
         for group in args:
             try:
                 options[group] = dict(self._sections[group])

@@ -936,7 +936,7 @@ class Server(object):
                             "Error {1}".format(self.role, err.msg), err.errno)
         except AttributeError as err:
             raise UtilError("Cannot connect to the {0} server.\n"
-                            "Error {1}".format(self.role, err.message))
+                            "Error {1}".format(self.role, err))
 
     def disconnect(self):
         """Disconnect from the server.
