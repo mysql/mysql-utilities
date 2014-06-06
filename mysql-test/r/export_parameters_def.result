@@ -32,8 +32,8 @@ Options:
                         metadata followed by the data (default: export
                         definitions)
   -b, --bulk-insert     use bulk insert statements for data (default:False)
-  -h, --no-headers      do not display the column headers - ignored for grid
-                        format
+  -h, --no-headers      do not show column headers (only applies to formats:
+                        tab, csv).
   --skip-blobs          do not export blob data.
   --file-per-table      write table data to separate files. Valid only for
                         --export=data or --export=both.

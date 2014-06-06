@@ -36,6 +36,7 @@ from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import (add_verbosity, add_format_option,
+                                            add_no_headers_option,
                                             setup_common_options)
 
 
@@ -71,10 +72,8 @@ if __name__ == '__main__':
     add_format_option(parser, "display the output in either grid (default), "
                       "tab, csv, or vertical format", "grid")
 
-    # Header row
-    parser.add_option("-h", "--no-headers", action="store_true",
-                      dest="no_headers", default=False,
-                      help="do not show column headers")
+    # No header option
+    add_no_headers_option(parser, restricted_formats=['grid', 'tab', 'csv'])
 
     # Binlogs option
     parser.add_option("-b", "--binlog", action="store_true", dest="do_binlog",

@@ -28,7 +28,8 @@ Options:
                         definitions)
   -d, --drop-first      drop database before importing.
   -b, --bulk-insert     use bulk insert statements for data (default:False)
-  -h, --no-headers      files do not contain column headers
+  -h, --no-headers      files do not contain column headers (only applies to
+                        formats: tab, csv).
   --dryrun              import the files and generate the statements but do
                         not execute them - useful for testing file validity
   --table=TABLE         destination table in the form: <db>.<table>.

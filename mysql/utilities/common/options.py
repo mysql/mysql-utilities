@@ -267,6 +267,31 @@ def add_format_option_with_extras(parser, help_text, default_val,
                       choices=formats)
 
 
+def add_no_headers_option(parser, restricted_formats=None, help_msg=None):
+    """Add the --no-headers option.
+
+    parser[in]              The parser instance.
+    restricted_formats[in]  List of formats supported by this option (only
+                            applies to them).
+    help_msg[in]            Alternative help message to use, otherwise a
+                            default one is used.
+    """
+    # Create the help message according to any format restriction.
+    if restricted_formats:
+        plural = "s" if len(restricted_formats) > 1 else ""
+        formats_msg = (" (only applies to format{0}: "
+                       "{1})").format(plural, ", ".join(restricted_formats))
+    else:
+        formats_msg = ""
+    if help_msg:
+        help_msg = "{0}{1}.".format(help_msg, formats_msg)
+    else:
+        help_msg = "do not show column headers{0}.".format(formats_msg)
+    # Add the option.
+    parser.add_option("-h", "--no-headers", action="store_true",
+                      dest="no_headers", default=False, help=help_msg)
+
+
 def add_verbosity(parser, quiet=True):
     """Add the verbosity and quiet options.
 

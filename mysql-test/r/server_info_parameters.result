@@ -15,7 +15,8 @@ Options:
   -f FORMAT, --format=FORMAT
                         display the output in either grid (default), tab, csv,
                         or vertical format
-  -h, --no-headers      do not show column headers
+  -h, --no-headers      do not show column headers (only applies to formats:
+                        grid, tab, csv).
   -d, --show-defaults   show defaults from the config file per server
   -s, --start           start server in read only mode if offline
   --basedir=BASEDIR     the base directory for the server
