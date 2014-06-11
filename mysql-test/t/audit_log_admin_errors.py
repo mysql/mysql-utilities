@@ -226,6 +226,16 @@ class test(audit_log_admin.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        num_test += 1
+        comment = ("Test case {0} - User connection failure "
+                   "".format(num_test))
+        cmd_opts = "--server=r:r@notthere --show-options"
+        res = self.run_test_case(1, cmd_base + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        self.replace_result("ERROR: Can't connect",
+                            "ERROR: Can't connect to XXXX\n")
         self.replace_result("mysqlauditadmin: error: Server connection values"
                             " invalid",
                             "mysqlauditadmin: error: Server connection "

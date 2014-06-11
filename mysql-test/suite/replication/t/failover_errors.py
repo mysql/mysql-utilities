@@ -21,6 +21,7 @@ failover_errors test.
 
 import os
 import socket
+import time
 
 import mutlib
 import rpl_admin_gtid
@@ -150,6 +151,19 @@ class test(rpl_admin_gtid.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - Connection failure".format(test_num))
+        cmd_str = "mysqlfailover.py health "
+        cmd_opts = (" --master={0} --slaves={1} --candidates=root:root@{2}:"
+                    "{3} ".format(master_conn,
+                                  "nope@notthere:90125",
+                                  "nothere",
+                                  self.server2.port))
+        res = mutlib.System_test.run_test_case(self, 1, cmd_str + cmd_opts,
+                                               comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.reset_topology()
 
         self.replace_substring(str(self.m_port), "PORT1")
@@ -159,6 +173,11 @@ class test(rpl_admin_gtid.test):
         self.replace_substring(str(self.s4_port), "PORT5")
 
         self.remove_result("NOTE: Log file")
+
+        self.replace_result("ERROR: Can't connect to MySQL server on",
+                            "ERROR: Can't connect to MySQL server on XXXX\n")
+
+        self.remove_result("{0}".format(time.localtime()[0]))
 
         return True
 

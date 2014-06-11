@@ -57,7 +57,8 @@ class test(check_index.test):
         comment = ("Test case {0} - error: invalid login to "
                    "server".format(test_num))
         res = self.run_test_case(1, "mysqlindexcheck.py util_test_a "
-                                    "--server=nope:nada@localhost:3306",
+                                    "--server=nope:nada@localhost:"
+                                    "{0}".format(self.server1.port),
                                  comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -121,6 +122,8 @@ class test(check_index.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        self.replace_result("ERROR: Can't connect",
+                            "ERROR: Can't connect to XXXX\n")
         self.replace_any_result(["Error 1045", "Error 2003",
                                  "Error Can't connect to MySQL server on",
                                  "Error Access denied for user"],

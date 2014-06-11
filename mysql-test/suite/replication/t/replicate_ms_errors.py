@@ -113,6 +113,21 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test cade {0} - Connection error".format(test_num))
+        cmd_str = "mysqlrplms.py {0}"
+        cmd_opts = (
+            "--slave=nope@notthere",
+            "--masters={0}".format(",".join([master1_conn, master2_conn])),
+        )
+        res = self.run_test_case(
+            1, cmd_str.format(" ".join(cmd_opts)), comment
+        )
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        self.replace_result("ERROR: Can't connect to MySQL server on",
+                            "ERROR: Can't connect to MySQL server on XXXX\n")
         return True
 
     def get_result(self):

@@ -256,7 +256,8 @@ class test(replicate.test):
                             "ERROR: Query failed. 1227: Access denied;\n")
 
         self.replace_any_result(
-            ["Error 2002: Can't connect to", "Error 2003: Can't connect to",
+            ["ERROR: Can't connect to MySQL server on",
+             "Error 2002: Can't connect to", "Error 2003: Can't connect to",
              "Error Can't connect to MySQL server on "],
             "Error ####: Can't connect to local MySQL server ####...\n")
 

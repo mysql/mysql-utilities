@@ -55,8 +55,8 @@ Test case 9 - No pri key
 #
 # ...done
 Test case 10 - Invalid --character-set
-# server1 on localhost: ... ERROR: Cannot connect to the server1 server.
-Error Character set 'unsupported_charset' unsupported.
+# server1 on localhost: ... 
+ERROR: Character set 'unsupported_charset' unsupported.
 Test case 11 - Invalid --use-indexes and different indexes
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.

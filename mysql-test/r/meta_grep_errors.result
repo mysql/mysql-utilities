@@ -4,3 +4,5 @@ Test case 2 - invalid --object-type.
 ERROR: Invalid object type 'function'. Use --help to see allowed values.
 Test case 3 - invalid --search-objects.
 ERROR: Invalid object type 'foo'. Use --help to see allowed values.
+Test case 4 - invalid user.
+ERROR: 2003: Can't connect to XXXX

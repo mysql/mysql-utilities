@@ -51,6 +51,18 @@ class test(proc_grep.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = "Test case {0} - invalid user".format(test_num)
+        cmd_base = "mysqlprocgrep.py --server=nope@nada"
+        cmd = ("{0} --match-user={1} "
+               "".format(cmd_base, conn_val[0]))
+        res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        self.replace_result("ERROR: 2003: Can't connect to MySQL server",
+                            "ERROR: 2003: Can't connect to XXXX\n")
+
         return True
 
     def get_result(self):

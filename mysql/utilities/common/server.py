@@ -215,7 +215,12 @@ def get_server(name, values, quiet):
         server_conn = Slave(server_options)
     else:
         server_conn = Server(server_options)
-    server_conn.connect()
+    try:
+        server_conn.connect()
+    except:
+        if not quiet:
+            print("")
+        raise
 
     return server_conn
 
@@ -372,8 +377,12 @@ def connect_servers(src_val, dest_val, options=None):
                             (dest_name, version))
     elif not quiet and dest_dict is not None and \
             not isinstance(dest_val, Server):
-        _print_connection(dest_name, src_dict)
-        print "connected."
+        try:
+            _print_connection(dest_name, src_dict)
+            print "connected."
+        except:
+            print("")
+            raise
     return (source, destination)
 
 
@@ -900,8 +909,7 @@ class Server(object):
             # Return MySQL connection object.
             return db_conn
         except mysql.connector.Error as err:
-            raise UtilError("Cannot connect to the {0} server.\n"
-                            "Error {1}".format(self.role, err.msg), err.errno)
+            raise UtilError(err.msg, err.errno)
 
     def disconnect(self):
         """Disconnect from the server.

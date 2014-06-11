@@ -1,2 +1,4 @@
 Test case 1 - invalid --character-set
 ERROR: Character set 'unsupported_charset' unsupported.
+Test case 2 - invalid user
+ERROR: 2003: Can't connect to XXXX

@@ -1,13 +1,13 @@
 Test case 1 - error: invalid login to source server
-# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+# Source on XXXX-XXXX: ... 
 Error XXXX: Access denied
 Test case 2 - error: invalid login to source server with --list option
 WARNING: The --destination option is not required for '--list' (option ignored).
-# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
+# Source on XXXX-XXXX: ... 
 Error XXXX: Access denied
 Test case 3 - error: invalid login to destination server
 # Source on XXXX-XXXX: ... connected.
-# Destination on XXXX-XXXX: ... ERROR: Cannot connect to the Destination server.
+# Destination on XXXX-XXXX: ... 
 Error XXXX: Access denied
 Test case 4 - error: no arguments
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost

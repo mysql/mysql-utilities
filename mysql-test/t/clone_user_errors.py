@@ -122,7 +122,7 @@ class test(clone_user.test):
 
         # Replace error code.
         self.replace_any_result(["Error 1045", "Error 2003",
-                                 "Error Can't connect to MySQL server on",
+                                 "ERROR: Can't connect to",
                                  "Error Access denied for user"],
                                 "Error XXXX: Access denied\n")
 

@@ -45,3 +45,8 @@ Total size of logs = XXXX
 # Relay log information not accessible. User must have the SUPER or REPLICATION CLIENT privilege.
 # InnoDB is disabled on this server.
 #...done.
+Test Case 3 : Using bad user account.
+# Source on localhost: ... 
+Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage: error: Access denied for user 'root'@'localhost' (using password: YES)

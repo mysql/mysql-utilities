@@ -65,5 +65,5 @@ Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:p
 
 mysqldiff: error: No objects specified to compare.
 Test case 13 - invalid --character-set
-# server1 on localhost: ... ERROR: Cannot connect to the server1 server.
-Error Character set 'unsupported_charset' unsupported.
+# server1 on localhost: ... 
+ERROR: Character set 'unsupported_charset' unsupported.

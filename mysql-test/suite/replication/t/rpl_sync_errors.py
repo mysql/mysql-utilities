@@ -161,6 +161,8 @@ class test(mutlib.System_test):
     def do_masks(self):
         """Masks non deterministic connection error code.
         """
+        self.replace_result("ERROR: Can't connect to",
+                            "ERROR Can't connect to MySQL XXXXX\n")
         self.replace_any_result(
             ["Error 2003: Can't connect to MySQL server on 'localhost'",
              "Error Can't connect to MySQL server on 'localhost:999999'"],

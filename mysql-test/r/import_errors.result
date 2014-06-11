@@ -52,8 +52,8 @@ Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.gri
 
 mysqldbimport: error: Server connection values invalid
 Test case 9 - error: cannot connect to server
-# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
-Error Access denied for user 'nope'@'localhost' (using password: YES)
+# Source on XXXX-XXXX: ... 
+ERROR: Access denied for user 'nope'@'localhost' (using password: YES)
 Test case 10 - error: not enough privileges
 # Source on XXXX-XXXX: ... connected.
 # Importing definitions from test_run.txt.
@@ -102,8 +102,8 @@ ERROR: Cannot read an import file generated with --display=NAMES
 AFTER:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 19 - invalid --character-set
-# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
-Error Character set 'unsupported_charset' unsupported.
+# Source on XXXX-XXXX: ... 
+ERROR: Character set 'unsupported_charset' unsupported.
 Running export to test_run.txt...
 Test case 20 - error: invalid multiprocess value.
 Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid

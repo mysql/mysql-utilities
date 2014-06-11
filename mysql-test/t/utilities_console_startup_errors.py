@@ -125,10 +125,13 @@ class test(mutlib.System_test):
             self.results = [line.replace("\r", "")
                             for line in file_res.readlines()]
 
-            self.replace_result(("The execution of the command returned: "
-                                 "python: can't open file"),
-                                ("The execution of the command returned: "
-                                 "python: can't open file ...\n"))
+            self.replace_any_result([("The execution of the command "
+                                      "returned: /"),
+                                     ("The execution of the command "
+                                      "returned: python: can't open file")],
+                                     ("The execution of the command "
+                                      "returned: python: can't open file "
+                                      "...\n"))
 
         if self.debug:
             print("\n")

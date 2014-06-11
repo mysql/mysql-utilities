@@ -3,11 +3,11 @@ Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.ta
 
 mysqlindexcheck: error: You must specify at least one table or database to check.
 Test case 2 - error: invalid source specified
-# Source on nohost: ... ERROR: Cannot connect to the Source server.
-Error XXXX: Access denied
+# Source on nohost: ... 
+ERROR: Can't connect to XXXX
 Test case 3 - error: invalid login to server
-# Source on localhost: ... ERROR: Cannot connect to the Source server.
-Error XXXX: Access denied
+# Source on localhost: ... 
+ERROR: Access denied for user 'nope'@'localhost' (using password: YES)
 Test case 4 - error: stats and best=alpha
 Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 

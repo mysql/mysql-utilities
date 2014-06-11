@@ -155,8 +155,9 @@ class test(frm_reader_base.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        self.replace_any_result(["Error 1045", "Error 2003",
-                                 "Error Can't connect to MySQL server on ",
+        self.replace_any_result(["mysqlfrm: error: Can't connect to MySQL ",
+                                 "Error 1045", "Error 2003",
+                                 "ERROR: Can't connect to MySQL server on ",
                                  "Error Access denied for user "],
                                 "Error ####: Can't connect to MySQL server"
                                 " on XXXXXXXXXXXXXXXXXXXX\n")

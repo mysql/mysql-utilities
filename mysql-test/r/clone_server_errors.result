@@ -9,10 +9,8 @@ Usage: mysqlserverclone --server=user:pass@host:port:socket --new-data=/tmp/data
 mysqlserverclone: error: Server to be cloned must be running on the same machine as mysqlserverclone.
 Test case 3 - error: no login
 # WARNING: Root password for new instance has not been set.
-ERROR: Cannot connect to the source server.
 Error ####: Can't connect to MySQL server on 'nothere:####'
 Test case 4 - error: cannot connect
-ERROR: Cannot connect to the source server.
 Error ####: Can't connect to MySQL server on 'nothere:####'
 Test case 5 - cannot create directory
 # Cloning the MySQL server running on XXXXX-XXXXX.
@@ -23,7 +21,6 @@ Usage: mysqlserverclone --server=user:pass@host:port:socket --new-data=/tmp/data
 
 mysqlserverclone: error: Target data directory exists and is not empty. Use --delete-data option to delete folder before cloning.
 Test case 7 - --new-data does not exist (but cannot connect)
-ERROR: Cannot connect to the source server.
 Error ####: Can't connect to MySQL server on 'nothere:####'
 Test case 8 - attempt to use existing port
 ERROR: Port ##### in use. Please choose an available port.

@@ -15,12 +15,12 @@ Test case 4 - error: old database doesn't exist
 # Destination on XXXX-XXXX: ... connected.
 ERROR: Source database does not exist - NOT_THERE_AT_ALL
 Test case 5 - error: cannot connect to source
-# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
-Error XXXX: Access denied
+# Source on XXXX-XXXX: ... 
+ERROR: Can't connect to XXXX
 Test case 6 - error: cannot connect to destination
 # Source on XXXX-XXXX: ... connected.
-# Destination on XXXX-XXXX: ... ERROR: Cannot connect to the Destination server.
-Error XXXX: Access denied
+# Destination on XXXX-XXXX: ... 
+ERROR: Can't connect to XXXX
 Test case 7 - users with minimal privileges
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
@@ -187,8 +187,8 @@ Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@h
 
 mysqldbcopy: error: The --rpl-user option must be used with the --rpl option.
 Test case 24 - Invalid --character-set
-# Source on XXXX-XXXX: ... ERROR: Cannot connect to the Source server.
-Error Character set 'unsupported_charset' unsupported.
+# Source on XXXX-XXXX: ... 
+ERROR: Character set 'unsupported_charset' unsupported.
 Test case 25 - error: invalid multiprocess value.
 Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
