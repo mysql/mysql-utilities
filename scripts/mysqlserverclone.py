@@ -34,7 +34,7 @@ from mysql.utilities.command import serverclone
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_basedir_option, add_verbosity,
-                                            check_basedir_option,
+                                            check_dir_option,
                                             setup_common_options)
 from mysql.utilities.common.server import Server
 
@@ -123,7 +123,7 @@ if __name__ == '__main__':
     opt, args = parser.parse_args()
 
     # Check the basedir option for errors (e.g., invalid path)
-    check_basedir_option(parser, opt.basedir)
+    check_dir_option(parser, opt.basedir, '--basedir')
 
     # Can only use --basedir and --datadir if --server is missing
     if opt.basedir is not None and opt.server is not None:

@@ -58,6 +58,9 @@ _INSERT_FC_TABLE = "INSERT INTO mysql.failover_console VALUES ('%s', '%s')"
 _DELETE_FC_TABLE = ("DELETE FROM mysql.failover_console WHERE host = '%s' "
                     "AND port = '%s'")
 
+# Idle time (in seconds) for polling user input to avoid high CPU usage.
+_IDLE_TIME_INPUT_POLLING = 0.01  # 10 ms
+
 # Try to import the windows getch() if it fails, we're on Posix so define
 # a custom getch() method to return keys.
 try:
@@ -88,7 +91,9 @@ except ImportError:
     def kbhit():
         """Make a keyboard hit method for Posix machines.
         """
-        return select([sys.stdin], [], [], 0) == ([sys.stdin], [], [])
+        # Use a timeout != 0 to avoid 100% CPU usage for polling user input.
+        return select([sys.stdin], [], [],
+                      _IDLE_TIME_INPUT_POLLING) == ([sys.stdin], [], [])
 
 
 def get_terminal_size():
@@ -441,16 +446,21 @@ class FailoverConsole(object):
 
         key = None
         done = False
-        # loop for interval in seconds while detecting keypress
-        while not done:
-            done = self.alarm <= time.time()
-            if not self.no_keyboard and kbhit() and not done:
-                key = getch()
-                done = True
-
-        # Reset terminal IO sys to older state
-        if not self.no_keyboard and os.name == "posix":
-            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+        try:
+            # Loop for interval in seconds while detecting keypress
+            while not done:
+                done = self.alarm <= time.time()
+                if not self.no_keyboard and kbhit() and not done:
+                    key = getch()
+                    done = True
+                if os.name != "posix":
+                    # On Windows wait a few ms to avoid 100% CPU usage for
+                    # polling input (handled in kbhit() for posix systems).
+                    time.sleep(_IDLE_TIME_INPUT_POLLING)
+        finally:
+            # Ensure terminal IO sys is reset to older state.
+            if not self.no_keyboard and os.name == "posix":
+                termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
 
         return key
 

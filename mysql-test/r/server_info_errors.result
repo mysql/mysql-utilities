@@ -29,3 +29,11 @@ Test case 9 - Invalid --start-timeout value
 Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
 
 mysqlserverinfo: error: option --start-timeout: invalid integer value: '1.5'
+Test case 10 - Invalid basedir with --start option.
+Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
+
+mysqlserverinfo: error: The specified path for --basedir option is not a directory: not_exist
+Test case 11 - Invalid datadir with --start option.
+Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
+
+mysqlserverinfo: error: The specified path for --datadir option is not a directory: not_exist

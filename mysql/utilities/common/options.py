@@ -806,12 +806,32 @@ def add_basedir_option(parser):
                       help="the base directory for the server")
 
 
-def check_basedir_option(parser, opt_basedir):
-    """ Check if the specified --basedir option is valid.
+def check_dir_option(parser, opt_value, opt_name, check_access=False,
+                     read_only=False):
+    """ Check if the specified directory option is valid.
+
+    Check if the value specified for the option is a valid directory, and if
+    the user has appropriate access privileges. An appropriate  parser error
+    is issued if the specified directory is invalid.
+
+    parser[in]          Instance of the option parser (optparse).
+    opt_value[in]       Value specified for the option.
+    opt_name[in]        Option name (e.g., --basedir).
+    check_access[in]    Flag specifying if the access privileges need to be
+                        checked. By default, False (no access check).
+    read_only[in]       Flag indicating if the access required is only for
+                        read or read/write. By default, False (read/write
+                        access). Note: only used if check_access=True.
     """
-    if opt_basedir and not os.path.isdir(get_absolute_path(opt_basedir)):
-        parser.error("The specified path for --basedir option is not a "
-                     "directory: %s" % opt_basedir)
+    # Check existence of specified directory.
+    if opt_value and not os.path.isdir(get_absolute_path(opt_value)):
+        parser.error("The specified path for {0} option is not a "
+                     "directory: {1}".format(opt_name, opt_value))
+    if check_access:
+        mode = os.R_OK if read_only else os.R_OK | os.W_OK
+        if not os.access(opt_value, mode):
+            parser.error("You do not have enough privileges to access the "
+                         "folder specified by {0}.".format(opt_name))
 
 
 def get_absolute_path(path):
