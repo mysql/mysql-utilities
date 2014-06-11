@@ -109,20 +109,21 @@ if __name__ == '__main__':
     # base user and the next N are the new users.
     opt, args = parser.parse_args()
 
+    # Fail if no --source provided
+    if not opt.source:
+        parser.error(PARSE_ERR_OPTS_REQ.format(opt='--source'))
+
+    # Fail if no users specified and not using the --list option
+    if not args and not opt.list_users:
+        parser.error("You must specify either a source user or use the --list "
+                     "option. See --help for details.")
+
     # Fail if dump and quiet set
     if opt.quiet and opt.dump:
         parser.error("You cannot use --quiet and --dump together.")
 
     # Warn if quiet and verbosity are both specified
     check_verbosity(opt)
-
-    # Fail if no --source provided
-    if not opt.source:
-        parser.error(PARSE_ERR_OPTS_REQ.format(opt='--source'))
-
-    # Fail if no arguments and no options.
-    if (len(args) == 0 or opt is None) and not opt.list_users:
-        parser.error("No arguments found. Use --help for available options.")
 
     # Parse source connection values
     try:
@@ -154,7 +155,8 @@ if __name__ == '__main__':
     else:
         # Make sure we have the base user plus at least one new user
         if len(args) < 2 and not opt.dump:
-            parser.error("Wrong parameter combination or no new users.")
+            parser.error("You need to specify at least one new user or use "
+                         "the --dump option.")
 
         base_user = args[0]
         new_user_list = args[1:]

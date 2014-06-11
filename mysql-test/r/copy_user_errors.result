@@ -8,11 +8,11 @@ Error XXXX: Access denied
 Test case 3 - error: no arguments
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
-mysqluserclone: error: No arguments found. Use --help for available options.
+mysqluserclone: error: You must specify either a source user or use the --list option. See --help for details.
 Test case 4 - error: no new user
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
-mysqluserclone: error: Wrong parameter combination or no new users.
+mysqluserclone: error: You need to specify at least one new user or use the --dump option.
 Test case 5 - error: cannot use dump and quiet together
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
