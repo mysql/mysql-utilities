@@ -33,7 +33,7 @@ from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_basedir_option, add_verbosity,
                                             add_format_option,
                                             add_no_headers_option,
-                                            check_basedir_option,
+                                            check_dir_option,
                                             setup_common_options)
 
 
@@ -100,8 +100,16 @@ if __name__ == '__main__':
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
 
-    # Check the basedir option for errors (e.g., invalid path)
-    check_basedir_option(parser, opt.basedir)
+    # The --basedir and --datadir options are only required if --start is used
+    # otherwise they are ignored.
+    if opt.start:
+        # Check the basedir option for errors (e.g., invalid path).
+        check_dir_option(parser, opt.basedir, '--basedir', check_access=True,
+                         read_only=True)
+
+        # Check the datadir option for errors.
+        check_dir_option(parser, opt.datadir, '--datadir', check_access=True,
+                         read_only=False)
 
     # Check start timeout for minimal value
     if int(opt.start_timeout) < 10:

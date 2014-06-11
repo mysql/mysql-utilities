@@ -18,6 +18,7 @@
 """
 This file contains the reporting mechanisms for reporting disk usage.
 """
+import getpass
 import os
 import subprocess
 import sys
@@ -312,8 +313,16 @@ def _start_server(server_val, basedir, datadir, options=None):
     post_5_6 = version is not None and \
         int(version[0]) >= 5 and int(version[1]) >= 6
 
+    # Get the user executing the utility to use in the mysqld options.
+    # Note: the option --user=user_name is mandatory to start mysqld as root.
+    user_name = getpass.getuser()
+
     # Start the instance
-    print "# Starting read-only instance of the server ...",
+    if verbosity > 0:
+        print "# Starting read-only instance of the server ..."
+        print "# --- BEGIN (server output) ---"
+    else:
+        print "# Starting read-only instance of the server ...",
     args = [
         "--no-defaults",
         "--skip-grant-tables",
@@ -321,6 +330,7 @@ def _start_server(server_val, basedir, datadir, options=None):
         "--port=%(port)s" % server_val,
         "--basedir=" + basedir,
         "--datadir=" + datadir,
+        "--user={0}".format(user_name),
     ]
 
     # It the server is 5.6 or later, we must use additional parameters
@@ -365,11 +375,21 @@ def _start_server(server_val, basedir, datadir, options=None):
             # Store exception to raise later (if needed).
             error = err
         i += 1
+
+    # Indicate end of the server output.
+    if verbosity > 0:
+        print "# --- END (server output) ---"
+
     # Raise last known exception (if unable to connect to the server)
     if error:
         raise error  # pylint: disable=E0702
                      # See: http://www.logilab.org/ticket/3207
-    print "done."
+
+    if verbosity > 0:
+        print "# done (server started)."
+    else:
+        print "done."
+
     return server
 
 
@@ -390,7 +410,13 @@ def _stop_server(server_val, basedir, options=None):
     verbosity = options.get("verbosity", 0)
     socket = server_val.get("unix_socket", None)
     mysqladmin_path = get_tool_path(basedir, "mysqladmin")
-    print "# Shutting down server ...",
+
+    # Stop the instance
+    if verbosity > 0:
+        print "# Shutting down server ..."
+        print "# --- BEGIN (server output) ---"
+    else:
+        print "# Shutting down server ...",
 
     if os.name == "posix":
         cmd = mysqladmin_path + " shutdown -uroot "
@@ -407,7 +433,12 @@ def _stop_server(server_val, basedir, options=None):
                                 stdout=fnull, stderr=fnull)
     # Wait for subprocess to finish
     proc.wait()
-    print "done."
+
+    if verbosity > 0:
+        print "# --- END (server output) ---"
+        print "# done (server stopped)."
+    else:
+        print "done."
 
 
 def _show_running_servers(start=3306, end=3333):
