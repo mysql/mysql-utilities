@@ -220,6 +220,10 @@ class test(mutlib.System_test):
         self.remove_result("root,")
         # Remove possible leftovers from other tests.
         self.remove_result("joe_wildcard,")
+        # Mask windows output, remove single quotes around hostname
+        if os.name == 'nt':
+            self.replace_result("# Dumping grants for user remote@'%'",
+                                "# Dumping grants for user remote@%\n")
 
         return True
 
