@@ -33,3 +33,20 @@ Test case 9 - error: missing source option
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 
 mysqluserclone: error: Option '--source' is required.
+Test case 10 - user from destination server does not have enough privileges to clone
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Cloning 1 users...
+# Cloning remote@% to user xxx:12345@localhost 
+ERROR: User xxx:12345@localhost cannot be cloned because destination user remote@localhost is missing the following privilege: WITH GRANT OPTION on `util_test`.*.
+Test case 11 - user from destination server does not have the privilege to create users
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Cloning 1 users...
+ERROR: Destination user user1@localhost needs either the 'CREATE USER' on *.* or 'INSERT' on mysql.* privilege to create new users.
+Test case 12 - user from destination server does not have the privilege to drop users
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Cloning 1 users...
+# Cloning remote@% to user remote@localhost 
+ERROR: Destination user user1@localhost needs either the 'CREATE USER' on *.* or 'DELETE' on mysql.* privilege to drop existing users.

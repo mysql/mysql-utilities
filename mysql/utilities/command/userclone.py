@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ to the new users.
 
 import sys
 
-from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.user import User
@@ -142,6 +142,18 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
     # Create an instance of the user class for destination.
     user_dest = User(destination, base_user, verbosity)
 
+    # First find out what is the user that will be giving of grants in the
+    # destination server.
+    try:
+        res = destination.exec_query("SELECT CURRENT_USER()")
+    except UtilDBError as err:
+        raise UtilError("Unable to obtain information about the account used "
+                        "to connect to the destination server: "
+                        "{0}".format(err.errmsg))
+
+    # Create an instance of the user who will be giving the privileges.
+    user_priv_giver = User(destination, res[0][0], verbosity)
+
     # Check to ensure base user exists.
     if not user_source.exists(base_user):
         raise UtilError("Base user does not exist!")
@@ -160,6 +172,21 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
 
     if not quiet:
         print "# Cloning %d users..." % (len(new_user_list))
+    # Check privileges to create/delete users.
+    can_create = can_drop = False
+    if user_priv_giver.has_privilege('*', '*', "CREATE_USER"):
+        can_create = can_drop = True
+    else:
+        if user_priv_giver.has_privilege('mysql', '*', "INSERT"):
+            can_create = True
+        if user_priv_giver.has_privilege('mysql', '*', "DELETE"):
+            can_drop = True
+
+    if not can_create:  # Destination user cannot create new users.
+        raise UtilError("Destination user {0}@{1} needs either the "
+                        "'CREATE USER' on *.* or 'INSERT' on mysql.* "
+                        "privilege to create new users."
+                        "".format(user_priv_giver.user, user_priv_giver.host))
 
     # Perform the clone here. Loop through new users and clone.
     for new_user in new_user_list:
@@ -167,10 +194,33 @@ def clone_user(src_val, dest_val, base_user, new_user_list, options):
             print "# Cloning %s to user %s " % (base_user, new_user)
         # Check to see if user exists.
         if user_dest.exists(new_user):
+            if not can_drop:  # Destination user cannot drop existing users.
+                raise UtilError("Destination user {0}@{1} needs either the "
+                                "'CREATE USER' on *.* or 'DELETE' on mysql.* "
+                                "privilege to drop existing users."
+                                "".format(user_priv_giver.user,
+                                          user_priv_giver.host))
+
             user_dest.drop(new_user)
         # Clone user.
         try:
-            user_source.clone(new_user, destination, global_privs)
+            missing_privs = user_priv_giver.missing_user_privileges(
+                user_source, plus_grant_option=True)
+            if not missing_privs:
+                user_source.clone(new_user, destination, global_privs)
+            else:
+                # Our user lacks some privileges, lets create an informative
+                # error message
+                pluralize = '' if len(missing_privs) == 1 else 's'
+                missing_privs_str = ', '.join(
+                    ["{0} on {1}.{2}".format(priv, db, table) for
+                     priv, db, table in missing_privs])
+                raise UtilError("User {0} cannot be cloned because destination"
+                                " user {1}@{2} is missing the following "
+                                "privilege{3}: {4}."
+                                "".format(new_user, user_priv_giver.user,
+                                          user_priv_giver.host, pluralize,
+                                          missing_privs_str))
         except UtilError:
             raise
 

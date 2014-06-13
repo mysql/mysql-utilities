@@ -129,9 +129,9 @@ class test(mutlib.System_test):
                                       "returned: /"),
                                      ("The execution of the command "
                                       "returned: python: can't open file")],
-                                     ("The execution of the command "
-                                      "returned: python: can't open file "
-                                      "...\n"))
+                                    ("The execution of the command "
+                                     "returned: python: can't open file "
+                                     "...\n"))
 
         if self.debug:
             print("\n")
