@@ -228,3 +228,6 @@ class TestUserPrivileges(unittest.TestCase):
             self.user1))
         self.assertEquals(set([("WITH GRANT OPTION", '*', '*')]),
                           self.user1.missing_user_privileges(self.user2))
+
+if __name__ == '__main__':
+    unittest.main()
