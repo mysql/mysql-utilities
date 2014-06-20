@@ -19,6 +19,8 @@
 clone_user_errors test.
 """
 
+import os
+
 import clone_user
 
 from mysql.utilities.exception import MUTLibError, UtilDBError
@@ -208,6 +210,10 @@ class test(clone_user.test):
                             "values invalid",
                             "mysqluserclone: error: Destination connection "
                             "values invalid\n")
+        # Mask windows output, remove single quotes around hostname
+        if os.name == 'nt':
+            self.replace_substring_portion("Cloning remote@'%'", "to",
+                                           "Cloning remote@% to")
 
         # Mask known source and destination host name.
         self.replace_substring("on localhost", "on XXXX-XXXX")
