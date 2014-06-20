@@ -32,7 +32,8 @@ from mysql.utilities.common.format import print_dictionary_list
 from mysql.utilities.common.variables import Variables
 from mysql.utilities.exception import UtilError
 
-
+# TODO remove this pylint disable regarding duplicate keys
+# pylint: disable=W0109
 _COMMAND_KEY = {
     '\x7f': 'DELETE_POSIX',
     '\x1b[3~': 'DELETE_MAC',
@@ -44,6 +45,7 @@ _COMMAND_KEY = {
     '\x1b[C': 'ARROW_RT',
     '\x1b[D': 'ARROW_LT',
     '\t': 'TAB',
+    '\x7f': 'BACKSPACE_POSIX',
     '\xe0': 'SPECIAL_WIN',
     '\x08': 'BACKSPACE_WIN'
 }
