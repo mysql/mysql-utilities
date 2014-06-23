@@ -190,15 +190,18 @@ def get_port(process_id):
     Returns str - The port number where the server is listening
     """
     plat = platform.system()
-
     if plat == "Linux":
-        cmd = "netstat -anop --tcp | grep {0} | grep LISTEN".format(process_id)
-        pid_column = 6
-        port_column = 3
+        cmd = ("ps ax | grep mysqld | grep -v grep | "
+               "sed -nr 's/^.*({0}).*(--port=|-P )([0-9]*).*/\\1 \\3/p'"
+               "".format(process_id))
+        pid_column = 0
+        port_column = 1
     elif plat == "Darwin":
-        cmd = "lsof -n -i | grep {0} | grep LISTEN".format(process_id)
-        pid_column = 1
-        port_column = 7
+        cmd = ("ps -A | grep mysqld | grep -v grep | "
+               "sed -nE 's/^.*({0}).*(--port=|-P )([0-9]*).*/\\1 \\3/p'"
+               "".format(process_id))
+        pid_column = 0
+        port_column = 1
     elif plat == "Windows":
         cmd = ('netstat -ano | find /I "{0}" | find /I '
                '"LISTEN"'.format(process_id))
@@ -213,8 +216,7 @@ def get_port(process_id):
             for line in f:
                 try:
                     columns = line.split()
-                    #  Getting pid only, because of Linux
-                    if columns[pid_column].split('/')[0] == str(process_id):
+                    if columns[pid_column] == str(process_id):
                         return columns[port_column].rsplit(':', 1)[-1]
                 except IndexError:  # we might be reading some warning messages
                     pass
