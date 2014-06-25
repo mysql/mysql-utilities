@@ -476,19 +476,16 @@ def add_regexp(parser):
                       "operator to match pattern. Default is to use 'LIKE'.")
 
 
-def add_rpl_user(parser, default_val="rpl:rpl"):
+def add_rpl_user(parser):
     """Add the --rpl-user option.
 
     parser[in]        the parser instance
-    default_val[in]   default value for user, password
-                      Default = rpl, rpl
     """
     parser.add_option("--rpl-user", action="store", dest="rpl_user",
-                      type="string", default=default_val,
+                      type="string",
                       help="the user and password for the replication "
                            "user requirement, in the form: <user>[:<password>]"
-                           " or <login-path>. E.g. rpl:passwd - By default = "
-                           "%default")
+                           " or <login-path>. E.g. rpl:passwd")
 
 
 def add_rpl_mode(parser, do_both=True, add_file=True):

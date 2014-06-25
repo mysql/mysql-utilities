@@ -109,7 +109,7 @@ WARNING: mysqlauditadmin failed to read options. This utility will not be shown 
                         <login-path>[:<port>][:<socket>].
   --rpl-user=RPL_USER   the user and password for the replication user
                         requirement, in the form: <user>[:<password>] or
-                        <login-path>. E.g. rpl:passwd - By default = rpl:rpl
+                        <login-path>. E.g. rpl:passwd
   -p, --pedantic        fail if storage engines differ among master and slave.
   --test-db=TEST_DB     database name to use in testing replication setup
                         (optional)

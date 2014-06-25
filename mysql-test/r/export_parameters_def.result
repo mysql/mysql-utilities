@@ -61,7 +61,7 @@ Options:
                         (default): consistent read using a single transaction.
   --rpl-user=RPL_USER   the user and password for the replication user
                         requirement, in the form: <user>[:<password>] or
-                        <login-path>. E.g. rpl:passwd - By default = none
+                        <login-path>. E.g. rpl:passwd
   --rpl=RPL_MODE, --replication=RPL_MODE
                         include replication information. Choices: 'master' =
                         include the CHANGE MASTER command using the source

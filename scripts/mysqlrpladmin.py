@@ -130,7 +130,7 @@ if __name__ == '__main__':
     add_verbosity(parser, True)
 
     # Replication user and password
-    add_rpl_user(parser, None)
+    add_rpl_user(parser)
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()

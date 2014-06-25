@@ -123,7 +123,7 @@ if __name__ == '__main__':
     add_regexp(parser)
 
     # Replication user and password
-    add_rpl_user(parser, None)
+    add_rpl_user(parser)
 
     # Add replication options but don't include 'both'
     add_rpl_mode(parser, False, False)
