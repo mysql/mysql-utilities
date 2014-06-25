@@ -692,7 +692,10 @@ class Console(object):
             self.tab_count = 0
         else:
             if len(matches) == 1:
-                new_cmd = matches[0]['name'] + ' '
+                if matches[0]['name'][:len(command_text)] == command_text:
+                    new_cmd = matches[0]['name'] + ' '
+                else:
+                    new_cmd = matches[0]['alias'] + ' '
                 self.tab_count = 0
                 self.cmd_line.add(new_cmd[len(command_text):])
 

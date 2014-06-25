@@ -16,6 +16,7 @@
 #
 
 import os
+import sys
 import unittest
 
 from mysql.utilities.common.console import _WIN_COMMAND_KEY
@@ -90,6 +91,41 @@ class TestUtilitiesConsole(unittest.TestCase):
         self.assertEqual("1234", self.util_con.cmd_line.command)
         self.util_con._process_command_keys('BACKSPACE_WIN')
         self.assertEqual("123", self.util_con.cmd_line.command)
+
+    def test_quit_tab(self):
+        """Test console response to Q+tab (should be 'quit').
+
+        NOTICE: This test is designed to be executed from the base of the
+        source tree. If you want to run it from elsewhere, you will need
+        to change the 'utildir' variable below.
+
+        """
+        options = {
+            'verbosity': False,
+            'quiet': False,
+            'width': 80,
+            'utildir': "./scripts",
+            'variables': [],
+            'prompt': '>',
+            'welcome': "",
+            'goodbye': "",
+            'commands': [],
+            'custom': True,
+            'hide_util': False,
+            'add_util': []
+        }
+        util_con = UtilitiesConsole(options)
+        stdout_backup = sys.stdout
+        try:
+            sys.stdout = open(os.devnull, 'w')
+            test_cases = ["q", "Q"]
+            for key in test_cases:
+                util_con.cmd_line.command = ""
+                util_con.cmd_line.add(key)
+                util_con.do_command_tab("q")
+                self.assertEqual(util_con.cmd_line.command, "{0}uit ".format(key))
+        finally:
+            sys.stdout = stdout_backup
 
 if __name__ == '__main__':
     unittest.main()

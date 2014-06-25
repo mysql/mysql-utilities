@@ -81,7 +81,9 @@ class test(mutlib.System_test):
         comment = ("Test case {0} - Test error with non-existent "
                    "utility".format(test_num))
         print(comment)
-        cmd = ["python", os.path.join(os.getcwd(), "../scripts/mysqlnotexst")]
+        cmd = ["python",
+               os.path.normpath(os.path.join(os.getcwd(),
+                                             "../scripts/mysqlnotexst"))]
         util_name = "mysqlnotexst"
         utils.get_util_info(cmd, util_name)
 
@@ -90,7 +92,9 @@ class test(mutlib.System_test):
                    "parameter".format(test_num))
         print(comment)
         utils = Utilities(self.options)
-        cmd = ["python", os.path.join(os.getcwd(), "../scripts/mysqldiff.py"),
+        cmd = ["python",
+               os.path.normpath(os.path.join(os.getcwd(),
+                                             "../scripts/mysqldiff.py")),
                "--unreal_option"]
         util_name = "mysqldiff"
         utils.get_util_info(cmd, util_name)
@@ -124,6 +128,12 @@ class test(mutlib.System_test):
 
             self.results = [line.replace("\r", "")
                             for line in file_res.readlines()]
+
+            if sys.platform == 'darwin':
+                self.replace_result(("The execution of the command returned: "
+                                     "/usr"),
+                                    ("The execution of the command returned: "
+                                     "python: can't open file ...\n"))
 
             self.replace_any_result([("The execution of the command "
                                       "returned: /"),
