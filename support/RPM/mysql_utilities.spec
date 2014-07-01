@@ -6,7 +6,7 @@
 
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
 Name:          mysql-utilities
-Version:       1.5.0
+Version:       1.5.1
 Release:       1%{?dist}
 License:       GPLv2
 Group:         Development/Libraries
@@ -97,6 +97,9 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}
 
 %changelog
+* Tues Jul 01 2014 Chuck Bell <chuck.bell@oracle.com> - 1.5.1
+- Updated the Version to 1.5.1
+
 * Mon May 26 2014  Murthy Narkedimilli <murthy.narkedimilli@oracle.com> - 1.5.0
 - Updated the Version to 1.5.0
 
