@@ -1,4 +1,5 @@
 Test case 1 - use the test feature
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 # Checking for binary logging on master...
@@ -35,6 +36,7 @@ Test case 2 - show the help
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.
 Test case 3 - use the verbose feature
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 # master id = XXX
@@ -51,6 +53,7 @@ Test case 3 - use the verbose feature
 # IO thread running: Yes
 # ...done.
 Test case 4 - use the start-from-beginning feature
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 # Checking for binary logging on master...

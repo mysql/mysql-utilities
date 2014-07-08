@@ -74,6 +74,7 @@ Test case 14 - warning: --skip-blobs
 # WARNING: --skip-blobs option ignored for metadata import.
 # Source on XXXX-XXXX: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 Test case 15 - error: --skip=data & --import=data
 ERROR: You cannot use --import=data and --skip-data when importing table data.
@@ -125,6 +126,7 @@ Test case 24 - warning: max bulk insert ignored without bulk insert option.
 # WARNING: The --max-bulk-insert option is only used with --bulk-insert (option ignored).
 # Source on XXXX-XXXX: ... connected.
 # Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 Test case 25 - error: Use --drop-first to drop the database before importing.
 # Source on XXXX-XXXX: ... connected.

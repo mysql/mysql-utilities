@@ -696,6 +696,18 @@ if __name__ == "__main__":
             run_msg = None
             try:
                 run_ok = test_case.run()
+                #
+                # TODO: Replace this with the new result class from WL#7856
+                #       Tests can turn off this global check with
+                #       self.mask_global = False
+                #
+                mask_global = test_case.mask_global
+                result_file = test_case.res_fname
+                if mask_global:
+                    test_case.remove_result("WARNING: Using a password on "
+                                            "the comma")
+                    test_case.remove_result("# WARNING: Using a password on "
+                                            "the com")
             except MUTLibError:
                 _, e, _ = sys.exc_info()
                 if debug_mode:

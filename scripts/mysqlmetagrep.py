@@ -33,7 +33,8 @@ from mysql.utilities.command.grep import ObjectGrep, OBJECT_TYPES
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_regexp, setup_common_options,
                                             add_format_option,
-                                            add_character_set_option)
+                                            add_character_set_option,
+                                            check_password_security)
 from mysql.utilities.exception import UtilError
 
 # Check for connector/python
@@ -92,6 +93,9 @@ if __name__ == '__main__':
                       "tab, csv, or vertical format", "grid")
 
     options, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(options, args)
 
     _LOOKS_LIKE_CONNECTION_MSG = """Pattern '{pattern}' looks like a
     connection specification. Use --pattern if this is really what you

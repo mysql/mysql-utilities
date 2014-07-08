@@ -31,7 +31,9 @@ import sys
 
 from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command.check_rpl import check_replication
-from mysql.utilities.common.options import add_verbosity, setup_common_options
+from mysql.utilities.common.options import (add_verbosity,
+                                            setup_common_options,
+                                            check_password_security)
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
@@ -99,6 +101,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # option --master is required (mandatory)
     if not opt.master:

@@ -85,4 +85,4 @@ Test case 1 - show help
                         verbose, -vv = more verbose, -vvv = debug
   --rpl-user=RPL_USER   the user and password for the replication user
                         requirement, in the form: <user>[:<password>] or
-                        <login-path>. E.g. rpl:passwd - By default = none
+                        <login-path>. E.g. rpl:passwd

@@ -69,6 +69,7 @@ class test(failover.test):
         return True
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         # Create connection strings.
         master_conn = self.build_custom_connection_string(self.server1,
                                                           'm_user', 'm_pwd')

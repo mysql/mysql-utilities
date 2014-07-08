@@ -145,6 +145,7 @@ Helpful Hints
 Enjoy!
 
 Test case 2: - Check .frm files in a db folder
+WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files
@@ -935,6 +936,7 @@ CREATE TABLE `frm_test`.`t0001` (
 
 #...done.
 Test case 3: - Check .frm files in a db folder
+WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files
@@ -1081,6 +1083,7 @@ CREATE TABLE `frm_files`.`this.has.periods` (
 #
 #...done.
 Test case 4: - Export .frm files in a db folder
+WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files
@@ -1210,6 +1213,7 @@ CREATE TABLE `frm_files`.`this.has.periods` (
 #
 #...done.
 Test case 5: - User the --user option
+WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 # Spawning server with --user=JOE_USER.
 # Starting the spawned server on port XXXXXXX

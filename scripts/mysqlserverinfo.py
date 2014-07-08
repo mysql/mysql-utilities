@@ -34,7 +34,8 @@ from mysql.utilities.common.options import (add_basedir_option, add_verbosity,
                                             add_format_option,
                                             add_no_headers_option,
                                             check_dir_option,
-                                            setup_common_options)
+                                            setup_common_options,
+                                            check_password_security)
 
 
 # Constants
@@ -99,6 +100,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # The --basedir and --datadir options are only required if --start is used
     # otherwise they are ignored.

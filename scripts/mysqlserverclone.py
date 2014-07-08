@@ -35,7 +35,8 @@ from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_basedir_option, add_verbosity,
                                             check_dir_option,
-                                            setup_common_options)
+                                            setup_common_options,
+                                            check_password_security)
 from mysql.utilities.common.server import Server
 
 
@@ -121,6 +122,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Check the basedir option for errors (e.g., invalid path)
     check_dir_option(parser, opt.basedir, '--basedir')

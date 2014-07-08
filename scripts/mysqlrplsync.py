@@ -42,7 +42,8 @@ from mysql.utilities.common.options import (add_discover_slaves_option,
                                             add_slaves_option, add_verbosity,
                                             check_server_lists,
                                             db_objects_list_to_dictionary,
-                                            setup_common_options)
+                                            setup_common_options,
+                                            check_password_security)
 from mysql.utilities.common.server import check_hostname_alias, Server
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.topology import parse_topology_connections
@@ -170,6 +171,9 @@ if __name__ == '__main__':
 
     # Parse the options and arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # At least one of the options --discover-slaves-login or --slaves is
     # required.

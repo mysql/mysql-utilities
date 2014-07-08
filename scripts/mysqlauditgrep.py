@@ -42,7 +42,8 @@ from mysql.utilities.common.options import (add_verbosity, add_regexp,
                                             add_format_option_with_extras,
                                             CaseInsensitiveChoicesOption,
                                             license_callback,
-                                            UtilitiesParser)
+                                            UtilitiesParser,
+                                            check_password_security)
 
 
 class MyParser(UtilitiesParser):
@@ -163,6 +164,9 @@ if __name__ == '__main__':
 
     # Parse the command line arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Perform error checking
 

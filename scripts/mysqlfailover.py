@@ -42,7 +42,8 @@ from mysql.utilities.common.options import (add_verbosity, add_rpl_user,
                                             add_failover_options,
                                             check_server_lists,
                                             license_callback,
-                                            UtilitiesParser)
+                                            UtilitiesParser,
+                                            check_password_security)
 
 
 # Constants
@@ -201,6 +202,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Check slaves list
     if opt.daemon != "stop":

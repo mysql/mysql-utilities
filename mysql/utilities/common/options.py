@@ -29,6 +29,7 @@ import os.path
 import re
 
 from optparse import Option as CustomOption, OptionValueError
+from ip_parser import find_password
 
 from mysql.utilities import LICENSE_FRM, VERSION_FRM
 from mysql.utilities.exception import UtilError, FormatError
@@ -894,3 +895,39 @@ def db_objects_list_to_dictionary(parser, obj_list, option_desc):
                 else:
                     db_objs_dict[db_name] = set([obj_name])
     return db_objs_dict
+
+
+def check_password_security(options, args, prefix=""):
+    """Check command line for passwords and report a warning.
+
+    This method checks all options for passwords in the form ':%@'. If
+    this pattern is found, the method with issue a warning to stdout and
+    return True, else it returns False.
+
+    Note: this allows us to make it possible to abort if command-line
+          passwords are found (not the default...yet).
+
+    options[in]     list of options
+    args[in]        list of arguments
+    prefix[in]      (optional) allows preface statement with # or something
+                    for making the message a comment in-stream
+
+    Returns - bool : False = no passwords, True = password found and msg shown
+    """
+    result = False
+    for value in options.__dict__.values():
+        if type(value) == list:
+            for item in value:
+                if find_password(item):
+                    result = True
+        else:
+            if find_password(value):
+                result = True
+    for arg in args:
+        if find_password(arg):
+            result = True
+    if result:
+        print("{0}WARNING: Using a password on the command line interface"
+              " can be insecure.".format(prefix))
+
+    return result

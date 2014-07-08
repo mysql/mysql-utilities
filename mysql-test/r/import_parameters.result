@@ -66,6 +66,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 2 - no grants
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -75,6 +76,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 3 - no events
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -84,6 +86,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 4 - no triggers
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -93,6 +96,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 5 - no views
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -102,6 +106,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 6 - no procedures
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -111,6 +116,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 7 - no functions
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -120,6 +126,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 8 - no tables
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -129,6 +136,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 9 - no create_db
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was NOT created.
@@ -139,6 +147,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 10 - no grants
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -148,6 +157,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 11 - no events
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -157,6 +167,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 12 - no triggers
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -166,6 +177,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 13 - no views
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -175,6 +187,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 14 - no procedures
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -184,6 +197,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 15 - no functions
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -193,6 +207,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 16 - no tables
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was created.
@@ -202,6 +217,7 @@ OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 
 Test case 17 - no create_db
 # Source on localhost: ... connected.
 # Importing definitions from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 Database was NOT created.
@@ -210,6 +226,7 @@ Generating import file
 Test case 18 - no events
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 SET FOREIGN_KEY_CHECKS=0;
 CREATE DATABASE `util_test`;
 CREATE TABLE `util_test`.`t1` (
@@ -292,6 +309,7 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 19 - no data
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 SET FOREIGN_KEY_CHECKS=0;
 CREATE DATABASE `util_test`;
 CREATE TABLE `util_test`.`t1` (
@@ -367,6 +385,7 @@ Test case 20 - no blobs
 # WARNING: --skip-blobs option ignored for metadata import.
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 SET FOREIGN_KEY_CHECKS=0;
 CREATE DATABASE `util_test`;
 CREATE TABLE `util_test`.`t1` (
@@ -444,6 +463,7 @@ INSERT INTO `util_test`.`t5` VALUES  (1, 'kitkat', 0.99, 19),  (2, 'M&M', 5.99, 
 SET FOREIGN_KEY_CHECKS=1;
 #...done.
 Test case 21 - no messages (quiet)
+CAUTION: The following warning messages were included in the import file:
 Test case 22 - multiprocessing.
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -451,6 +471,7 @@ Running export...
 Running import...
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done. (test_run.txt)
 AFTER:
 OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
@@ -461,6 +482,7 @@ Running export...
 Running import...
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 

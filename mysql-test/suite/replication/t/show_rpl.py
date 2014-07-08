@@ -91,6 +91,7 @@ class test(mutlib.System_test):
         return True
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         self.res_fname = "result.txt"
 
         master_con = self.build_connection_string(self.server_list[2])

@@ -20,7 +20,9 @@
 This file contains the mysql utilities client.
 """
 
-from mysql.utilities.common.options import license_callback, UtilitiesParser
+from mysql.utilities.common.options import (license_callback,
+                                            UtilitiesParser,
+                                            check_password_security)
 from mysql.utilities.common.tools import (check_connector_python,
                                           check_python_version)
 
@@ -139,6 +141,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Warn if quiet and verbosity are both specified
     check_verbosity(opt)

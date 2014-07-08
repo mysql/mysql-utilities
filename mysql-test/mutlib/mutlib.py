@@ -762,6 +762,7 @@ class System_test(object):
         self.utildir = utildir      # Location of utilities being tested
         self.verbose = verbose      # Option for verbosity
         self.debug = debug          # Option for diagnostic work
+        self.mask_global = True     # Apply global masks to all tests
 
     def __del__(self):
         """Destructor
@@ -1128,14 +1129,21 @@ class System_test(object):
         """
         linenums = []
         linenum = 0
-        for line in self.results:
-            index = line.find(prefix)
-            if index == 0:
-                linenums.append(linenum)
-            linenum += 1
-        # Must remove lines in reverse order
-        for linenum in reversed(linenums):
-            self.results.pop(linenum)
+        #
+        # Try block is used to capture situations where there is no
+        # result file or there is a problem accessing it. In which case,
+        # it is Ok to skip the replacement.
+        try:
+            for line in self.results:
+                index = line.find(prefix)
+                if index == 0:
+                    linenums.append(linenum)
+                linenum += 1
+            # Must remove lines in reverse order
+            for linenum in reversed(linenums):
+                self.results.pop(linenum)
+        except AttributeError:
+            return
 
     def remove_many_result(self, prefix_list):
         """ If any of the prefixes in prefix_list is found on a line on

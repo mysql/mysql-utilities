@@ -32,6 +32,7 @@ Available Commands:
                      Values = 0, 4294967295
 
 Test case 2 - show the audit options 
+WARNING: Using a password on the command line interface can be insecure.
 #
 # Audit Log Variables and Options
 #
@@ -53,6 +54,7 @@ Test case 3 - show file stats - before rotate
 | audit.log [...] 
 +------------+-------+---------------------------+---------------------------+
 Test case 4 - rotate the audit log 
+WARNING: Using a password on the command line interface can be insecure.
 #
 # Showing options before command.
 #
@@ -97,6 +99,7 @@ Test case 5 - show file stats after rotate
 | audit.log [...] 
 +------------------------------+-------+---------------------------+---------------------------+
 Test case 6 - change the policy to QUERIES
+WARNING: Using a password on the command line interface can be insecure.
 #
 # Showing options before command.
 #
@@ -134,6 +137,7 @@ Test case 6 - change the policy to QUERIES
 +---------------------------+---------------+
 
 Test case 7 - change the policy to default
+WARNING: Using a password on the command line interface can be insecure.
 #
 # Showing options before command.
 #
@@ -171,6 +175,7 @@ Test case 7 - change the policy to default
 +---------------------------+---------------+
 
 Test case 8 - change the rotate_on_size to 32535
+WARNING: Using a password on the command line interface can be insecure.
 #
 # Showing options before command.
 #
@@ -208,6 +213,7 @@ Test case 8 - change the rotate_on_size to 32535
 +---------------------------+---------------+
 
 Test case 9 - change the rotate_on_size to default
+WARNING: Using a password on the command line interface can be insecure.
 #
 # Showing options before command.
 #

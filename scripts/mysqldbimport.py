@@ -41,7 +41,8 @@ from mysql.utilities.common.options import (add_character_set_option,
                                             add_skip_options, add_verbosity,
                                             check_skip_options,
                                             check_verbosity,
-                                            setup_common_options)
+                                            setup_common_options,
+                                            check_password_security)
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.tools import (check_connector_python,
                                           print_elapsed_time)
@@ -154,6 +155,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Warn if quiet and verbosity are both specified
     check_verbosity(opt)

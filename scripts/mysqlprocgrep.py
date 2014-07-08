@@ -36,7 +36,8 @@ from mysql.utilities.command.proc import (ProcessGrep, KILL_CONNECTION,
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_regexp, setup_common_options,
                                             add_verbosity, add_format_option,
-                                            add_character_set_option)
+                                            add_character_set_option,
+                                            check_password_security)
 
 
 def add_pattern(option, opt, value, parser, field):
@@ -120,6 +121,9 @@ if __name__ == '__main__':
     )
 
     (options, args) = parser.parse_args()
+
+    # Check security settings
+    check_password_security(options, args)
 
     # Print SQL if only --sql-body is given
     if options.sql_body:

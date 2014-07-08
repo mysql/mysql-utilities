@@ -183,6 +183,7 @@ class test(mutlib.System_test):
                               "{0}".format(err.errmsg))
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 

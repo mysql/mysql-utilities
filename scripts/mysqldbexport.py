@@ -40,7 +40,8 @@ from mysql.utilities.common.options import (
     add_all, add_character_set_option, add_format_option, add_locking,
     add_no_headers_option, add_regexp, add_rpl_mode, add_rpl_user,
     add_skip_options, add_verbosity, check_all, check_rpl_options,
-    check_skip_options, check_verbosity, setup_common_options
+    check_skip_options, check_verbosity, setup_common_options,
+    check_password_security
 )
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
@@ -176,6 +177,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args, "# ")
 
     # Warn if quiet and verbosity are both specified
     check_verbosity(opt)

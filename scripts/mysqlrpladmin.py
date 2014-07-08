@@ -40,7 +40,8 @@ from mysql.utilities.common.options import (add_format_option, add_verbosity,
                                             add_failover_options, add_rpl_user,
                                             CaseInsensitiveChoicesOption,
                                             check_server_lists,
-                                            license_callback, UtilitiesParser)
+                                            license_callback, UtilitiesParser,
+                                            check_password_security)
 from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
                                              PARSE_ERR_OPTS_REQ_BY_CMD,
                                              PARSE_ERR_SLAVE_DISCO_REQ,
@@ -134,6 +135,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Check for invalid command
     if len(args) > 1:

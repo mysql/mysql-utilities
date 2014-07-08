@@ -38,7 +38,8 @@ from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
                                              WARN_OPT_NOT_REQUIRED)
 from mysql.utilities.common.options import (add_format_option, add_verbosity,
                                             check_verbosity,
-                                            setup_common_options)
+                                            setup_common_options,
+                                            check_password_security)
 
 
 # Constants
@@ -117,6 +118,9 @@ if __name__ == '__main__':
     if not args and not opt.list_users:
         parser.error("You must specify either a source user or use the --list "
                      "option. See --help for details.")
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Fail if dump and quiet set
     if opt.quiet and opt.dump:

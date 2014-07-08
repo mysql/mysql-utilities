@@ -1,4 +1,5 @@
 Test case 1 - show health before switchover
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -33,6 +34,7 @@ Test case 1 - show health before switchover
 4 rows.
 # ...done.
 Test case 2 - switchover to slave1
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
 # Checking candidate slave prerequisites.
@@ -58,6 +60,7 @@ Test case 2 - switchover to slave1
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 3 - show health after switchover
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -92,6 +95,7 @@ Test case 3 - show health after switchover
 4 rows.
 # ...done.
 Test case 4 - switchover to slave2
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Performing switchover from master at localhost:PORT2 to slave at localhost:PORT3.
 # Checking candidate slave prerequisites.
@@ -117,6 +121,7 @@ Test case 4 - switchover to slave2
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 5 - show health after switchover
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -151,6 +156,7 @@ Test case 5 - show health after switchover
 4 rows.
 # ...done.
 Test case 6 - switchover to slave3
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Performing switchover from master at localhost:PORT3 to slave at localhost:PORT4.
 # Checking candidate slave prerequisites.
@@ -176,6 +182,7 @@ Test case 6 - switchover to slave3
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 7 - show health after switchover
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -210,6 +217,7 @@ Test case 7 - show health after switchover
 4 rows.
 # ...done.
 Test case 8 - switchover to master
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
 # Performing switchover from master at 127.0.0.1:PORT4 to slave at localhost:PORT1.
@@ -236,6 +244,7 @@ Test case 8 - switchover to master
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 9 - show health after switchover
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -270,6 +279,7 @@ Test case 9 - show health after switchover
 4 rows.
 # ...done.
 Test case 10 - health with loopback
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -283,6 +293,7 @@ Test case 10 - health with loopback
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 11 - health with discovery
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Found slave: localhost:PORT2
@@ -303,6 +314,7 @@ Test case 11 - health with discovery
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 12 - run command stop with --master
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 Ok
@@ -310,6 +322,7 @@ Test case 12 - run command stop with --master
 #   Executing stop on slave localhost:PORT4 Ok
 # ...done.
 Test case 13 - run command start with --master
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Performing START on all slaves.
 #   Executing start on slave localhost:PORT2 Ok
@@ -317,6 +330,7 @@ Test case 13 - run command start with --master
 #   Executing start on slave localhost:PORT4 Ok
 # ...done.
 Test case 13(b) - health after start
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -330,6 +344,7 @@ Test case 13(b) - health after start
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 14 - run command stop with --master
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 Ok
@@ -337,6 +352,7 @@ Test case 14 - run command stop with --master
 #   Executing stop on slave localhost:PORT4 Ok
 # ...done.
 Test case 15 - run command reset with --master
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 WARN - slave is not connected to master
@@ -351,6 +367,7 @@ Test case 15 - run command reset with --master
 #   Executing reset on slave localhost:PORT4 Ok
 # ...done.
 Test case 16 - run command start without --master
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Performing START on all slaves.
 #   Executing start on slave localhost:PORT2 Ok
@@ -358,6 +375,7 @@ Test case 16 - run command start without --master
 #   Executing start on slave localhost:PORT4 Ok
 # ...done.
 Test case 16(b) - health after start
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -371,6 +389,7 @@ Test case 16(b) - health after start
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 17 - run command stop without --master
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 Ok
@@ -378,6 +397,7 @@ Test case 17 - run command stop without --master
 #   Executing stop on slave localhost:PORT4 Ok
 # ...done.
 Test case 18 - run command reset without --master
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 WARN - slave is not connected to master
@@ -392,12 +412,14 @@ Test case 18 - run command reset without --master
 #   Executing reset on slave localhost:PORT4 Ok
 # ...done.
 Test case 19 - elect
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Checking privileges on candidates.
 # Electing candidate slave from candidate list then slaves list.
 # Best slave found is located on localhost:PORT2.
 # ...done.
 Test case 20 - gtid
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 #
 # UUIDS for all servers:
@@ -407,6 +429,7 @@ host,port,role,uuid
 host,port,role,gtid
 # ...done.
 Test case 21 - heatlh with discover
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Found slave: localhost:PORT2
@@ -424,6 +447,7 @@ localhost,PORT3,SLAVE,UP,ON,OK
 localhost,PORT4,SLAVE,UP,ON,OK
 # ...done.
 Test case 22 - failover to localhost:PORT4
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Checking privileges on candidates.
 # Performing failover.
@@ -450,6 +474,7 @@ Test case 22 - failover to localhost:PORT4
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 23 - show health after failover
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 #
 # Replication Topology Health:
@@ -477,6 +502,7 @@ Test case 23 - show health after failover
 3 rows.
 # ...done.
 Test case 24 - elect with missing rpl user
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Checking privileges on candidates.
 # Electing candidate slave from candidate list then slaves list.
@@ -488,6 +514,7 @@ Test case 24 - elect with missing rpl user
 # Best slave found is located on localhost:PORT2.
 # ...done.
 Test case 25 - mix FILE/TABLE and missing --rpl-user
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Found slave: localhost:PORT2
@@ -500,6 +527,7 @@ Test case 25 - mix FILE/TABLE and missing --rpl-user
 # Checking privileges.
 ERROR: You must specify either the --rpl-user or set all slaves to use --master-info-repository=TABLE.
 Test case 26 - mix FILE/TABLE and --rpl-user
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Found slave: localhost:PORT2
@@ -533,6 +561,7 @@ Test case 26 - mix FILE/TABLE and --rpl-user
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 Test case 27 - slave not part of topology
+WARNING: Using a password on the command line interface can be insecure.
 # ERROR: Errant transaction(s) found on slave(s).
 #  - For slave 'localhost@PORT?': XXXXX
 # WARNING: Server 'localhost@PORT5' is not acting as a slave.
@@ -545,6 +574,7 @@ Test case 27 - slave not part of topology
 | localhost  | PORT5  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 Test case 28 - HEALTH with some transactions behind
+WARNING: Using a password on the command line interface can be insecure.
 # Checking privileges.
 # Attempting to contact localhost ... Success
 # Attempting to contact localhost ... Success

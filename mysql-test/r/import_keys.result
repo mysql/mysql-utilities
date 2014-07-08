@@ -7,6 +7,7 @@ Running export...
 Running import...
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 CREATE TABLE `t1` (   `a` int(11) NOT NULL DEFAULT '0',   `b` int(11) DEFAULT NULL,   `c` int(11) DEFAULT NULL,   `d` char(30) DEFAULT NULL,   PRIMARY KEY (`a`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
@@ -21,6 +22,7 @@ Running export...
 Running import...
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 CREATE TABLE `t1` (   `a` int(11) NOT NULL DEFAULT '0',   `b` int(11) DEFAULT NULL,   `c` int(11) DEFAULT NULL,   `d` char(30) DEFAULT NULL,   PRIMARY KEY (`a`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
@@ -35,6 +37,7 @@ Running export...
 Running import...
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 CREATE TABLE `t1` (   `a` int(11) NOT NULL DEFAULT '0',   `b` int(11) DEFAULT NULL,   `c` int(11) DEFAULT NULL,   `d` char(30) DEFAULT NULL,   PRIMARY KEY (`a`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
@@ -49,6 +52,7 @@ Running export...
 Running import...
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 CREATE TABLE `t1` (   `a` int(11) NOT NULL DEFAULT '0',   `b` int(11) DEFAULT NULL,   `c` int(11) DEFAULT NULL,   `d` char(30) DEFAULT NULL,   PRIMARY KEY (`a`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
@@ -62,6 +66,7 @@ Running export...
 Running import...
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 CREATE TABLE `t1` (   `d` int(11) NOT NULL DEFAULT '0',   `b` char(20) DEFAULT NULL,   PRIMARY KEY (`d`) ) ENGINE=InnoDB DEFAULT CHARSET=latin1
@@ -74,7 +79,7 @@ Running export...
 Running import...
 # Source on localhost: ... connected.
 # Importing definitions and data from test_run.txt.
-CAUTION: The following 1 warning messages were included in the import file:
+CAUTION: The following warning messages were included in the import file:
 # WARNING: Output contains tables with foreign key contraints. You should disable foreign key checks prior to importing this stream.
 ERROR: Invalid statement:
 CREATE TABLE `a1` (

@@ -35,7 +35,8 @@ from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (setup_common_options, add_rpl_user,
-                                            add_verbosity)
+                                            add_verbosity,
+                                            check_password_security)
 from mysql.utilities.common.messages import (PARSE_ERR_OPTS_REQ,
                                              WARN_OPT_USING_DEFAULT)
 
@@ -109,6 +110,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # option --master is required (mandatory)
     if not opt.master:

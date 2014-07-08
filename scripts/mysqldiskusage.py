@@ -37,7 +37,8 @@ from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import (add_verbosity, add_format_option,
                                             add_no_headers_option,
-                                            setup_common_options)
+                                            setup_common_options,
+                                            check_password_security)
 
 
 # Constants
@@ -106,6 +107,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Parse source connection values
     try:

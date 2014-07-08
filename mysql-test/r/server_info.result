@@ -1,4 +1,5 @@
 Test case 1 - basic serverinfo 
+WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 *************************       1. row *************************
                    server: localhost: XXXX
@@ -25,6 +26,7 @@ Test case 1 - basic serverinfo
 Test case 2 - basic serverinfo with -d option
 
 Test case 3 - re-started server prints results 
+WARNING: Using a password on the command line interface can be insecure.
 # Server is offline.
 # Checking server version ... done.
 # Starting read-only instance of the server ... done.

@@ -44,7 +44,8 @@ from mysql.utilities.common.options import (add_skip_options, add_verbosity,
                                             add_all, check_all, add_locking,
                                             add_regexp, add_rpl_mode,
                                             add_rpl_user, setup_common_options,
-                                            add_character_set_option)
+                                            add_character_set_option,
+                                            check_password_security)
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
 from mysql.utilities.common.tools import (check_connector_python,
@@ -142,6 +143,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     try:
         skips = check_skip_options(opt.skip_objects)

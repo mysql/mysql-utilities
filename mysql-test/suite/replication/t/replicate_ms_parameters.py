@@ -39,6 +39,7 @@ class test(mutlib.System_test):
         return True
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         self.res_fname = "result.txt"
 
         test_num = 1
@@ -48,9 +49,21 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = "Test case {0} - show warning".format(test_num)
+        cmd = ("mysqlrplms.py --masters=root:toor@nohost,"
+               "root:root@nope --slave=root:root@nada")
+        res = mutlib.System_test.run_test_case(self, 1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities mysqlrplms "
                                            "version", 6)
+        self.replace_any_result(["ERROR: Can't connect",
+                                 "Error Can't connect",
+                                 "ERROR: Cannot connect"],
+                                "ERROR: Can't connect to XXXX\n")
 
         return True
 
