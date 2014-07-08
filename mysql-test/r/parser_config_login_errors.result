@@ -5,13 +5,13 @@ Unable to locate MySQL Client tools. Please confirm that the path to the MySQL c
 Test case 3 - c:\some_config.cnf
 Unable to locate MySQL Client tools. Please confirm that the path to the MySQL client tools are included in the PATH. Error: Cannot find location of my_print_defaults.
 Test case 4 - /etc_etc/some_config.cnf
-Unable to locate MySQL Client tools. Please confirm that the path to the MySQL client tools are included in the PATH. Error: Cannot find location of my_print_defaults. In addition, Could not find a configuration file XXXX-XXXXX
+Unable to locate MySQL Client tools. Please confirm that the path to the MySQL client tools are included in the PATH. Error: Cannot find location of my_print_defaults. In addition, could not find a configuration file XXXX-XXXXX
 Test case 5 - test_default_group
-Unable to locate MySQL Client tools. Please confirm that the path to the MySQL client tools are included in the PATH. Error: Cannot find location of my_print_defaults. In addition, Could not find a configuration file XXXX-XXXXX
+Unable to locate MySQL Client tools. Please confirm that the path to the MySQL client tools are included in the PATH. Error: Cannot find location of my_print_defaults. In addition, could not find a configuration file XXXX-XXXXX
 Test case 6 - temp_1.cnf
 Unable to locate MySQL Client tools. Please confirm that the path to the MySQL client tools are included in the PATH. Error: Cannot find location of my_print_defaults.
 Test case 7 - temp_1.cnf[undeclared]
-The given group: 'undeclared' was not found on the configuration file 'temp_1.cnf'
+The given group 'undeclared' was not found on the configuration file 'temp_1.cnf'
 Test case 8 - temp_2.cnf
 Unable to locate MySQL Client tools. Please confirm that the path to the MySQL client tools are included in the PATH. Error: Cannot find location of my_print_defaults.
 Test case 9 - temp_2.cnf[missing_values]

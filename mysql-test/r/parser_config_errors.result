@@ -15,7 +15,7 @@ No login credentials found for either login-path: 'test_default_group' nor confi
 Test case 8 - temp_1.cnf
 Missing connection value for port option
 Test case 9 - temp_1.cnf[undeclared]
-The given group: 'undeclared' was not found on the configuration file 'temp_1.cnf'
+The given group 'undeclared' was not found on the configuration file 'temp_1.cnf'
 Test case 10 - temp_2.cnf
 Missing connection values for user,host and port options
 Test case 11 - temp_2.cnf[missing_values]

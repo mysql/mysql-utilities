@@ -131,8 +131,8 @@ class test(mutlib.System_test):
         self.replace_substring_portion("port or ", "socket", "port")
         self.replace_substring(".exe", "")
         self.mask_result_portion("Unable to locate MySQL Client tools.",
-                                 "In addition, Could not find a configuration "
-                                 "file", "\n", "In addition, Could not find a "
+                                 "In addition, could not find a configuration "
+                                 "file", "\n", "In addition, could not find a "
                                  "configuration file XXXX-XXXXX")
 
         return True

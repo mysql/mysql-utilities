@@ -246,21 +246,21 @@ def handle_config_path(config_path, group=None, use_default=True):
                 return dict_grp[req_group]
             else:
                 if group:
-                    raise UtilError("The given group: '{0}' was not found on "
+                    raise UtilError("The given group '{0}' was not found on "
                                     "the configuration file '{1}'"
                                     "".format(group, file_loc))
                 else:
-                    raise UtilError("The default group: '{0}' was not found "
-                                    "on the configuration file: '{1}'"
+                    raise UtilError("The default group '{0}' was not found "
+                                    "on the configuration file '{1}'"
                                     "".format(req_group, file_loc))
 
     # No configuration file was found
     if paths[0] != paths[1]:
-        raise UtilError('Could not find a configuration file neither in the '
-                        'given path: {0} nor the default path:{1}.'
-                        ''.format(*paths))
-    raise UtilError('Could not find a configuration file neither in the given '
-                    'path: {0}.'.format(paths[0]))
+        raise UtilError("Could not find a configuration file neither in the "
+                        "given path '{0}' nor the default path '{1}'."
+                        "".format(*paths))
+    raise UtilError("Could not find a configuration file in the given "
+                    "path '{0}'.".format(paths[0]))
 
 
 def parse_connection(connection_values, my_defaults_reader=None, options=None):
@@ -365,7 +365,10 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                 if group:
                     raise
                 else:
-                    config_path_err_msg = err.errmsg
+                    # Convert first letter to lowercase to include in error
+                    # message with the correct case.
+                    config_path_err_msg = \
+                        err.errmsg[0].lower() + err.errmsg[1:]
 
         if group is None:
             # the conn_format can still be a login_path so continue
@@ -382,7 +385,7 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                                     "".format(my_login_config_path()))
                     if config_path_err_msg and not (port or socket):
                         util_err_msg = ("{0} In addition, {1}"
-                                        "").format(util_err_msg.errmsg,
+                                        "").format(util_err_msg,
                                                    config_path_err_msg)
                     raise UtilError(util_err_msg)
 
@@ -392,10 +395,10 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                 if not my_defaults_reader:
                     try:
                         my_defaults_reader = MyDefaultsReader(options)
-                    except UtilError as util_err_msg:
+                    except UtilError as err:
                         if config_path_err_msg and not (port or socket):
                             util_err_msg = ("{0} In addition, {1}"
-                                            "").format(util_err_msg.errmsg,
+                                            "").format(err.errmsg,
                                                        config_path_err_msg)
                             raise UtilError(util_err_msg)
                         else:
