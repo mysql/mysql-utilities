@@ -24,7 +24,10 @@ C/py v2.0.0 is released and in the meanwhile will be used from here.
 
 """
 
+import codecs
+import io
 import os
+import re
 from ConfigParser import SafeConfigParser, MissingSectionHeaderError
 
 DEFAULT_OPTION_FILES = {
@@ -41,157 +44,208 @@ DEFAULT_EXTENSIONS = {
 class MySQLOptionsParser(SafeConfigParser):
     """This class implements methods to parse MySQL option files"""
 
-    def __init__(self, files=None, defaults=False):
-        """If defaults is True, default option files are read first
+    def __init__(self, files=None, keep_dashes=True):
+        """Initialize
 
         files[in]       The files to parse searching for configuration items.
-        defaults[in]    Use the defaults to extend the search (default False).
+        keep_dashes[in] If False, dashes in options are replaced with
+                        underscores.
 
         Raises ValueError if defaults is set to True but defaults files
         cannot be found.
         """
-        SafeConfigParser.__init__(self, allow_no_value=True)
-        self.default_file = None
+
+        # Regular expression to allow options with no value(For Python v2.6)
+        self.OPTCRE = re.compile(           # pylint: disable=C0103
+            r'(?P<option>[^:=\s][^:=]*)'
+            r'\s*(?:'
+            r'(?P<vi>[:=])\s*'
+            r'(?P<value>.*))?$'
+        )
+
+        self._options_dict = {}
+
+        SafeConfigParser.__init__(self)
         self.default_extension = DEFAULT_EXTENSIONS[os.name]
+        self.keep_dashes = keep_dashes
 
-        if not files and not defaults:
-            raise ValueError('Either files argument should be given or/and '
-                             'defaults should be set to true')
-
-        if files is None:
-            files = []
+        if not files:
+            raise ValueError('files argument should be given')
         if isinstance(files, str):
             self.files = [files]
         else:
             self.files = files
 
-        if defaults:
-            self.default_file = DEFAULT_OPTION_FILES[os.name]
-            if os.path.isfile(self.default_file):
-                self.files.append(self.default_file)
-            else:
-                raise ValueError("Unable to find default option file at"
-                                 "location '{path}'".format(self.default_file))
-
         self._parse_options(list(self.files))
+        self._sections = self.get_groups_as_dict()
+
+    def optionxform(self, optionstr):
+        """Converts option strings
+
+        optionstr[in] input to be converted.
+
+        Converts option strings to lower case and replaces dashes(-) with
+        underscores(_) if keep_dashes variable is set.
+
+        """
+        if not self.keep_dashes:
+            optionstr = optionstr.replace('-', '_')
+        return optionstr.lower()
 
     def _parse_options(self, files):
         """Parse options from files given as arguments.
-        This method checks for !include or !inculdedir directives and if there
-        is any, those files included by these directives are also parsed
-        for options.
+         This method checks for !include or !includedir directives and if there
+         is any, those files included by these directives are also parsed
+         for options.
 
-        files[in]       The files to parse searching for configuration items.
+         files[in]       The files to parse searching for configuration items.
 
         Raises ValueError if any of the included or file given in arguments
         is not readable.
         """
         index = 0
+        err_msg = "Option file '{0}' being included again in file '{1}'"
 
         for file_ in files:
             try:
-                with open(file_, 'r') as fp:
-                    for line in fp.readlines():
+                with open(file_, 'r') as op_file:
+                    for line in op_file.readlines():
                         if line.startswith('!includedir'):
-                            dir_path = line.split()[1]
+                            _, dir_path = line.split(None, 1)
                             for entry in os.listdir(dir_path):
                                 entry = os.path.join(dir_path, entry)
                                 if entry in files:
-                                    raise ValueError('Same option file '
-                                                     'occurring more than '
-                                                     'once.')
-                                if os.path.isfile(entry) and \
-                                   entry.endswith(self.default_extension):
-                                    files.insert(index + 1, entry)
+                                    raise ValueError(err_msg.format(
+                                        entry, file_))
+                                if (os.path.isfile(entry) and
+                                        entry.endswith(self.default_extension)):
+                                    files.insert(index+1, entry)
 
                         elif line.startswith('!include'):
-                            filename = line.split()[1]
-                            if filename not in files:
-                                files.insert(index + 1, line.split()[1])
-                            else:
-                                raise ValueError('Same option file occurring '
-                                                 'more than once.')
+                            _, filename = line.split(None, 1)
+                            if filename in files:
+                                raise ValueError(err_msg.format(
+                                    filename, file_))
+                            files.insert(index+1, filename)
+
                         index += 1
 
             except (IOError, OSError) as exc:
-                raise ValueError(exc)
+                raise ValueError("Failed reading file '{0}': {1}".format(
+                    file_, str(exc)))
 
         read_files = self.read(files)
         not_read_files = set(files) - set(read_files)
         if not_read_files:
-            raise ValueError("{0} Cannot be read.".format(
+            raise ValueError("File(s) {0} could not be read.".format(
                 ', '.join(not_read_files)))
 
     def read(self, filenames):
         """Read and parse a filename or a list of filenames.
 
-        filenames[in]    The file names to read.
-
-        Files that cannot be opened are silently ignored;
-        A single filename may also be given.
         Overridden from ConfigParser and modified so as to allow options
         which are not inside any section header
+
+        filenames[in]    The file names to read.
 
         Return list of successfully read files.
         """
         if isinstance(filenames, str):
             filenames = [filenames]
         read_ok = []
-        for filename in filenames:
+        for priority, filename in enumerate(filenames):
             try:
-                fp = open(filename)
+                out_file = io.StringIO()
+                for line in codecs.open(filename, encoding='utf-8'):
+                    line = line.strip()
+                    match_obj = self.OPTCRE.match(line)
+                    if not self.SECTCRE.match(line) and match_obj:
+                        optname, delimiter, optval = match_obj.group('option',
+                                                                     'vi',
+                                                                     'value')
+                        if optname and not optval and not delimiter:
+                            out_file.write(line + "=\n")
+                        else:
+                            out_file.write(line + '\n')
+                    else:
+                        out_file.write(line + '\n')
+                out_file.seek(0)
+                self._read(out_file, filename)
             except IOError:
                 continue
             try:
-                self._read(fp, filename)
+                self._read(out_file, filename)
+                for group in self._sections.keys():
+                    try:
+                        self._options_dict[group]
+                    except KeyError:
+                        self._options_dict[group] = {}
+                    for option, value in self._sections[group].items():
+                        self._options_dict[group][option] = (value, priority)
+
+                self._sections = self._dict()
+
             except MissingSectionHeaderError:
-                self._read(fp, filename)
-            fp.close()
+                self._read(out_file, filename)
+            out_file.close()
             read_ok.append(filename)
         return read_ok
 
     def get_groups(self, *args):
-        """Returns options from all the groups specified as arguments, returns
+        """Returns options as a dictionary.
+
+        Returns options from all the groups specified as arguments, returns
         the options from all groups if no argument provided. Options are
         overridden when they are found in the next group.
 
-        *args[in]    Each group to be returned can be requested by given his
-                     name as an argument.
+        *args[in]    Each group to be returned can be requested by providing
+                     its name as an argument.
 
         Returns a dictionary
         """
         if len(args) == 0:
-            args = self._sections.keys()
+            args = self._options_dict.keys()
 
         options = {}
         for group in args:
             try:
-                options.update(dict(self._sections[group]))
+                for option, value in self._options_dict[group].items():
+                    if option not in options or options[option][1] <= value[1]:
+                        options[option] = value
             except KeyError:
                 pass
 
         for key in options.keys():
             if key == '__name__' or key.startswith('!'):
                 del options[key]
+            else:
+                options[key] = options[key][0]
         return options
 
-    def get_groups_as_dict(self, *args):
-        """Returns options from all the groups specified as arguments. For each
-        group the option are contained in a dictionary. Options are not
+    def get_groups_as_dict_with_priority(self, *args):  # pylint: disable=C0103
+        """Returns options as dictionary of dictionaries.
+
+        Returns options from all the groups specified as arguments. For each
+        group the option are contained in a dictionary. The order in which
+        the groups are specified is unimportant. Also options are not
         overridden in between the groups.
 
-        *args[in]    Each group to be returned can be requested by given his
-                     name as an argument.
+        The value is a tuple with two elements, first being the actual value
+        and second is the priority of the value which is higher for a value
+        read from a higher priority file.
 
-        Returns a dictionary of dictionaries.
+        *args[in]    Each group to be returned can be requested by providing
+                     its name as an argument.
+
+        Returns an dictionary of dictionaries
         """
         if len(args) == 0:
-            args = self._sections.keys()
+            args = self._options_dict.keys()
 
-        options = {}
+        options = dict()
         for group in args:
             try:
-                options[group] = dict(self._sections[group])
+                options[group] = dict(self._options_dict[group])
             except KeyError:
                 pass
 
@@ -199,4 +253,35 @@ class MySQLOptionsParser(SafeConfigParser):
             for key in options[group].keys():
                 if key == '__name__' or key.startswith('!'):
                     del options[group][key]
+        return options
+
+    def get_groups_as_dict(self, *args):
+        """Returns options as dictionary of dictionaries.
+
+        Returns options from all the groups specified as arguments. For each
+        group the option are contained in a dictionary. The order in which
+        the groups are specified is unimportant. Also options are not
+        overridden in between the groups.
+
+        *args[in]    Each group to be returned can be requested by providing
+                     its name as an argument.
+
+        Returns an dictionary of dictionaries
+        """
+        if len(args) == 0:
+            args = self._options_dict.keys()
+
+        options = dict()
+        for group in args:
+            try:
+                options[group] = dict(self._options_dict[group])
+            except KeyError:
+                pass
+
+        for group in options.keys():
+            for key in options[group].keys():
+                if key == '__name__' or key.startswith('!'):
+                    del options[group][key]
+                else:
+                    options[group][key] = options[group][key][0]
         return options

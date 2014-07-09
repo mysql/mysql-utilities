@@ -17,4 +17,4 @@ Unable to locate MySQL Client tools. Please confirm that the path to the MySQL c
 Test case 9 - temp_2.cnf[missing_values]
 Missing connection values for host and port options
 Test case 10 - temp_1.cnf[complete]
-[('host', 'somehost'), ('passwd', 'mypasswd'), ('port', 3305), ('user', 'my_user')]
+[('host', u'somehost'), ('passwd', u'mypasswd'), ('port', 3305), ('user', u'my_user')]
