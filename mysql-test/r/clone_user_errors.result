@@ -38,7 +38,7 @@ Test case 10 - user from destination server does not have enough privileges to c
 # Destination on XXXX-XXXX: ... connected.
 # Cloning 1 users...
 # Cloning remote@% to user xxx:12345@localhost 
-ERROR: User xxx:12345@localhost cannot be cloned because destination user remote@localhost is missing the following privilege: WITH GRANT OPTION on `util_test`.*.
+ERROR: User xxx:12345@localhost cannot be cloned because destination user remote@localhost is missing the following privilege: GRANT OPTION on `util_test`.*.
 Test case 11 - user from destination server does not have the privilege to create users
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.

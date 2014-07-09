@@ -304,7 +304,7 @@ class User(object):
         # If self has all privileges for all databases, no need to check,
         # simply return True
         if ("ALL PRIVILEGES" in grant_dict['*']['*'] and
-                "WITH GRANT OPTION" in grant_dict['*']['*']):
+                "GRANT OPTION" in grant_dict['*']['*']):
             return True
 
         # Quote db and obj with backticks if necessary
@@ -323,17 +323,17 @@ class User(object):
         # Check server wide grants.
         elif (access in grant_dict['*']['*'] or
                 "ALL PRIVILEGES" in grant_dict['*']['*'] and
-                access != "WITH GRANT OPTION"):
+                access != "GRANT OPTION"):
             return True
         # Check database level grants.
         elif (access in grant_dict[db]['*'] or
                 "ALL PRIVILEGES" in grant_dict[db]['*'] and
-                access != "WITH GRANT OPTION"):
+                access != "GRANT OPTION"):
             return True
         # Check object level grants.
         elif (access in grant_dict[db][obj] or
                 "ALL PRIVILEGES" in grant_dict[db][obj] and
-                access != "WITH GRANT OPTION"):
+                access != "GRANT OPTION"):
             return True
         else:
             return False
@@ -343,7 +343,7 @@ class User(object):
 
         user[in]               instance of the user class
         plus_grant_option[in]  if True, checks if besides the all the other
-                               privileges, self has also the WITH GRANT OPTION
+                               privileges, self has also the GRANT OPTION
                                in all of the bd, tables in which the user
                                passed as argument has privileges. Required for
                                instance if we will be using self to clone the
@@ -357,7 +357,7 @@ class User(object):
         user_grants = user.get_grants(as_dict=True)
 
         # If we are cloning User1, using User2, then User2 needs
-        # the WITH GRANT OPTION privilege in each of the db,table where
+        # the GRANT OPTION privilege in each of the db,table where
         # User1 has privileges.
         if plus_grant_option:
             for db in user_grants:
@@ -371,7 +371,7 @@ class User(object):
                                 "USAGE" in priv_set):
                             continue
                         else:
-                            priv_set.add('WITH GRANT OPTION')
+                            priv_set.add('GRANT OPTION')
 
         for db in user_grants:
             for table in user_grants[db]:
@@ -388,7 +388,7 @@ class User(object):
 
         user[in]               instance of the user class
         plus_grant_option[in]  if True, checks if besides the all the other
-                               privileges, self has also the WITH GRANT OPTION
+                               privileges, self has also the GRANT OPTION
                                in all of the bd, tables in which the user
                                passed as argument has privileges. Required for
                                instance if we will be using self to clone the
@@ -404,7 +404,7 @@ class User(object):
         missing_grants = set()
 
         # If we are cloning User1, using User2, then User2 needs
-        # the WITH GRANT OPTION privilege in each of the db,table where
+        # the GRANT OPTION privilege in each of the db,table where
         # User1 has privileges.
         if plus_grant_option:
             for db in user_grants:
@@ -418,7 +418,7 @@ class User(object):
                                 "USAGE" in priv_set):
                             continue
                         else:
-                            priv_set.add('WITH GRANT OPTION')
+                            priv_set.add('GRANT OPTION')
 
         for db in user_grants:
             for table in user_grants[db]:
@@ -519,6 +519,6 @@ class User(object):
             )
             # If user has grant option, add it to the list of privileges
             if match.group(5) is not None:
-                grants.privileges.add("WITH GRANT OPTION")
+                grants.privileges.add("GRANT OPTION")
 
         return grants

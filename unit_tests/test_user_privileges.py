@@ -73,7 +73,7 @@ class TestUserPrivileges(unittest.TestCase):
             self.user2))
 
         # If we are cloning parameter is true,  it needs to have an extra
-        # WITH GRANT OPTION grant
+        # GRANT OPTION grant
 
         self.assertFalse(self.user2.contains_user_privileges(
             self.user1, plus_grant_option=True))
@@ -82,7 +82,7 @@ class TestUserPrivileges(unittest.TestCase):
         self.user1_dict = self._get_privs_dict(
             "GRANT SELECT, UPDATE ON `mysql`.* TO 'user1'@'%'")
 
-        self.assertEquals(set([("WITH GRANT OPTION", '`mysql`', '*')]),
+        self.assertEquals(set([("GRANT OPTION", '`mysql`', '*')]),
                           self.user2.missing_user_privileges(
                               self.user1, plus_grant_option=True))
 
@@ -108,7 +108,7 @@ class TestUserPrivileges(unittest.TestCase):
 
     def test_subset_privs(self):
 
-        # Tests that WITH GRANT OPTION is not added with the usage privilege
+        # Tests that GRANT OPTION is not added with the usage privilege
         # when used together with plus_grant_option option
         self.user1_dict = self._get_privs_dict(
             "GRANT USAGE ON *.* TO 'user1'@'%'")
@@ -171,7 +171,7 @@ class TestUserPrivileges(unittest.TestCase):
     def test_double_star_privs(self):
 
         # ALL PRIVILEGES grant is a superset of all other grants except for
-        # the WITH GRANT OPTION privilege.
+        # the GRANT OPTION privilege.
         self.user1_dict = self._get_privs_dict(
             "GRANT SELECT, UPDATE, DELETE ON `mysql`.`users` TO 'user1'@'%'")
         self.user2_dict = self._get_privs_dict(
@@ -193,7 +193,7 @@ class TestUserPrivileges(unittest.TestCase):
             "GRANT ALL PRIVILEGES ON `mysql`.`users` TO 'user2'@'%'")
         self.assertFalse(self.user2.contains_user_privileges(self.user1))
         self.assertFalse(self.user1.contains_user_privileges(self.user2))
-        self.assertEquals(set([('WITH GRANT OPTION', '`mysql`', '`users`')]),
+        self.assertEquals(set([('GRANT OPTION', '`mysql`', '`users`')]),
                           self.user2.missing_user_privileges(self.user1))
         self.assertEquals(set([('ALL PRIVILEGES', '`mysql`', '`users`')]),
                           self.user1.missing_user_privileges(self.user2))
@@ -226,7 +226,7 @@ class TestUserPrivileges(unittest.TestCase):
         self.assertFalse(self.user1.contains_user_privileges(self.user2))
         self.assertEquals(set(), self.user2.missing_user_privileges(
             self.user1))
-        self.assertEquals(set([("WITH GRANT OPTION", '*', '*')]),
+        self.assertEquals(set([("GRANT OPTION", '*', '*')]),
                           self.user1.missing_user_privileges(self.user2))
 
 if __name__ == '__main__':
