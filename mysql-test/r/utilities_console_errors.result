@@ -87,3 +87,7 @@ Launching console ...
 
 Execution of utility: 'mysqlfakeutility -e2 --message-error=' ended with return code '2' but no error message was streamed to the standard error, please review the output from its execution.
 
+Test case 7 - Test missing quote
+Launching console ...
+
+WARNING: Unable to execute command, reason: No closing quotation

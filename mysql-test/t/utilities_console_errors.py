@@ -157,6 +157,16 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - Test missing quote".format(test_num))
+        execute = ("mysqluserclone --source=root:root@localhost:3395"
+                   " --dump 'ssluser'@'%")
+        utildir = os.path.abspath(os.path.join('../scripts', os.path.curdir))
+        command = cmd_str.format(utildir, '', '--execute="{0}"')
+        res = self.run_test_case(0, command.format(execute), comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.replace_result(("The execution of the command returned: "
                              "python: can't open file"),
                             ("The execution of the command returned: "
