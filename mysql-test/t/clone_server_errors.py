@@ -148,6 +148,7 @@ class test(mutlib.System_test):
             ["ERROR: Can't connect to MySQL server on ",
              "Error ####: Can't connect to MySQL server",
              "Error ####:(28000):", "Error Can't connect to MySQL server on",
+             "ERROR: Access denied for user",
              "Error Access denied for user"],
             "Error ####: Can't connect to MySQL server on 'nothere:####'\n")
 

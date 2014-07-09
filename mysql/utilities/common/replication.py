@@ -997,26 +997,19 @@ class Master(Server):
 
         conn_dict[in]  dictionary of connection information
 
-        Returns bool - True - is configured, False - not configured
+        Returns True if configured with this master otherwise an error is
+        raised.
         """
         slave_conn = Slave(conn_dict)
-        is_configured = False
         try:
             slave_conn.connect()
             # Skip discovered slaves that are not configured
             # to connect to the master
-            if slave_conn.is_configured_for_master(self, verify_state=False):
-                is_configured = True
-        except:
-            _, e, _ = sys.exc_info()
-            print "Error connecting to a slave as %s@%s: %s" % \
-                  (conn_dict['conn_info']['user'],
-                   conn_dict['conn_info']['host'],
-                   e.errmsg)
+            return slave_conn.is_configured_for_master(self,
+                                                       verify_state=False,
+                                                       raise_error=True)
         finally:
             slave_conn.disconnect()
-
-        return is_configured
 
     def get_slaves(self, user, password):
         """Return the slaves registered for this master.
@@ -1045,6 +1038,7 @@ class Master(Server):
         no_host_slaves = []
         connect_error_slaves = []
         res = self.exec_query("SHOW SLAVE HOSTS")
+        verbose = self.options.get("verbose", False)
         if not res == []:
             # Sort for conformity
             res.sort()  # pylint: disable=E1103
@@ -1055,27 +1049,35 @@ class Master(Server):
                                   'host': row[1], 'port': row[2],
                                   'socket': None},
                     'role': 'slave',
-                    'verbose': self.options.get("verbosity", 0) > 0,
+                    'verbose': verbose,
                 }
                 if not row[1]:
-                    no_host_slaves.append(info)
-                elif self._check_discovered_slave(conn_dict):
+                    no_host_slaves.append(" - {0}".format(info))
+                    break
+                # Verify slave connection and configuration.
+                try:
+                    self._check_discovered_slave(conn_dict)
+                    # Slave correctly configured.
                     slaves.append(info)
-                else:
-                    connect_error_slaves.append(info)
+                except UtilError as err:
+                    # Connection or configuration errors found.
+                    connect_error_slaves.append(
+                        " - {0}: {1}".format(info, err.errmsg)
+                    )
 
+        # Warn if slaves were found with configuration/connection issues.
+        hint = ":" if verbose else " (--verbose for more details)."
         if no_host_slaves:
-            print "WARNING: There are slaves that have not been registered" + \
-                  " with --report-host or --report-port."
-            if self.options.get("verbosity", 0) > 0:
+            print("WARNING: There are slaves that have not been registered"
+                  " with --report-host or --report-port{0}".format(hint))
+            if verbose:
                 for row in no_host_slaves:
-                    print "\t", row
-
+                    print(row)
         if connect_error_slaves:
-            print "\nWARNING: There are slaves that had connection errors."
-            if self.options.get("verbosity", 0) > 0:
+            print("\nWARNING: Cannot connect to some slaves{0}".format(hint))
+            if verbose:
                 for row in connect_error_slaves:
-                    print "\t", row
+                    print(row)
 
         return slaves
 
@@ -1972,26 +1974,45 @@ class Slave(Server):
 
         return change_master
 
-    def is_configured_for_master(self, master, verify_state=False):
+    def is_configured_for_master(self, master, verify_state=False,
+                                 raise_error=False):
         """Check that slave is connected to the master at host, port.
 
-        master[in]     instance of the master
+        master[in]          Instance of the master.
+        verify_state[in]    Flag to verify the state of the slave.
+                            By default False, state verification ignored.
+        raise_error[in]     Indicate if an Error is raised instead of
+                            returning false (not configured for master).
+                            By default False, return a boolean value.
 
         Returns bool - True = is connected
         """
         res = self.get_status()
         if res == [] or not res[0]:
+            if raise_error:
+                raise UtilRplError("Server '{0}:{1}' is not acting as a Slave "
+                                   "(slave status is empty)"
+                                   ".".format(self.host, self.port))
             return False
-        res = res[0]
         # pylint: disable=W0633
         m_host, m_port = self.get_master_host_port()
         # Suppose the state is True for "Waiting for master to send event"
         # so we can ignore it if verify_state is not given as True.
-        state = True
         if verify_state:
             state = self.get_state() == "Waiting for master to send event"
-        if (not master.is_alias(m_host) or int(m_port) != int(master.port)
-           or not state):
+            if not state:
+                if raise_error:
+                    raise UtilRplError("Slave '{0}:{1}' is not waiting for "
+                                       "events from master.".format(self.host,
+                                                                    self.port))
+                return False
+        if not master.is_alias(m_host) or int(m_port) != int(master.port):
+            if raise_error:
+                raise UtilRplError("Slave '{0}:{1}' is configured for master "
+                                   "'{2}:{3}' and not '{4}:{5}'"
+                                   ".".format(self.host, self.port, m_host,
+                                              m_port, master.host,
+                                              master.port))
             return False
         return True
 

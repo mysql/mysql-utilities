@@ -428,8 +428,9 @@ class test(copy_db.test):
         self.replace_substring("on localhost", "on XXXX-XXXX")
         self.replace_substring("on [::1]", "on XXXX-XXXX")
 
-        self.replace_result("ERROR: Can't connect",
-                            "ERROR: Can't connect to XXXX\n")
+        self.replace_any_result(["ERROR: Can't connect",
+                                 "ERROR: Access denied for user"],
+                                "ERROR: Can't connect to XXXX\n")
         # Replace error code.
         self.replace_any_result(["Error 1045", "Error 2003",
                                  "Error Can't connect to MySQL server on",

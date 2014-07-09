@@ -199,6 +199,7 @@ class test(clone_user.test):
         # Replace error code.
         self.replace_any_result(["Error 1045", "Error 2003",
                                  "ERROR: Can't connect to",
+                                 "ERROR: Access denied for user",
                                  "Error Access denied for user"],
                                 "Error XXXX: Access denied\n")
 

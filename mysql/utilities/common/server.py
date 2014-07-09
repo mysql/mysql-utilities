@@ -185,15 +185,17 @@ def get_local_servers(all_proc=False, start=3306, end=3333,
     return processes
 
 
-def get_server(name, values, quiet):
+def get_server(name, values, quiet, verbose=False):
     """Connect to a server and return Server instance
 
     If the name is 'master' or 'slave', the connection will be made via the
     Master or Slave class else a normal Server class shall be used.
 
-    name[in]           name of the server
-    values[in]         dictionary of connection values
-    quiet[in]          if True, do not print messages
+    name[in]        Name of the server.
+    values[in]      Dictionary of connection values.
+    quiet[in]       If True, do not print messages.
+    verbose[in]     Verbose value used by the returned server instances.
+                    By default False.
 
     Returns Server class instance
     """
@@ -208,6 +210,7 @@ def get_server(name, values, quiet):
     server_options = {
         'conn_info': values,
         'role': name,
+        'verbose': verbose,
     }
     if name.lower() == 'master':
         server_conn = Master(server_options)
@@ -304,6 +307,8 @@ def connect_servers(src_val, dest_val, options=None):
                        (default is "Destination")
         unique         if True, servers must be different when dest_val is
                        not None (default is False)
+        verbose        Verbose value used by the returned server instances
+                       (default is False).
 
     Returns tuple (source, destination) where
             source = connection to source server
@@ -318,6 +323,7 @@ def connect_servers(src_val, dest_val, options=None):
     dest_name = options.get("dest_name", "Destination")
     version = options.get("version", None)
     charset = options.get("charset", None)
+    verbose = options.get('verbose', False)
 
     source = None
     destination = None
@@ -355,7 +361,7 @@ def connect_servers(src_val, dest_val, options=None):
     if isinstance(src_val, Server):
         source = src_val
     else:
-        source = get_server(src_name, src_dict, quiet)
+        source = get_server(src_name, src_dict, quiet, verbose=verbose)
         if not quiet:
             print "connected."
     if not _require_version(source, version):
@@ -368,7 +374,8 @@ def connect_servers(src_val, dest_val, options=None):
         if isinstance(dest_val, Server):
             destination = dest_val
         else:
-            destination = get_server(dest_name, dest_dict, quiet)
+            destination = get_server(dest_name, dest_dict, quiet,
+                                     verbose=verbose)
             if not quiet:
                 print "connected."
         if not _require_version(destination, version):

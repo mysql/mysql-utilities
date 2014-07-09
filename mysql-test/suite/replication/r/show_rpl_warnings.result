@@ -1,7 +1,7 @@
 Test case 1 - warning for missing --report-host
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT1
-WARNING: There are slaves that have not been registered with --report-host or --report-port.
+WARNING: There are slaves that have not been registered with --report-host or --report-port (--verbose for more details).
 
 # Replication Topology Graph
 localhost:PORT1 (MASTER)
@@ -11,4 +11,19 @@ localhost:PORT1 (MASTER)
    +--- localhost:PORT3 - (SLAVE)
    |
    +--- localhost:PORT4 - (SLAVE)
+
+Test case 2 - warning for missing --report-host (using --verbose)
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
+WARNING: There are slaves that have not been registered with --report-host or --report-port:
+ - unknown host:PORT5
+
+# Replication Topology Graph
+localhost:PORT1 (MASTER)
+   |
+   +--- localhost:PORT2 [IO: Yes, SQL: Yes] - (SLAVE)
+   |
+   +--- localhost:PORT3 [IO: Yes, SQL: Yes] - (SLAVE)
+   |
+   +--- localhost:PORT4 [IO: Yes, SQL: Yes] - (SLAVE)
 

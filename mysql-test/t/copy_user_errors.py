@@ -106,6 +106,7 @@ class test(copy_user.test):
         self.replace_any_result(["ERROR: Can't connect",
                                  "Error 1045", "Error 2003",
                                  "Error Can't connect to MySQL server on",
+                                 "ERROR: Access denied for user",
                                  "Error Access denied for user"],
                                 "Error XXXX: Access denied\n")
 

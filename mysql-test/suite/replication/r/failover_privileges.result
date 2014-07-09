@@ -1,11 +1,8 @@
 Test case 1 - failover (fail) using 's_user' only with: REPLICATION SLAVE.
 WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
 
-WARNING: There are slaves that had connection errors.
+WARNING: Cannot connect to some slaves (--verbose for more details).
 # Checking privileges.
 # ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 # ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
@@ -14,11 +11,8 @@ ERROR: Not enough privileges to execute command.
 Test case 2 - failover (fail) using 's_user' without: SUPER.
 WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
 
-WARNING: There are slaves that had connection errors.
+WARNING: Cannot connect to some slaves (--verbose for more details).
 # Checking privileges.
 # ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 # ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
