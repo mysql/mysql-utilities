@@ -20,7 +20,6 @@ This module contains abstractions of MySQL replication functionality.
 """
 
 import os
-import sys
 import time
 import StringIO
 import socket

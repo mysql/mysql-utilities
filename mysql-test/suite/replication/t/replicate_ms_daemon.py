@@ -180,7 +180,8 @@ class test(replicate_ms.test):
         )
 
         base_cmd = ("python ../scripts/mysqlrplms.py --daemon={0} --log={1} "
-                    "--interval=5 --switchover-interval=30 {2} {3}{4}")
+                    "--interval=5 --switchover-interval=30 --rpl-user=rpl:rpl "
+                    "{2} {3}{4}")
         test_num = 1
         nodetach_cmd = base_cmd.format("nodetach", _RPLMS_LOG.format(1),
                                        slave_str, masters_str, "")

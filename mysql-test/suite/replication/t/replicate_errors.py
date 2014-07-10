@@ -249,6 +249,13 @@ class test(replicate.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = "Test case {0} - option --rpl-user missing".format(test_num)
+        cmd = "mysqlreplicate.py {0} {1}".format(master_str, slave_str)
+        res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask known platform-dependent lines
         self.mask_result("Error 2005:", "(1", '#######')
         self.replace_substring(" (42000)", "")

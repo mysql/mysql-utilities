@@ -52,7 +52,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = "Test case {0} - show warning".format(test_num)
         cmd = ("mysqlrplms.py --masters=root:toor@nohost,"
-               "root:root@nope --slave=root:root@nada")
+               "root:root@nope --slave=root:root@nada --rpl-user=rpl:rpl")
         res = mutlib.System_test.run_test_case(self, 1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

@@ -65,3 +65,7 @@ Test case 15 - option --slave missing
 Usage: mysqlreplicate --master=root@localhost:3306 --slave=root@localhost:3310 --rpl-user=rpl:passwd 
 
 mysqlreplicate: error: Option '--slave' is required.
+Test case 16 - option --rpl-user missing
+Usage: mysqlreplicate --master=root@localhost:3306 --slave=root@localhost:3310 --rpl-user=rpl:passwd 
+
+mysqlreplicate: error: Option '--rpl-user' is required.

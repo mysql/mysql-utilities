@@ -239,6 +239,10 @@ if __name__ == '__main__':
     if not opt.masters:
         parser.error(PARSE_ERR_OPTS_REQ.format(opt="--masters"))
 
+    # option --rpl-user is required (mandatory)
+    if not opt.rpl_user:
+        parser.error(PARSE_ERR_OPTS_REQ.format(opt="--rpl-user"))
+
     config_reader = MyDefaultsReader(opt, False)
 
     # Parse slave connection values

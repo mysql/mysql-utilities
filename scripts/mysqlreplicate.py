@@ -126,6 +126,10 @@ if __name__ == '__main__':
     if not opt.slave:
         parser.error(PARSE_ERR_OPTS_REQ.format(opt='--slave'))
 
+    # option --rpl-user is required (mandatory)
+    if not opt.rpl_user:
+        parser.error(PARSE_ERR_OPTS_REQ.format(opt="--rpl-user"))
+
     # Parse source connection values
     try:
         m_values = parse_connection(opt.master, None, opt)

@@ -10,3 +10,7 @@ Test case 3 - Pidfile does not exist
 Usage: mysqlrplms --slave=root@localhost:3306 --masters=root@localhost:3310,root@localhost:3311 --rpl-user=rpl:passwd
 
 mysqlrplms: error: pidfile ###### does not exist.
+Test case 4 - Option --rpl-user is required
+Usage: mysqlrplms --slave=root@localhost:3306 --masters=root@localhost:3310,root@localhost:3311 --rpl-user=rpl:passwd
+
+mysqlrplms: error: Option '--rpl-user' is required.

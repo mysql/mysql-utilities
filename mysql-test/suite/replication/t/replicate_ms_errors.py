@@ -54,7 +54,7 @@ class test(mutlib.System_test):
 
         comment = ("Test case {0} - error: option --slave is required"
                    "".format(test_num))
-        cmd_str = ("mysqlrplms.py --masters={0}"
+        cmd_str = ("mysqlrplms.py --masters={0} --rpl-user=rpl:rpl"
                    "".format(",".join([master1_conn, master2_conn])))
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
@@ -63,7 +63,8 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - error: at least two masters are required"
                    "".format(test_num))
-        cmd_str = "mysqlrplms.py --slave={0}".format(slave_conn)
+        cmd_str = ("mysqlrplms.py --slave={0} --rpl-user=rpl:rpl"
+                   "".format(slave_conn))
         res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -76,7 +77,8 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - error: invalid --report-values value"
                    "".format(test_num))
-        cmd_str = "mysqlrplms.py --report-values=unknown {0}"
+        cmd_str = ("mysqlrplms.py --report-values=unknown --rpl-user=rpl:rpl "
+                   "{0}")
         res = self.run_test_case(
             2, cmd_str.format(" ".join(cmd_opts)), comment
         )
@@ -86,7 +88,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - error: invalid --format value"
                    "".format(test_num))
-        cmd_str = "mysqlrplms.py --format=unknown {0}"
+        cmd_str = "mysqlrplms.py --format=unknown --rpl-user=rpl:rpl {0}"
         res = self.run_test_case(
             2, cmd_str.format(" ".join(cmd_opts)), comment
         )
@@ -96,7 +98,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - error: interval in seconds for reporting "
                    "health is too low".format(test_num))
-        cmd_str = "mysqlrplms.py --interval=3 {0}"
+        cmd_str = "mysqlrplms.py --interval=3 --rpl-user=rpl:rpl {0}"
         res = self.run_test_case(
             2, cmd_str.format(" ".join(cmd_opts)), comment
         )
@@ -106,7 +108,8 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - error: switchover interval in seconds for "
                    "switching masters is too low".format(test_num))
-        cmd_str = "mysqlrplms.py --switchover-interval=10 {0}"
+        cmd_str = ("mysqlrplms.py --switchover-interval=10 --rpl-user=rpl:rpl "
+                   "{0}")
         res = self.run_test_case(
             2, cmd_str.format(" ".join(cmd_opts)), comment
         )
@@ -114,14 +117,27 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = ("Test cade {0} - Connection error".format(test_num))
-        cmd_str = "mysqlrplms.py {0}"
+        comment = ("Test case {0} - Connection error".format(test_num))
+        cmd_str = "mysqlrplms.py --rpl-user=rpl:rpl {0}"
         cmd_opts = (
             "--slave=nope@notthere",
             "--masters={0}".format(",".join([master1_conn, master2_conn])),
         )
         res = self.run_test_case(
             1, cmd_str.format(" ".join(cmd_opts)), comment
+        )
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - error: option --rpl-user is required"
+                   "".format(test_num))
+        cmd_opts = (
+            "--slave={0}".format(slave_conn),
+            "--masters={0}".format(",".join([master1_conn, master2_conn])),
+        )
+        res = self.run_test_case(
+            2, "mysqlrplms.py {0}".format(" ".join(cmd_opts)), comment
         )
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

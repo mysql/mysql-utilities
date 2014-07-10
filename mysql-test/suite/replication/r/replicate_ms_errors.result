@@ -22,7 +22,11 @@ Test case 6 - error: switchover interval in seconds for switching masters is too
 Usage: mysqlrplms --slave=root@localhost:3306 --masters=root@localhost:3310,root@localhost:3311 --rpl-user=rpl:passwd
 
 mysqlrplms: error: The --switchover-interval option requires a value greater than or equal to 30.
-Test cade 7 - Connection error
+Test case 7 - Connection error
 # Starting multi-source replication...
 # Press CTRL+C to quit.
 ERROR: Can't connect to MySQL server on XXXX
+Test case 8 - error: option --rpl-user is required
+Usage: mysqlrplms --slave=root@localhost:3306 --masters=root@localhost:3310,root@localhost:3311 --rpl-user=rpl:passwd
+
+mysqlrplms: error: Option '--rpl-user' is required.

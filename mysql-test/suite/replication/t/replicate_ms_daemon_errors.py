@@ -55,7 +55,7 @@ class test(mutlib.System_test):
         test_num = 1
         comment = ("Test case {0} - Missing --log when using --daemon"
                    "".format(test_num))
-        cmd_str = "mysqlrplms.py --daemon=start {0}"
+        cmd_str = "mysqlrplms.py --daemon=start --rpl-user=rpl:rpl {0}"
         cmd_opts = (
             "--slave={0}".format(slave_conn),
             "--masters={0}".format(",".join([master1_conn, master2_conn])),
@@ -69,7 +69,8 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - Missing --daemon when using --pidfile"
                    "".format(test_num))
-        cmd_str = "mysqlrplms.py --pidfile=rplms_daemon.pid {0}"
+        cmd_str = ("mysqlrplms.py --pidfile=rplms_daemon.pid "
+                   "--rpl-user=rpl:rpl {0}")
         res = self.run_test_case(
             2, cmd_str.format(" ".join(cmd_opts)), comment
         )
@@ -79,7 +80,17 @@ class test(mutlib.System_test):
         test_num += 1
         comment = "Test case {0} - Pidfile does not exist".format(test_num)
         cmd_str = ("mysqlrplms.py --daemon=stop --log=rplms_daemon.log "
-                   "--pidfile=nonexistent.pid {0}")
+                   "--rpl-user=rpl:rpl --pidfile=nonexistent.pid {0}")
+        res = self.run_test_case(
+            2, cmd_str.format(" ".join(cmd_opts)), comment
+        )
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - Option --rpl-user is required"
+                   "".format(test_num))
+        cmd_str = "mysqlrplms.py --daemon=start {0}"
         res = self.run_test_case(
             2, cmd_str.format(" ".join(cmd_opts)), comment
         )
