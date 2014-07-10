@@ -232,6 +232,9 @@ class test(mutlib.System_test):
         # Mask out non-deterministic data
         self.do_masks()
 
+        # Remove warning when using test servers without GTID enabled.
+        self.remove_result("# WARNING: Errant transactions check skipped")
+
         return True
 
     def do_masks(self):

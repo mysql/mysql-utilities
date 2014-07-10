@@ -63,6 +63,9 @@ class test(rpl_admin.test):
         self.server4 = self.servers.spawn_server("rep_slave3_gtid", mysqld,
                                                  True)
 
+        # Reset spawned servers (clear binary log and GTID_EXECUTED set).
+        self.reset_master()
+
         self.m_port = self.server1.port
         self.s1_port = self.server2.port
         self.s2_port = self.server3.port

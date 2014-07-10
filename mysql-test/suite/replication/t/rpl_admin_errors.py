@@ -326,6 +326,9 @@ class test(rpl_admin.test):
 
         self.remove_result("NOTE: Log file")
 
+        # Remove warning when using test servers without GTID enabled.
+        self.remove_result("# WARNING: Errant transactions check skipped")
+
         return True
 
     def get_result(self):

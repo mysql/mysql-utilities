@@ -562,8 +562,6 @@ WARNING: Using a password on the command line interface can be insecure.
 # ...done.
 Test case 27 - slave not part of topology
 WARNING: Using a password on the command line interface can be insecure.
-# ERROR: Errant transaction(s) found on slave(s).
-#  - For slave 'localhost@PORT?': XXXXX
 # WARNING: Server 'localhost@PORT5' is not acting as a slave.
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |

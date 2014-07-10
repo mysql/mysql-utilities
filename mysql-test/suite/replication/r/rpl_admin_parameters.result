@@ -126,6 +126,7 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 # Discovering slave at localhost:PORT4
 # Found slave: localhost:PORT4
 # Checking privileges.
+# WARNING: Errant transactions check skipped (GTID not enabled for the whole topology).
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
 # Checking candidate slave prerequisites.
 # Checking eligibility of slave localhost:PORT2 for candidate.
@@ -173,6 +174,7 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 # Found slave: localhost:PORT3
 # Discovering slave at localhost:PORT4
 # Found slave: localhost:PORT4
+# WARNING: Errant transactions check skipped (GTID not enabled for the whole topology).
 +------------+-------+---------+--------+------------+---------+
 | host       | port  | role    | state  | gtid_mode  | health  |
 +------------+-------+---------+--------+------------+---------+
@@ -193,6 +195,7 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 # Discovering slave at localhost:PORT4
 # Found slave: localhost:PORT4
 # Checking privileges.
+# WARNING: Errant transactions check skipped (GTID not enabled for the whole topology).
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
 # Checking candidate slave prerequisites.
 # Checking slaves configuration to master.
@@ -220,6 +223,7 @@ There are additional entries in the log.
 Test case 6 - attempt switchover with stranger server without using --force option
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
+# WARNING: Errant transactions check skipped (GTID not enabled for the whole topology).
 # Performing switchover from master at localhost:PORT3 to slave at localhost:PORT5.
 # Checking candidate slave prerequisites.
 Candidate is not connected to the correct master.
@@ -239,6 +243,7 @@ ERROR: Candidate is not connected to the correct master.
 Test case 7 - attempt switchover with stranger server using --force option
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
+# WARNING: Errant transactions check skipped (GTID not enabled for the whole topology).
 # Performing switchover from master at localhost:PORT3 to slave at localhost:PORT5.
 # Checking candidate slave prerequisites.
 Candidate is not connected to the correct master.

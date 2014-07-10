@@ -95,13 +95,12 @@ class test(rpl_admin.test):
         return True
 
     def run(self):
-
-        test_num = 1
-
         # Create an errant transaction on server2 and server4
         self.server2.exec_query("CREATE DATABASE `errant_tnx2`")
         self.server4.exec_query("CREATE DATABASE `errant_tnx4`")
 
+        # Test failover command.
+        test_num = 1
         comment = ("Test case {0} - failover to {1}:{2} with errant "
                    "transactions.".format(test_num, self.server2.host,
                                           self.server2.port))
@@ -114,13 +113,45 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-
         comment = ("Test case {0} - failover to {1}:{2} with errant "
                    "transactions using --force "
                    "option.".format(test_num, self.server2.host,
                                     self.server2.port))
         cmd_str = ("mysqlrpladmin.py --candidates={0} --slaves={1} "
                    "--force failover -vvv".format(self.slave1_conn, slaves))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Set the initial replication topology
+        self.reset_topology()
+
+        # Create more errant transaction on server2 and server4
+        self.server2.exec_query("CREATE DATABASE `errant_tnx22`")
+        self.server4.exec_query("CREATE DATABASE `errant_tnx44`")
+
+        # Test switchover command.
+        test_num += 1
+        comment = ("Test case {0} - switchover to {1}:{2} with errant "
+                   "transactions.".format(test_num, self.server2.host,
+                                          self.server2.port))
+        slaves = ",".join([self.slave1_conn, self.slave2_conn,
+                           self.slave3_conn])
+        cmd_str = ("mysqlrpladmin.py --master={0} --new-master={1} "
+                   "--slaves={2} switchover "
+                   "-vvv").format(self.master_conn, self.slave1_conn, slaves)
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - switchover to {1}:{2} with errant "
+                   "transactions using --force "
+                   "option.".format(test_num, self.server2.host,
+                                    self.server2.port))
+        cmd_str = ("mysqlrpladmin.py --master={0} --new-master={1} "
+                   "--slaves={2} --force switchover "
+                   "-vvv").format(self.master_conn, self.slave1_conn, slaves)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

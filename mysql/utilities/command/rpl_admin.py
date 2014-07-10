@@ -356,6 +356,31 @@ class RplCommands(object):
             self._report(msg, logging.CRITICAL)
             raise UtilRplError(msg)
 
+        # Can only check errant transactions if GTIDs are enabled.
+        if self.topology.gtid_enabled():
+            # Check existence of errant transactions on slaves
+            errant_tnx = self.topology.find_errant_transactions()
+            if errant_tnx:
+                force = self.options.get('force')
+                print("# ERROR: {0}".format(_ERRANT_TNX_ERROR))
+                self._report(_ERRANT_TNX_ERROR, logging.ERROR, False)
+                for host, port, tnx_set in errant_tnx:
+                    errant_msg = (" - For slave '{0}@{1}': "
+                                  "{2}".format(host, port, ", ".join(tnx_set)))
+                    print("# {0}".format(errant_msg))
+                    self._report(errant_msg, logging.ERROR, False)
+                # Raise an exception (to stop) if tolerant mode is OFF
+                if not force:
+                    raise UtilRplError("{0} Note: If you want to ignore this "
+                                       "issue, although not advised, please "
+                                       "use the utility with the --force "
+                                       "option.".format(_ERRANT_TNX_ERROR))
+        else:
+            warn_msg = ("Errant transactions check skipped (GTID not enabled "
+                        "for the whole topology).")
+            print("# WARNING: {0}".format(warn_msg))
+            self._report(warn_msg, logging.WARN, False)
+
         self._report(" ".join(["# Performing switchover from master at",
                      "%s:%s" % (self.master_vals['host'],
                                 self.master_vals['port']),
@@ -443,10 +468,10 @@ class RplCommands(object):
                 self._report(errant_msg, logging.ERROR, False)
             # Raise an exception (to stop) if tolerant mode is OFF
             if not force:
-                raise UtilRplError("%s Note: If you want to ignore this issue,"
-                                   " although not advised, please use the "
-                                   "utility with the --force option."
-                                   % _ERRANT_TNX_ERROR)
+                raise UtilRplError("{0} Note: If you want to ignore this "
+                                   "issue, although not advised, please use "
+                                   "the utility with the --force option."
+                                   "".format(_ERRANT_TNX_ERROR))
 
         self._report("# Performing failover.")
         if not self.topology.failover(self.candidates, strict,
