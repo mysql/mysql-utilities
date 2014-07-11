@@ -1,4 +1,4 @@
-Release 1.4.4rc1 (Released July 11, 2014)
+Release 1.4.4qa1 (Released July 11, 2014)
 -----------------------------------------
 
 - BUG#17957509: ReadMe and License files are lost after OSX installer finish
