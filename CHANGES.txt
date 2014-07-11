@@ -1,3 +1,9 @@
+Release 1.5.1rc1 (Released July 08, 2014)
+-----------------------------------------
+
+- BUG#19009690: AttributeError using mysqlfailover utility
+- BUG#18914270: importerror: cannot import name ... 1.5.0
+
 Release 1.5.0 (Released June 06, 2014)
 -------------------------------------
 
