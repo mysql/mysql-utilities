@@ -224,8 +224,9 @@ class test(rpl_admin.test):
         self.mask_column_result("| master_log_file", "|", 2, " XXXXXXXX ")
         self.mask_column_result("| master_log_pos", "|", 2, " XXXXXXXX ")
 
-        self.remove_result_and_lines_before("WARNING: There are slaves that "
-                                            "had connection errors.")
+        self.remove_result_and_lines_before("WARNING: Cannot connect to some "
+                                            "slaves (--verbose for more "
+                                            "details).")
 
         self.replace_result("| XXXXXXXXX  | PORT2  | SLAVE   | UP     "
                             "| ON         | OK      | ",

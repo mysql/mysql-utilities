@@ -94,6 +94,7 @@ class TopologyMap(object):
             'dest_name': None,
             'version': "5.0.0",
             'unique': True,
+            'verbose': self.verbose,
         }
 
         certs_paths = {}

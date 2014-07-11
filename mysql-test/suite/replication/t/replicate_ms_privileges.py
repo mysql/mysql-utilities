@@ -139,7 +139,7 @@ class test(replicate_ms.test):
 
         test_num = 1
         rplms_cmd = ("python ../scripts/mysqlrplms.py --log={0} --interval=5 "
-                     "--switchover-interval=30 {1} {2}"
+                     "--switchover-interval=30 --rpl-user=rpl:rpl {1} {2}"
                      "".format(_RPLMS_LOG.format(test_num), slave_str,
                                masters_str))
         comment = ("Test case {0} - User does not have the privileges needed "
@@ -164,7 +164,7 @@ class test(replicate_ms.test):
 
         test_num += 1
         rplms_cmd = ("python ../scripts/mysqlrplms.py --log={0} --interval=5 "
-                     "--switchover-interval=30 {1} {2}"
+                     "--switchover-interval=30 --rpl-user=rpl:rpl {1} {2}"
                      "".format(_RPLMS_LOG.format(test_num), slave_str,
                                masters_str))
         comment = ("Test case {0} - User does have the privileges needed for "

@@ -216,7 +216,7 @@ def _read_row(file_h, fmt, skip_comments=False):
                     yield row
 
     if warnings_found:
-        print("CAUTION: The following {0} warning messages were included in "
+        print("CAUTION: The following warning messages were included in "
               "the import file:".format(len(warnings_found)))
         for row in warnings_found:
             print(row.strip('\n'))

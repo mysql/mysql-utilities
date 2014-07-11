@@ -38,9 +38,10 @@ from mysql.utilities.command.dbexport import multiprocess_db_export_task
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import (
     add_all, add_character_set_option, add_format_option, add_locking,
-    add_regexp, add_rpl_mode, add_rpl_user, add_skip_options, add_verbosity,
-    check_all, check_rpl_options, check_skip_options, check_verbosity,
-    get_ssl_dict, setup_common_options
+    add_no_headers_option, add_regexp, add_rpl_mode, add_rpl_user,
+    add_skip_options, add_verbosity, check_all, check_rpl_options,
+    check_skip_options, check_verbosity, setup_common_options,
+    check_password_security, get_ssl_dict,
 )
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
@@ -104,10 +105,8 @@ if __name__ == '__main__':
                       help="use bulk insert statements for data "
                            "(default:False)")
 
-    # Header row
-    parser.add_option("-h", "--no-headers", action="store_true",
-                      dest="no_headers", default=False, help="do not display "
-                      "the column headers - ignored for grid format")
+    # No header option
+    add_no_headers_option(parser, restricted_formats=['tab', 'csv'])
 
     # Skip blobs for export
     parser.add_option("--skip-blobs", action="store_true", dest="skip_blobs",
@@ -145,7 +144,7 @@ if __name__ == '__main__':
     add_locking(parser)
 
     # Replication user and password
-    add_rpl_user(parser, None)
+    add_rpl_user(parser)
 
     # Add replication options
     add_rpl_mode(parser)
@@ -178,6 +177,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args, "# ")
 
     # Warn if quiet and verbosity are both specified
     check_verbosity(opt)

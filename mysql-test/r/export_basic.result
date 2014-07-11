@@ -1,4 +1,5 @@
 Test case 1 - export metadata only
+# WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
@@ -138,6 +139,7 @@ GRANT UPDATE ON `util_test`.* TO 'joe_wildcard'@'%';
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - export data only - single rows
+# WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
@@ -170,6 +172,7 @@ INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - export data only - bulk insert
+# WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;
@@ -187,6 +190,7 @@ INSERT INTO `util_test`.`t5` VALUES  (1, 'kitkat', 0.99, 19),  (2, 'M&M', 5.99, 
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - export data and metadata
+# WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
@@ -354,6 +358,7 @@ INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - export data and metadata with quiet
+# WARNING: Using a password on the command line interface can be insecure.
 SET FOREIGN_KEY_CHECKS=0;
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
@@ -468,6 +473,7 @@ INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
 INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - export data and metadata with debug
+# WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 #
 SET FOREIGN_KEY_CHECKS=0;
@@ -641,6 +647,7 @@ SET FOREIGN_KEY_CHECKS=1;
 Time:       XXXXXX
 
 Test case 7 - export data and metadata with multiprocessing (2 processes).
+# WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
@@ -808,6 +815,7 @@ INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - export data and metadata to output file.
+# WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 Output file results:
 SET FOREIGN_KEY_CHECKS=0;
@@ -976,6 +984,7 @@ INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 9 - export database with weird names (backticks)
+# WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 # Exporting metadata from db`:db
 DROP DATABASE IF EXISTS `db``:db`;
@@ -1058,6 +1067,7 @@ INSERT INTO `db``:db`.```t``.``export_2` VALUES (1, '@`var`.`var`');
 INSERT INTO `db``:db`.```t``export_1` VALUES (1, '@`var``var`');
 #...done.
 Test case 10 - export data with special characters
+# WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 # Exporting metadata from db`:db
 DROP DATABASE IF EXISTS `db``:db`;
@@ -1141,6 +1151,7 @@ INSERT INTO `db``:db`.```t``export_1` VALUES (1, '@`var``var`');
 INSERT INTO `db``:db`.```t``export_1` VALUES (2, '\0\'\"\b\n\r\t\Z\\\%\_');
 #...done.
 Test case 11 - export data with unicode characters
+# WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 USE `util_test`;

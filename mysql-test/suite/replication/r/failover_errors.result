@@ -29,3 +29,7 @@ Test case 8 - Master listed as a candidate - alias
 Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover: error: The master and one of the candidates are the same host and port.
+Test case 9 - Connection failure
+# Checking privileges.
+# Checking privileges on candidates.
+ERROR: Can't connect to MySQL server on XXXX

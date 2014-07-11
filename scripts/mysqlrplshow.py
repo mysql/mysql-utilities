@@ -34,9 +34,10 @@ from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command.show_rpl import show_topology
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.common.options import (add_format_option, add_ssl_options,
-                                            add_verbosity,
-                                            setup_common_options)
+from mysql.utilities.common.options import (add_verbosity, add_format_option,
+                                            setup_common_options,
+                                            add_ssl_options,
+                                            check_password_security)
 
 
 # Constants
@@ -122,6 +123,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Fail is --discover-slaves-login not specified
     if opt.discover is None:

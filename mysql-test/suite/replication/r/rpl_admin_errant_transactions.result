@@ -65,3 +65,60 @@ Test case 2 - failover to localhost:PORT2 with errant transactions using --force
 #
 # Replication Topology Health:
 # ...done.
+Test case 3 - switchover to localhost:PORT2 with errant transactions.
+# Checking privileges.
+# ERROR: Errant transaction(s) found on slave(s).
+#  - For slave 'localhost@PORT2': XXXXXXXXX:1
+#  - For slave 'localhost@PORT4': XXXXXXXXX:1
+ERROR: Errant transaction(s) found on slave(s). Note: If you want to ignore this issue, although not advised, please use the utility with the --force option.
+Test case 4 - switchover to localhost:PORT2 with errant transactions using --force option.
+# Checking privileges.
+# ERROR: Errant transaction(s) found on slave(s).
+#  - For slave 'localhost@PORT2': XXXXXXXXX:1
+#  - For slave 'localhost@PORT4': XXXXXXXXX:1
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
+# Checking candidate slave prerequisites.
+# GTID_MODE=ON is set for all servers.
+# Checking eligibility of slave localhost:PORT2 for candidate.
+#   Slave connected to master ... Ok
+#   GTID_MODE=ON ... Ok
+#   Replication user exists ... Ok
+# Checking slaves configuration to master.
+# Creating replication user if it does not exist.
+# Blocking writes on master.
+# LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Waiting for slaves to catch up to old master.
+# Slave localhost:PORT2:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXXXXXX)
+# Return Code = XXX
+# Slave localhost:PORT3:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXXXXXX)
+# Return Code = XXX
+# Slave localhost:PORT4:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXXXXXX)
+# Return Code = XXX
+# Stopping slaves.
+# Performing STOP on all slaves.
+#   Executing stop on slave localhost:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
+# UNLOCK STRING: UNLOCK TABLES
+# Switching slaves to new master.
+# Executing CHANGE MASTER on localhost:PORT3.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT2, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT4.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT2, MASTER_AUTO_POSITION=1
+# Starting all slaves.
+# Performing START on all slaves.
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT4 Ok
+# Checking slaves for errors.
+# localhost:PORT3 status: Ok 
+# localhost:PORT4 status: Ok 
+# Switchover complete.
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
+#
+# Replication Topology Health:
+# ...done.

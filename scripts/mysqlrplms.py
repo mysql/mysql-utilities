@@ -40,6 +40,12 @@ from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import (add_format_option, add_verbosity,
                                             add_rpl_user, add_ssl_options,
                                             get_ssl_dict)
+from mysql.utilities.common.options import (setup_common_options,
+                                            add_verbosity, add_rpl_user,
+                                            add_format_option,
+                                            add_ssl_options,
+                                            get_ssl_dict,
+                                            check_password_security)
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.my_print_defaults import MyDefaultsReader
@@ -217,6 +223,9 @@ if __name__ == '__main__':
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
 
+    # Check security settings
+    check_password_security(opt, args)
+
     # Check if the values specified for the --report-values option are valid.
     for report in opt.report_values.split(","):
         if report.lower() not in ("health", "gtid", "uuid"):
@@ -240,6 +249,10 @@ if __name__ == '__main__':
     # option --masters is required (mandatory)
     if not opt.masters:
         parser.error(PARSE_ERR_OPTS_REQ.format(opt="--masters"))
+
+    # option --rpl-user is required (mandatory)
+    if not opt.rpl_user:
+        parser.error(PARSE_ERR_OPTS_REQ.format(opt="--rpl-user"))
 
     config_reader = MyDefaultsReader(opt, False)
 

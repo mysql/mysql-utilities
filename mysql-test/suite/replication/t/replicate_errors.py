@@ -249,6 +249,13 @@ class test(replicate.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = "Test case {0} - option --rpl-user missing".format(test_num)
+        cmd = "mysqlreplicate.py {0} {1}".format(master_str, slave_str)
+        res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask known platform-dependent lines
         self.mask_result("Error 2005:", "(1", '#######')
         self.replace_substring(" (42000)", "")
@@ -256,7 +263,8 @@ class test(replicate.test):
                             "ERROR: Query failed. 1227: Access denied;\n")
 
         self.replace_any_result(
-            ["Error 2002: Can't connect to", "Error 2003: Can't connect to",
+            ["ERROR: Can't connect to MySQL server on",
+             "Error 2002: Can't connect to", "Error 2003: Can't connect to",
              "Error Can't connect to MySQL server on "],
             "Error ####: Can't connect to local MySQL server ####...\n")
 

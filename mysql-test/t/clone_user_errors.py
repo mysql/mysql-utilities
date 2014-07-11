@@ -19,9 +19,11 @@
 clone_user_errors test.
 """
 
+import os
+
 import clone_user
 
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.exception import MUTLibError, UtilDBError
 
 
 class test(clone_user.test):
@@ -29,12 +31,45 @@ class test(clone_user.test):
     This test ensures the known error conditions are tested. It uses the
     cloneuser test as a parent for setup and teardown methods.
      """
+    server2 = None
 
     def check_prerequisites(self):
         return clone_user.test.check_prerequisites(self)
 
     def setup(self):
-        return clone_user.test.setup(self)
+        super_setup = clone_user.test.setup(self)
+        if not super_setup:
+            return False
+        self.server2 = self.servers.spawn_server("clone_user_errors",
+                                                 kill=True, mysqld="")
+        # Create accounts on destination server and give them some privileges.
+        try:
+            self.server2.exec_query("CREATE USER remote@'localhost'")
+        except UtilDBError as err:
+            print("Unable to create user remote@'localhost': "
+                  "{0}".format(err.errmsg))
+            return False
+        try:
+            self.server2.exec_query("GRANT ALL ON *.* to remote@'localhost'")
+        except UtilDBError as err:
+            print("Unable to grant privileges to user remote@'localhost': "
+                  "{0}".format(err.errmsg))
+            return False
+
+        try:
+            self.server2.exec_query("CREATE USER user1@'localhost'")
+        except UtilDBError as err:
+            print("Unable to create user user1@'localhost': "
+                  "{0}".format(err.errmsg))
+            return False
+        try:
+            self.server2.exec_query("GRANT SELECT ON *.* to "
+                                    "user1@'localhost'")
+        except UtilDBError as err:
+            print("Unable to grant privileges to user user1@'localhost': "
+                  "{0}".format(err.errmsg))
+            return False
+        return True
 
     def run(self):
         self.res_fname = "result.txt"
@@ -51,6 +86,13 @@ class test(clone_user.test):
         comment = ("Test case {0} - error: invalid login to source "
                    "server".format(test_num))
         res = self.run_test_case(1, cmd_str + " a@b b@c", comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - error: invalid login to source "
+                   "server with --list option".format(test_num))
+        res = self.run_test_case(1, cmd_str + " --list", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -113,9 +155,51 @@ class test(clone_user.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        to_conn = ("--destination=remote@localhost:"
+                   "{0}".format(self.server2.port))
+        cmd_str = ("mysqluserclone.py {0} {1} remote@'%' xxx:12345@localhost"
+                   "".format(from_conn, to_conn))
+        comment = ("Test case {0} - user from destination server does not "
+                   "have enough privileges to clone".format(test_num))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        to_conn = ("--destination=user1@localhost:"
+                   "{0}".format(self.server2.port))
+        cmd_str = ("mysqluserclone.py {0} {1} remote@'%' xxx:12345@localhost"
+                   "".format(from_conn, to_conn))
+        comment = ("Test case {0} - user from destination server does not "
+                   "have the privilege to create users".format(test_num))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        # give user1 the privilege to create users, however it still lacks
+        # the privilege to drop users.
+        try:
+            self.server2.exec_query("GRANT INSERT ON mysql.* to "
+                                    "user1@'localhost'")
+        except UtilDBError as err:
+            print("Unable to grant privileges to user user1@'localhost': "
+                  "{0}".format(err.errmsg))
+        to_conn = ("--destination=user1@localhost:"
+                   "{0}".format(self.server2.port))
+        cmd_str = ("mysqluserclone.py {0} {1} remote@'%' remote@localhost "
+                   "--force".format(from_conn, to_conn))
+        comment = ("Test case {0} - user from destination server does not "
+                   "have the privilege to drop users".format(test_num))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Replace error code.
         self.replace_any_result(["Error 1045", "Error 2003",
-                                 "Error Can't connect to MySQL server on",
+                                 "ERROR: Can't connect to",
+                                 "ERROR: Access denied for user",
                                  "Error Access denied for user"],
                                 "Error XXXX: Access denied\n")
 
@@ -127,6 +211,10 @@ class test(clone_user.test):
                             "values invalid",
                             "mysqluserclone: error: Destination connection "
                             "values invalid\n")
+        # Mask windows output, remove single quotes around hostname
+        if os.name == 'nt':
+            self.replace_substring_portion("Cloning remote@'%'", "to",
+                                           "Cloning remote@% to")
 
         # Mask known source and destination host name.
         self.replace_substring("on localhost", "on XXXX-XXXX")
@@ -141,4 +229,5 @@ class test(clone_user.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        return clone_user.test.cleanup(self)
+        return (self.kill_server(self.server2.role) and
+                clone_user.test.cleanup(self))

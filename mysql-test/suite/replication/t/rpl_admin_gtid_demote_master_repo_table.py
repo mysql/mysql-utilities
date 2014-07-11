@@ -137,8 +137,9 @@ class test(rpl_admin.test):
                             "WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)\n")
         self.replace_substring("localhost", "XXXXXXXXX")
 
-        self.remove_result_and_lines_before("WARNING: There are slaves that"
-                                            " had connection errors.")
+        self.remove_result_and_lines_before("WARNING: Cannot connect to some "
+                                            "slaves (--verbose for more "
+                                            "details).")
 
         self.replace_result("| XXXXXXXXX  | PORT2  | MASTER  | UP     "
                             "| ON         | OK      | ",

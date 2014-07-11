@@ -457,8 +457,11 @@ def run_mut(port, parser, specific_tests=None, env=None, force=False,
 
 
 def copy_connector(connector_path):
-    """copies the connector folder from connector-python folder to the
-    utilities one.
+    """Installs the connector python on connector_path to the current
+    working directory.
+
+    connector_path [in]   path where we can find the connector python
+
     it must be called on the root of the utilities folder"""
     cwd = os.getcwd()
     # check if we are on the root of the utilities folder
@@ -466,16 +469,13 @@ def copy_connector(connector_path):
     if not is_root:
         print("# Error: please chdir to the root utilities folder")
         sys.exit(1)
-    dest_folder = os.path.join(os.getcwd(), "mysql", "connector")
-    origin_folder = os.path.join(connector_path, "python2", "mysql",
-                                 "connector")
-    if not os.path.exists(origin_folder):
-        print("# couldn't find connector folder in {0}".format(origin_folder))
-        sys.exit(1)
-    print("# copying connector folder from connector-python")
-    shutil.copytree(origin_folder, dest_folder)
-    print("# copying version.py file from connector-python")
-    shutil.copy(os.path.join(connector_path, "version.py"), os.getcwd())
+    dest_folder = cwd
+    install_cmd = ("python setup.py install --root={0} --install-lib='' "
+                   "".format(dest_folder))
+
+    with working_path(os.path.normpath(connector_path)):
+        print ("Installing connector using command '{0}'".format(install_cmd))
+        subprocess.call(install_cmd, shell=True)
 
 
 def _read_disabled_tests(filename):

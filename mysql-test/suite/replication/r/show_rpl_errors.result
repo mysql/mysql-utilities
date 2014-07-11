@@ -3,10 +3,10 @@ Usage: mysqlrplshow --master=root@localhost:3306
 
 mysqlrplshow: error: Master connection values invalid
 Test case 2 - error: invalid login to master
-# master on localhost: ... FAILED.
+# master on localhost: ... 
+FAILED.
 
-ERROR: Cannot connect to the master server.
-Error Access denied for user 'wanda'@'localhost' (using password: YES)
+ERROR: Access denied for user 'wanda'@'localhost' (using password: YES)
 Test case 3 - show topology - bad format
 Usage: mysqlrplshow --master=root@localhost:3306 
 

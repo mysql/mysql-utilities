@@ -767,7 +767,7 @@ def _get_compare_objects(index_cols, table1,
         table = _COMPARE_TABLE.format(db=table1.q_db_name,
                                       compare_tbl=q_tbl_name,
                                       pkdef=index_defn,
-                                      span_key_size=span_key_size/2)
+                                      span_key_size=span_key_size / 2)
 
     return (table, index_str)
 

@@ -37,6 +37,7 @@ class test(replicate.test):
         return replicate.test.setup(self)
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         self.res_fname = "result.txt"
 
         test_num = 1

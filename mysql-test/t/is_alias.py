@@ -51,42 +51,42 @@ _python_ip = socket.getaddrinfo(_python_org, None)[0][4][0]
 
 _special_test_cases = [
     {_desc: "This test reuse of aliases", _test_case_name: _alias_reuseness,
-     _aliases: [_alias_reuseness], _host_name: _alias_reuseness,
+     _aliases: set([_alias_reuseness]), _host_name: _alias_reuseness,
      _result: True},
 
     {_desc: "this test addition of  lookup to aliases",
-     _test_case_name: _mock_no_local_host, _aliases: [],
+     _test_case_name: _mock_no_local_host, _aliases: set(),
      _host_name: _mock_no_local_host, _result: True},
 
     {_desc: "This test Negative host added to aliases",
-     _test_case_name: _alias_reuseness, _aliases: [],
+     _test_case_name: _alias_reuseness, _aliases: set(),
      _host_name: _mock_no_local_host, _result: False},
 
     {_desc: ("This test non local server host name,"
              " lookup of his aliases"), _test_case_name: _oracle_com,
-     _aliases: [], _host_name: _python_org, _result: False},
+     _aliases: set(), _host_name: _python_org, _result: False},
 
     {_desc: ("This test non local server, lookup"
              " of aliases for the given hostname"),
-     _test_case_name: _oracle_com, _aliases: [_mock_no_local_host],
+     _test_case_name: _oracle_com, _aliases: set([_mock_no_local_host]),
      _host_name: _mock_no_local_host, _result: False},
 
     {_desc: ("This test non local server,"
              "lookup of aliases for the given ip"),
-     _test_case_name: _python_ip, _aliases: [_mock_no_local_host],
+     _test_case_name: _python_ip, _aliases: set([_mock_no_local_host]),
      _host_name: _mock_no_local_host, _result: False},
 
     {_desc: ("This test lookup of aliases for non "
-             "local server by IP."), _test_case_name: _oracle_ip, _aliases: [],
-     _host_name: _oracle_com, _result: True},
+             "local server by IP."), _test_case_name: _oracle_ip,
+     _aliases: set(), _host_name: _oracle_com, _result: True},
 
     {_desc: ("This test lookups of aliases for non "
              "local server by hostname."), _test_case_name: _python_org,
-     _aliases: [], _host_name: _python_ip, _result: True},
+     _aliases: set(), _host_name: _python_ip, _result: True},
 
     {_desc: ("It test the reuse of aliases for the "
              "given non local server by hostname."),
-     _test_case_name: _python_org, _aliases: [_python_ip],
+     _test_case_name: _python_org, _aliases: set([_python_ip]),
      _host_name: _python_ip, _result: True}]
 
 
@@ -168,7 +168,7 @@ class test(mutlib.System_test):
                 print(_PASS)
             self.results.append(_PASS)
         self.results.append("\n")
-        server.aliases = []
+        server.aliases = set()
 
     def run_is_alias_test_cases(self, server, test_num):
         """Run is_alias test cases.

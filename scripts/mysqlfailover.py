@@ -43,7 +43,8 @@ from mysql.utilities.common.options import (add_failover_options,
                                             add_ssl_options,
                                             check_server_lists,
                                             license_callback,
-                                            UtilitiesParser)
+                                            UtilitiesParser,
+                                            check_password_security)
 
 
 # Constants
@@ -198,13 +199,16 @@ if __name__ == '__main__':
     add_verbosity(parser, False)
 
     # Replication user and password
-    add_rpl_user(parser, None)
+    add_rpl_user(parser)
 
     # Add ssl options
     add_ssl_options(parser)
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Check slaves list
     if opt.daemon != "stop":

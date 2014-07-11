@@ -1,4 +1,5 @@
 Test case 1 - use the test feature
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 # Checking for binary logging on master...
@@ -20,7 +21,7 @@ Test case 2 - show the help
                         path>[<[group]>].
   --rpl-user=RPL_USER   the user and password for the replication user
                         requirement, in the form: <user>[:<password>] or
-                        <login-path>. E.g. rpl:passwd - By default = rpl:rpl
+                        <login-path>. E.g. rpl:passwd
   -p, --pedantic        fail if storage engines differ among master and slave.
   --test-db=TEST_DB     database name to use in testing replication setup
                         (optional)
@@ -43,6 +44,7 @@ Test case 2 - show the help
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.
 Test case 3 - use the verbose feature
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 # master id = XXX
@@ -59,6 +61,7 @@ Test case 3 - use the verbose feature
 # IO thread running: Yes
 # ...done.
 Test case 4 - use the start-from-beginning feature
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 # Checking for binary logging on master...

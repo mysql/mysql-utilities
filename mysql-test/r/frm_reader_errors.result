@@ -14,15 +14,13 @@ Test case 4: - No server and no access
 ERROR: Cannot read XXXXXX
 ERROR: Method requires basedir or server and port options.
 Test case 5: - Connection errors
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
-mysqlfrm: error: Cannot connect to the Source server.
 Error ####: Can't connect to MySQL server on XXXXXXXXXXXXXXXXXXXX
-
 Test case 6: - Connection errors
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
-mysqlfrm: error: Cannot connect to the Source server.
-Error ####: Can't connect to MySQL server on XXXXXXXXXXXXXXXXXXXX
-
+mysqlfrm: error: Access denied for user 'root'@'localhost' (using password: YES)
 Test case 7: - Invalid port
 Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 

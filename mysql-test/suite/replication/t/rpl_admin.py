@@ -93,6 +93,7 @@ class test(mutlib.System_test):
         return self.reset_topology()
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         cmd_str = "mysqlrpladmin.py {0} ".format(self.master_str)
 
         master_conn = self.build_connection_string(self.server1).strip(' ')
@@ -230,6 +231,9 @@ class test(mutlib.System_test):
 
         # Mask out non-deterministic data
         self.do_masks()
+
+        # Remove warning when using test servers without GTID enabled.
+        self.remove_result("# WARNING: Errant transactions check skipped")
 
         return True
 

@@ -166,6 +166,7 @@ class test(rpl_admin.test):
         return True
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         cmd_base = "mysqlrplsync.py"
         master_con = self.build_connection_string(self.server1).strip(' ')
         slave1_con = self.build_connection_string(self.server2).strip(' ')

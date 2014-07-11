@@ -22,7 +22,7 @@ localhost	PORT3	SLAVE	UP	ON	OK
 localhost	PORT4	SLAVE	UP	ON	OK
 Test case 4 - warning for missing --report-host
 # Discovering slaves for master at localhost:PORT1
-WARNING: There are slaves that have not been registered with --report-host or --report-port.
+WARNING: There are slaves that have not been registered with --report-host or --report-port (--verbose for more details).
 # Discovering slave at localhost:PORT2
 # Found slave: localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -38,9 +38,32 @@ localhost,PORT2,SLAVE,UP,ON,OK
 localhost,PORT3,SLAVE,UP,ON,OK
 localhost,PORT4,SLAVE,UP,ON,OK
 # ...done.
-Test case 5 - warning for --format and not health or gtid
+Test case 5 - warning for missing --report-host (using --verbose)
+# Discovering slaves for master at localhost:PORT1
+WARNING: There are slaves that have not been registered with --report-host or --report-port:
+ - unknown host:PORT5
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
+# Checking privileges.
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
+#
+# Replication Topology Health:
+host,port,role,state,gtid_mode,health,version,master_log_file,master_log_pos,IO_Thread,SQL_Thread,Secs_Behind,Remaining_Delay,IO_Error_Num,IO_Error,SQL_Error_Num,SQL_Error,Trans_Behind
+localhost,PORT1,MASTER,UP,ON,OK, ...
+localhost,PORT2,SLAVE,UP,ON,OK, ...
+localhost,PORT3,SLAVE,UP,ON,OK, ...
+localhost,PORT4,SLAVE,UP,ON,OK, ...
+# ...done.
+Test case 6 - warning for --format and not health or gtid
 WARNING: The --format option is not required for 'stop' (option ignored). Only used with the health or gtid command.
-Test case 6 - warning for --master and failover
+Test case 7 - warning for --master and failover
 WARNING: The --master option is not required for 'failover' (option ignored).
 # Checking privileges.
 # Performing failover.
@@ -66,7 +89,7 @@ WARNING: The --master option is not required for 'failover' (option ignored).
 | localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-Test case 7 - warnings for switchover with offline slave
+Test case 8 - warnings for switchover with offline slave
 # Checking privileges.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
 # Checking candidate slave prerequisites.
@@ -92,11 +115,11 @@ Test case 7 - warnings for switchover with offline slave
 | offline    | 1234  | SLAVE   | DOWN   |            | Cannot connect to slave.  |
 +------------+-------+---------+--------+------------+---------------------------+
 # ...done.
-Test case 8 - elect using a slave with gtid disabled.
+Test case 9 - elect using a slave with gtid disabled.
 # Checking privileges.
 # WARNING: Slave election requires GTID_MODE=ON for all servers.
 # ...done.
-Test case 9 - elect using a master with gtid disabled.
+Test case 10 - elect using a master with gtid disabled.
 # Checking privileges.
 # WARNING: Slave election requires GTID_MODE=ON for all servers.
 # ...done.

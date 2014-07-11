@@ -186,8 +186,11 @@ class test(rpl_admin.test):
         test_num += 1
 
         # Test for BUG#14080657
+        # Note: disable binary logging to avoid creating errant transactions.
+        self.server2.exec_query("SET SQL_LOG_BIN= 0")
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
                                 "'rpl'@'rpl'")
+        self.server2.exec_query("SET SQL_LOG_BIN= 1")
 
         cmd_str = "mysqlrpladmin.py --master={0} ".format(slave3_conn)
         comment = "Test case {0} - elect with missing rpl user".format(
@@ -321,9 +324,6 @@ class test(rpl_admin.test):
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
         self.replace_substring(str(self.s4_port), "PORT5")
-
-        self.replace_result("#  - For slave 'localhost",
-                            "#  - For slave 'localhost@PORT?': XXXXX\n")
 
         # Mask data from verbose health report (except Trans_Behind)
         self.replace_result("         version: ",

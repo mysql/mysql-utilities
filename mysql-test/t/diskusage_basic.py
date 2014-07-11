@@ -149,6 +149,7 @@ class test(mutlib.System_test):
         self.replace_result("clone-bin.index,", "clone-bin.index,XXXX\n")
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         self.res_fname = "result.txt"
 
         from_conn = "--server={0}".format(

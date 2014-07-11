@@ -200,6 +200,15 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - mysqluserclone --dump user "
+                   "with global privileges".format(test_num))
+        cmd_str = ("mysqluserclone.py {0} -d remote@'%' ".format(
+            from_conn))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask known source and destination host name.
         self.replace_result("# Source on ",
                             "# Source on XXXX-XXXX: ... connected.\n")
@@ -211,6 +220,10 @@ class test(mutlib.System_test):
         self.remove_result("root,")
         # Remove possible leftovers from other tests.
         self.remove_result("joe_wildcard,")
+        # Mask windows output, remove single quotes around hostname
+        if os.name == 'nt':
+            self.replace_result("# Dumping grants for user remote@'%'",
+                                "# Dumping grants for user remote@%\n")
 
         return True
 
@@ -244,7 +257,7 @@ class test(mutlib.System_test):
             return False
         users = ["'joe_pass'@'%'", "joe_pass@user", "'joe_nopass'@'user'",
                  "'amy_nopass'@'user'", "'jill'@'user'", "'jack'@'user'",
-                 "'john'@'user'", "'joe_wildcard'@'%'"]
+                 "'john'@'user'", "'joe_wildcard'@'%'", "'remote'@'%'", ]
 
         dropped_users = [self.drop_user(user, self.server1) for user in users]
 

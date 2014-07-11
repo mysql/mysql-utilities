@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,10 +20,8 @@ import os
 
 # MySQL Utilities\scripts\etc\mysql\fabric.cfg
 dir_fab_conf = ('<Directory>'
-    '<Directory Id="Scripts" Name="scripts">'
     '<Directory Id="ETC" Name="etc">'
     '<Directory Id="FABCONF" Name="mysql"/>'
-    '</Directory>'
     '</Directory>'
     '</Directory>'
 )
@@ -38,7 +36,6 @@ dirref_fab =('<Product>'
     '<DirectoryRef Id="FABCONF">'
     '<Component Id="Fabric_config"'
     ' Guid="CA95B0AF-5500-48CD-9707-56608AE78491">'
-    '<RemoveFolder Id="RemScripts" Directory="Scripts" On="uninstall"/>'
     '<RemoveFolder Id="RemMySQLDir" Directory="ETC" On="uninstall"/>'
     '<RemoveFolder Id="RemFABCONF" Directory="FABCONF" On="uninstall"/>'
     '<RegistryKey Root="HKCU"'
@@ -62,6 +59,13 @@ dirref_fab =('<Product>'
 compref_fab = ('<Feature>'
     '<ComponentRef Id="Fabric_config"/>'
     '</Feature>'
+)
+
+comp_fabric_cfg_menu = ('<Component>'
+    '<Shortcut Description="MySQL Fabric configuration file" Id="fabric_cfg" '
+    'Name="MySQL Fabric configuration file" '
+    'Target="[INSTALLDIR]etc\\mysql\\fabric.cfg"/>'
+    '</Component>'
 )
 
 dir_php_zip = ('<Directory>'
@@ -182,6 +186,13 @@ def add_fabric_elements(dom_msi):
     # Define the files to be installed on DirectoryRef.
     product = dom_msi.getElementsByTagName("Product")[0]
     append_childs_from_unparsed_xml(product, dirref_fab)
+
+    # Add comp_fabric_cfg_menu shortcut.
+    diref = get_element(dom_msi, "DirectoryRef", id="UtilsMenu")
+    comps = diref.getElementsByTagName('Component')
+    for com in comps:
+        if com.getAttribute('Id') == 'UtilsShortcuts':
+            append_childs_from_unparsed_xml(com, comp_fabric_cfg_menu)
 
     # Set ComponentRef to Feature, that list elements to be installed 
     # We need to include the references to all elements added before. 

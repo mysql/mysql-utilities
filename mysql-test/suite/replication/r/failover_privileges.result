@@ -1,28 +1,25 @@
 Test case 1 - failover (fail) using 's_user' only with: REPLICATION SLAVE.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
 
-WARNING: There are slaves that had connection errors.
+WARNING: Cannot connect to some slaves (--verbose for more details).
 # Checking privileges.
 # ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 # ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 # ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 2 - failover (fail) using 's_user' without: SUPER.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
-Error connecting to a slave as s_user@localhost: Query failed. 1227: Access denied; you need (at least one of) the SUPER, REPLICATION CLIENT privilege(s) for this operation
 
-WARNING: There are slaves that had connection errors.
+WARNING: Cannot connect to some slaves (--verbose for more details).
 # Checking privileges.
 # ERROR: User s_user on localhost@PORT2 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 # ERROR: User s_user on localhost@PORT3 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 # ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 3 - failover (fail) using 's_user' without: DROP.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -33,6 +30,7 @@ Test case 3 - failover (fail) using 's_user' without: DROP.
 # ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 4 - failover (fail) using 's_user' without: CREATE.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -43,6 +41,7 @@ Test case 4 - failover (fail) using 's_user' without: CREATE.
 # ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 5 - failover (fail) using 's_user' without: GRANT OPTION.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -53,6 +52,7 @@ Test case 5 - failover (fail) using 's_user' without: GRANT OPTION.
 # ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 6 - failover (fail) using 's_user' without: SELECT.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -63,6 +63,7 @@ Test case 6 - failover (fail) using 's_user' without: SELECT.
 # ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 7 - failover (fail) using 's_user' without: RELOAD.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -73,6 +74,7 @@ Test case 7 - failover (fail) using 's_user' without: RELOAD.
 # ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 8 - failover (fail) using 's_user' without: INSERT.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -83,9 +85,11 @@ Test case 8 - failover (fail) using 's_user' without: INSERT.
 # ERROR: User s_user on localhost@PORT4 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 9 - failover (fail) using 'm_user' without: REPLICATION SLAVE.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 ERROR: ('Query failed. 1227: Access denied; you need (at least one of) the REPLICATION SLAVE privilege(s) for this operation', 0)
 Test case 10 - failover (fail) using 'm_user' without: SUPER.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -94,6 +98,7 @@ Test case 10 - failover (fail) using 'm_user' without: SUPER.
 # ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 11 - failover (fail) using 'm_user' without: DROP.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -102,6 +107,7 @@ Test case 11 - failover (fail) using 'm_user' without: DROP.
 # ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 12 - failover (fail) using 'm_user' without: CREATE.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -110,6 +116,7 @@ Test case 12 - failover (fail) using 'm_user' without: CREATE.
 # ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 13 - failover (fail) using 'm_user' without: GRANT OPTION.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -118,6 +125,7 @@ Test case 13 - failover (fail) using 'm_user' without: GRANT OPTION.
 # ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 14 - failover (fail) using 'm_user' without: SELECT.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -126,6 +134,7 @@ Test case 14 - failover (fail) using 'm_user' without: SELECT.
 # ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 15 - failover (fail) using 'm_user' without: RELOAD.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3
@@ -134,6 +143,7 @@ Test case 15 - failover (fail) using 'm_user' without: RELOAD.
 # ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 16 - failover (fail) using 'm_user' without: INSERT.
+WARNING: Using a password on the command line interface can be insecure.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Discovering slave at localhost:PORT3

@@ -1,4 +1,5 @@
 Test case 1 - check a table without indexes
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Checking indexes...
 # Getting indexes for util_test_c.t6
@@ -6,6 +7,7 @@ Test case 1 - check a table without indexes
 #
 # ...done.
 Test case 2 - check a list of tables and databases
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Checking indexes...
 # Getting indexes for util_test_a.t1
@@ -48,6 +50,7 @@ CREATE FULLTEXT INDEX `ft4` ON `util_test_c`.`t5` (`a`, `b`, `y`)
 #
 # ...done.
 Test case 3 - check all tables for a single database
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Checking indexes...
 # Getting indexes for util_test_a.t1
@@ -67,19 +70,23 @@ CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32))
 #
 # ...done.
 Test case 4 - check tables for a non-existant database
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Warning: database util_test_X does not exist. Skipping.
 ERROR: No tables to check.
 Test case 5 - check indexes for a non-existant table
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Checking indexes...
 ERROR: Table nosuch.nosuch does not exist. Use --skip to skip missing tables.
 Test case 6 - check indexes for a non-existant table with skip option
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Checking indexes...
 #
 # ...done.
 Test case 7 - check clustered indexes redundancies
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Checking indexes...
 # Getting indexes for util_test_d.cluster_idx
@@ -117,6 +124,7 @@ CREATE INDEX `another_redundant` ON `util_test_d`.`various_cluster_idx` (`col3`,
 #
 # ...done.
 Test case 8 - check PRIMARY key against unique index with more columns, show drops
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Checking indexes...
 # Getting indexes for util_test_f.qted_`2_quoted_`2

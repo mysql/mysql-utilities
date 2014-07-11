@@ -206,7 +206,8 @@ class test(mutlib.System_test):
         """
         user_drop_lst = ["joe_pass@'%'", "joe_pass@user",
                          "'joe_nopass'@'user'", "'amy_nopass'@'user'",
-                         "'jill'@'user'", "'jack'@'user'", "'john'@'user'"]
+                         "'jill'@'user'", "'jack'@'user'", "'john'@'user'",
+                         "'remote'@'%'"]
 
         for user in user_drop_lst:
             self.drop_user(user, self.server1)

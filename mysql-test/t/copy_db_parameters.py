@@ -97,6 +97,7 @@ class test(copy_db.test):
         return True
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         self.res_fname = "result.txt"
 
         from_conn = "--source={0}".format(

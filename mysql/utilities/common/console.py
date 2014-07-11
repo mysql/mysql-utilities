@@ -32,7 +32,8 @@ from mysql.utilities.common.format import print_dictionary_list
 from mysql.utilities.common.variables import Variables
 from mysql.utilities.exception import UtilError
 
-
+# TODO remove this pylint disable regarding duplicate keys
+# pylint: disable=W0109
 _COMMAND_KEY = {
     '\x7f': 'DELETE_POSIX',
     '\x1b[3~': 'DELETE_MAC',
@@ -44,6 +45,7 @@ _COMMAND_KEY = {
     '\x1b[C': 'ARROW_RT',
     '\x1b[D': 'ARROW_LT',
     '\t': 'TAB',
+    '\x7f': 'BACKSPACE_POSIX',
     '\xe0': 'SPECIAL_WIN',
     '\x08': 'BACKSPACE_WIN'
 }
@@ -690,7 +692,10 @@ class Console(object):
             self.tab_count = 0
         else:
             if len(matches) == 1:
-                new_cmd = matches[0]['name'] + ' '
+                if matches[0]['name'][:len(command_text)] == command_text:
+                    new_cmd = matches[0]['name'] + ' '
+                else:
+                    new_cmd = matches[0]['alias'] + ' '
                 self.tab_count = 0
                 self.cmd_line.add(new_cmd[len(command_text):])
 
@@ -755,26 +760,30 @@ class Console(object):
             self.show_custom_options()
         else:
             cmd, parameters = self._get_util_parameters(command)
-            cmd = cmd.strip()
-            parameters = parameters.strip()
-            if cmd.lower() == 'help':
-                self.show_help(parameters)
-                self.cmd_line.clear()
-                self.tab_count = 0
-            elif cmd == '':
-                print
-            elif cmd.lower() in ['exit', 'quit']:
-                print
-                return True
-            elif self.custom_commands:
-                if not self.is_valid_custom_command(cmd):
-                    print "\n\nUnknown command: %s %s\n" % (cmd, parameters)
-                else:
-                    try:
-                        self.execute_custom_command(cmd, parameters)
-                        print
-                    except UtilError, err:
-                        print err.errmsg
+            if cmd is None:
+                return False
+            else:
+                cmd = cmd.strip()
+                parameters = parameters.strip()
+                if cmd.lower() == 'help':
+                    self.show_help(parameters)
+                    self.cmd_line.clear()
+                    self.tab_count = 0
+                elif cmd == '':
+                    print
+                elif cmd.lower() in ['exit', 'quit']:
+                    print
+                    return True
+                elif self.custom_commands:
+                    if not self.is_valid_custom_command(cmd):
+                        print("\n\nUnknown command: {0} {1}\n"
+                              "".format(cmd, parameters))
+                    else:
+                        try:
+                            self.execute_custom_command(cmd, parameters)
+                            print
+                        except UtilError as err:
+                            print err.errmsg
 
         self.cmd_line.clear()
         self.tab_count = 0
@@ -868,9 +877,16 @@ class Console(object):
 
         Returns tuple - command, parameters
         """
-        tokens = shlex.split(cmd_string)
-        if len(tokens):
-            return (tokens[0], ' '.join(tokens[1:]))
+        try:
+            tokens = shlex.split(cmd_string)
+        except ValueError as err:
+            print
+            print("WARNING: Unable to execute command, reason: {0}"
+                  "".format(str(err)))
+            return None, None
+        else:
+            if len(tokens):
+                return (tokens[0], ' '.join(tokens[1:]))
         return (cmd_string.strip(' '), '')
 
     def get_user_command(self):

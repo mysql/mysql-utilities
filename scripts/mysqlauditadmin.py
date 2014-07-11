@@ -42,7 +42,8 @@ from mysql.utilities.common.messages import PARSE_ERR_SSL_REQ_SERVER
 from mysql.utilities.common.options import (add_ssl_options, add_verbosity,
                                             UtilitiesParser,
                                             CaseInsensitiveChoicesOption,
-                                            license_callback)
+                                            license_callback,
+                                            check_password_security)
 from mysql.utilities.common.tools import (check_connector_python,
                                           show_file_statistics)
 
@@ -139,6 +140,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Perform error checking
 

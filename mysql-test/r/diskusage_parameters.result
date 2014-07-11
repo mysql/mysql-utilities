@@ -22,7 +22,8 @@ Options:
   -f FORMAT, --format=FORMAT
                         display the output in either grid (default), tab, csv,
                         or vertical format
-  -h, --no-headers      do not show column headers
+  -h, --no-headers      do not show column headers (only applies to formats:
+                        grid, tab, csv).
   -b, --binlog          include binary log usage
   -r, --relaylog        include relay log usage
   -l, --logs            include general and slow log usage

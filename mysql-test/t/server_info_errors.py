@@ -54,9 +54,9 @@ class test(server_info.test):
         self.results.append("\n")
 
         test_num += 1
-        cmd_opts = " --server=xewkjsdd:21"
+        cmd_opts = "{0} --server=xewkjsdd:21".format(cmd_str)
         comment = "Test case {0} - bad server".format(test_num)
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        res = self.run_test_case(1, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
@@ -64,27 +64,27 @@ class test(server_info.test):
         cmd_str = "mysqlserverinfo.py {0} ".format(from_conn2)
 
         test_num += 1
-        cmd_opts = " --format=ASDASDASD"
+        cmd_opts = "{0} --format=ASDASDASD".format(cmd_str)
         comment = "Test case {0} - bad format".format(test_num)
-        res = self.run_test_case(2, cmd_str + cmd_opts, comment)
+        res = self.run_test_case(2, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
-        cmd_opts = " --format=grid"
         cmd_str_wrong = cmd_str.replace(":root", ":wrong")
+        cmd_opts = "{0} --format=grid".format(cmd_str_wrong)
         comment = "Test case {0} - wrong password".format(test_num)
-        res = self.run_test_case(1, cmd_str_wrong + cmd_opts, comment)
+        res = self.run_test_case(1, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
-        cmd_opts = " --format=grid"
         cmd_str_wrong = cmd_str.replace(":root", ":")
+        cmd_opts = "{0} --format=grid".format(cmd_str_wrong)
         comment = "Test case {0} - no password".format(test_num)
-        res = self.run_test_case(1, cmd_str_wrong + cmd_opts, comment)
+        res = self.run_test_case(1, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
@@ -92,37 +92,55 @@ class test(server_info.test):
         cmd_str = self.start_stop_newserver()
 
         test_num += 1
-        cmd_opts = " --format=vertical "
+        cmd_opts = "{0} --format=vertical".format(cmd_str)
         comment = ("Test case {0} - offline server without start, basedir, "
                    "datadir option".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        res = self.run_test_case(1, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
-        cmd_opts = " --format=vertical --basedir=."
+        cmd_opts = "{0} --format=vertical --basedir=.".format(cmd_str)
         comment = ("Test case {0} - offline server without start, "
                    "datadir option".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        res = self.run_test_case(1, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
         test_num += 1
-        cmd_opts = " --format=vertical --basedir=. --datadir=."
+        cmd_opts = ("{0} --format=vertical --basedir=. "
+                    "--datadir=.").format(cmd_str)
         comment = ("Test case {0} - offline server without start "
                    "option".format(test_num))
-        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        res = self.run_test_case(1, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = "--start-timeout=1.5"
-        cmd = "{0} {1}".format(cmd_str, cmd_opts)
+        cmd_opts = "{0} --start-timeout=1.5".format(cmd_str)
         comment = ("Test case {0} - Invalid --start-timeout "
                    "value".format(test_num))
-        res = self.run_test_case(2, cmd, comment)
+        res = self.run_test_case(2, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = ("{0} --format=vertical --basedir=not_exist --datadir=."
+                    " --start").format(cmd_str)
+        comment = ("Test case {0} - Invalid basedir with --start "
+                   "option.".format(test_num))
+        res = self.run_test_case(2, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = ("{0} --format=vertical --basedir=. --datadir=not_exist"
+                    " --start").format(cmd_str)
+        comment = ("Test case {0} - Invalid datadir with --start "
+                   "option.".format(test_num))
+        res = self.run_test_case(2, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

@@ -19,7 +19,7 @@ Test case 1 - show help
                         separated list.
   --rpl-user=RPL_USER   the user and password for the replication user
                         requirement, in the form: <user>[:<password>] or
-                        <login-path>. E.g. rpl:passwd - By default = rpl:rpl
+                        <login-path>. E.g. rpl:passwd
   -b, --start-from-beginning
                         start replication from the first event recorded in the
                         binary logging of the masters.
@@ -115,3 +115,8 @@ Helpful Hints
   - The default interval for switching masters is 60 seconds.
     This value can be changed with the --switchover-interval option.
 
+Test case 2 - show warning
+WARNING: Using a password on the command line interface can be insecure.
+# Starting multi-source replication...
+# Press CTRL+C to quit.
+ERROR: Can't connect to XXXX

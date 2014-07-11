@@ -1,8 +1,39 @@
 Release 1.5.1rc1 (Released July 08, 2014)
 -----------------------------------------
-
 - BUG#19009690: AttributeError using mysqlfailover utility
 - BUG#18914270: importerror: cannot import name ... 1.5.0
+
+Release 1.4.4qa1 (Released July 11, 2014)
+-----------------------------------------
+
+- BUG#17957509: ReadMe and License files are lost after OSX installer finish
+- BUG#18379971: mysqlfailover consumes excessive cpu
+- BUG#18477410: mysqldbcompare reports only one difference per span
+- BUG#18483844: index 'span' for mysqldbcompare
+- BUG#18546744: refactoring failover_daemon command to use the daemon class
+- BUG#18603598: does not warn against passwords on the command line
+- BUG#18603715: mysqlreplicate - default password hardcoded to rpl
+- BUG#18730656: mysqluserclone does not give informative error messages
+- BUG#18730720: mysqluserclone shows grants twice
+- BUG#18730815: mysqluc suddenly exits when a command misses closing quotation
+- BUG#18768487: mysqluserclone shows python exception instead of error message
+- BUG#18768780: mysqluserclone creates user on destination host, after error
+- BUG#18777318: Utilities minimum required Connector version needs update
+- BUG#18790134: --no-headers do not work with --format=vertical
+- BUG#18790361: fatal error using mysqlserverinfo as root
+- BUG#18815523: unclear connection message --discover-slaves-login.
+- BUG#18815545: error: unable to communicate with new instance
+- BUG#18838462: Minimum version on Debian packages is out of date.
+- BUG#18852933: in mysqluc "backspace" (deleting) does not work
+- BUG#18852960: mysqluc types qxit when type q + enter
+- BUG#18904014: mysqlfabric manage setup can't find configuration file
+- BUG#18958536: mut does not kill mysqld processes on MAC OS X
+- BUG#19076488: mysqlrpladmin does not check errant transactions
+- BUG#19178471: Error using mysqlreplicate or mysqlrplms without --rpl-user
+- BUG#69857: mysqlrpladmin says "health: Slave is not connected to master."
+- BUG#71724: mysqlfailover tool failed when executing a 2nd failover
+- BUG#71851: general query log not handles blanklines with multi-line queries
+
 
 Release 1.5.0 (Released June 06, 2014)
 -------------------------------------

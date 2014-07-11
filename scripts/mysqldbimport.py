@@ -35,11 +35,15 @@ import re
 from mysql.utilities.command import dbimport
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.messages import WARN_OPT_ONLY_USED_WITH
-from mysql.utilities.common.options import (
-    add_character_set_option, add_engines, add_format_option, add_skip_options,
-    add_verbosity, check_skip_options, check_verbosity, get_ssl_dict,
-    setup_common_options
-)
+from mysql.utilities.common.options import (add_character_set_option,
+                                            add_engines, add_format_option,
+                                            add_no_headers_option,
+                                            add_skip_options, add_verbosity,
+                                            check_skip_options,
+                                            check_verbosity,
+                                            setup_common_options,
+                                            get_ssl_dict,
+                                            check_password_security)
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.tools import (check_connector_python,
                                           print_elapsed_time)
@@ -95,10 +99,9 @@ if __name__ == '__main__':
                       dest="bulk_insert", default=False, help="use bulk "
                       "insert statements for data (default:False)")
 
-    # Header row
-    parser.add_option("-h", "--no-headers", action="store_true",
-                      dest="no_headers", default=False,
-                      help="files do not contain column headers")
+    # No header option
+    add_no_headers_option(parser, restricted_formats=['tab', 'csv'],
+                          help_msg="files do not contain column headers")
 
     # Dryrun mode
     parser.add_option("--dryrun", action="store_true", dest="dryrun",
@@ -153,6 +156,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Warn if quiet and verbosity are both specified
     check_verbosity(opt)

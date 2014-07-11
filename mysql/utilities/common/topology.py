@@ -254,15 +254,18 @@ class Topology(Replication):
         master = None
         slaves = []
 
+        # Set verbose value.
+        verbose = self.options.get("verbosity", 0) > 0
+
         # attempt to connect to the master
         if master_vals:
-            master = get_server('master', master_vals, True)
+            master = get_server('master', master_vals, True, verbose=verbose)
 
         for slave_val in slave_vals:
             host = slave_val['host']
             port = slave_val['port']
             try:
-                slave = get_server('slave', slave_val, True)
+                slave = get_server('slave', slave_val, True, verbose=verbose)
             except:
                 msg = "Cannot connect to slave %s:%s as user '%s'." % \
                       (host, port, slave_val['user'])

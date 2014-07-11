@@ -710,3 +710,21 @@ def format_IPv6(host_address):
         if not "]" in host_address:
             host_address = "[{0}]".format(host_address)
     return host_address
+
+
+def find_password(value):
+    """Search for password in a string
+
+    value[in]           String to search for password
+    """
+    if not type(value) == str:
+        return False
+    # has to have an @ sign
+    if not '@' in value:
+        return False
+    match = _CONN_USERPASS.match(value)
+    if not match:
+        return False
+    if match.group('passwd'):
+        return True
+    return False

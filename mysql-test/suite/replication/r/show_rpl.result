@@ -1,4 +1,5 @@
 Test case 1 - show topology of master with no slaves
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT2
 
@@ -6,6 +7,7 @@ Test case 1 - show topology of master with no slaves
 No slaves found.
 
 Test case 2 - show topology
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT2
 # master on localhost: ... connected.
@@ -32,6 +34,7 @@ localhost:PORT2 (MASTER)
 | localhost:PORT3  | localhost:PORT4  |
 +-----------------+-----------------+
 Test case 3 - show topology with --max-depth
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT2
 # master on localhost: ... connected.
@@ -51,6 +54,7 @@ localhost:PORT2 (MASTER)
 | localhost:PORT2  | localhost:PORT3  |
 +-----------------+-----------------+
 Test case 4 - show topology with circular replication
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT2
 # master on localhost: ... connected.
@@ -80,6 +84,7 @@ localhost:PORT2 (MASTER)
 | localhost:PORT4  | localhost:PORT2  |
 +-----------------+-----------------+
 Test case 5 - show circular topology with verbose option
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT2
 # master on localhost: ... connected.
@@ -109,6 +114,7 @@ localhost:PORT2 (MASTER)
 | localhost:PORT4  | localhost:PORT2  |
 +-----------------+-----------------+
 Test case 6 - show topology with master:master replication
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT5
 # master on localhost: ... connected.
@@ -127,14 +133,24 @@ localhost:PORT5 (MASTER)
 | localhost:PORT5  | localhost:PORT6  |
 | localhost:PORT6  | localhost:PORT5  |
 +-----------------+-----------------+
-Test case 7 : SHOW SLAVE HOSTS contains 1 row.
-Test case 7 - show topology with phantom slave
+Test case 7a : SHOW SLAVE HOSTS contains 1 row.
+Test case 7b - show topology with phantom slave
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # Finding slaves for master: localhost:PORT3
-Error connecting to a slave ...
-Error ####: Can't connect to local MySQL server
 
-WARNING: There are slaves that had connection errors.
+WARNING: Cannot connect to some slaves (--verbose for more details).
+
+# Replication Topology Graph
+No slaves found.
+
+Test case 7c - show topology with phantom slave (with --verbose)
+WARNING: Using a password on the command line interface can be insecure.
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT3
+
+WARNING: Cannot connect to some slaves:
+ - localhost:PORT4: Can't connect to MySQL server on ...
 
 # Replication Topology Graph
 No slaves found.

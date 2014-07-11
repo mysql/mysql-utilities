@@ -215,6 +215,9 @@ class test(rpl_admin.test):
                             "| 127.0.0.1  | PORT4  | SLAVE   | UP     "
                             "| NO         | OK      |\n")
 
+        # Remove warning when using test servers without GTID enabled.
+        self.remove_result("# WARNING: Errant transactions check skipped")
+
         return True
 
     def get_result(self):

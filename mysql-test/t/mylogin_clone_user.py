@@ -171,7 +171,7 @@ class test(mutlib.System_test):
             return False
         users = ["'joe_pass'@'%'", "joe_pass@user", "'joe_nopass'@'user'",
                  "'amy_nopass'@'user'", "'jill'@'user'", "'jack'@'user'",
-                 "'john'@'user'"]
+                 "'john'@'user'", "'remote'@'%'"]
 
         users_dropped = [self.drop_user(user, self.server1) for user in users]
 

@@ -11,8 +11,8 @@ Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
 mysqldbexport: error: Server connection values invalid
 Test case 5 - error: cannot connect to server
-# Source on localhost: ... ERROR: Cannot connect to the Source server.
-Error Access denied for user 'nope'@'localhost' (using password: YES)
+# Source on localhost: ... 
+ERROR: Access denied for user 'nope'@'localhost' (using password: YES)
 Test case 6 - error: not enough privileges
 # Source on localhost: ... connected.
 ERROR: User joe on the Source server does not have permissions to read all objects in util_test. User needs SELECT privilege on util_test.
@@ -27,8 +27,8 @@ Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
 mysqldbexport: error: You cannot use the --all option with a list of databases.
 Test case 10 - invalid --character-set
-# Source on localhost: ... ERROR: Cannot connect to the Source server.
-Error Character set 'unsupported_charset' unsupported.
+# Source on localhost: ... 
+ERROR: Character set 'unsupported_charset' unsupported.
 Test case 11 - error: invalid multiprocess value.
 Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 

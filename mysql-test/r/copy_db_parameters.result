@@ -1,4 +1,5 @@
 Test case 1 - normal run
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
@@ -22,6 +23,7 @@ Test case 1 - normal run
 # Copying EVENT util_test.e1
 #...done.
 Test case 2 - operation fails - need overwrite
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
@@ -82,7 +84,7 @@ Options:
                         use 'LIKE'.
   --rpl-user=RPL_USER   the user and password for the replication user
                         requirement, in the form: <user>[:<password>] or
-                        <login-path>. E.g. rpl:passwd - By default = none
+                        <login-path>. E.g. rpl:passwd
   --rpl=RPL_MODE, --replication=RPL_MODE
                         include replication information. Choices: 'master' =
                         include the CHANGE MASTER command using the source
@@ -103,6 +105,7 @@ Options:
                         processes equal to the CPUs detected) and 1 (default -
                         no concurrency).
 Test case 4 - no data
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Copying database util_test renamed as util_db_clone
@@ -122,7 +125,9 @@ Test case 4 - no data
 #...done.
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test case 5 - quiet copy
+WARNING: Using a password on the command line interface can be insecure.
 Test case 6 - copy all databases - but only the utils
+WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Including all databases.

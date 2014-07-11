@@ -1,4 +1,5 @@
 Test case 1 - diff a sample database
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing `util_test` to `util_test`                             [PASS]
@@ -19,6 +20,7 @@ Test case 1 - diff a sample database
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
 Test case 2 - diff a single object - not same
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing util_test.t2 to util_test.t2                           [FAIL]
@@ -34,11 +36,13 @@ Test case 2 - diff a single object - not same
 +) ENGINE=MEMORY DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
 Test case 3 - diff a single object - is same
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing util_test.t3 to util_test.t3                           [PASS]
 Success. All objects are the same.
 Test case 4 - diff multiple objects - are same
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing util_test.t3 to util_test.t3                           [PASS]
@@ -47,6 +51,7 @@ Test case 4 - diff multiple objects - are same
 # Comparing util_test.t4 to util_test.t4                           [PASS]
 Success. All objects are the same.
 Test case 5 - diff multiple objects + database - some same
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing util_test.t3 to util_test.t3                           [PASS]
@@ -90,6 +95,7 @@ Test case 5 - diff multiple objects + database - some same
 # Comparing `util_test`.`v2` to `util_test`.`v2`                   [PASS]
 Compare failed. One or more differences found.
 Test case 6 - diff two databases on same server w/server2
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # WARNING: Objects in server1.util_test but not in server1.util_test1:
@@ -106,6 +112,7 @@ Test case 6 - diff two databases on same server w/server2
 #        TABLE: t2
 Compare failed. One or more differences found.
 Test case 7 - diff two databases on same server
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # WARNING: Objects in server1.util_test but not in server1.util_test1:
 #    PROCEDURE: p1
@@ -121,6 +128,7 @@ Test case 7 - diff two databases on same server
 #        TABLE: t2
 Compare failed. One or more differences found.
 Test case 8 - diff a sample database with weird names (backticks)
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing `db.``:db` to `db.``:db`                               [PASS]
@@ -129,11 +137,13 @@ Test case 8 - diff a sample database with weird names (backticks)
 # Comparing `db.``:db`.```v``export_1` to `db.``:db`.```v``export_1`   [PASS]
 Success. All objects are the same.
 Test case 9 - diff a single object with weird names (backticks)
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing `db.``:db`.```t``.``export_2` to `db.``:db`.```t``.``export_2`   [PASS]
 Success. All objects are the same.
 Test case 10 - diff a sample database containing tables with weird names (no backticks) and different table options.
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -151,6 +161,7 @@ Test case 10 - diff a sample database containing tables with weird names (no bac
 +) ENGINE=InnoDB AUTO_INCREMENT=50000005 DEFAULT CHARSET=latin1
 Compare failed. One or more differences found.
 Test case 11 - diff a sample database containing tables with weird names (no backticks) and skipping table options.
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing `db_diff_test` to `db_diff_test`                       [PASS]
@@ -166,6 +177,7 @@ Test case 11 - diff a sample database containing tables with weird names (no bac
 #  CHARSET=latin1
 Success. All objects are the same.
 Test case 12 - diff a database with objects of different types with the same name (no differences)
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing `db.``:db` to `db.``:db`                               [PASS]
@@ -175,6 +187,7 @@ Test case 12 - diff a database with objects of different types with the same nam
 # Comparing `db.``:db`.```v``export_1` to `db.``:db`.```v``export_1`   [PASS]
 Success. All objects are the same.
 Test case 13 - diff a database with objects of different types with the same name (with differences)
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing `db.``:db` to `db.``:db`                               [PASS]
@@ -190,6 +203,7 @@ Test case 13 - diff a database with objects of different types with the same nam
 +SELECT 2
 Compare failed. One or more differences found.
 Test case 14 - diff specific objects of different types with the same name (with differences)
+# WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing `db.``:db`.```t``export_1` to `db.``:db`.```t``export_1`   [PASS]

@@ -243,6 +243,19 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - Connect failure".format(test_num))
+        slaves_str = ",".join([slave2_conn, slave3_conn])
+        cmd_str = ("{0} --master={1} --new-master=nope@notthere "
+                   " --force switchover -q "
+                   "--rpl-user=rpl:rpl --slaves={2} --log={3} --log-age=1 "
+                   "--rpl-user=notthere "
+                   "--no-health".format(base_cmd, alone_srv_conn,
+                                        slaves_str, _LOGNAME))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Check log file for error.
         # Now check the log and dump its entries for debugging
         log_file = open(_LOGNAME, "r")
@@ -260,6 +273,10 @@ class test(rpl_admin.test):
 
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
+
+        self.replace_result("ERROR: Can't connect to",
+                            "ERROR: Can't connect to XXXXXXX\n")
+
         self.replace_substring(str(self.server5.port), "PORT5")
 
         self.replace_substring(socket.gethostname().split('.', 1)[0],
@@ -308,6 +325,9 @@ class test(rpl_admin.test):
                             "| OFF        | OK      |\n")
 
         self.remove_result("NOTE: Log file")
+
+        # Remove warning when using test servers without GTID enabled.
+        self.remove_result("# WARNING: Errant transactions check skipped")
 
         return True
 

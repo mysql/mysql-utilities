@@ -47,6 +47,7 @@ class test(frm_reader_base.test):
         return frm_reader_base.test.setup(self)
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         self.res_fname = "result.txt"
 
         if self.debug:

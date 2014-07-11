@@ -48,6 +48,7 @@ class test(mutlib.System_test):
         return True
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         self.res_fname = "result.txt"
 
         from_conn = "--server={0}".format(

@@ -36,7 +36,8 @@ from mysql.utilities.command import indexcheck
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_verbosity, add_format_option,
-                                            get_ssl_dict, setup_common_options)
+                                            get_ssl_dict, setup_common_options,
+                                            check_password_security)
 
 
 # Constants
@@ -98,6 +99,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Check to make sure at least one table specified.
     if len(args) == 0:

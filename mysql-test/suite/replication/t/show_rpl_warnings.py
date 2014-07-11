@@ -80,6 +80,15 @@ class test(rpl_admin.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += test_num
+        comment = ("Test case {0} - warning for missing --report-host "
+                   "(using --verbose)").format(test_num)
+        cmd_str = ("mysqlrplshow.py --master={0} --disco=root:root "
+                   "--verbose").format(master_conn)
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         try:
             self.server5.exec_query("STOP SLAVE")
             self.server5.exec_query("RESET SLAVE")

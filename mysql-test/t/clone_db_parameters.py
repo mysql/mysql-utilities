@@ -43,6 +43,7 @@ class test(clone_db.test):
         return clone_db.test.setup(self)
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 

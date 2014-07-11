@@ -42,7 +42,8 @@ from mysql.utilities.common.options import CaseInsensitiveChoicesOption
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import (add_ssl_options, add_verbosity,
                                             get_ssl_dict, license_callback,
-                                            UtilitiesParser)
+                                            UtilitiesParser,
+                                            check_password_security)
 from mysql.utilities.common.server import connect_servers
 
 
@@ -256,6 +257,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args)
 
     # Check for argument errors
     if not args:

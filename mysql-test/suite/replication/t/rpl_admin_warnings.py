@@ -181,6 +181,15 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
+        comment = ("Test case {0} - warning for missing "
+                   "--report-host (using --verbose)".format(test_num))
+        cmd_str = ("mysqlrpladmin.py {0} --disco=root:root health "
+                   "--format=csv --verbose".format(master_str))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
         comment = ("Test case {0} - warning for --format and not health or "
                    "gtid".format(test_num))
         cmd_str = ("mysqlrpladmin.py {0} {1} stop --quiet "
@@ -256,6 +265,9 @@ class test(rpl_admin.test):
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
 
+        # Mask server port.
+        self.replace_substring(str(self.server5.port), "PORT5")
+
         # Mask slaves behind master.
         # It happens sometimes on windows in a non-deterministic way.
         self.replace_substring("+--------------------------------------------"
@@ -268,6 +280,16 @@ class test(rpl_admin.test):
                                "No  |", "| OK                        |")
         self.replace_substring("| Cannot connect to slave.                   "
                                "  |", "| Cannot connect to slave.  |")
+
+        # Mask verbose health report.
+        self.replace_result("localhost,PORT1,MASTER,UP,ON,OK,",
+                            "localhost,PORT1,MASTER,UP,ON,OK, ...\n")
+        self.replace_result("localhost,PORT2,SLAVE,UP,ON,OK,",
+                            "localhost,PORT2,SLAVE,UP,ON,OK, ...\n")
+        self.replace_result("localhost,PORT3,SLAVE,UP,ON,OK,",
+                            "localhost,PORT3,SLAVE,UP,ON,OK, ...\n")
+        self.replace_result("localhost,PORT4,SLAVE,UP,ON,OK,",
+                            "localhost,PORT4,SLAVE,UP,ON,OK, ...\n")
 
         return True
 

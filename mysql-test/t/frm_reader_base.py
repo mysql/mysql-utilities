@@ -129,7 +129,8 @@ class test(mutlib.System_test):
         # But first, fix the output file.
         for line in file1.readlines():
             # Skip comments or blank lines
-            if line[0] == '#' or len(line.strip()) == 0:
+            if line[0] == '#' or len(line.strip()) == 0 or \
+               line[0:25] == "WARNING: Using a password":
                 continue
             lines.append(line.strip())
 
@@ -180,7 +181,8 @@ class test(mutlib.System_test):
             comment = self.results[i]
             result = self.results[i + 1]
             if result:
-                return False, "{0}\nFAILED: differences found!".format(comment)
+                return (False,
+                        "{0}\nFAILED: differences found!".format(comment))
             i += 2
 
         return True, ''

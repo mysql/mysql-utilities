@@ -1,4 +1,5 @@
 Test case 1 - normal run
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 Test Description                                                     Status
@@ -16,6 +17,7 @@ Checking lower_case_table_names settings                             [pass]
 Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 Test case 2 - verbose run
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 Test Description                                                     Status
@@ -64,6 +66,7 @@ Checking lower_case_table_names settings                             [pass]
 Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 Test case 3 - with show slave status
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 Test Description                                                     Status
@@ -123,6 +126,7 @@ Checking slave delay (seconds behind master)                         [pass]
                 Last_SQL_Error : 
 # ...done.
 Test case 4 - normal run with loopback
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 Test Description                                                     Status
@@ -140,6 +144,7 @@ Checking lower_case_table_names settings                             [pass]
 Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 Test case 5 - normal run with grant for rpl@'%'
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 Test Description                                                     Status
@@ -157,6 +162,7 @@ Checking lower_case_table_names settings                             [pass]
 Checking slave delay (seconds behind master)                         [pass]
 # ...done.
 Test case 6 - normal run with grant with wildcard rpl@'local%'
+WARNING: Using a password on the command line interface can be insecure.
 # master on localhost: ... connected.
 # slave on localhost: ... connected.
 Test Description                                                     Status

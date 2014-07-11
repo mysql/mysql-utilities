@@ -91,6 +91,7 @@ class test(mutlib.System_test):
         return True
 
     def run(self):
+        self.mask_global = False  # Turn off global masks
         self.res_fname = "result.txt"
 
         master_con = self.build_connection_string(self.server_list[2])
@@ -208,19 +209,26 @@ class test(mutlib.System_test):
 
         # This shows there is indeed stale data in the view
         res = self.server_list[3].exec_query("SHOW SLAVE HOSTS")
-        self.results.append("Test case {0} : SHOW SLAVE HOSTS contains {1} "
+        self.results.append("Test case {0}a : SHOW SLAVE HOSTS contains {1} "
                             "row.\n".format(test_num, len(res)))
 
-        comment = ("Test case {0} - show topology with phantom "
+        comment = ("Test case {0}b - show topology with phantom "
                    "slave".format(test_num))
         cmd_str = ("mysqlrplshow.py --disco=root:root {0}"
                    "--show-list".format(relay_slave_master))
         res = self.run_test_case(0, cmd_str, comment)
-
-        self.do_replacements()
-
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+
+        comment = ("Test case {0}c - show topology with phantom "
+                   "slave (with --verbose)".format(test_num))
+        cmd_str = ("mysqlrplshow.py --disco=root:root {0}"
+                   "--show-list --verbose".format(relay_slave_master))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        self.do_replacements()
 
         for i in range(6, 0, -1):
             self.stop_replication(self.server_list[i])
@@ -244,6 +252,11 @@ class test(mutlib.System_test):
             ["Error 2002: Can't connect to", "Error 2003: Can't connect to",
              "Error Can't connect to MySQL server on "],
             "Error ####: Can't connect to local MySQL server\n")
+
+        # Remove non-deterministic error details (platform dependent).
+        self.replace_result(
+            " - localhost:PORT4: Can't connect to MySQL server on",
+            " - localhost:PORT4: Can't connect to MySQL server on ...\n")
 
     def get_result(self):
         return self.compare(__name__, self.results)

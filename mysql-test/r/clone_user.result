@@ -68,6 +68,7 @@ WARNING: The --destination option is not required for '--list' (option ignored).
 # All Users:
 user,host
 joe_pass,%
+remote,%
 ROOT,LOCALHOST
 amy_nopass,user
 jack,user
@@ -83,3 +84,8 @@ GRANT USAGE ON *.* TO 'joe_pass'@'user' IDENTIFIED BY PASSWORD '*6DA88CFC2023168
 GRANT SELECT ON `util_test`.* TO 'joe_pass'@'user'
 GRANT USAGE ON *.* TO 'joe_pass'@'%'
 GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_pass'@'%'
+Test case 11 - mysqluserclone --dump user with global privileges
+# Source on XXXX-XXXX: ... connected.
+# Dumping grants for user remote@%
+GRANT USAGE ON *.* TO 'remote'@'%' IDENTIFIED BY PASSWORD '*F98F1930C34C35152FBCC939712A7A908664F013'
+GRANT SELECT ON `util_test`.* TO 'remote'@'%'

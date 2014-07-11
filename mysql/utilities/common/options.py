@@ -29,6 +29,7 @@ import os.path
 import re
 
 from optparse import Option as CustomOption, OptionValueError
+from ip_parser import find_password
 
 from mysql.utilities import LICENSE_FRM, VERSION_FRM
 from mysql.utilities.exception import UtilError, FormatError
@@ -328,6 +329,31 @@ def add_format_option_with_extras(parser, help_text, default_val,
                       choices=formats)
 
 
+def add_no_headers_option(parser, restricted_formats=None, help_msg=None):
+    """Add the --no-headers option.
+
+    parser[in]              The parser instance.
+    restricted_formats[in]  List of formats supported by this option (only
+                            applies to them).
+    help_msg[in]            Alternative help message to use, otherwise a
+                            default one is used.
+    """
+    # Create the help message according to any format restriction.
+    if restricted_formats:
+        plural = "s" if len(restricted_formats) > 1 else ""
+        formats_msg = (" (only applies to format{0}: "
+                       "{1})").format(plural, ", ".join(restricted_formats))
+    else:
+        formats_msg = ""
+    if help_msg:
+        help_msg = "{0}{1}.".format(help_msg, formats_msg)
+    else:
+        help_msg = "do not show column headers{0}.".format(formats_msg)
+    # Add the option.
+    parser.add_option("-h", "--no-headers", action="store_true",
+                      dest="no_headers", default=False, help=help_msg)
+
+
 def add_verbosity(parser, quiet=True):
     """Add the verbosity and quiet options.
 
@@ -512,19 +538,16 @@ def add_regexp(parser):
                       "operator to match pattern. Default is to use 'LIKE'.")
 
 
-def add_rpl_user(parser, default_val="rpl:rpl"):
+def add_rpl_user(parser):
     """Add the --rpl-user option.
 
     parser[in]        the parser instance
-    default_val[in]   default value for user, password
-                      Default = rpl, rpl
     """
     parser.add_option("--rpl-user", action="store", dest="rpl_user",
-                      type="string", default=default_val,
+                      type="string",
                       help="the user and password for the replication "
                            "user requirement, in the form: <user>[:<password>]"
-                           " or <login-path>. E.g. rpl:passwd - By default = "
-                           "%default")
+                           " or <login-path>. E.g. rpl:passwd")
 
 
 def add_rpl_mode(parser, do_both=True, add_file=True):
@@ -845,12 +868,32 @@ def add_basedir_option(parser):
                       help="the base directory for the server")
 
 
-def check_basedir_option(parser, opt_basedir):
-    """ Check if the specified --basedir option is valid.
+def check_dir_option(parser, opt_value, opt_name, check_access=False,
+                     read_only=False):
+    """ Check if the specified directory option is valid.
+
+    Check if the value specified for the option is a valid directory, and if
+    the user has appropriate access privileges. An appropriate  parser error
+    is issued if the specified directory is invalid.
+
+    parser[in]          Instance of the option parser (optparse).
+    opt_value[in]       Value specified for the option.
+    opt_name[in]        Option name (e.g., --basedir).
+    check_access[in]    Flag specifying if the access privileges need to be
+                        checked. By default, False (no access check).
+    read_only[in]       Flag indicating if the access required is only for
+                        read or read/write. By default, False (read/write
+                        access). Note: only used if check_access=True.
     """
-    if opt_basedir and not os.path.isdir(get_absolute_path(opt_basedir)):
-        parser.error("The specified path for --basedir option is not a "
-                     "directory: %s" % opt_basedir)
+    # Check existence of specified directory.
+    if opt_value and not os.path.isdir(get_absolute_path(opt_value)):
+        parser.error("The specified path for {0} option is not a "
+                     "directory: {1}".format(opt_name, opt_value))
+    if check_access:
+        mode = os.R_OK if read_only else os.R_OK | os.W_OK
+        if not os.access(opt_value, mode):
+            parser.error("You do not have enough privileges to access the "
+                         "folder specified by {0}.".format(opt_name))
 
 
 def get_absolute_path(path):
@@ -939,6 +982,41 @@ def get_ssl_dict(parser_options=None):
             certs_paths['ssl_cert'] = parser_options.ssl_cert
         if 'ssl_key' in dir(parser_options):
             certs_paths['ssl_key'] = parser_options.ssl_key
-
         conn_options.update(certs_paths)
     return conn_options
+
+
+def check_password_security(options, args, prefix=""):
+    """Check command line for passwords and report a warning.
+
+    This method checks all options for passwords in the form ':%@'. If
+    this pattern is found, the method with issue a warning to stdout and
+    return True, else it returns False.
+
+    Note: this allows us to make it possible to abort if command-line
+          passwords are found (not the default...yet).
+
+    options[in]     list of options
+    args[in]        list of arguments
+    prefix[in]      (optional) allows preface statement with # or something
+                    for making the message a comment in-stream
+
+    Returns - bool : False = no passwords, True = password found and msg shown
+    """
+    result = False
+    for value in options.__dict__.values():
+        if type(value) == list:
+            for item in value:
+                if find_password(item):
+                    result = True
+        else:
+            if find_password(value):
+                result = True
+    for arg in args:
+        if find_password(arg):
+            result = True
+    if result:
+        print("{0}WARNING: Using a password on the command line interface"
+              " can be insecure.".format(prefix))
+
+    return result

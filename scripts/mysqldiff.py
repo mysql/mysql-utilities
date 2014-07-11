@@ -43,7 +43,8 @@ from mysql.utilities.common.options import (add_difftype, add_verbosity,
                                             check_verbosity, add_changes_for,
                                             add_reverse, setup_common_options,
                                             add_character_set_option,
-                                            get_ssl_dict)
+                                            get_ssl_dict,
+                                            check_password_security)
 
 
 # Constants
@@ -116,6 +117,9 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check security settings
+    check_password_security(opt, args, "# ")
 
     # Warn if quiet and verbosity are both specified
     check_verbosity(opt)

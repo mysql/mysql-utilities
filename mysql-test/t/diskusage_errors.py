@@ -100,6 +100,14 @@ class test(diskusage_basic.test):
         if not res:
             raise MUTLibError("DISKUSAGE: {0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test Case {0} : Using bad user account.".format(test_num))
+        cmd_base = cmd_base.replace('repl:repl', 'root:toor')
+        cmd = '{0} -a'.format(cmd_base)
+        res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("DISKUSAGE: {0}: failed".format(comment))
+
         diskusage_basic.test.mask(self)
 
         self.mask_column_result("mysql,", ",", 2, "XXXXXXX")

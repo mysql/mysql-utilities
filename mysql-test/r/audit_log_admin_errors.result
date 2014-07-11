@@ -84,3 +84,5 @@ Test case 22 - Copy-to option requires command COPY
 Usage: mysqlauditadmin --server=user:pass@host:port --show-options 
 
 mysqlauditadmin: error: The --copy-to option can only be used with the COPY command.
+Test case 23 - User connection failure 
+ERROR: Can't connect to XXXX
