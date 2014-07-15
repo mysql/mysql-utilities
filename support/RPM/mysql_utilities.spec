@@ -97,7 +97,7 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}
 
 %changelog
-* Tues Jul 01 2014 Chuck Bell <chuck.bell@oracle.com> - 1.5.1
+* Tue Jul 01 2014 Chuck Bell <chuck.bell@oracle.com> - 1.5.1
 - Updated the Version to 1.5.1
 
 * Mon May 26 2014  Murthy Narkedimilli <murthy.narkedimilli@oracle.com> - 1.5.0
