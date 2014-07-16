@@ -978,6 +978,8 @@ class Server(object):
             return db_conn
         except mysql.connector.Error as err:
             raise UtilError(err.msg, err.errno)
+        except AttributeError as err:
+            raise UtilError(str(err))
 
     def disconnect(self):
         """Disconnect from the server.

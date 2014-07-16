@@ -541,14 +541,17 @@ class User(object):
         Returns named tuple with GRANT information or None.
         """
         grant_parse_re = re.compile(
-            r"GRANT\s(.+)?\sON\s(\*|`?[^'`]+`?)\.(\*|`?[^`']+`?)"
-            r"\sTO\s([^@]+@[\S]+)(?:\sIDENTIFIED\sBY\sPASSWORD"
-            r"\s\'[^\']+\')?(\sWITH\sGRANT\sOPTION)?")
+            r"GRANT\s(.+)?\sON\s(\*|`?[^'`]+`?)\.(\*|`?[^`']+`?)\sTO\s"
+            r"([^@]+@[\S]+)(?:\sIDENTIFIED\sBY\sPASSWORD\s\'[^\']+\')?"
+            r"(?:\sREQUIRE\sSSL)?(\sWITH\sGRANT\sOPTION)?")
 
         grant_tpl_factory = namedtuple("grant_info", "privileges db object "
                                                      "user")
         grants = None
         match = re.match(grant_parse_re, statement)
+
+        # After adding PROXY privilege support, add else clause if no match is
+        # found. The else clause should raise an UtilError exception.
         if match:
             # quote database name and object name with backticks
             db = match.group(2)

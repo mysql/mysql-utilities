@@ -118,15 +118,16 @@ class MySQLOptionsParser(SafeConfigParser):
                                     raise ValueError(err_msg.format(
                                         entry, file_))
                                 if (os.path.isfile(entry) and
-                                        entry.endswith(self.default_extension)):
-                                    files.insert(index+1, entry)
+                                        entry.endswith(
+                                            self.default_extension)):
+                                    files.insert(index + 1, entry)
 
                         elif line.startswith('!include'):
                             _, filename = line.split(None, 1)
                             if filename in files:
                                 raise ValueError(err_msg.format(
                                     filename, file_))
-                            files.insert(index+1, filename)
+                            files.insert(index + 1, filename)
 
                         index += 1
 

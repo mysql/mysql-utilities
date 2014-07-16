@@ -28,31 +28,15 @@ from mutlib.ssl_certs import (ssl_pass, ssl_user, ssl_server_opts,
                               ssl_c_ca, ssl_c_cert, ssl_c_key)
 
 
-def drop_all(server):
-    """Drops all databases.
-    """
-    databases = ["util_test_a", "util_test_b", "util_test_c",
-                 "util_test_d", "util_test_e", "util_test_f,",
-                 "util_test"]
-    for db in databases:
-        try:
-            server.exec_query("DROP DATABASE IF EXISTS "
-                              "{0}".format(db))
-        except UtilError:
-            pass
-            # Drops all database and users created.
-
-
 class test(mutlib.System_test):
     """checks ssl connection support for utilities that uses add server option
-    from option module or the add_ssl_optios method.
+    from option module or the add_ssl_options method.
     """
 
-    server0 = None
     server1 = None
 
     def check_prerequisites(self):
-        # This test requires server version < 5.5.7, due to the lack of
+        # This test requires server version > 5.5.7, due to the lack of
         # 'GRANT PROXY ON ...' on previews versions.
         if not self.servers.get_server(0).check_version_compat(5, 5, 8):
             raise MUTLibError("Test requires server version >= 5.5.8")
@@ -65,8 +49,6 @@ class test(mutlib.System_test):
         except MUTLibError as err:
             raise MUTLibError("Cannot spawn needed servers: {0}"
                               "".format(err.errmsg))
-
-        self.server0 = self.servers.get_server(0)
 
         index = self.servers.find_server_by_name('ssl_server')
         self.server1 = self.servers.get_server(index)
@@ -96,7 +78,7 @@ class test(mutlib.System_test):
             raise MUTLibError("Cannot spawn a SSL server.")
         data_files = ["std_data/index_test.sql", "./std_data/basic_users.sql"]
 
-        drop_all(self.server1)
+        self.drop_all()
         for data_file in data_files:
             try:
                 self.server1.read_and_exec_SQL(data_file, self.debug)
@@ -233,6 +215,29 @@ class test(mutlib.System_test):
 
         return True
 
+    def drop_all(self):
+        """Drops all databases and users.
+        """
+        # Drop databases
+        databases = ["util_test_a", "util_test_b", "util_test_c",
+                     "util_test_d", "util_test_e", "util_test_f",
+                     "util_test"]
+        for db in databases:
+            try:
+                self.server1.exec_query("DROP DATABASE IF EXISTS "
+                                        "{0}".format(db))
+            except UtilError:
+                pass
+
+        # Drop users
+        users = ["joe_nopass@'user'", "amy_nopass@'user'", "remote@'%'", ]
+        for user in users:
+            try:
+                self.server1.exec_query("DROP USER {0}".format(user))
+            except UtilError:
+                pass
+        return True
+
     def get_result(self):
         return self.compare(__name__, self.results)
 
@@ -240,5 +245,4 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        drop_all(self.server1)
-        return True
+        return self.drop_all()

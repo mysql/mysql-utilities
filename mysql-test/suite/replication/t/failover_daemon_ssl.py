@@ -239,8 +239,8 @@ class test(failover_daemon.test):
                                   self.fail_event_script, "")
         self.test_cases.append(
             (self.server3, cmd, False, _FAILOVER_LOG.format("3"),
-             "Test case {0} - Simple failover with --failover=fail.",
-             "Master has failed and automatic".format(i), True)
+             "Test case {0} - Simple failover with --failover=fail.".format(i),
+             "Master has failed and automatic", True)
         )
 
         i += 1

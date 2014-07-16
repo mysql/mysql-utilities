@@ -73,7 +73,7 @@ Test case 1 - show help
   -q, --quiet           turn off all messages for quiet execution.
   --rpl-user=RPL_USER   the user and password for the replication user
                         requirement, in the form: <user>[:<password>] or
-                        <login-path>. E.g. rpl:passwd - By default = none
+                        <login-path>. E.g. rpl:passwd
   --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
                         CAs.
   --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
@@ -169,9 +169,9 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 #   Executing start on slave localhost:PORT4 Ok
 #   Executing start on slave localhost:PORT1 Ok
 # Checking slaves for errors.
-# localhost:PORT3 status: Ok
-# localhost:PORT4 status: Ok
-# localhost:PORT1 status: Ok
+# localhost:PORT3 status: Ok 
+# localhost:PORT4 status: Ok 
+# localhost:PORT1 status: Ok 
 # Switchover complete.
 # ...done.
 Test case 4 - switchover with quiet

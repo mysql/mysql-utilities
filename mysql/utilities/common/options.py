@@ -112,7 +112,7 @@ def path_callback(option, opt, value, parser):
     """
     if not os.path.exists(value):
         parser.error("the given path '{0}' in option {1} does not"
-                     " exists or can not be acceded".format(value, opt))
+                     " exist or can not be accessed".format(value, opt))
 
     if not os.path.isfile(value):
         parser.error("the given path '{0}' in option {1} does not"

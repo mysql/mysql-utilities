@@ -316,8 +316,8 @@ def find_tests(path):
 
 if __name__ == "__main__":
     # Begin 'main' code
-    parser = setup_common_options(os.path.basename(sys.argv[0]),
-                                  DESCRIPTION, USAGE, False, False)
+    parser = setup_common_options(os.path.basename(sys.argv[0]), DESCRIPTION,
+                                  USAGE, False, False, add_ssl=True)
 
     # Add server option
     parser.add_option("--server", action="append", dest="servers",
@@ -496,8 +496,11 @@ if __name__ == "__main__":
     else:
         i = 0
         for server in opt.servers:
+            # add ssl options values.
+            conn_options = {}
+            conn_options.update(get_ssl_dict(opt))
             try:
-                conn_val = parse_connection(server)
+                conn_val = parse_connection(server, options=conn_options)
             except UtilError as err:
                 parser.error(err.errmsg)
             except:

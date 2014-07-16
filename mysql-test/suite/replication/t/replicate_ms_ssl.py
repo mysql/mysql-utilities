@@ -19,6 +19,8 @@
 replicate_ms test with SSL.
 """
 
+import os
+
 import ConfigParser
 
 import replicate_ms
@@ -188,10 +190,17 @@ class test(replicate_ms.test):
 
         test_num = 1
         rplms_cmd = ("python ../scripts/mysqlrplms.py --log={0} --interval=5 "
-                     "--switchover-interval=30 {1} {2} {3}"
+                     "--switchover-interval=30 --rpl-user=rpl:rpl {1} {2} {3}"
                      "".format(_RPLMS_LOG.format(test_num), slave_str,
                                masters_str, ssl_util_opts()))
         comment = ("Test case {0} - Simple multi-source replication."
                    "".format(test_num))
         self.test_rplms(rplms_cmd, _RPLMS_LOG.format(test_num), comment, True)
         return True
+
+    def cleanup(self):
+        try:
+            os.unlink(self.config_file_path)
+        except OSError:
+            pass
+        return replicate_ms.test.cleanup(self)

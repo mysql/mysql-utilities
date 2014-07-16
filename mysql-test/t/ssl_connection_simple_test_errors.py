@@ -19,84 +19,17 @@
 check ssl connection support test.
 """
 
-import mutlib
-
-from mysql.utilities.exception import MUTLibError, UtilError
-from mysql.utilities.common.server import Server
-from mysql.utilities.common.user import grant_proxy_ssl_privileges
-from mutlib.ssl_certs import (ssl_pass, ssl_user, ssl_server_opts,
-                              ssl_c_ca, ssl_c_cert, ssl_c_key)
+import ssl_connection_simple_test
 
 
-class test(mutlib.System_test):
+class test(ssl_connection_simple_test.test):
     """checks ssl connection support for utilities that uses add server option
     from option module.
+
+    Shares the the same pre_requisites, setup and drop_all methods as the
+    parent class.
     """
-    server1 = None
-
-    def check_prerequisites(self):
-        # This test requires server version < 5.5.7, due to the lack of
-        # 'GRANT PROXY ON ...' on previews versions.
-        if not self.servers.get_server(0).check_version_compat(5, 5, 8):
-            raise MUTLibError("Test requires server version >= 5.5.8")
-        return self.check_num_servers(1)
-
-    def drop_all(self):
-        """Drops all databases.
-        """
-        databases = ["util_test_a", "util_test_b", "util_test_c",
-                     "util_test_d", "util_test_e", "util_test_f"]
-        for db in databases:
-            try:
-                self.server1.exec_query("DROP DATABASE IF EXISTS "
-                                        "{0}".format(db))
-            except UtilError:
-                pass
-
-    def setup(self):
-        try:
-            self.servers.spawn_server('ssl_server',
-                                      ssl_server_opts(), kill=False)
-        except MUTLibError as err:
-            raise MUTLibError("Cannot spawn needed servers: {0}"
-                              "".format(err.errmsg))
-
-        index = self.servers.find_server_by_name('ssl_server')
-        self.server1 = self.servers.get_server(index)
-        for server in [self.server1]:
-            try:
-                grant_proxy_ssl_privileges(server, ssl_user, ssl_pass)
-            except UtilError as err:
-                raise MUTLibError("{0} on:{1}".format(err.errmsg,
-                                                      server.role))
-
-        conn_info = {
-            'user': ssl_user,
-            'passwd': ssl_pass,
-            'host': self.server1.host,
-            'port': self.server1.port,
-            'ssl_ca': ssl_c_ca,
-            'ssl_cert': ssl_c_cert,
-            'ssl_key': ssl_c_key,
-        }
-
-        self.server1 = Server.fromServer(self.server1, conn_info)
-        self.server1.connect()
-
-        res = self.server1.exec_query("SHOW STATUS LIKE 'Ssl_cipher'")
-        if not res[0][1]:
-            raise MUTLibError("Cannot spawn a SSL server.")
-        data_files = ["std_data/index_test.sql", "./std_data/basic_users.sql"]
-        self.drop_all()
-        for data_file in data_files:
-            try:
-                self.server1.read_and_exec_SQL(data_file, self.debug)
-            except UtilError as err:
-                raise MUTLibError("Failed to read commands from file {0}: "
-                                  "{1}".format(data_file, err.errmsg))
-
-        return True
-
+    # pylint: disable=W0221
     def run_test(self, test, test_case, conn_str, exp_result):
         """Runs each individual test.
         """
@@ -290,15 +223,7 @@ class test(mutlib.System_test):
         """
         self.replace_substring("localhost", "XXXX-XXXX")
         self.replace_substring("127.0.0.1", "XXXX-XXXX")
-        # Previews versions of C/py v1.2 differ on the message for missing ssl
-        # certificates, or does not mention all missing. Mask those.
         self.replace_substring("1045 (28000): ", "")
-        self.replace_substring("ERROR: Missing", "Error Missing")
-        self.replace_result("Error Missing",
-                            "Error Missing ssl certificate(s)\n")
-        self.replace_substring("ERROR: ssl", "Error ssl")
-        self.replace_result("Error ssl",
-                            "Error Missing ssl certificate(s)\n")
 
     def get_result(self):
         return self.compare(__name__, self.results)
@@ -307,4 +232,4 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        return True
+        return ssl_connection_simple_test.test.cleanup(self)

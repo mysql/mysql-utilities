@@ -253,3 +253,9 @@ class test(rpl_sync.test):
         self.do_masks()
 
         return True
+
+    def get_result(self):
+        return self.compare(__name__, self.results)
+
+    def record(self):
+        return self.save_result_file(__name__, self.results)

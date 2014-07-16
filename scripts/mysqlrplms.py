@@ -36,10 +36,6 @@ from mysql.utilities.common.messages import (
     PARSE_ERR_OPTS_REQ_GREATER_OR_EQUAL,
     PARSE_ERR_OPTS_REQ
 )
-from mysql.utilities.common.options import setup_common_options
-from mysql.utilities.common.options import (add_format_option, add_verbosity,
-                                            add_rpl_user, add_ssl_options,
-                                            get_ssl_dict)
 from mysql.utilities.common.options import (setup_common_options,
                                             add_verbosity, add_rpl_user,
                                             add_format_option,
