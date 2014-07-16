@@ -470,7 +470,7 @@ def copy_connector(connector_path):
         print("# Error: please chdir to the root utilities folder")
         sys.exit(1)
     dest_folder = cwd
-    install_cmd = ("python setup.py install --root={0} --install-lib='' "
+    install_cmd = ("python setup.py install --root={0} --install-lib=. "
                    "".format(dest_folder))
 
     with working_path(os.path.normpath(connector_path)):
