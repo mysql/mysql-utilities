@@ -39,6 +39,7 @@ import os
 import socket
 import subprocess
 import time
+import mysql.connector
 from mysql.utilities.common.server import Server, get_local_servers
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import add_verbosity
@@ -446,6 +447,7 @@ if __name__ == "__main__":
     print("  Test directory      = '{0}'".format(opt.testdir))
     print("  Utilities directory = '{0}'".format(opt.utildir))
     print("  Starting port       = {0}".format(opt.start_port))
+    print("  Connector/Python    = {0}".format(mysql.connector.__version__))
 
     # Check for suite list
     if opt.suites:

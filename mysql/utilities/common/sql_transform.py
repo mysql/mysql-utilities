@@ -83,7 +83,8 @@ def to_sql(obj):
 
     Returns (string) converted value
     """
-    return MySQLConverter().quote(obj)
+    to_sql.__dict__.setdefault('converter', MySQLConverter())
+    return str(to_sql.converter.quote(obj))  # pylint: disable=E1101
 
 
 def quote_with_backticks(identifier):
