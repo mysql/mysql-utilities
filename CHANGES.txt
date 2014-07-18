@@ -1,5 +1,7 @@
-Release 1.5.1rc1 (Released July 08, 2014)
+Release 1.5.1rc1 (Released July 18, 2014)
 -----------------------------------------
+
+- BUG#19215979: Fix compatibility with Connector/Python 2.0
 - BUG#19009690: AttributeError using mysqlfailover utility
 - BUG#18914270: importerror: cannot import name ... 1.5.0
 
@@ -8,11 +10,10 @@ Release 1.4.4qa1 (Released July 11, 2014)
 
 - BUG#17957509: ReadMe and License files are lost after OSX installer finish
 - BUG#18379971: mysqlfailover consumes excessive cpu
-- BUG#18477410: mysqldbcompare reports only one difference per span
-- BUG#18483844: index 'span' for mysqldbcompare
-- BUG#18546744: refactoring failover_daemon command to use the daemon class
+- BUG#18442315: mysqldiff fails to consider order of index
 - BUG#18603598: does not warn against passwords on the command line
 - BUG#18603715: mysqlreplicate - default password hardcoded to rpl
+- BUG#18603760: mysqlreplicate documentations needs update
 - BUG#18730656: mysqluserclone does not give informative error messages
 - BUG#18730720: mysqluserclone shows grants twice
 - BUG#18730815: mysqluc suddenly exits when a command misses closing quotation
@@ -31,8 +32,6 @@ Release 1.4.4qa1 (Released July 11, 2014)
 - BUG#19076488: mysqlrpladmin does not check errant transactions
 - BUG#19178471: Error using mysqlreplicate or mysqlrplms without --rpl-user
 - BUG#69857: mysqlrpladmin says "health: Slave is not connected to master."
-- BUG#71724: mysqlfailover tool failed when executing a 2nd failover
-- BUG#71851: general query log not handles blanklines with multi-line queries
 
 
 Release 1.5.0 (Released June 06, 2014)
