@@ -143,9 +143,7 @@ class test(frm_reader_base.test):
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqlfrm version",
-            "MySQL Utilities mysqlfrm version X.Y.Z "
-            "(part of MySQL Workbench ... XXXXXX)\n"
-        )
+            "MySQL Utilities mysqlfrm version X.Y.Z\n")
 
         return True
 

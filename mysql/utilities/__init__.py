@@ -20,12 +20,8 @@
 # Major, Minor, Patch, Status
 VERSION = (1, 5, 1, 'RC', 0)
 # Future versions will have to include only the X, Y (no Z).
-WORKBENCH_VERSION = (6, 1, 4)
 
 VERSION_STRING = "%s.%s.%s" % VERSION[0:3]
-RELEASE_STRING = (
-    VERSION_STRING +
-    " (part of MySQL Workbench Distribution %s.%s.%s)" % WORKBENCH_VERSION)
 
 COPYRIGHT = "2010, 2014 Oracle and/or its affiliates. All rights reserved."
 
@@ -38,9 +34,9 @@ MySQL Utilities is brought to you by Oracle.
 
 LICENSE = "GPLv2"
 
-VERSION_FRM = ("MySQL Utilities {program} version {RELEASE_STRING} \n"
+VERSION_FRM = ("MySQL Utilities {program} version {VERSION_STRING} \n"
                "License type: {LICENSE}".format(program="{program}",
-                                                RELEASE_STRING=RELEASE_STRING,
+                                                VERSION_STRING=VERSION_STRING,
                                                 LICENSE=LICENSE))
 
 LICENSE_FRM = (VERSION_FRM + "\n" + COPYRIGHT_FULL)

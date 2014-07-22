@@ -134,8 +134,7 @@ class test(clone_db.test):
                                        "'YYYY-MM-DD HH:MI:SS' ON COMPLETION")
 
         self.replace_result("MySQL Utilities mysqldbcopy version",
-                            "MySQL Utilities mysqldbcopy version X.Y.Z "
-                            "(part of MySQL Workbench ... XXXXXX)\n")
+                            "MySQL Utilities mysqldbcopy version X.Y.Z\n")
 
         return True
 

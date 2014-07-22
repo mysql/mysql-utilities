@@ -77,9 +77,7 @@ class test(mutlib.System_test):
         for utility in AVAILABLE_UTILITIES:
             self.replace_result(
                 "MySQL Utilities {0} version".format(utility),
-                "MySQL Utilities {0} version X.Y.Z (part of MySQL Workbench "
-                "... XXXXXX)\n".format(utility)
-            )
+                "MySQL Utilities {0} version X.Y.Z\n".format(utility))
 
         return True
 

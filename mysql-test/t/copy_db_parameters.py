@@ -181,9 +181,7 @@ class test(copy_db.test):
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqldbcopy version",
-            "MySQL Utilities mysqldbcopy version X.Y.Z "
-            "(part of MySQL Workbench ... XXXXXX)\n"
-        )
+            "MySQL Utilities mysqldbcopy version X.Y.Z\n")
 
         return True
 

@@ -1,5 +1,5 @@
 Test case 1 - Use --help 
-MySQL Utilities mysqldbcompare version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldbcompare version X.Y.Z
 License type: GPLv2
 Usage: mysqldbcompare --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1:db2
 

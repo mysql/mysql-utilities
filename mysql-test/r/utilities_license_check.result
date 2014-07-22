@@ -1,5 +1,5 @@
 Test Case 1: license mysqlrpladmin
-MySQL Utilities mysqlrpladmin version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlrpladmin version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -8,11 +8,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 2: version mysqlrpladmin
-MySQL Utilities mysqlrpladmin version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlrpladmin version X.Y.Z
 License type: GPLv2
 
 Test Case 3: license mysqldbcompare
-MySQL Utilities mysqldbcompare version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldbcompare version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -21,11 +21,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 4: version mysqldbcompare
-MySQL Utilities mysqldbcompare version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldbcompare version X.Y.Z
 License type: GPLv2
 
 Test Case 5: license mysqlrplcheck
-MySQL Utilities mysqlrplcheck version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlrplcheck version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -34,11 +34,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 6: version mysqlrplcheck
-MySQL Utilities mysqlrplcheck version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlrplcheck version X.Y.Z
 License type: GPLv2
 
 Test Case 7: license mysqlauditgrep
-MySQL Utilities mysqlauditgrep version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlauditgrep version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -47,11 +47,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 8: version mysqlauditgrep
-MySQL Utilities mysqlauditgrep version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlauditgrep version X.Y.Z
 License type: GPLv2
 
 Test Case 9: license mysqlrplms
-MySQL Utilities mysqlrplms version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlrplms version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -60,11 +60,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 10: version mysqlrplms
-MySQL Utilities mysqlrplms version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlrplms version X.Y.Z
 License type: GPLv2
 
 Test Case 11: license mysqlrplshow
-MySQL Utilities mysqlrplshow version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlrplshow version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -73,11 +73,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 12: version mysqlrplshow
-MySQL Utilities mysqlrplshow version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlrplshow version X.Y.Z
 License type: GPLv2
 
 Test Case 13: license mysqlfailover
-MySQL Utilities mysqlfailover version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlfailover version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -86,11 +86,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 14: version mysqlfailover
-MySQL Utilities mysqlfailover version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlfailover version X.Y.Z
 License type: GPLv2
 
 Test Case 15: license mysqlindexcheck
-MySQL Utilities mysqlindexcheck version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlindexcheck version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -99,11 +99,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 16: version mysqlindexcheck
-MySQL Utilities mysqlindexcheck version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlindexcheck version X.Y.Z
 License type: GPLv2
 
 Test Case 17: license mysqlmetagrep
-MySQL Utilities mysqlmetagrep version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlmetagrep version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -112,11 +112,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 18: version mysqlmetagrep
-MySQL Utilities mysqlmetagrep version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlmetagrep version X.Y.Z
 License type: GPLv2
 
 Test Case 19: license mysqlserverinfo
-MySQL Utilities mysqlserverinfo version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlserverinfo version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -125,11 +125,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 20: version mysqlserverinfo
-MySQL Utilities mysqlserverinfo version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlserverinfo version X.Y.Z
 License type: GPLv2
 
 Test Case 21: license mysqluserclone
-MySQL Utilities mysqluserclone version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqluserclone version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -138,11 +138,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 22: version mysqluserclone
-MySQL Utilities mysqluserclone version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqluserclone version X.Y.Z
 License type: GPLv2
 
 Test Case 23: license mysqldiskusage
-MySQL Utilities mysqldiskusage version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldiskusage version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -151,11 +151,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 24: version mysqldiskusage
-MySQL Utilities mysqldiskusage version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldiskusage version X.Y.Z
 License type: GPLv2
 
 Test Case 25: license mysqldbcopy
-MySQL Utilities mysqldbcopy version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldbcopy version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -164,11 +164,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 26: version mysqldbcopy
-MySQL Utilities mysqldbcopy version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldbcopy version X.Y.Z
 License type: GPLv2
 
 Test Case 27: license mysqlrplsync
-MySQL Utilities mysqlrplsync version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlrplsync version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -177,11 +177,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 28: version mysqlrplsync
-MySQL Utilities mysqlrplsync version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlrplsync version X.Y.Z
 License type: GPLv2
 
 Test Case 29: license mysqldbexport
-MySQL Utilities mysqldbexport version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldbexport version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -190,11 +190,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 30: version mysqldbexport
-MySQL Utilities mysqldbexport version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldbexport version X.Y.Z
 License type: GPLv2
 
 Test Case 31: license mysqldiff
-MySQL Utilities mysqldiff version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldiff version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -203,11 +203,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 32: version mysqldiff
-MySQL Utilities mysqldiff version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldiff version X.Y.Z
 License type: GPLv2
 
 Test Case 33: license mysqlserverclone
-MySQL Utilities mysqlserverclone version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlserverclone version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -216,11 +216,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 34: version mysqlserverclone
-MySQL Utilities mysqlserverclone version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlserverclone version X.Y.Z
 License type: GPLv2
 
 Test Case 35: license mysqlfrm
-MySQL Utilities mysqlfrm version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlfrm version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -229,11 +229,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 36: version mysqlfrm
-MySQL Utilities mysqlfrm version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlfrm version X.Y.Z
 License type: GPLv2
 
 Test Case 37: license mysqlreplicate
-MySQL Utilities mysqlreplicate version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlreplicate version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -242,11 +242,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 38: version mysqlreplicate
-MySQL Utilities mysqlreplicate version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlreplicate version X.Y.Z
 License type: GPLv2
 
 Test Case 39: license mysqluc
-MySQL Utilities mysqluc version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqluc version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -255,11 +255,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 40: version mysqluc
-MySQL Utilities mysqluc version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqluc version X.Y.Z
 License type: GPLv2
 
 Test Case 41: license mysqlprocgrep
-MySQL Utilities mysqlprocgrep version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlprocgrep version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -268,11 +268,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 42: version mysqlprocgrep
-MySQL Utilities mysqlprocgrep version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlprocgrep version X.Y.Z
 License type: GPLv2
 
 Test Case 43: license mysqldbimport
-MySQL Utilities mysqldbimport version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldbimport version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -281,11 +281,11 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 44: version mysqldbimport
-MySQL Utilities mysqldbimport version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldbimport version X.Y.Z
 License type: GPLv2
 
 Test Case 45: license mysqlauditadmin
-MySQL Utilities mysqlauditadmin version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlauditadmin version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 This is a release of dual licensed MySQL Utilities. For the avoidance of
@@ -294,6 +294,6 @@ under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
 Test Case 46: version mysqlauditadmin
-MySQL Utilities mysqlauditadmin version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlauditadmin version X.Y.Z
 License type: GPLv2
 

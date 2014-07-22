@@ -211,9 +211,7 @@ class test(diskusage_basic.test):
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqldiskusage version",
-            "MySQL Utilities mysqldiskusage version X.Y.Z "
-            "(part of MySQL Workbench ... XXXXXX)\n"
-        )
+            "MySQL Utilities mysqldiskusage version X.Y.Z\n")
 
         return True
 

@@ -123,9 +123,7 @@ class test(server_info.test):
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqlserverinfo version",
-            "MySQL Utilities mysqlserverinfo version X.Y.Z "
-            "(part of MySQL Workbench ... XXXXXX)\n"
-        )
+            "MySQL Utilities mysqlserverinfo version X.Y.Z\n")
 
         server_info.test.do_replacements(self)
 

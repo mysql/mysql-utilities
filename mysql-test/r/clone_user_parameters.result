@@ -5,7 +5,7 @@ WARNING: The --destination option is not required for '--dump' (option ignored).
 GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'
 Test case 2 - show the help
-MySQL Utilities mysqluserclone version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqluserclone version X.Y.Z
 License type: GPLv2
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@localhost sam:secret1@localhost
 

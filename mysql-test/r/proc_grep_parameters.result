@@ -1,5 +1,5 @@
 Test case 1 - do the help
-MySQL Utilities mysqlprocgrep version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqlprocgrep version X.Y.Z
 License type: GPLv2
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 

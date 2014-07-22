@@ -83,9 +83,7 @@ class test(meta_grep.test):
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqlmetagrep version",
-            "MySQL Utilities mysqlmetagrep version X.Y.Z "
-            "(part of MySQL Workbench ... XXXXXX)\n"
-        )
+            "MySQL Utilities mysqlmetagrep version X.Y.Z\n")
 
         return True
 

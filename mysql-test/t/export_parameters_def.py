@@ -212,9 +212,7 @@ class test(export_basic.test):
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqldbexport version",
-            "MySQL Utilities mysqldbexport version X.Y.Z "
-            "(part of MySQL Workbench ... XXXXXX)\n"
-        )
+            "MySQL Utilities mysqldbexport version X.Y.Z\n")
 
         self.replace_result("CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR",
                             "CREATE EVENT `e1` ON SCHEDULE EVERY 1 YEAR "

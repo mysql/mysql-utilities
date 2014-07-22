@@ -159,8 +159,7 @@ class test(check_index.test):
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqlindexcheck version",
-            "MySQL Utilities mysqlindexcheck version X.Y.Z "
-            "(part of MySQL Workbench ... XXXXXX)\n"
+            "MySQL Utilities mysqlindexcheck version X.Y.Z\n"
         )
 
         return True

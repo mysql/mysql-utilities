@@ -1,5 +1,5 @@
 Test case 1 - Use --help 
-MySQL Utilities mysqldiff version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldiff version X.Y.Z
 License type: GPLv2
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 

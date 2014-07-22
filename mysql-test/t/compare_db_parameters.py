@@ -177,9 +177,7 @@ class test(compare_db.test):
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqldbcompare version",
-            "MySQL Utilities mysqldbcompare version X.Y.Z "
-            "(part of MySQL Workbench ... XXXXXX)\n"
-        )
+            "MySQL Utilities mysqldbcompare version X.Y.Z\n")
 
         compare_db.test.do_replacements(self)
 

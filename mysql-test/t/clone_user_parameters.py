@@ -77,8 +77,7 @@ class test(clone_user.test):
 
                 # Mask version
         self.replace_result("MySQL Utilities mysqluserclone version",
-                            "MySQL Utilities mysqluserclone version X.Y.Z "
-                            "(part of MySQL Workbench ... XXXXXX)\n")
+                            "MySQL Utilities mysqluserclone version X.Y.Z\n")
 
         return True
 

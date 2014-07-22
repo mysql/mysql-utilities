@@ -194,9 +194,7 @@ class test(import_basic.test):
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqldbimport version",
-            "MySQL Utilities mysqldbimport version X.Y.Z "
-            "(part of MySQL Workbench ... XXXXXX)\n"
-        )
+            "MySQL Utilities mysqldbimport version X.Y.Z\n")
 
         return True
 

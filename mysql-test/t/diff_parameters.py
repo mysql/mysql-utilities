@@ -171,9 +171,7 @@ class test(diff.test):
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqldiff version",
-            "MySQL Utilities mysqldiff version X.Y.Z "
-            "(part of MySQL Workbench ... XXXXXX)\n"
-        )
+            "MySQL Utilities mysqldiff version X.Y.Z\n")
 
         return True
 

@@ -29,7 +29,7 @@ WARNING: Using a password on the command line interface can be insecure.
 # Copying database util_test renamed as util_db_clone
 ERROR: destination database exists. Use --drop-first to overwrite existing database.
 Test case 3 - help
-MySQL Utilities mysqldbcopy version X.Y.Z (part of MySQL Workbench ... XXXXXX)
+MySQL Utilities mysqldbcopy version X.Y.Z
 License type: GPLv2
 Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 

@@ -73,9 +73,7 @@ class test(proc_grep.test):
         # Mask version
         self.replace_result(
             "MySQL Utilities mysqlprocgrep version",
-            "MySQL Utilities mysqlprocgrep version X.Y.Z "
-            "(part of MySQL Workbench ... XXXXXX)\n"
-        )
+            "MySQL Utilities mysqlprocgrep version X.Y.Z\n")
 
         return True
 
