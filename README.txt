@@ -8,8 +8,8 @@ MySQL Utilities is brought to you by the MySQL team at Oracle.
 
 Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 
-For more information MySQL Utilities, visit 
-  http://dev.mysql.com/doc/mysql-utilities/en/index.html
+For more information on MySQL Utilities, visit
+  http://www.mysql.com/products/enterprise/utilities.html
 For more downloads and the source of MySQL Utilities, visit
   http://dev.mysql.com/downloads/utilities
 
