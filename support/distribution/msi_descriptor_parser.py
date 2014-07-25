@@ -32,7 +32,17 @@ file_exe_gen = ('<Component>'
     '</Component>'
 )
 
-dirref_fab =('<Product>'
+util_help_gen = (
+    '<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"'
+    ' xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">'
+     '<util:InternetShortcut Id="url_{mysql_util}"'
+     ' Name="{mysql_util} (online)" '
+     ' Target="http://dev.mysql.com/doc/mysql-utilities/$(var.DocVersion)/en/'
+     '{util_url}.html"/>'
+     '</Wix>'
+)
+
+dirref_fab = ('<Product>'
     '<DirectoryRef Id="FABCONF">'
     '<Component Id="Fabric_config"'
     ' Guid="CA95B0AF-5500-48CD-9707-56608AE78491">'
@@ -131,8 +141,59 @@ def get_element(dom_msi, tagName, name=None, id=None):
             if element.getAttribute('Id') == id:
                 return element
 
+
+def add_online_help_utils(xml_path, result_path, util_names=None, log=None):
+    """Adds the URL shortcuts to the online help of utilities to the msi
+    package descriptor.
+
+    This method adds the URL shortcuts to the online help for utilities XML
+    attributes to the msi package descriptor so the installer can create them
+    in the start Windows menu.
+
+    xml_path[in]       The original xml msi descriptor path
+    result_path[in]    Path to save the resulting xml
+    util_names[in]     the list of the utilities names, if not given all
+                       scripts will be added.
+    log[in]            build command log instance
+    """
+    dom_msi = parse(xml_path)
+
+    if util_names is None:
+        msg = ("Descriptor Parser: None help URL was added to the"
+               "package descriptor.")
+        _print(log, msg)
+        return
+
+    print("util_names {0}".format(util_names))
+    print("set util_names {0}".format(set(util_names)))
+
+    # Add the Fabric scripts.
+    diref = get_element(dom_msi, "DirectoryRef", id='DocMenu')
+    comps = diref.getElementsByTagName('Component')
+    for com in comps:
+        if com.getAttribute('Id') == 'UtilsManuals':
+            for util_name in set(util_names):
+                mysql_util = os.path.splitext(os.path.split(util_name)[1])[0]
+                if mysql_util == 'mysqlfabric':
+                    util_url = 'fabric'
+                else:
+                    util_url = mysql_util
+                _print(log, "Adding online help: {0}".format(util_name))
+                append_childs_from_unparsed_xml(
+                    com,
+                    util_help_gen.format(mysql_util=mysql_util,
+                                         util_url=util_url)
+                )
+
+    _print(log, "Online help added, Saving xml to:{0} working directory:{1}"
+           "".format(result_path, os.getcwd()))
+    f = open(result_path, "w+")
+    f.write(dom_msi.toprettyxml())
+    f.flush()
+    f.close()
+
+
 def add_exe_utils(xml_path, result_path, util_names=None, log=None):
-                      
     """Adds the executable utilities to the msi package descriptor
 
     This method adds the executable utilities XML attributes to the msi
@@ -175,6 +236,7 @@ def add_exe_utils(xml_path, result_path, util_names=None, log=None):
     f.write(dom_msi.toprettyxml())
     f.flush()
     f.close()
+
 
 def add_fabric_elements(dom_msi):
     # Define the Directories structure that will be used on the installation 

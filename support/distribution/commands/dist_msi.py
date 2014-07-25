@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,16 +30,14 @@ from distutils import log
 from distutils.errors import DistutilsError
 from distutils.dir_util import remove_tree
 from distutils.sysconfig import get_python_version
-from distutils.command.bdist_dumb import bdist_dumb
-from distutils.command.install_data import install_data
 from distutils.command.bdist import bdist
 from distutils.util import get_platform
-from distutils.file_util import copy_file
 
-from mysql.utilities import RELEASE_STRING, COPYRIGHT
+from mysql.utilities import COPYRIGHT
 from support import wix
 from support.distribution.msi_descriptor_parser import (add_exe_utils,
-                                                        add_features)
+                                                        add_features,
+                                                        add_online_help_utils)
 
 
 WIX_INSTALL = r"C:\Program Files (x86)\Windows Installer XML v3.5"
@@ -119,23 +117,23 @@ class _MSIDist(bdist):
 
         Returns a string
         """
-        raise NotImplemented
+        raise NotImplementedError
 
     def _create_msi(self, dry_run=0):
         """Create the Windows Installer using WiX
-        
+
         Creates the Windows Installer using WiX and returns the name of
         the created MSI file.
-        
+
         Raises DistutilsError on errors.
-        
+
         Returns a string
         """
         # load the upgrade codes
         fp = open('support/MSWindows/upgrade_codes.json')
         upgrade_codes = json.load(fp)
         fp.close()
-        
+
         # Version of the application being packaged
         appver = self.distribution.metadata.version
         match = re.match(r"(\d+)\.(\d+).(\d+).*", appver)
@@ -146,7 +144,7 @@ class _MSIDist(bdist):
         # Python version
         pyver = self.python_version
         pymajor, pyminor = pyver.split('.')[0:2]
-        
+
         # Check whether we have an upgrade code
         try:
             upgrade_code = upgrade_codes[appver[0:3]][pyver]
@@ -157,7 +155,7 @@ class _MSIDist(bdist):
         log.info("upgrade code for v{appver},"
                  " Python v{pyver}: {upgrade}".format(
                     appver=appver, pyver=pyver, upgrade=upgrade_code))
-        
+
         # wixobj's basename is the name of the installer
         wixobj = self._get_wixobj_name()
         msi = os.path.abspath(
@@ -167,7 +165,7 @@ class _MSIDist(bdist):
                         msi_out=msi,
                         base_path=self.dist_dir,
                         install=self.wix_install)
-        
+
         # WiX preprocessor variables
         if self.dist_type == 'com':
             liscense_file = 'License_com.rtf'
@@ -175,7 +173,7 @@ class _MSIDist(bdist):
             liscense_file = 'License.rtf'
         params = {
             'ProductName': self.product_name,
-            'ReleaseString': RELEASE_STRING,
+            'DocVersion': '.'.join([major, minor]),
             'Copyright': COPYRIGHT,
             'Version': '.'.join([major, minor, patch]),
             'FullVersion': appver,
@@ -194,9 +192,9 @@ class _MSIDist(bdist):
             'LicenseRtf': os.path.abspath(
                 os.path.join('support', 'MSWindows', liscense_file)),
         }
-        
+
         wixer.set_parameters(params)
-        
+
         if not dry_run:
             try:
                 wixer.compile(ui=True)
@@ -209,7 +207,7 @@ class _MSIDist(bdist):
             os.unlink(msi.replace('.msi', '.wixobj'))
             os.unlink(msi.replace('.msi', '.wixpdb'))
             remove_tree(self.bdist_base)
-        
+
         return msi
 
     def _prepare_distribution(self):
@@ -227,9 +225,9 @@ class _MSIDist(bdist):
 
         wix.check_wix_install(wix_install_path=self.wix_install,
                               dry_run=self.dry_run)
-        
+
         self._prepare_distribution()
-        
+
         # create the Windows Installer
         msi_file = self._create_msi(dry_run=self.dry_run)
         log.info("created MSI as %s" % msi_file)
@@ -246,7 +244,13 @@ class MSIBuiltDist(_MSIDist):
 
     python_version = get_python_version()
     wxs = 'support/MSWindows/mysql_utilities.xml'
-    fix_txtfiles = ['README.txt', 'LICENSE.txt']
+    fix_txtfiles = [
+        ('README.txt', 'README_Utilities.txt'),
+        ('README_Fabric.txt', 'README_Fabric.txt'),
+        ('LICENSE.txt', 'LICENSE.txt'),
+        ('CHANGES.txt', 'CHANGES_Utilities.txt'),
+        ('CHANGES_Fabric.txt', 'CHANGES_Fabric.txt')
+    ]
 
     def initialize_options(self):
         """Initialize the options"""
@@ -263,7 +267,9 @@ class MSIBuiltDist(_MSIDist):
         base_xml_path = "support/MSWindows/mysql_utilities.xml"
         result_xml_path = 'support/MSWindows/mysql_utilities_fab-doc.xml'
         add_exe_utils(base_xml_path, result_xml_path,
-                      self.distribution.scripts ,log=log)
+                      self.distribution.scripts, log=log)
+        add_online_help_utils(result_xml_path, result_xml_path,
+                              self.distribution.scripts, log=log)
 
         pck_fabric, add_doczip = self.are_fabric_doctrine_present()
         if pck_fabric or add_doczip:
@@ -273,7 +279,8 @@ class MSIBuiltDist(_MSIDist):
                          add_doczip=add_doczip,
                          log=log)
             for root, _dirs, files in os.walk('support/MSWindows/'):
-                log.info('Checking for new msi descriptor at: {0}'.format(root))
+                log.info('Checking for new msi descriptor at: {0}'
+                         ''.format(root))
                 for afile in files:
                     log.info('file: {0}'.format(afile))
                 if 'mysql_utilities_fab-doc.xml' in files:
@@ -293,7 +300,7 @@ class MSIBuiltDist(_MSIDist):
             platform = '-' + self.plat_name
 
         return ("mysql-utilities-{app_version}{sub_version}{tag}"
-                "{platform}.wixobj").format(app_version=appver, 
+                "{platform}.wixobj").format(app_version=appver,
                                             sub_version=self.sub_version,
                                             python_version=pyver,
                                             tag=self.tag,
@@ -308,16 +315,21 @@ class MSIBuiltDist(_MSIDist):
         log.info("installing to %s" % self.bdist_base)
         self.run_command('install_data')
         log.info('install_data finish')
-        
+
         buildexe = self.get_finalized_command('build_exe')
-        buildexe.build_exe = self.bdist_base 
+        buildexe.build_exe = self.bdist_base
         buildexe.run()
 
         # copy text files and correct newlines
-        for txtfile in self.fix_txtfiles:
-            log.info("creating and fixing text file %s", txtfile)
-            builttxt = os.path.join(self.bdist_base, txtfile)
-            open(builttxt, 'w').write(open(txtfile).read())
+        for txtfile, new_txtfile in self.fix_txtfiles:
+            if os.path.exists(txtfile):
+                log.info("creating and fixing text file {0}"
+                         "".format(new_txtfile))
+                builttxt = os.path.join(self.bdist_base, new_txtfile)
+                open(builttxt, 'w').write(open(txtfile).read())
+            else:
+                log.info("File {0} not found, skipping."
+                         "".format(txtfile))
 
 
 class BuiltCommercialMSI(_MSIDist):
@@ -346,8 +358,8 @@ class BuiltCommercialMSI(_MSIDist):
     boolean_options = [
         'keep-temp', 'include-sources'
     ]
-    
-    def initialize_options (self):
+
+    def initialize_options(self):
         """Initialize the options"""
         self.sub_version = ""
         self.bdist_base = None
@@ -358,9 +370,9 @@ class BuiltCommercialMSI(_MSIDist):
         self.include_sources = False
         self.wix_install = wix.WIX_INSTALL_PATH
         self.python_version = get_python_version()
-        self.dist_type =''#'com'
+        self.dist_type = ''
         self.sub_version = ''
-    
+
     def finalize_options(self):
         """Finalize the options"""
         self.set_undefined_options('bdist',
@@ -370,7 +382,9 @@ class BuiltCommercialMSI(_MSIDist):
         base_xml_path = "support/MSWindows/mysql_utilities_com.xml"
         result_xml_path = 'support/MSWindows/mysql_utilities_fab-doc_com.xml'
         add_exe_utils(base_xml_path, result_xml_path,
-                      self.distribution.scripts ,log=log)
+                      self.distribution.scripts, log=log)
+        add_online_help_utils(result_xml_path, result_xml_path,
+                              self.distribution.scripts, log=log)
 
         pck_fabric, add_doczip = self.are_fabric_doctrine_present()
         if pck_fabric or add_doczip:
@@ -380,18 +394,18 @@ class BuiltCommercialMSI(_MSIDist):
                          add_doczip=add_doczip,
                          log=log)
             for root, _dirs, files in os.walk('support/MSWindows/'):
-                log.info('Checking for new msi descriptor at: {0}'.format(root))
+                log.info('Checking for new msi descriptor at: {0}'
+                         ''.format(root))
                 for afile in files:
                     log.info('file: {0}'.format(afile))
                 if 'mysql_utilities_fab-doc_com.xml' in files:
                     log.info('new msi descriptor found')
                 else:
                     log.info('new msi descriptor not found')
-            self.wxs = result_xml_path
-        else:
-            self.wxs = 'support/MSWindows/mysql_utilities_com.xml'
+        self.wxs = result_xml_path
 
-        self.fix_txtfiles = ['README_com.txt', 'LICENSE_com.txt']
+        self.fix_txtfiles = [('README_com.txt', 'README_com.txt'),
+                             ('LICENSE_com.txt', 'LICENSE_com.txt')]
         if self.tag:
             self.tag = "-{0}".format(self.tag)
 
@@ -405,7 +419,6 @@ class BuiltCommercialMSI(_MSIDist):
 
         if self.plat_name:
             platform = '-' + self.plat_name
-
 
         return ("mysql-utilities-commercial-{app_version}{sub_version}{tag}"
                 "{platform}.wixobj").format(app_version=appver,
@@ -423,7 +436,7 @@ class BuiltCommercialMSI(_MSIDist):
 
         log.info("building exes at {0}".format(cmdbdist.bdist_dir))
         buildexe = self.get_finalized_command('build_exe')
-        buildexe.build_exe = cmdbdist.bdist_dir 
+        buildexe.build_exe = cmdbdist.bdist_dir
         buildexe.run()
         docfiles = [
             (os.path.join(cmdbdist.dist_target, 'LICENSE_com.txt'),
@@ -436,4 +449,3 @@ class BuiltCommercialMSI(_MSIDist):
         self.bdist_base = cmdbdist.bdist_dir
         # This sets name for various items as install directory.
         self.product_name = 'MySQL Utilities commercial'
-

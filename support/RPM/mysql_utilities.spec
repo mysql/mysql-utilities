@@ -59,7 +59,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, -)
-%doc CHANGES.txt LICENSE.txt README.txt
+%doc CHANGES_*.txt LICENSE.txt README_*.txt
 %config(noreplace) %{_sysconfdir}/mysql/fabric.cfg
 %dir %{_sysconfdir}/mysql
 %{_bindir}/mysqlauditadmin

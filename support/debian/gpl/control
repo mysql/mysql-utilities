@@ -12,7 +12,7 @@ Depends: python2.6 | python2.7, python (>= 2.6.3), mysql-connector-python (>= 1.
 Conflicts: mysql-utilities-commercial (<= ${binary:Version})
 Replaces: mysql-utilities-commercial (<= ${binary:Version}), mysql-utilities (<= ${binary:Version})
 Provides: mysql-utilities
-Homepage: http://dev.mysql.com/doc/workbench/en/mysql-utilities.html
+Homepage: http://dev.mysql.com/doc/index-utils-fabric.html
 Description: Collection of scripts for managing MySQL servers
  MySQL Utilities is both a set of command-line utilities as well as a 
  python library, developed for making the common tasks easy to 
@@ -20,5 +20,4 @@ Description: Collection of scripts for managing MySQL servers
  and administration of MySQL servers. These utilities encapsulate a set 
  of primitive commands, and bundles them so they can be used to perform 
  macro operations with a single command.
- They can be installed via MySQL Workbench, or as a standalone package. 
 

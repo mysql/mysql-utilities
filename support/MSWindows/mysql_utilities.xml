@@ -136,10 +136,16 @@
       </Component>
 
       <Component Id="UtilsDocs" Guid="68608e06-d064-4909-9e3e-a60bd6f3f09b">
-        <File Id="README" Name="README.txt"
-         Source="$(var.BuildDir)\README.txt" DiskId="1"/>
+        <File Id="README_Utilities" Name="README_Utilities.txt"
+         Source="$(var.BuildDir)\README_Utilities.txt" DiskId="1"/>
+        <File Id="README_Fabric" Name="README_Fabric.txt"
+         Source="$(var.BuildDir)\README_Fabric.txt" DiskId="1"/>
         <File Id="LICENSE" Name="LICENSE.txt"
          Source="$(var.BuildDir)\LICENSE.txt" DiskId="1"/>
+        <File Id="CHANGES_Utilities" Name="CHANGES_Utilities.txt"
+         Source="$(var.BuildDir)\CHANGES_Utilities.txt" DiskId="1"/>
+        <File Id="CHANGES_Fabric" Name="CHANGES_Fabric.txt"
+         Source="$(var.BuildDir)\CHANGES_Fabric.txt" DiskId="1"/>
       </Component>
 
     </DirectoryRef>
@@ -184,69 +190,9 @@
           <RegistryValue Type="string" Name="Version" Value="$(var.Version)"/>
           <RegistryValue Type="string" Name="Location" Value="[INSTALLDIR]"/>
         </RegistryKey>
-        <util:InternetShortcut Id="url_workbench"
-         Name="MySQL Workbench Manual (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/index.html"/>
-        <util:InternetShortcut Id="url_mysqlauditadmin"
-         Name="mysqlauditadmin (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlauditadmin.html"/>
-        <util:InternetShortcut Id="url_mysqlauditgrep"
-         Name="mysqlauditgrep (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlauditgrep.html"/>
-        <util:InternetShortcut Id="url_mysqldbcompare"
-         Name="mysqldbcompare (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqldbcompare.html"/>
-        <util:InternetShortcut Id="url_mysqldbcopy"
-         Name="mysqldbcopy (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqldbcopy.html"/>
-        <util:InternetShortcut Id="url_mysqldbexport"
-         Name="mysqldbexport (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqldbexport.html"/>
-        <util:InternetShortcut Id="url_mysqldbimport"
-         Name="mysqldbimport (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqldbimport.html"/>
-        <util:InternetShortcut Id="url_mysqldiff"
-         Name="mysqldiff (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqldiff.html"/>
-        <util:InternetShortcut Id="url_mysqldiskusage"
-         Name="mysqldiskusage (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqldiskusage.html"/>
-        <util:InternetShortcut Id="url_mysqlfailover"
-         Name="mysqlfailover (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlfailover.html"/>
-        <util:InternetShortcut Id="url_mysqlindexcheck"
-         Name="mysqlindexcheck (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlindexcheck.html"/>
-        <util:InternetShortcut Id="url_mysqlmedagrep"
-         Name="mysqlmetagrep (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlmetagrep.html"/>
-        <util:InternetShortcut Id="url_mysqlprocgrep"
-         Name="mysqlprocgrep (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlprocgrep.html"/>
-        <util:InternetShortcut Id="url_mysqlreplicate"
-         Name="mysqlreplicate (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlreplicate.html"/>
-        <util:InternetShortcut Id="url_mysqlrpladmin"
-         Name="mysqlrepladmin (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlrpladmin.html"/>
-        <util:InternetShortcut Id="url_mysqlrplcheck"
-         Name="mysqlrplcheck (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlrplcheck.html"/>
-        <util:InternetShortcut Id="url_mysqlrplshow"
-         Name="mysqlrplshow (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlrplshow.html"/>
-        <util:InternetShortcut Id="url_mysqlserverclone"
-         Name="mysqlserverclone (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlserverclone.html"/>
-        <util:InternetShortcut Id="url_mysqlserverinfo"
-         Name="mysqlserverinfo (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqlserverinfo.html"/>
-        <util:InternetShortcut Id="url_mysqluc"
-         Name="mysqluc (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqluc.html"/>
-        <util:InternetShortcut Id="url_mysqluserclone"
-         Name="mysqluserclone (online)"
-         Target="http://dev.mysql.com/doc/workbench/en/mysqluserclone.html"/>
+        <util:InternetShortcut Id="url_utils_fabric"
+         Name="MySQL Utilities - MySQL Fabric Manual (online)"
+         Target="http://dev.mysql.com/doc/index-utils-fabric.html"/>
       </Component>
     </DirectoryRef>
 
@@ -299,6 +245,5 @@
      Value="$(var.BitmapDir)\WixUIDialog_Utilities.bmp"/>
 
     <Property Id="Version" Value="$(var.Version)"/>
-    <Property Id="WorkbenchReleaseNotice" Value="$(var.ReleaseString)"/>
   </Product>
 </Wix>

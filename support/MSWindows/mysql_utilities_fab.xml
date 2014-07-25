@@ -335,6 +335,5 @@
      Value="$(var.BitmapDir)\WixUIDialog_Utilities.bmp"/>
 
     <Property Id="Version" Value="$(var.Version)"/>
-    <Property Id="WorkbenchReleaseNotice" Value="$(var.ReleaseString)"/>
   </Product>
 </Wix>

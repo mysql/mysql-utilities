@@ -61,7 +61,7 @@ class GenericSourceGPL(sdist):
          "Owner name used when creating a tar file [default: current user]"),
         ('group=', 'g',
          "Group name used when creating a tar file [default: current group]"),
-	('tag=', 't',
+        ('tag=', 't',
          "Adds a tag name after the release version"),
         ]
 
@@ -82,10 +82,18 @@ class GenericSourceGPL(sdist):
 
     def copy_extra_files(self, base_dir):
         extra_files = [
-           
         ]
         for src, dest in extra_files:
             self.copy_file(src, dest)
+
+    def rename_info_files(self, base_dir):
+        info_files = [
+            ('README.txt', 'README_Utilities.txt'),
+            ('CHANGES.txt', 'CHANGES_Utilities.txt')
+        ]
+        for src, dest in info_files:
+            self.move_file(os.path.join(base_dir, src),
+                           os.path.join(base_dir, dest))
 
     def make_release_tree(self, base_dir, files):
         self.mkpath(base_dir)
@@ -105,6 +113,8 @@ class GenericSourceGPL(sdist):
                 self.copy_file(file, dest)
 
         self.copy_extra_files(base_dir)
+
+        self.rename_info_files(base_dir)
 
         self.distribution.metadata.write_pkg_info(base_dir)
 
@@ -261,19 +271,26 @@ class SourceGPL(sdist):
         
         # create distribution
         info_files = [
-            ('README.txt', 'README.txt'),
-            ('LICENSE.txt', 'LICENSE.txt')
+            ('README.txt', 'README_Utilities.txt'),
+            ('LICENSE.txt', 'LICENSE.txt'),
+            ('CHANGES.txt', 'CHANGES_Utilities.txt'),
+            ('README_fabric.txt', 'README_fabric.txt'),
+            ('CHANGES_fabric.txt', 'CHANGES_fabric.txt')
         ]
         copy_tree(self.bdist_dir, self.dist_target)
         pkg_info = mkpath(os.path.join(self.dist_target))
         for src, dst in info_files:
-            if dst is None:
-                copy_file(src, self.dist_target)
+            if os.path.exists(src):
+                if dst is None:
+                    copy_file(src, self.dist_target)
+                else:
+                    copy_file(src, os.path.join(self.dist_target, dst))
             else:
-                copy_file(src, os.path.join(self.dist_target, dst))
+                log.info("File not found: {0}".format(src))
 
         if not self.keep_temp:
             remove_tree(self.build_base, dry_run=self.dry_run)
+
 
 class SourceCommercial(sdist):
     """Create commercial source distribution

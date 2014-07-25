@@ -93,8 +93,8 @@ python setup.py install -O1 --root=$RPM_BUILD_ROOT --prefix=%{_prefix} \
 
 mkdir %{buildroot}%{_docdir}/
 mkdir %{buildroot}%{_docdir}/%{name}-%{version}/
-cp -p README.txt %{buildroot}%{_docdir}/%{name}-%{version}/
-cp -p LICENSE.txt %{buildroot}%{_docdir}/%{name}-%{version}/
+cp -p *.txt %{buildroot}%{_docdir}/%{name}-%{version}/
+#cp -p LICENSE.txt %{buildroot}%{_docdir}/%{name}-%{version}/
 # Removing the shared __init__.py[c] file(s), recreated in %post
 TMP=`grep 'mysql/__init__.py' INSTALLED_FILES | head -n1`
 PKGLOC=`dirname $TMP`
@@ -106,7 +106,8 @@ rm -rf ${buildroot}
 
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
-%doc %{_docdir}/%{name}-%{version}/README.txt
+%doc %{_docdir}/%{name}-%{version}/README_*.txt
+%doc %{_docdir}/%{name}-%{version}/CHANGES_*.txt
 %doc %{_docdir}/%{name}-%{version}/LICENSE.txt
 %{_mandir}/man1/mysqlauditadmin.1*
 %{_mandir}/man1/mysqlauditgrep.1*

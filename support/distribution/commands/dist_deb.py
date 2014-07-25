@@ -127,20 +127,29 @@ class BuildDistDebian(Command):
         for src, dst in copy_tree_src_dst:
             copy_tree(src, dst)
 
-        copy_file(os.path.join(os.getcwd(), "README.txt"),
-                  os.path.join(self.deb_base, "README.txt"))
-        copy_file(os.path.join(os.getcwd(), "LICENSE.txt"),
-                  os.path.join(self.deb_base, "LICENSE.txt"))
-        copy_file(os.path.join(os.getcwd(), "setup.py"),
-                  os.path.join(self.deb_base, "setup.py"))
-        copy_file(os.path.join(os.getcwd(), "info.py"),
-                  os.path.join(self.deb_base, "info.py"))
+        #copy txt files
+        file_list = [
+            ("README.txt", "README_Utilities.txt"),
+            ("LICENSE.txt", "LICENSE.txt"),
+            ("CHANGES.txt", "CHANGES_Utilities.txt"),
+            ("README_fabric.txt", "README_fabric.txt"),
+            ("CHANGES_fabric.txt", "CHANGES_fabric.txt"),
+            ("setup.py", "setup.py"),
+            ("info.py", "info.py")
+        ]
+        for src, dest in file_list:
+            if os.path.exists(os.path.join(os.getcwd(), src)):
+                copy_file(os.path.join(os.getcwd(), src),
+                          os.path.join(self.deb_base, dest))
+            else:
+                log.info("File not found: {0}".format(src))
 
         # debian/files
         log.info("creating debian/docs file")
         f_compat = open(os.path.join(deb_dir, 'docs'), mode='w')
-        f_compat.write('README.txt\n')
+        f_compat.write('README_*.txt\n')
         f_compat.write('LICENSE.txt\n')
+        f_compat.write('CHANGES_*.txt\n')
         f_compat.flush()
         f_compat.close()
 

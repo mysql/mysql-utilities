@@ -122,9 +122,15 @@ class BuildDistOSX(bdist):
                 (os.path.join(cwd, "LICENSE.txt"),
                  os.path.join(osx_pkg_resrc, "License.txt")),
                 (os.path.join(cwd, "README.txt"),
-                 os.path.join(data_path, "ReadMe.txt")),
+                 os.path.join(data_path, "ReadMe_Utilities.txt")),
+                (os.path.join(cwd, "CHANGES.txt"),
+                 os.path.join(data_path, "CHANGES_Utilities.txt")),
                 (os.path.join(cwd, "LICENSE.txt"),
                  os.path.join(data_path, "License.txt")),
+                (os.path.join(cwd, "README_fabric.txt"),
+                 os.path.join(data_path, "ReadMe_fabric.txt")),
+                (os.path.join(cwd, "CHANGES_fabric.txt"),
+                 os.path.join(data_path, "CHANGES_fabric.txt"))
             ]
         else:
             com_path = os.path.join('support', 'commercial_docs')
@@ -158,7 +164,10 @@ class BuildDistOSX(bdist):
                     dest_f.write('{0}\n'.format(content))
 
         for src, dst in copy_file_src_dst:
-            copy_file(src, dst)
+            if os.path.exists(src):
+                copy_file(src, dst)
+            else:
+                log.info("File not found: {0}".format(src))
 
     def _create_pkg(self, template_name, dmg=False, sign=False, root='',
                     identity=''):

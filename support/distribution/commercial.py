@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,13 +41,11 @@ COPYRIGHT_FULL_COM = [
 ]
 
 COMMERCIAL_LICENSE_NOTICE = """
-This is a release of MySQL Utilities (part of MySQL Workbench Distribution),
-Oracle's dual-license MySQL Utilities complete database modeling, 
-administration and development program for MySQL. For the avoidance of
-doubt, this particular copy of the software is released
-under a commercial license and the GNU General Public
-License does not apply. MySQL Utilities is brought
-to you by Oracle.
+This is a release of MySQL Utilities, the dual-license, complete 
+database modeling, administration and development program for MySQL. 
+For the avoidance of doubt, this particular copy of the software is 
+released under the version 2 of the GNU General Public License. 
+MySQL Utilities is brought to you by the MySQL team at Oracle.
 
 Copyright (c) 2011, {0}, Oracle and/or its affiliates. All rights reserved.
 
@@ -55,8 +53,8 @@ This distribution may include materials developed by third
 parties. For license and attribution notices for these
 materials, please refer to the documentation that accompanies
 this distribution (see the "Licenses for Third-Party Components"
-appendix) or view the online documentation at 
-<http://dev.mysql.com/doc/>
+appendix) or view the online documentation at
+<http://dev.mysql.com/doc/index-utils-fabric.html>
 """.format(time.strftime('%Y'))
 
 COMMERCIAL_SETUP_PY = """#!/usr/bin/env python
