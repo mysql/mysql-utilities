@@ -1,11 +1,11 @@
-Release 1.5.1rc1 (Released July 18, 2014)
+Release 1.5.1 (Released July 18, 2014)
 -----------------------------------------
 
 - BUG#19215979: Fix compatibility with Connector/Python 2.0
 - BUG#19009690: AttributeError using mysqlfailover utility
 - BUG#18914270: importerror: cannot import name ... 1.5.0
 
-Release 1.4.4qa1 (Released July 11, 2014)
+Release 1.4.4 (Released July 11, 2014)
 -----------------------------------------
 
 - BUG#17957509: ReadMe and License files are lost after OSX installer finish
