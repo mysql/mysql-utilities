@@ -6,7 +6,7 @@ For the avoidance of doubt, this particular copy of the software is
 released under the version 2 of the GNU General Public License. 
 MySQL Utilities is brought to you by the MySQL team at Oracle.
 
-Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 
 For more information on MySQL Utilities, visit
   http://www.mysql.com/products/enterprise/utilities.html
