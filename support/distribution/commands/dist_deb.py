@@ -132,8 +132,8 @@ class BuildDistDebian(Command):
             ("README.txt", "README_Utilities.txt"),
             ("LICENSE.txt", "LICENSE.txt"),
             ("CHANGES.txt", "CHANGES_Utilities.txt"),
-            ("README_fabric.txt", "README_fabric.txt"),
-            ("CHANGES_fabric.txt", "CHANGES_fabric.txt"),
+            ("README_Fabric.txt", "README_Fabric.txt"),
+            ("CHANGES_Fabric.txt", "CHANGES_Fabric.txt"),
             ("setup.py", "setup.py"),
             ("info.py", "info.py")
         ]

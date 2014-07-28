@@ -92,8 +92,11 @@ class GenericSourceGPL(sdist):
             ('CHANGES.txt', 'CHANGES_Utilities.txt')
         ]
         for src, dest in info_files:
-            self.move_file(os.path.join(base_dir, src),
-                           os.path.join(base_dir, dest))
+            if not os.path.exists(dest):
+                self.move_file(os.path.join(base_dir, src),
+                               os.path.join(base_dir, dest))
+            else:
+                log.info("File {0} already renamed".format(dest))
 
     def make_release_tree(self, base_dir, files):
         self.mkpath(base_dir)
@@ -274,8 +277,8 @@ class SourceGPL(sdist):
             ('README.txt', 'README_Utilities.txt'),
             ('LICENSE.txt', 'LICENSE.txt'),
             ('CHANGES.txt', 'CHANGES_Utilities.txt'),
-            ('README_fabric.txt', 'README_fabric.txt'),
-            ('CHANGES_fabric.txt', 'CHANGES_fabric.txt')
+            ('README_Fabric.txt', 'README_Fabric.txt'),
+            ('CHANGES_Fabric.txt', 'CHANGES_Fabric.txt')
         ]
         copy_tree(self.bdist_dir, self.dist_target)
         pkg_info = mkpath(os.path.join(self.dist_target))
