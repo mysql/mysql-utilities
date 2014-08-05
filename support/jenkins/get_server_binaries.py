@@ -24,11 +24,11 @@ import time
 import platform
 import sys
 import shutil
+import re
 from support.jenkins.common import working_path
 
 OS = {
     "Linux": {
-        #"5.1":   ("mysql-5.1", "binary-max-linux-x86_64-tar-gz"),
         #"5.5":   ("daily-5.5",
         #           "binary-release-community_el6-x86-64bit_tar-gz"),
         "5.6":   ("daily-5.6",
@@ -37,7 +37,6 @@ OS = {
                   "binary-release-advanced_el6-x86-64bit_tar-gz"),
     },
     "Windows": {
-        #"5.1":   ("mysql-5.1",   "tree-max-win-x86_64-zip"),
         #"5.5":   ("daily-5.5",
         #          "binary-release-community_windows-x86-64bit_zip"),
         "5.6":   ("daily-5.6",
@@ -47,31 +46,20 @@ OS = {
     }
 }
 
-LATEST_GA_LINUX = {
-    "5.1.73": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.1.73/dist/"
-              "packages/mysql-advanced-5.1.73-linux-x86_64-glibc23.tar.gz",
-    "5.5.36": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.5.36/dist/"
-              "packages/mysql-advanced-5.5.36-linux2.6-x86_64.tar.gz",
-    "5.6.8-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.8-rc/dist/"
-                "packages/mysql-5.6.8-rc-linux2.6-x86_64.tar.gz",
-    "5.6.9-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.9-rc/dist/"
-                "packages/mysql-5.6.9-rc-linux-glibc2.5-x86_64.tar.gz",
-    "5.6.16": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.16/dist/"
-              "packages/mysql-advanced-5.6.16-linux-glibc2.5-x86_64.tar.gz",
-
+SPECIAL_GA_LINUX = {
+    # Disabled until we get a better machine to run the tests
+    # "5.6.8-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.8-rc/"
+    #             "dist/packages/mysql-5.6.8-rc-linux2.6-x86_64.tar.gz",
+    # "5.6.9-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.9-rc/"
+    #             "dist/packages/mysql-5.6.9-rc-linux-glibc2.5-x86_64.tar.gz",
 }
 
-LATEST_GA_WIN = {
-    "5.1.73": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.1.73/dist/"
-              "packages/mysql-advanced-noinstall-5.1.73-winx64.zip",
-    "5.5.36": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.5.36/dist/"
-              "packages/mysql-advanced-5.5.36-winx64.zip",
-    "5.6.8-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.8-rc/dist/"
-                "packages/mysql-5.6.8-rc-winx64.zip",
-    "5.6.9-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.9-rc/dist/"
-                "packages/mysql-advanced-5.6.9-rc-winx64.zip",
-    "5.6.16": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.16/dist/"
-              "packages/mysql-advanced-5.6.16-winx64.zip",
+SPECIAL_GA_WIN = {
+    # Disabled until we get a better machine to run the tests
+    # "5.6.8-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.8-rc/"
+    #             "dist/packages/mysql-5.6.8-rc-winx64.zip",
+    # "5.6.9-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.9-rc/"
+    #             "dist/packages/mysql-advanced-5.6.9-rc-winx64.zip",
 }
 
 
@@ -101,12 +89,113 @@ def download_binary(uri, download_dir, filename):
             sys.exit(1)
 
 
+def _get_mysql_uri(version_name, os_name, advanced=True, get64bit=True):
+    """Returns the specific uri to download the mysql version with the
+    specified version_name or None if it cannot find it.
+
+    version_name[in] string with the mysql version name.
+    os_name[in]      string with the operating system name. Supports Linux and
+                     Windows.
+    advanced[in]     if True returns the uri for the advanced version, else
+                     returns the uri for the normal version.
+    get64bit[in]     if True returns the 64 bit package, else the 32bit.
+
+    """
+    os_name = os_name.lower()
+    if os_name not in ['linux', 'windows']:
+        raise ValueError("invalid os_name, supported values are 'Linux' or "
+                         "'Windows'")
+    uri = ("http://alvheim.se.oracle.com/trees/mysql/{0}/dist/"
+           "packages".format(version_name))
+    if os_name == 'windows':
+        os_str = ''
+        extension_str = re.escape('.zip')
+        if get64bit:
+            arch_str = 'winx64'
+        else:
+            arch_str = 'win32'
+    else:
+        os_str = 'linux'
+        extension_str = re.escape('.tar.gz')
+        if get64bit:
+            arch_str = re.escape('x86_64')
+        else:
+            arch_str = 'i686'
+    if advanced:
+        version_str = re.escape("mysql-advanced-")
+    else:
+        version_str = re.escape("mysql-")
+
+    #build pattern
+    pattern_str = ('<a\shref="({0}(?:noinstall\-)?\d.*?{1}.*?'
+                   '{2}(:?\-glibc\d+)?{3})">'.format(version_str, os_str,
+                                                     arch_str, extension_str))
+    #res =
+    pattern = re.compile(pattern_str)
+    for line in urllib.urlopen(uri):
+        match = re.search(pattern, line)
+        if match:
+            return "{0}/{1}".format(uri, match.group(1))
+    else:
+        raise LookupError("Could not retrieve the download uri for version {0}"
+                          "{1} on {2} for arch {3}".format(
+                          version_name, ' advanced'*advanced, os_name,
+                          arch_str))
+
+
+def get_GA_binaries_uris(versions):
+    """Returns a dict with the URIs to download each of the latest server
+    version for each platform.
+
+    versions[in]  list with the major versions that we want to download:
+                  E.g if we want the download links for the latest 5.5 and 5.6
+                  versions = ["5.5", "5.6"]
+    """
+    lines = urllib.urlopen("http://alvheim.se.oracle.com/trees/"
+                           "mysql/").readlines()
+    version_dict = dict((version, []) for version in versions)
+    res_dict = {'Linux': {}, 'Windows': {}}
+
+    re_patterns = {}
+    # build pattern list
+    for version in versions:
+        re_patterns[version] = re.compile(
+            '<a\shref="(mysql-({0}\.?\d*)[^/]*)/'.format(re.escape(version)))
+    for line in lines:
+        for version in versions:
+            match = re.search(re_patterns[version], line)
+            if match:
+                version_dict[version].append((match.group(1), match.group(2)))
+
+    # Now get the maximum version
+    # Convert version string to ints to correctly get the maximum version
+    max_func = lambda tpl: (map(int, tpl[1].split('.')), tpl[0])
+    for version in versions:
+        version_dict[version] = max(version_dict[version], key=max_func)[0]
+
+    # Build download uri for each OS and version
+    for version in versions:
+        v_name = version_dict[version]
+        # Get the 64 bit advanced version for linux and windows
+        try:
+            download_uri_linux = _get_mysql_uri(v_name, 'linux')
+            res_dict['Linux'][version_dict[version]] = download_uri_linux
+        except LookupError as err:
+            print(str(err))
+        try:
+            download_uri_windows = _get_mysql_uri(v_name, 'windows')
+            res_dict['Windows'][version_dict[version]] = download_uri_windows
+        except LookupError as err:
+            print(str(err))
+    return res_dict
+
+
 def get_filename(uri):
     """Returns the archive filename looking at the url"""
     if not (uri.endswith(".zip") or uri.endswith(".tar.gz")):
         print("ERROR: '{0}' is not a valid URI".format(uri))
         sys.exit(1)
-    # Break the url from the right on the first ocurrence of mysql word
+    # Break the url from the right on the first occurrence of mysql word
     fname = "mysql-{0}".format(uri.rsplit("mysql-")[-1])
     return fname
 
@@ -172,10 +261,13 @@ if __name__ == "__main__":
 
     uri_to_retrieve = []
     uri_to_retrieve.extend(get_latest_uris(os_dict))
+    latest_ga_dict = get_GA_binaries_uris(['5.5', '5.6'])
     if platform.system() == 'Windows':
-        uri_to_retrieve.extend(LATEST_GA_WIN.values())
+        uri_to_retrieve.extend(SPECIAL_GA_WIN.values())
+        uri_to_retrieve.extend(latest_ga_dict['Windows'].values())
     elif platform.system() == 'Linux':
-        uri_to_retrieve.extend(LATEST_GA_LINUX.values())
+        uri_to_retrieve.extend(SPECIAL_GA_LINUX.values())
+        uri_to_retrieve.extend(latest_ga_dict['Linux'].values())
     else:
         print("ERROR: This operating system is not yet supported")
     # Get filename and retrieve it
