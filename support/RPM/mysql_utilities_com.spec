@@ -96,9 +96,9 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, -)
-%doc %{bdist_dir}README_com.txt
+%doc %{bdist_dir}README_*.txt
 %doc %{bdist_dir}LICENSE_com.txt
-%doc %{bdist_dir}CHANGES.txt
+%doc %{bdist_dir}CHANGES_*.txt
 %config(noreplace) %{_sysconfdir}/mysql/fabric.cfg
 %dir %{_sysconfdir}/mysql
 %{_bindir}/mysqlauditadmin

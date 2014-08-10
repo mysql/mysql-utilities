@@ -441,8 +441,14 @@ class BuiltCommercialMSI(_MSIDist):
         docfiles = [
             (os.path.join(cmdbdist.dist_target, 'LICENSE_com.txt'),
              os.path.join(cmdbdist.bdist_dir, 'LICENSE_com.txt')),
-            (os.path.join(cmdbdist.dist_target, 'README_com.txt'),
-             os.path.join(cmdbdist.bdist_dir, 'README_com.txt'))
+            (os.path.join(cmdbdist.dist_target, 'README_Utilities_com.txt'),
+             os.path.join(cmdbdist.bdist_dir, 'README_Utilities_com.txt')),
+            (os.path.join(cmdbdist.dist_target, 'CHANGES_Utilities.txt'),
+             os.path.join(cmdbdist.bdist_dir, 'CHANGES_Utilities.txt')),
+            (os.path.join(cmdbdist.dist_target, 'README_Fabric.txt'),
+             os.path.join(cmdbdist.bdist_dir, 'README_Fabric.txt')),
+            (os.path.join(cmdbdist.dist_target, 'CHANGES_Fabric.txt'),
+             os.path.join(cmdbdist.bdist_dir, 'CHANGES_Fabric.txt'))
         ]
         for src, dst in docfiles:
             self.copy_file(src, dst)

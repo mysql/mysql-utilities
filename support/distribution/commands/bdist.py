@@ -318,9 +318,12 @@ class BuiltCommercial(bdist):
         # create distribution
         comm_path = os.path.join('support', 'commercial_docs')
         info_files = [
-            (os.path.join(comm_path, 'README_com.txt'), 'README_com.txt'),
+            (os.path.join(comm_path, 'README_com.txt'),
+             'README_Utilities_com.txt'),
             (os.path.join(comm_path, 'LICENSE_com.txt'), 'LICENSE_com.txt'),
-            ('CHANGES.txt', 'CHANGES.txt'),
+            ('CHANGES.txt', 'CHANGES_Utilities.txt'),
+            ('README_Fabric.txt', 'README_Fabric.txt'),
+            ('CHANGES_Fabric.txt', 'CHANGES_Fabric.txt')
         ]
         copy_tree(self.bdist_dir, self.dist_target)
         pkg_info = mkpath(os.path.join(self.dist_target))

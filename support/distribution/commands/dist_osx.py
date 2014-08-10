@@ -143,6 +143,12 @@ class BuildDistOSX(bdist):
                  os.path.join(data_path, "ReadMe.txt")),
                 (os.path.join(cwd, com_path, "LICENSE_com.txt"),
                  os.path.join(data_path, "License.txt")),
+                (os.path.join(cwd, "CHANGES.txt"),
+                 os.path.join(data_path, "CHANGES_Utilities.txt")),
+                (os.path.join(cwd, "README_Fabric.txt"),
+                 os.path.join(data_path, "ReadMe_Fabric.txt")),
+                (os.path.join(cwd, "CHANGES_Fabric.txt"),
+                 os.path.join(data_path, "CHANGES_Fabric.txt"))
             ]
 
         property_files = [
