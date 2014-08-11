@@ -6,7 +6,7 @@
 
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
 Name:          mysql-utilities
-Version:       1.5.2
+Version:       1.6.0
 Release:       1%{?dist}
 License:       GPLv2
 Group:         Development/Libraries
@@ -97,6 +97,9 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}
 
 %changelog
+* Mon Aug 11 2014 Nelson Goncalves <nelson.goncalves@oracle.com> - 1.6.0
+- Updated the Version to 1.6.0
+
 * Mon Aug 11 2014 Chuck Bell <chuck.bell@oracle.com> - 1.5.2
 - Updated the Version to 1.5.2
 
