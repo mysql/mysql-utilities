@@ -295,8 +295,9 @@ class BuildCommercialDistDebian(BuildDistDebian):
         # debian/files
         log.info("creating debian/docs file")
         f_compat = open(os.path.join(deb_dir, 'docs'), mode='w')
-        f_compat.write('README_com.txt\n')
+        f_compat.write('README_*.txt\n')
         f_compat.write('LICENSE_com.txt\n')
+        f_compat.write('CHANGES_*.txt\n')
         f_compat.flush()
         f_compat.close()
 

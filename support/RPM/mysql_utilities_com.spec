@@ -36,7 +36,7 @@ Source0:        %{name}-commercial%{version}-py%{python_version}.tar.gz
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires: python-devel > 2.6
-Requires:      mysql-connector-python >= 1.2.1
+Requires:      mysql-connector-python >= 2.0.0
 Obsoletes:      %{name} <= %{version}, mysql-utilities <= %{version},
 AutoReq:        no
 
@@ -96,9 +96,9 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, -)
-%doc %{bdist_dir}README_com.txt
+%doc %{bdist_dir}README_*.txt
 %doc %{bdist_dir}LICENSE_com.txt
-%doc %{bdist_dir}CHANGES.txt
+%doc %{bdist_dir}CHANGES_*.txt
 %config(noreplace) %{_sysconfdir}/mysql/fabric.cfg
 %dir %{_sysconfdir}/mysql
 %{_bindir}/mysqlauditadmin

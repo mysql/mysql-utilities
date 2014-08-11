@@ -8,7 +8,7 @@ Standards-Version: 3.9.3
 
 Package: mysql-utilities-commercial
 Architecture: all
-Depends: python2.6 | python2.7, python (>= 2.6.3), mysql-connector-python (>= 1.2.1) | mysql-connector-python-commercial (>= 1.2.1)
+Depends: python2.6 | python2.7, python (>= 2.6.3), mysql-connector-python (>= 2.0.0) | mysql-connector-python-commercial (>= 2.0.0)
 Conflicts: mysql-utilities (<= ${binary:Version})
 Replaces: mysql-utilities (<= ${binary:Version}), mysql-utilities-commercial (<= ${binary:Version})
 Provides: mysql-utilities-commercial

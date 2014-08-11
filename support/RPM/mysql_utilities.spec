@@ -6,7 +6,7 @@
 
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
 Name:          mysql-utilities
-Version:       1.5.1
+Version:       1.5.2
 Release:       1%{?dist}
 License:       GPLv2
 Group:         Development/Libraries
@@ -14,7 +14,7 @@ URL:           https://dev.mysql.com/downloads/tools/utilities/
 Source0:       https://cdn.mysql.com/Downloads/MySQLGUITools/mysql-utilities-%{version}.zip
 BuildArch:     noarch
 BuildRequires: python-devel > 2.6
-Requires:      mysql-connector-python >= 1.2.1
+Requires:      mysql-connector-python >= 2.0.0
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %description
 
@@ -97,6 +97,9 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}
 
 %changelog
+* Mon Aug 11 2014 Chuck Bell <chuck.bell@oracle.com> - 1.5.2
+- Updated the Version to 1.5.2
+
 * Tue Jul 01 2014 Chuck Bell <chuck.bell@oracle.com> - 1.5.1
 - Updated the Version to 1.5.1
 
