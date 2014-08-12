@@ -34,8 +34,8 @@ Test case 1 : show help
   --start-timeout=START_TIMEOUT
                         Number of seconds to wait for server to start. Default
                         = 10.
-  --force               Ignore the maximum path length check for the --new-
-                        data option.
+  --force               Ignore the maximum path length and the low space
+                        checks for the --new-data option.
 Test case 2 : write command to file
 # Cloning the MySQL server running on XXXXX-XXXXX.
 # Creating new data directory...

@@ -24,13 +24,16 @@ import shutil
 
 import mutlib
 
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.command import serverclone
+from mysql.utilities.exception import MUTLibError, UtilError
 
 
 class test(mutlib.System_test):
     """clone server errors
     This test exercises the error conditions for mysqlserverclone.
     """
+
+    test_path = None
 
     def check_prerequisites(self):
         return self.check_num_servers(1)
@@ -140,6 +143,50 @@ class test(mutlib.System_test):
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - No minimum required Free space for path "
+                   "in --new-data".format(test_num))
+        if self.debug:
+            print("\n{0}".format(comment))
+        else:
+            self.results.append("{0}\n".format(comment))
+        next_port = self.servers.get_next_port()
+        self.test_path = "temp_{0}".format(next_port)
+        options = {
+            'new_data': self.test_path,
+            'new_port': next_port,
+            'new_id': next_port,
+            'root_pass': "root",
+            'mysqld_options': None,
+            'verbosity': "",
+            'quiet': True,
+            'cmd_file': None,
+            'basedir': "",
+            'delete': False,
+            'start_timeout': 10,
+            'force': False,
+        }
+        temp_req_free_space = serverclone.REQ_FREE_SPACE
+        min_mb = 120000000
+        serverclone.REQ_FREE_SPACE = min_mb
+        conn = self.servers.get_server(0).get_connection_values()
+        test_passed = False
+        try:
+            serverclone.clone_server(conn, options)
+        except UtilError as err:
+            err_msg = "mysqlserverclone needs at least {0} MB".format(min_mb)
+            if err_msg in err.errmsg:
+                if self.debug:
+                    print("Pass")
+                else:
+                    self.results.append("Pass")
+                test_passed = True
+        if not test_passed:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        serverclone.REQ_FREE_SPACE = temp_req_free_space
+
         # Mask known platform-dependent lines
         self.mask_result("Error 2003:", "2003", "####")
         self.mask_result("Error 1045", "1045", "####:")
@@ -179,6 +226,8 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
+        if self.test_path:
+            shutil.rmtree(self.test_path, True)
         if self.res_fname:
             os.unlink(self.res_fname)
         return True

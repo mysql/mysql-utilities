@@ -19,6 +19,7 @@
 This module contains methods for working with mysql server tools.
 """
 
+import ctypes
 import inspect
 import os
 import re
@@ -131,6 +132,36 @@ def delete_directory(path):
                 i += 1
         else:
             shutil.rmtree(path, True)
+
+
+def estimate_free_space(path, unit_multiple=2):
+    """Estimated free space for the given path.
+
+    Calculates free space for the given path, returning the value
+    on the size given by the unit_multiple.
+
+    path[in]             the path to calculate the free space for.
+    unit_multiple[in]    the unit size given as a multiple.
+                         Accepts int values > to zero.
+                         Size    unit_multiple
+                          bytes        0
+                          Kilobytes    1
+                          Megabytes    2
+                          Gigabytes    3
+                         and so on...
+
+    Returns folder/drive free space (in bytes)
+    """
+    unit_size = 1024 ** unit_multiple
+    if os.name == 'nt':
+        free_bytes = ctypes.c_ulonglong(0)
+        ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(path),
+                                                   None, None,
+                                                   ctypes.pointer(free_bytes))
+        return free_bytes.value / unit_size
+    else:
+        st = os.statvfs(path)  # pylint: disable=E1101
+        return st.f_bavail * st.f_frsize / unit_size
 
 
 def execute_script(run_cmd, filename=None, options=None, verbosity=False):
