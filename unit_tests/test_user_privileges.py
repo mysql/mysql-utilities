@@ -20,6 +20,7 @@ import unittest
 from collections import defaultdict
 
 from mysql.utilities.common import user, server
+from mysql.utilities.exception import UtilError
 
 
 class TestUserPrivileges(unittest.TestCase):
@@ -229,5 +230,51 @@ class TestUserPrivileges(unittest.TestCase):
         self.assertEquals(set([("GRANT OPTION", '*', '*')]),
                           self.user1.missing_user_privileges(self.user2))
 
+    def test_parse_grant_statement(self):
+        # Test function
+        self.assertEquals(user.User._parse_grant_statement(
+            "GRANT ALTER ROUTINE, EXECUTE ON FUNCTION `util_test`.`f1` TO "
+            "'priv_test_user2'@'%' WITH GRANT OPTION"),
+            (set(['GRANT OPTION', 'EXECUTE', 'ALTER ROUTINE']), None,
+                '`util_test`', '`f1`', "'priv_test_user2'@'%'"))
+        # Test procedure
+        self.assertEquals(user.User._parse_grant_statement(
+            "GRANT ALTER ROUTINE ON PROCEDURE `util_test`.`p1` TO "
+            "'priv_test_user2'@'%' IDENTIFIED BY "
+            "PASSWORD '*123DD712CFDED6313E0DDD2A6E0D62F12E580A6F' "
+            "WITH GRANT OPTION"),
+            (set(['GRANT OPTION', 'ALTER ROUTINE']), None,
+                '`util_test`', '`p1`', "'priv_test_user2'@'%'"))
+        # Test with quoted objects
+        self.assertEquals(user.User._parse_grant_statement(
+            "GRANT CREATE VIEW ON `db``:db`.```t``.``export_2` TO "
+            "'priv_test_user'@'%'"),
+            (set(['CREATE VIEW']), None, '`db``:db`.```t``', '``export_2`',
+                "'priv_test_user'@'%'"))
+        self.assertEquals(user.User._parse_grant_statement(
+            "GRANT CREATE VIEW ON `db``:db`.```t``.* TO "
+            "'priv_test_user'@'%'"),
+            (set(['CREATE VIEW']), None, '`db``:db`.```t``', '*',
+                "'priv_test_user'@'%'"))
+        # Test multiple grants with password and grant option
+        self.assertEquals(user.User._parse_grant_statement(
+            "GRANT UPDATE, SELECT ON `mysql`.* TO 'user2'@'%' IDENTIFIED BY "
+            "PASSWORD '*123DD712CFDED6313E0DDD2A6E0D62F12E580A6F' "
+            "REQUIRE SSL WITH GRANT OPTION"),
+            (set(['GRANT OPTION', 'UPDATE', 'SELECT']), None, '`mysql`',
+                '*', "'user2'@'%'"))
+        # Test proxy privileges
+        self.assertEquals(user.User._parse_grant_statement(
+            "GRANT PROXY ON ''@'' TO 'root'@'localhost' WITH GRANT OPTION"),
+            (set(['GRANT OPTION', 'PROXY']), "''@''", None, None,
+                "'root'@'localhost'"))
+        self.assertEquals(user.User._parse_grant_statement(
+            "GRANT PROXY ON 'root'@'%' TO 'root'@'localhost' WITH GRANT "
+            "OPTION"),
+            (set(['GRANT OPTION', 'PROXY']), "'root'@'%'", None, None,
+                "'root'@'localhost'"))
+        self.assertRaises(UtilError, user.User._parse_grant_statement,
+                          "GRANT PROXY 'root'@'%' TO 'root'@'localhost' WITH "
+                          "GRANT OPTION")
 if __name__ == '__main__':
     unittest.main()

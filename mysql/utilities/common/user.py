@@ -249,7 +249,8 @@ class User(object):
         grant_dict = defaultdict(lambda: defaultdict(set))
         for grant in grant_list:
             grant_tpl = User._parse_grant_statement(grant[0])
-            if grant_tpl:  # For proxy privileges, grant_tpl is empty
+            # Ignore PROXY privilege
+            if 'PROXY' not in grant_tpl.privileges:
                 grant_dict[grant_tpl.db][grant_tpl.object].update(
                     grant_tpl.privileges)
         return grant_dict
@@ -540,36 +541,48 @@ class User(object):
 
         Returns named tuple with GRANT information or None.
         """
-        grant_parse_re = re.compile(
-            r"GRANT\s(.+)?\sON\s(\*|`?[^'`]+`?)\.(\*|`?[^`']+`?)\sTO\s"
-            r"([^@]+@[\S]+)(?:\sIDENTIFIED\sBY\sPASSWORD\s\'[^\']+\')?"
-            r"(?:\sREQUIRE\sSSL)?(\sWITH\sGRANT\sOPTION)?")
 
-        grant_tpl_factory = namedtuple("grant_info", "privileges db object "
-                                                     "user")
+        grant_parse_re = re.compile(r"""
+            GRANT\s(.+)?\sON\s # grant or list of grants
+            (?:(?:PROCEDURE\s)|(?:FUNCTION\s))? # optional for routines only
+            (?:(?:(\*|`?[^']+`?)\.(\*|`?[^']+`?)) # object where grant applies
+            | ('[^']*'@'[^']*')) # For proxy grants user/host
+            \sTO\s([^@]+@[\S]+) # grantee
+            (?:\sIDENTIFIED\sBY\sPASSWORD\s\'[^\']+\')? # optional password
+            (?:\sREQUIRE\sSSL)? # optional SSL
+            (\sWITH\sGRANT\sOPTION)? # optional grant option
+            $ # End of grant statement
+            """, re.VERBOSE)
+
+        grant_tpl_factory = namedtuple("grant_info", "privileges proxy_user "
+                                                     "db object user")
         grants = None
         match = re.match(grant_parse_re, statement)
 
-        # After adding PROXY privilege support, add else clause if no match is
-        # found. The else clause should raise an UtilError exception.
         if match:
             # quote database name and object name with backticks
-            db = match.group(2)
-            if not is_quoted_with_backticks(db) and db != '*':
-                db = quote_with_backticks(db)
-            obj = match.group(3)
-            if not is_quoted_with_backticks(obj) and obj != '*':
-                obj = quote_with_backticks(obj)
-
+            if match.group(1).upper() != 'PROXY':
+                db = match.group(2)
+                if not is_quoted_with_backticks(db) and db != '*':
+                    db = quote_with_backticks(db)
+                obj = match.group(3)
+                if not is_quoted_with_backticks(obj) and obj != '*':
+                    obj = quote_with_backticks(obj)
+            else:  # if it is not a proxy grant
+                db = obj = None
             grants = grant_tpl_factory(
                 # privileges
                 set([priv.strip() for priv in match.group(1).split(",")]),
+                match.group(4),  # proxied user
                 db,  # database
                 obj,  # object
-                match.group(4),  # user
+                match.group(5),  # user
             )
             # If user has grant option, add it to the list of privileges
-            if match.group(5) is not None:
+            if match.group(6) is not None:
                 grants.privileges.add("GRANT OPTION")
+        else:
+            raise UtilError("Unable to parse grant statement "
+                            "{0}".format(statement))
 
         return grants
