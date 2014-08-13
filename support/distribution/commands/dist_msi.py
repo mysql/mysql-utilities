@@ -41,8 +41,8 @@ from support.distribution.msi_descriptor_parser import (add_exe_utils,
                                                         add_online_help_utils)
 
 
-WIX_INSTALL = r"C:\Program Files (x86)\Windows Installer XML v3.5"
-
+#WIX_INSTALL = r"C:\Program Files (x86)\Windows Installer XML v3.5"
+WIX_INSTALL = r"C:\Program Files (x86)\WiX Toolset v3.8"
 
 class _MSIDist(bdist):
     """Create a Windows Installer with Windows Executables"""
