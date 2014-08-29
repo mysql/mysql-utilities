@@ -58,3 +58,7 @@ FROM
   INFORMATION_SCHEMA.PROCESSLIST
 WHERE
     USER LIKE 'XXXX'
+Test case 3 - do kill
+# The following KILL commands were executed:
+Id,User,Host,db,Command,Time,State,Info
+XXX,...

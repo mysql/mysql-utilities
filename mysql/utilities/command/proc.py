@@ -251,13 +251,19 @@ class ProcessGrep(object):
 
             cursor = connection.cursor()
             cursor.execute(self.__select)
+            print_rows = []
+            cols = ["Id", "User", "Host", "db", "Command", "Time",
+                    "State", "Info"]
             for row in cursor:
-                if KILL_QUERY in self.__actions:
-                    cursor.execute("KILL {0}".format(row[0]))
-                if KILL_CONNECTION in self.__actions:
+                if (KILL_QUERY in self.__actions) or \
+                   (KILL_CONNECTION in self.__actions):
+                    print_rows.append(row)
                     cursor.execute("KILL {0}".format(row[0]))
                 if PRINT_PROCESS in self.__actions:
                     entries.append(tuple([_spec(info)] + list(row)))
+            if print_rows:
+                print "# The following KILL commands were executed:"
+                print_list(output, fmt, cols, print_rows)
 
         # If output is None, nothing is printed
         if len(entries) > 0 and output:

@@ -20,10 +20,14 @@ proc_grep_parameters test.
 """
 
 import os
-
 import proc_grep
+import subprocess
+import tempfile
+import time
 
+from mutlib.mutlib import kill_process
 from mysql.utilities.exception import MUTLibError
+from mysql.utilities.common.server import get_connection_dictionary
 
 
 class test(proc_grep.test):
@@ -62,6 +66,43 @@ class test(proc_grep.test):
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+
+        # execute the mysql client to create a new connection
+        conn_dict = get_connection_dictionary(self.server1)
+        arguments = [
+            "mysql",
+            "-u{0}".format(conn_dict['user']),
+            "-p{0}".format(conn_dict['passwd']),
+            "-h127.0.0.1",
+            "--port={0}".format(conn_dict['port']),
+            "mysql",
+        ]
+        out_file = tempfile.TemporaryFile()
+        proc = subprocess.Popen(arguments, stdout=out_file,
+                                stdin=subprocess.PIPE, stderr=out_file)
+        # wait for console to start
+        time.sleep(5)
+        test_num += 1
+        processes = self.server1.exec_query("show processlist")
+        for proc_item in processes:
+            if proc_item[3] == "mysql" and proc_item[4] == "Sleep":
+                proc_id = proc_item[0]
+            else:
+                proc_id = 0
+        comment = "Test case {0} - do kill".format(
+            test_num)
+        cmd_str = "mysqlprocgrep.py {0}{1} {2} {3} {4} {5}{6} {7}".format(
+            "--match-user=", conn_val[0], "--match-command=Sleep",
+            "--match-db=mysql", "--kill-connection", "--server=",
+            from_conn, "--format=CSV")
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        kill_process(proc)
+
+        # Mask out process list for deterministic result
+        self.replace_result("{0},".format(proc_id), "XXX,...\n")
 
         self.mask_result("    USER LIKE 'root'", "    USER LIKE 'root'",
                          "    USER LIKE 'XXXX'")
