@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -270,6 +270,53 @@ class AuditLog(object):
                 "{0}".format(rotate_size)
             )
 
+    @staticmethod
+    def _change_policy(server, policy_value):
+        """ Change the audit log plugin policy.
+
+        This method changes the audit log policy by setting the appropriate
+        variables according to the MySQL server version.
+
+        Note: For recent MySQL server versions (i.e. >= 5.5.40, >= 5.6.21, and
+        >= 5.7.5) the audit_log_policy is readonly and cannot be changed at
+        runtime (only when starting the server). For those versions, the policy
+        results from the combination of the values set for the
+        'audit_log_connection_policy' and 'audit_log_statement_policy'
+        variables (not available in previous versions).
+
+        server[in]          Instance of the server.
+        policy_value[in]    Policy value to set, supported values: 'ALL',
+                            'NONE', 'LOGINS', 'QUERIES', 'DEFAULT'.
+        """
+        # Check server version to set appropriate variables.
+        if ((server.check_version_compat(5, 5, 40) and  # >= 5.5.40 and < 5.6
+             not server.check_version_compat(5, 6, 0)) or
+            (server.check_version_compat(5, 6, 21) and  # >= 5.6.21 and < 5.7
+             not server.check_version_compat(5, 7, 0)) or
+                server.check_version_compat(5, 7, 5)):  # >= 5.7.5
+            # Set the audit_log_connection_policy and
+            # audit_log_statement_policy to yield the chosen policy.
+            policy = policy_value.upper()
+            set_connection_policy = (
+                "SET @@GLOBAL.audit_log_connection_policy = {0}"
+            )
+            set_statement_policy = (
+                "SET @@GLOBAL.audit_log_statement_policy = {0}"
+            )
+            if policy == 'QUERIES':
+                server.exec_query(set_connection_policy.format('NONE'))
+                server.exec_query(set_statement_policy.format('ALL'))
+            elif policy == 'LOGINS':
+                server.exec_query(set_connection_policy.format('ALL'))
+                server.exec_query(set_statement_policy.format('NONE'))
+            else:
+                server.exec_query(set_connection_policy.format(policy_value))
+                server.exec_query(set_statement_policy.format(policy_value))
+        else:
+            # Set the audit_log_policy for older server versions.
+            server.exec_query("SET @@GLOBAL.audit_log_policy = "
+                              "{0}".format(policy_value))
+
     def do_command(self):
         """ Check and execute the audit log command (previously set by the the
         options of the object constructor).
@@ -299,8 +346,7 @@ class AuditLog(object):
         print "#\n# Executing %s command.\n#\n" % command
         try:
             if command == "POLICY":
-                server.exec_query("SET @@GLOBAL.audit_log_policy = %s" %
-                                  command_value)
+                self._change_policy(server, command_value)
             elif command == "ROTATE":
                 self._rotate_log(server)
             else:  # "ROTATE_ON_SIZE":

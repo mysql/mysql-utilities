@@ -34,8 +34,11 @@ class test(audit_log_admin.test):
     """
 
     def check_prerequisites(self):
-        # Prerequisites are the same of audit_log_admin test
-        return audit_log_admin.test.check_prerequisites(self)
+        # Make sure the server to be clone has the audit log included.
+        if not self.servers.get_server(0).supports_plugin("audit"):
+            raise MUTLibError("Test requires a server with the audit log "
+                              "plug-in installed and enabled.")
+        return self.check_num_servers(1)
 
     def setup(self):
         # Setup is the same of the audit_log_admin test

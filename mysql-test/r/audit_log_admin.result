@@ -43,16 +43,21 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 # Audit Log Variables and Options
 #
-+---------------------------+---------------+
-| Variable_name             | Value         |
-+---------------------------+---------------+
-| audit_log_buffer_size     | 1048576       |
-| audit_log_file            | audit.log     |
-| audit_log_flush           | OFF           |
-| audit_log_policy          | ALL           |
-| audit_log_rotate_on_size  | 0             |
-| audit_log_strategy        | ASYNCHRONOUS  |
-+---------------------------+---------------+
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
 
 Test case 3 - show file stats - before rotate 
 +------------+-------+---------------------------+---------------------------+
@@ -67,16 +72,21 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 # Audit Log Variables and Options
 #
-+---------------------------+---------------+
-| Variable_name             | Value         |
-+---------------------------+---------------+
-| audit_log_buffer_size     | 1048576       |
-| audit_log_file            | audit.log     |
-| audit_log_flush           | OFF           |
-| audit_log_policy          | ALL           |
-| audit_log_rotate_on_size  | 0             |
-| audit_log_strategy        | ASYNCHRONOUS  |
-+---------------------------+---------------+
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
 
 #
 # Executing ROTATE command.
@@ -87,16 +97,21 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 # Audit Log Variables and Options
 #
-+---------------------------+---------------+
-| Variable_name             | Value         |
-+---------------------------+---------------+
-| audit_log_buffer_size     | 1048576       |
-| audit_log_file            | audit.log     |
-| audit_log_flush           | OFF           |
-| audit_log_policy          | ALL           |
-| audit_log_rotate_on_size  | 0             |
-| audit_log_strategy        | ASYNCHRONOUS  |
-+---------------------------+---------------+
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
 
 Test case 5 - show file stats after rotate 
 +------------------------------+-------+---------------------------+---------------------------+
@@ -112,16 +127,21 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 # Audit Log Variables and Options
 #
-+---------------------------+---------------+
-| Variable_name             | Value         |
-+---------------------------+---------------+
-| audit_log_buffer_size     | 1048576       |
-| audit_log_file            | audit.log     |
-| audit_log_flush           | OFF           |
-| audit_log_policy          | ALL           |
-| audit_log_rotate_on_size  | 0             |
-| audit_log_strategy        | ASYNCHRONOUS  |
-+---------------------------+---------------+
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
 
 #
 # Executing POLICY command.
@@ -132,34 +152,44 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 # Audit Log Variables and Options
 #
-+---------------------------+---------------+
-| Variable_name             | Value         |
-+---------------------------+---------------+
-| audit_log_buffer_size     | 1048576       |
-| audit_log_file            | audit.log     |
-| audit_log_flush           | OFF           |
-| audit_log_policy          | QUERIES       |
-| audit_log_rotate_on_size  | 0             |
-| audit_log_strategy        | ASYNCHRONOUS  |
-+---------------------------+---------------+
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | NONE          |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
 
-Test case 7 - change the policy to default
+Test case 7 - change the policy to LOGINS
 WARNING: Using a password on the command line interface can be insecure.
 #
 # Showing options before command.
 #
 # Audit Log Variables and Options
 #
-+---------------------------+---------------+
-| Variable_name             | Value         |
-+---------------------------+---------------+
-| audit_log_buffer_size     | 1048576       |
-| audit_log_file            | audit.log     |
-| audit_log_flush           | OFF           |
-| audit_log_policy          | QUERIES       |
-| audit_log_rotate_on_size  | 0             |
-| audit_log_strategy        | ASYNCHRONOUS  |
-+---------------------------+---------------+
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | NONE          |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
 
 #
 # Executing POLICY command.
@@ -170,34 +200,188 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 # Audit Log Variables and Options
 #
-+---------------------------+---------------+
-| Variable_name             | Value         |
-+---------------------------+---------------+
-| audit_log_buffer_size     | 1048576       |
-| audit_log_file            | audit.log     |
-| audit_log_flush           | OFF           |
-| audit_log_policy          | ALL           |
-| audit_log_rotate_on_size  | 0             |
-| audit_log_strategy        | ASYNCHRONOUS  |
-+---------------------------+---------------+
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | NONE          |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
 
-Test case 8 - change the rotate_on_size to 32535
+Test case 8 - change the policy to ALL
 WARNING: Using a password on the command line interface can be insecure.
 #
 # Showing options before command.
 #
 # Audit Log Variables and Options
 #
-+---------------------------+---------------+
-| Variable_name             | Value         |
-+---------------------------+---------------+
-| audit_log_buffer_size     | 1048576       |
-| audit_log_file            | audit.log     |
-| audit_log_flush           | OFF           |
-| audit_log_policy          | ALL           |
-| audit_log_rotate_on_size  | 0             |
-| audit_log_strategy        | ASYNCHRONOUS  |
-+---------------------------+---------------+
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | NONE          |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
+
+#
+# Executing POLICY command.
+#
+
+#
+# Showing options after command.
+#
+# Audit Log Variables and Options
+#
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
+
+Test case 9 - change the policy to NONE
+WARNING: Using a password on the command line interface can be insecure.
+#
+# Showing options before command.
+#
+# Audit Log Variables and Options
+#
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
+
+#
+# Executing POLICY command.
+#
+
+#
+# Showing options after command.
+#
+# Audit Log Variables and Options
+#
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | NONE          |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | NONE          |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
+
+Test case 10 - change the policy to default
+WARNING: Using a password on the command line interface can be insecure.
+#
+# Showing options before command.
+#
+# Audit Log Variables and Options
+#
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | NONE          |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | NONE          |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
+
+#
+# Executing POLICY command.
+#
+
+#
+# Showing options after command.
+#
+# Audit Log Variables and Options
+#
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
+
+Test case 11 - change the rotate_on_size to 32535
+WARNING: Using a password on the command line interface can be insecure.
+#
+# Showing options before command.
+#
+# Audit Log Variables and Options
+#
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
 
 #
 # Executing ROTATE_ON_SIZE command.
@@ -208,34 +392,44 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 # Audit Log Variables and Options
 #
-+---------------------------+---------------+
-| Variable_name             | Value         |
-+---------------------------+---------------+
-| audit_log_buffer_size     | 1048576       |
-| audit_log_file            | audit.log     |
-| audit_log_flush           | OFF           |
-| audit_log_policy          | ALL           |
-| audit_log_rotate_on_size  | 28672         |
-| audit_log_strategy        | ASYNCHRONOUS  |
-+---------------------------+---------------+
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 28672         |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
 
-Test case 9 - change the rotate_on_size to default
+Test case 12 - change the rotate_on_size to default
 WARNING: Using a password on the command line interface can be insecure.
 #
 # Showing options before command.
 #
 # Audit Log Variables and Options
 #
-+---------------------------+---------------+
-| Variable_name             | Value         |
-+---------------------------+---------------+
-| audit_log_buffer_size     | 1048576       |
-| audit_log_file            | audit.log     |
-| audit_log_flush           | OFF           |
-| audit_log_policy          | ALL           |
-| audit_log_rotate_on_size  | 28672         |
-| audit_log_strategy        | ASYNCHRONOUS  |
-+---------------------------+---------------+
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 28672         |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
 
 #
 # Executing ROTATE_ON_SIZE command.
@@ -246,14 +440,19 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 # Audit Log Variables and Options
 #
-+---------------------------+---------------+
-| Variable_name             | Value         |
-+---------------------------+---------------+
-| audit_log_buffer_size     | 1048576       |
-| audit_log_file            | audit.log     |
-| audit_log_flush           | OFF           |
-| audit_log_policy          | ALL           |
-| audit_log_rotate_on_size  | 0             |
-| audit_log_strategy        | ASYNCHRONOUS  |
-+---------------------------+---------------+
++------------------------------+---------------+
+| Variable_name                | Value         |
++------------------------------+---------------+
+| audit_log_buffer_size        | 1048576       |
+| audit_log_connection_policy  | ALL           |
+| audit_log_current_session    | ON            |
+| audit_log_exclude_accounts   |               |
+| audit_log_file               | audit.log     |
+| audit_log_flush              | OFF           |
+| audit_log_include_accounts   |               |
+| audit_log_policy             | ALL           |
+| audit_log_rotate_on_size     | 0             |
+| audit_log_statement_policy   | ALL           |
+| audit_log_strategy           | ASYNCHRONOUS  |
++------------------------------+---------------+
 
