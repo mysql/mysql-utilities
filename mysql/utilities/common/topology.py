@@ -1257,48 +1257,59 @@ class Topology(Replication):
               IO_Thread, SQL_Thread, Secs_Behind, Remaining_Delay,
               IO_Error_Num, IO_Error
 
+        Note: The method will return health for the master and slaves or just
+              the slaves if no master is specified. In which case, the master
+              status shall display "no master specified" instead of a status
+              for the connection.
+
         Returns tuple - (columns, rows)
         """
-        assert (self.master is not None), "No master or connection failed."
-
-        # Get master health
-        rpl_health = self.master.check_rpl_health()
-        self._report("# Getting health for master: %s:%s." %
-                     (self.master.host, self.master.port), logging.INFO, False)
-        have_gtid = self.master.supports_gtid()
         rows = []
-        master_data = [
-            self.master.host,
-            self.master.port,
-            "MASTER",
-            get_server_state(self.master, self.master.host, self.pingtime,
-                             self.verbosity > 0),
-            have_gtid,
-            "OK" if rpl_health[0] else ", ".join(rpl_health[1]),
-        ]
-
-        m_status = self.master.get_status()
-        if len(m_status):
-            master_log, master_log_pos = m_status[0][0:2]
-        else:
-            master_log = None
-            master_log_pos = 0
-
         columns = []
         columns.extend(_HEALTH_COLS)
-        # Show additional details if verbosity turned on
         if self.verbosity > 0:
             columns.extend(_HEALTH_DETAIL_COLS)
-            master_data.extend([self.master.get_version(), master_log,
-                                master_log_pos, "", "", "", "", "", "", "", "",
-                                ""])
+        if self.master:
+            # Get master health
+            rpl_health = self.master.check_rpl_health()
+            self._report("# Getting health for master: %s:%s." %
+                         (self.master.host, self.master.port), logging.INFO,
+                         False)
+            have_gtid = self.master.supports_gtid()
+            master_data = [
+                self.master.host,
+                self.master.port,
+                "MASTER",
+                get_server_state(self.master, self.master.host, self.pingtime,
+                                 self.verbosity > 0),
+                have_gtid,
+                "OK" if rpl_health[0] else ", ".join(rpl_health[1]),
+            ]
 
-        rows.append(master_data)
+            m_status = self.master.get_status()
+            if len(m_status):
+                master_log, master_log_pos = m_status[0][0:2]
+            else:
+                master_log = None
+                master_log_pos = 0
 
-        slave_rows = []
+            # Show additional details if verbosity turned on
+            if self.verbosity > 0:
+                master_data.extend([self.master.get_version(), master_log,
+                                    master_log_pos, "", "", "", "", "", "",
+                                    "", "", ""])
+
+            rows.append(master_data)
+            if have_gtid == "ON":
+                master_gtids = self.master.exec_query(_GTID_EXECUTED)
+        else:
+            # No master makes these impossible to determine.
+            have_gtid = "OFF"
+            master_log = ""
+            master_log_pos = ""
+
         # Get the health of the slaves
-        if have_gtid == "ON":
-            master_gtids = self.master.exec_query(_GTID_EXECUTED)
+        slave_rows = []
         for slave_dict in self.slaves:
             host = slave_dict['host']
             port = slave_dict['port']
@@ -1318,11 +1329,13 @@ class Topology(Replication):
                     # Connection failed.
                     rpl_health = (False, ["Slave is not alive."])
                     slave = None
+            elif not self.master:
+                rpl_health = (False, ["No master specified."])
             elif not slave.is_configured_for_master(self.master):
                 rpl_health = (False, ["Slave is not connected to master."])
                 slave = None
 
-            if slave is not None:
+            if self.master and slave is not None:
                 rpl_health = slave.check_rpl_health(self.master,
                                                     master_log, master_log_pos,
                                                     self.max_delay,

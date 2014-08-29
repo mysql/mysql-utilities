@@ -84,6 +84,16 @@ class test(rpl_admin.test):
                                            "version", 6)
 
         test_num += 1
+        slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
+        comment = "Test case {0} - health report slaves only".format(test_num)
+        cmd_str = "{0} --slaves={1} ".format(base_cmd, slaves)
+        cmd_opts = " health"
+        res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
+                                               comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
         comment = "Test case {0} - test slave discovery".format(test_num)
         cmd_str = "{0} {1} ".format(base_cmd, master_str)
         cmd_opts = " --discover-slaves-login=root:root health"

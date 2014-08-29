@@ -104,7 +104,19 @@ Available Commands:
 
         start, stop and reset require --slaves (and --master is optional)
 
-Test case 2 - test slave discovery
+Test case 2 - health report slaves only
+# Checking privileges.
+#
+# Replication Topology Health:
++------------+-------+--------+--------+------------+-----------------------+
+| host       | port  | role   | state  | gtid_mode  | health                |
++------------+-------+--------+--------+------------+-----------------------+
+| localhost  | PORT2  | SLAVE  | UP     | XXX        | No master specified.  |
+| localhost  | PORT3  | SLAVE  | UP     | XXX        | No master specified.  |
+| localhost  | PORT4  | SLAVE  | UP     | XXX        | No master specified.  |
++------------+-------+--------+--------+------------+-----------------------+
+# ...done.
+Test case 3 - test slave discovery
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
 # Found slave: localhost:PORT2
@@ -124,7 +136,7 @@ Test case 2 - test slave discovery
 | localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-Test case 3 - switchover with verbosity
+Test case 4 - switchover with verbosity
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
@@ -174,7 +186,7 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 # localhost:PORT1 status: Ok 
 # Switchover complete.
 # ...done.
-Test case 4 - switchover with quiet
+Test case 5 - switchover with quiet
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Discovering slave at localhost:PORT1
 # Found slave: localhost:PORT1
@@ -193,7 +205,7 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 +------------+-------+---------+--------+------------+---------+
 Switchover has written to the log.
 There are (before) 2 entries in the log.
-Test case 5 - switchover with logs
+Test case 6 - switchover with logs
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Discovering slaves for master at localhost:PORT1
 # Discovering slave at localhost:PORT2
@@ -228,7 +240,7 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 +------------+-------+---------+--------+------------+---------+
 # ...done.
 There are additional entries in the log.
-Test case 6 - attempt switchover with stranger server without using --force option
+Test case 7 - attempt switchover with stranger server without using --force option
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
 # WARNING: Errant transactions check skipped (GTID not enabled for the whole topology).
@@ -248,7 +260,7 @@ ERROR: Candidate is not connected to the correct master.
 | localhost  | PORT4  | SLAVE   | WARN   |            | Slave is not connected to master.  |
 +------------+-------+---------+--------+------------+------------------------------------+
 # ...done.
-Test case 7 - attempt switchover with stranger server using --force option
+Test case 8 - attempt switchover with stranger server using --force option
 WARNING: The --ping option is not required for 'switchover' (option ignored). Only used with the health command.
 # Checking privileges.
 # WARNING: Errant transactions check skipped (GTID not enabled for the whole topology).
@@ -279,7 +291,7 @@ ERROR: Candidate is not connected to the correct master.
 | localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-Test case 8 - attempt master switchover it self
+Test case 9 - attempt master switchover it self
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: The specified new master localhost:PORT5 is the same as the actual master localhost:PORT5.

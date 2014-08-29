@@ -151,9 +151,11 @@ if __name__ == '__main__':
     elif len(args) == 0:
         parser.error("You must specify a command to execute.")
 
+    command = args[0].lower()
+
     # At least one of the options --discover-slaves-login or --slaves is
-    # required.
-    if not opt.discover and not opt.slaves:
+    # required unless we are doing a health command.
+    if not opt.discover and not opt.slaves and not command == 'health':
         parser.error(PARSE_ERR_SLAVE_DISCO_REQ)
 
     # --discover-slaves-login and --slaves cannot be used simultaneously
@@ -174,7 +176,6 @@ if __name__ == '__main__':
 
     # Check errors and warnings of options and combinations.
 
-    command = args[0].lower()
     if command not in get_valid_rpl_commands():
         parser.error("'{0}' is not a valid command.".format(command))
 
@@ -184,9 +185,15 @@ if __name__ == '__main__':
         parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command,
                                                       opts=req_opts))
 
+    # Allow health report for --master or --slaves
+    if command == 'health' and not opt.master and not opt.slaves:
+        req_opts = '--master or --slaves'
+        parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command,
+                                                      opts=req_opts))
+
     # --master and either --slaves or --discover-slaves-login options are
-    # required by 'elect', 'health' and 'gtid'
-    if (command in ['elect', 'health', 'gtid'] and not opt.master and
+    # required by 'elect' and 'gtid'
+    if (command in ['elect', 'gtid'] and not opt.master and
             (not opt.slaves or not opt.discover)):
         req_opts = '--master and either --slaves or --discover-slaves-login'
         parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command,
