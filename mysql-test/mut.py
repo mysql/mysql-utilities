@@ -714,6 +714,7 @@ if __name__ == "__main__":
                                             "the comma")
                     test_case.remove_result("# WARNING: Using a password on "
                                             "the com")
+                    test_case.remove_result("# WARNING: The use of InnoDB is")
             except MUTLibError:
                 _, e, _ = sys.exc_info()
                 if debug_mode:

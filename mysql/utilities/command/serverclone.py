@@ -30,7 +30,9 @@ import shutil
 
 from mysql.utilities.common.tools import (check_port_in_use,
                                           estimate_free_space,
+                                          get_mysqld_version,
                                           get_tool_path)
+from mysql.utilities.common.messages import WARN_OPT_SKIP_INNODB
 from mysql.utilities.common.server import Server
 from mysql.utilities.exception import UtilError
 
@@ -100,6 +102,7 @@ def clone_server(conn_val, options):
                         "(> {1} characters). Please use a smaller one. "
                         "You can use the --force option to skip this "
                         "check".format(new_data, MAX_DATADIR_SIZE))
+
     # Clone running server
     if conn_val is not None:
         # Try to connect to the MySQL database server.
@@ -154,11 +157,18 @@ def clone_server(conn_val, options):
         raise UtilError(LOW_SPACE_ERRR_MSG.format(directory=new_data,
                                                   megabytes=REQ_FREE_SPACE))
 
+    # Check for warning of using --skip-innodb
+    mysqld_path = get_tool_path(basedir, "mysqld")
+    version = get_mysqld_version(mysqld_path)
+    if mysqld_options is not None and ("--skip-innodb" in mysqld_options or
+       "--innodb" in mysqld_options) and version is not None and \
+       int(version[0]) >= 5 and int(version[1]) >= 7 and int(version[2]) >= 5:
+        print("# WARNING: {0}".format(WARN_OPT_SKIP_INNODB))
+
     if not quiet:
         print "# Configuring new instance..."
         print "# Locating mysql tools..."
 
-    mysqld_path = get_tool_path(basedir, "mysqld")
     mysqladmin_path = get_tool_path(basedir, "mysqladmin")
     mysql_basedir = get_tool_path(basedir, "share/english/errgmsg.sys",
                                   False, False)

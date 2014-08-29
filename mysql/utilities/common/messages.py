@@ -146,3 +146,7 @@ ERROR_MIN_SERVER_VERSIONS = ("The {utility} requires server versions greater "
 
 PARSE_ERR_SSL_REQ_SERVER = ("Options --ssl-ca, --ssl-cert and --ssl-key "
                             "requires use of --server.")
+
+WARN_OPT_SKIP_INNODB = ("The use of InnoDB is mandatory since MySQL 5.7. The "
+                        "former options like '--innodb=0/1/OFF/ON' or "
+                        "'--skip-innodb' are ignored.")

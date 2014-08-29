@@ -41,7 +41,11 @@ class test(mutlib.System_test):
     start_cmd_fl = None
 
     def check_prerequisites(self):
-        return self.check_num_servers(1)
+        ret = self.check_num_servers(1)
+        if ret and \
+           not self.servers.get_server(0).check_version_compat(5, 6, 0):
+            raise MUTLibError("Test requires server version 5.6 and later.")
+        return ret
 
     def setup(self):
         # No setup needed
@@ -136,19 +140,26 @@ class test(mutlib.System_test):
                             self.servers.get_server(0))))
 
         #  (comment, command options, kill running server, restart_with_cmd)
-        test_cases = [("show help", " --help ", False, True, False),
-                      ("write command to file", " --write-command=startme.sh ",
-                       True, False, False),
-                      ("write command to file shortcut", " -w startme.sh ",
-                       True, False, False),
-                      ("verbosity = -v", " -v ", True, False, False),
-                      ("verbosity = -vv", " -vv ", True, False, False),
-                      ("verbosity = -vvv", " -vvv ", True, False, False),
-                      ("-vvv and write command to file shortcut",
-                       " -vvv -w startme.sh ", True, False, False),
-                      ("write command to file and run it",
-                       " -w {0} ".format(self.start_cmd_fl), True, False,
-                       self.start_cmd_fl)]
+        test_cases = [
+            ("show help", " --help ", False, True, False),
+            ("write command to file", " --write-command=startme.sh ",
+             True, False, False),
+            ("write command to file shortcut", " -w startme.sh ",
+             True, False, False),
+            ("verbosity = -v", " -v ", True, False, False),
+            ("verbosity = -vv", " -vv ", True, False, False),
+            ("verbosity = -vvv", " -vvv ", True, False, False),
+            ("-vvv and write command to file shortcut",
+             " -vvv -w startme.sh ", True, False, False),
+            ("write command to file and run it",
+             " -w {0} ".format(self.start_cmd_fl), True, False,
+             self.start_cmd_fl),
+            ("use --skip-innodb",
+             ("--mysqld='--skip-innodb --default-storage-engine=MYISAM "
+              "--default-tmp-storage-engine=MYISAM'"), True, False, False),
+            ("use --innodb", "--mysqld='--innodb'", True, False,
+             False),
+        ]
 
         test_num = 1
         for row in test_cases:
