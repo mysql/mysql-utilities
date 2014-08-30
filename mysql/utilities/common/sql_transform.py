@@ -326,7 +326,7 @@ class SQLTransformer(object):
     """
 
     def __init__(self, destination_db, source_db, destination,
-                 source, obj_type, verbosity):
+                 source, obj_type, verbosity, options=None):
         """Constructor
 
         destination_db[in] destination Database instance
@@ -335,6 +335,7 @@ class SQLTransformer(object):
         source[in]         the source object definition or data
         obj_type[in]       type of object
         verbosity[in]      verbosity level
+        options[in]        Options dictionary
 
         """
         self.destination_db = destination_db
@@ -345,6 +346,9 @@ class SQLTransformer(object):
         self.verbosity = verbosity
         self.dest_tbl = None
         self.src_tbl = None
+        if options is None:
+            options = {}
+        self.skip_table_opts = options.get("skip_table_opts", False)
 
     def transform_definition(self):
         """Transform an object definition
@@ -1124,8 +1128,11 @@ class SQLTransformer(object):
             statements.extend(columns[i])
 
         # General definition returns a single string of the option changes
-        gen_defn = self._get_table_defns(self.destination[_TABLE_DEF],
-                                         self.source[_TABLE_DEF])
+        if not self.skip_table_opts:
+            gen_defn = self._get_table_defns(self.destination[_TABLE_DEF],
+                                             self.source[_TABLE_DEF])
+        else:
+            gen_defn = None
 
         if gen_defn is not None:
             statements.append(gen_defn)

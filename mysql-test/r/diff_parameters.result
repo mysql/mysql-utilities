@@ -627,3 +627,16 @@ Test case 22b - Changes for server2 --difftype=sql (skipping table options).
 #  DEFAULT
 #  CHARSET=latin1
 Success. All objects are the same.
+Test case 23 - Use --skip-table-options 
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Comparing util_test.a1 to util_test.a1                           [FAIL]
+# Transformation for --changes-for=server1:
+#
+
+ALTER TABLE `util_test`.`a1` 
+  ADD INDEX bb (b), 
+  ADD INDEX cc (c), 
+  ADD COLUMN c int(10) unsigned NOT NULL COMMENT 'hello' AFTER b;
+
+Compare failed. One or more differences found.

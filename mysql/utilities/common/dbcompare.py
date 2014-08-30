@@ -409,7 +409,7 @@ def _get_transform(server1, server2, object1, object2, options,
     # Get the transformation based on direction.
     transform_str = []
     xform = SQLTransformer(db_1, db_2, obj1[0], obj2[0], object_type,
-                           options.get('verbosity', 0))
+                           options.get('verbosity', 0), options)
 
     differences = xform.transform_definition()
     if differences and len(differences) > 0:
