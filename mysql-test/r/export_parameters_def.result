@@ -149,10 +149,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -221,10 +221,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -288,10 +288,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - no procedures
@@ -344,10 +344,10 @@ CREATE DEFINER=`root`@`localhost` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNE
 RETURN base_price + base_price*(tax_percentage/100);
 ||
 DELIMITER ;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - no functions
@@ -386,10 +386,10 @@ CREATE TABLE `t5` (
   `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - no tables
@@ -399,10 +399,10 @@ SET FOREIGN_KEY_CHECKS=0;
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
 USE `util_test`;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - no create_db
@@ -410,10 +410,10 @@ Test case 8 - no create_db
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 USE `util_test`;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 9 - no data
@@ -421,16 +421,16 @@ Test case 9 - no data
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 USE `util_test`;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # Exporting metadata from util_test
 USE `util_test`;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 10 - SQL single rows
@@ -489,10 +489,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -633,10 +633,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -777,10 +777,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -890,8 +890,8 @@ NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,
 `p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,utf8,utf8_general_ci,latin1_swedish_ci
 # VIEWS in util_test:
 TABLE_SCHEMA,TABLE_NAME,DEFINER,SECURITY_TYPE,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
-`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 `util_test`,`v2`,root@localhost,DEFINER,"select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`",NONE,YES,utf8,utf8_general_ci
+`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 # TRIGGERS in util_test:
 TRIGGER_NAME,DEFINER,EVENT_MANIPULATION,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORIENTATION,ACTION_TIMING,ACTION_STATEMENT,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
 `trg`,root@localhost,INSERT,`util_test`,`t1`,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,utf8,utf8_general_ci,latin1_swedish_ci
@@ -963,8 +963,8 @@ NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	
 `p1`	SQL	CONTAINS_SQL	NO	DEFINER	root@localhost	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"		utf8	utf8_general_ci	latin1_swedish_ci
 # VIEWS in util_test:
 TABLE_SCHEMA	TABLE_NAME	DEFINER	SECURITY_TYPE	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
-`util_test`	`v1`	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	utf8	utf8_general_ci
 `util_test`	`v2`	root@localhost	DEFINER	select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`	NONE	YES	utf8	utf8_general_ci
+`util_test`	`v1`	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	utf8	utf8_general_ci
 # TRIGGERS in util_test:
 TRIGGER_NAME	DEFINER	EVENT_MANIPULATION	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORIENTATION	ACTION_TIMING	ACTION_STATEMENT	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
 `trg`	root@localhost	INSERT	`util_test`	`t1`	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		utf8	utf8_general_ci	latin1_swedish_ci
@@ -1047,8 +1047,8 @@ SET FOREIGN_KEY_CHECKS=0;
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
 | TABLE_SCHEMA  | TABLE_NAME  | DEFINER         | SECURITY_TYPE  | VIEW_DEFINITION                                                                                                                                              | CHECK_OPTION  | IS_UPDATABLE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
-| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | utf8                  | utf8_general_ci       |
 | util_test     | v2          | root@localhost  | DEFINER        | select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`  | NONE          | YES           | utf8                  | utf8_general_ci       |
+| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | utf8                  | utf8_general_ci       |
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
 # TRIGGERS in util_test:
 +---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
@@ -1370,20 +1370,20 @@ SET FOREIGN_KEY_CHECKS=0;
 # VIEWS in util_test:
 *************************       1. row *************************
          TABLE_SCHEMA: util_test
-           TABLE_NAME: v1
+           TABLE_NAME: v2
               DEFINER: root@localhost
         SECURITY_TYPE: DEFINER
-      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
+      VIEW_DEFINITION: select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`
          CHECK_OPTION: NONE
          IS_UPDATABLE: YES
  CHARACTER_SET_CLIENT: utf8
  COLLATION_CONNECTION: utf8_general_ci
 *************************       2. row *************************
          TABLE_SCHEMA: util_test
-           TABLE_NAME: v2
+           TABLE_NAME: v1
               DEFINER: root@localhost
         SECURITY_TYPE: DEFINER
-      VIEW_DEFINITION: select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`
+      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
          CHECK_OPTION: NONE
          IS_UPDATABLE: YES
  CHARACTER_SET_CLIENT: utf8
@@ -1735,10 +1735,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -1844,8 +1844,8 @@ SET FOREIGN_KEY_CHECKS=0;
 # PROCEDURES in util_test:
 `p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,utf8,utf8_general_ci,latin1_swedish_ci
 # VIEWS in util_test:
-`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 `util_test`,`v2`,root@localhost,DEFINER,"select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`",NONE,YES,utf8,utf8_general_ci
+`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 # TRIGGERS in util_test:
 `trg`,root@localhost,INSERT,`util_test`,`t1`,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,utf8,utf8_general_ci,latin1_swedish_ci
 # EVENTS in util_test:
@@ -1910,8 +1910,8 @@ SET FOREIGN_KEY_CHECKS=0;
 # PROCEDURES in util_test:
 `p1`	SQL	CONTAINS_SQL	NO	DEFINER	root@localhost	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"		utf8	utf8_general_ci	latin1_swedish_ci
 # VIEWS in util_test:
-`util_test`	`v1`	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	utf8	utf8_general_ci
 `util_test`	`v2`	root@localhost	DEFINER	select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`	NONE	YES	utf8	utf8_general_ci
+`util_test`	`v1`	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	utf8	utf8_general_ci
 # TRIGGERS in util_test:
 `trg`	root@localhost	INSERT	`util_test`	`t1`	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		utf8	utf8_general_ci	latin1_swedish_ci
 # EVENTS in util_test:
@@ -1991,8 +1991,8 @@ SET FOREIGN_KEY_CHECKS=0;
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
 | TABLE_SCHEMA  | TABLE_NAME  | DEFINER         | SECURITY_TYPE  | VIEW_DEFINITION                                                                                                                                              | CHECK_OPTION  | IS_UPDATABLE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
-| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | utf8                  | utf8_general_ci       |
 | util_test     | v2          | root@localhost  | DEFINER        | select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`  | NONE          | YES           | utf8                  | utf8_general_ci       |
+| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | utf8                  | utf8_general_ci       |
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
 # TRIGGERS in util_test:
 +---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
@@ -2314,20 +2314,20 @@ SET FOREIGN_KEY_CHECKS=0;
 # VIEWS in util_test:
 *************************       1. row *************************
          TABLE_SCHEMA: util_test
-           TABLE_NAME: v1
+           TABLE_NAME: v2
               DEFINER: root@localhost
         SECURITY_TYPE: DEFINER
-      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
+      VIEW_DEFINITION: select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`
          CHECK_OPTION: NONE
          IS_UPDATABLE: YES
  CHARACTER_SET_CLIENT: utf8
  COLLATION_CONNECTION: utf8_general_ci
 *************************       2. row *************************
          TABLE_SCHEMA: util_test
-           TABLE_NAME: v2
+           TABLE_NAME: v1
               DEFINER: root@localhost
         SECURITY_TYPE: DEFINER
-      VIEW_DEFINITION: select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`
+      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
          CHECK_OPTION: NONE
          IS_UPDATABLE: YES
  CHARACTER_SET_CLIENT: utf8
@@ -2679,10 +2679,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # VIEW: util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
+# VIEW: util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
 # TRIGGER: util_test.trg
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
@@ -2792,8 +2792,8 @@ NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,
 `p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,utf8,utf8_general_ci,latin1_swedish_ci
 # VIEWS in util_test:
 TABLE_SCHEMA,TABLE_NAME,DEFINER,SECURITY_TYPE,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
-`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 `util_test`,`v2`,root@localhost,DEFINER,"select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`",NONE,YES,utf8,utf8_general_ci
+`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 # TRIGGERS in util_test:
 TRIGGER_NAME,DEFINER,EVENT_MANIPULATION,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORIENTATION,ACTION_TIMING,ACTION_STATEMENT,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
 `trg`,root@localhost,INSERT,`util_test`,`t1`,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,utf8,utf8_general_ci,latin1_swedish_ci
@@ -2865,8 +2865,8 @@ NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	
 `p1`	SQL	CONTAINS_SQL	NO	DEFINER	root@localhost	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"		utf8	utf8_general_ci	latin1_swedish_ci
 # VIEWS in util_test:
 TABLE_SCHEMA	TABLE_NAME	DEFINER	SECURITY_TYPE	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
-`util_test`	`v1`	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	utf8	utf8_general_ci
 `util_test`	`v2`	root@localhost	DEFINER	select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`	NONE	YES	utf8	utf8_general_ci
+`util_test`	`v1`	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	utf8	utf8_general_ci
 # TRIGGERS in util_test:
 TRIGGER_NAME	DEFINER	EVENT_MANIPULATION	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORIENTATION	ACTION_TIMING	ACTION_STATEMENT	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
 `trg`	root@localhost	INSERT	`util_test`	`t1`	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		utf8	utf8_general_ci	latin1_swedish_ci
@@ -2949,8 +2949,8 @@ SET FOREIGN_KEY_CHECKS=0;
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
 | TABLE_SCHEMA  | TABLE_NAME  | DEFINER         | SECURITY_TYPE  | VIEW_DEFINITION                                                                                                                                              | CHECK_OPTION  | IS_UPDATABLE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
-| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | utf8                  | utf8_general_ci       |
 | util_test     | v2          | root@localhost  | DEFINER        | select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`  | NONE          | YES           | utf8                  | utf8_general_ci       |
+| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | utf8                  | utf8_general_ci       |
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
 # TRIGGERS in util_test:
 +---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
@@ -3272,20 +3272,20 @@ SET FOREIGN_KEY_CHECKS=0;
 # VIEWS in util_test:
 *************************       1. row *************************
          TABLE_SCHEMA: util_test
-           TABLE_NAME: v1
+           TABLE_NAME: v2
               DEFINER: root@localhost
         SECURITY_TYPE: DEFINER
-      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
+      VIEW_DEFINITION: select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`
          CHECK_OPTION: NONE
          IS_UPDATABLE: YES
  CHARACTER_SET_CLIENT: utf8
  COLLATION_CONNECTION: utf8_general_ci
 *************************       2. row *************************
          TABLE_SCHEMA: util_test
-           TABLE_NAME: v2
+           TABLE_NAME: v1
               DEFINER: root@localhost
         SECURITY_TYPE: DEFINER
-      VIEW_DEFINITION: select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`
+      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
          CHECK_OPTION: NONE
          IS_UPDATABLE: YES
  CHARACTER_SET_CLIENT: utf8
@@ -3617,8 +3617,8 @@ SET FOREIGN_KEY_CHECKS=0;
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
 | TABLE_SCHEMA  | TABLE_NAME  | DEFINER         | SECURITY_TYPE  | VIEW_DEFINITION                                                                                                                                              | CHECK_OPTION  | IS_UPDATABLE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
-| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | utf8                  | utf8_general_ci       |
 | util_test     | v2          | root@localhost  | DEFINER        | select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`  | NONE          | YES           | utf8                  | utf8_general_ci       |
+| util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | utf8                  | utf8_general_ci       |
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
 # TRIGGERS in util_test:
 +---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
@@ -3711,8 +3711,8 @@ SET FOREIGN_KEY_CHECKS=0;
 +----------------+---------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------+----------------+-----------------------+-----------------------+
 | TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | VIEW_DEFINITION                                                                                                                                              | CHECK_OPTION  | IS_UPDATABLE  | DEFINER         | SECURITY_TYPE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
 +----------------+---------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------+----------------+-----------------------+-----------------------+
-| None           | util_test     | v1          | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | root@localhost  | DEFINER        | utf8                  | utf8_general_ci       |
 | None           | util_test     | v2          | select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`  | NONE          | YES           | root@localhost  | DEFINER        | utf8                  | utf8_general_ci       |
+| None           | util_test     | v1          | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | root@localhost  | DEFINER        | utf8                  | utf8_general_ci       |
 +----------------+---------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------+----------------+-----------------------+-----------------------+
 # TRIGGERS in util_test:
 +------------------+-----------------+---------------+---------------------+-----------------------+----------------------+---------------------+---------------+-------------------+--------------------------------------------------------+---------------------+----------------+-----------------------------+-----------------------------+---------------------------+---------------------------+----------+-----------+-----------------+-----------------------+-----------------------+---------------------+
@@ -3800,8 +3800,8 @@ SET FOREIGN_KEY_CHECKS=0;
 +-------------+
 | TABLE_NAME  |
 +-------------+
-| v1          |
 | v2          |
+| v1          |
 +-------------+
 # TRIGGERS in util_test:
 +---------------+
@@ -3883,8 +3883,8 @@ NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,
 `p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,utf8,utf8_general_ci,latin1_swedish_ci
 # VIEWS in util_test:
 TABLE_SCHEMA,TABLE_NAME,DEFINER,SECURITY_TYPE,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
-`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 `util_test`,`v2`,root@localhost,DEFINER,"select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`",NONE,YES,utf8,utf8_general_ci
+`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 # TRIGGERS in util_test:
 TRIGGER_NAME,DEFINER,EVENT_MANIPULATION,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORIENTATION,ACTION_TIMING,ACTION_STATEMENT,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
 `trg`,root@localhost,INSERT,`util_test`,`t1`,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,utf8,utf8_general_ci,latin1_swedish_ci
@@ -3956,8 +3956,8 @@ DB,NAME,TYPE,SPECIFIC_NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TY
 `util_test`,`p1`,PROCEDURE,`p1`,SQL,CONTAINS_SQL,NO,DEFINER,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,utf8,utf8_general_ci,latin1_swedish_ci,"INSERT INTO util_test.t1 VALUES (""50"")"
 # VIEWS in util_test:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,DEFINER,SECURITY_TYPE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
-,`util_test`,`v1`,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,root@localhost,DEFINER,utf8,utf8_general_ci
 ,`util_test`,`v2`,"select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`",NONE,YES,root@localhost,DEFINER,utf8,utf8_general_ci
+,`util_test`,`v1`,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,root@localhost,DEFINER,utf8,utf8_general_ci
 # TRIGGERS in util_test:
 TRIGGER_CATALOG,TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_MANIPULATION,EVENT_OBJECT_CATALOG,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORDER,ACTION_CONDITION,ACTION_STATEMENT,ACTION_ORIENTATION,ACTION_TIMING,ACTION_REFERENCE_OLD_TABLE,ACTION_REFERENCE_NEW_TABLE,ACTION_REFERENCE_OLD_ROW,ACTION_REFERENCE_NEW_ROW,CREATED,SQL_MODE,DEFINER,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
 ,`util_test`,`trg`,INSERT,,`util_test`,`t1`,0,,XXXXXXXXXX,XXXXXXXXXX,AFTER,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,utf8,utf8_general_ci,latin1_swedish_ci
@@ -4024,8 +4024,8 @@ NAME
 `p1`
 # VIEWS in util_test:
 TABLE_NAME
-`v1`
 `v2`
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
 `trg`
@@ -4097,8 +4097,8 @@ NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	
 `p1`	SQL	CONTAINS_SQL	NO	DEFINER	root@localhost	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"		utf8	utf8_general_ci	latin1_swedish_ci
 # VIEWS in util_test:
 TABLE_SCHEMA	TABLE_NAME	DEFINER	SECURITY_TYPE	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
-`util_test`	`v1`	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	utf8	utf8_general_ci
 `util_test`	`v2`	root@localhost	DEFINER	select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`	NONE	YES	utf8	utf8_general_ci
+`util_test`	`v1`	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	utf8	utf8_general_ci
 # TRIGGERS in util_test:
 TRIGGER_NAME	DEFINER	EVENT_MANIPULATION	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORIENTATION	ACTION_TIMING	ACTION_STATEMENT	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
 `trg`	root@localhost	INSERT	`util_test`	`t1`	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		utf8	utf8_general_ci	latin1_swedish_ci
@@ -4170,8 +4170,8 @@ DB	NAME	TYPE	SPECIFIC_NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TY
 `util_test`	`p1`	PROCEDURE	`p1`	SQL	CONTAINS_SQL	NO	DEFINER	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"	root@localhost	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			utf8	utf8_general_ci	latin1_swedish_ci	"INSERT INTO util_test.t1 VALUES (""50"")"
 # VIEWS in util_test:
 TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	DEFINER	SECURITY_TYPE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
-	`util_test`	`v1`	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	root@localhost	DEFINER	utf8	utf8_general_ci
 	`util_test`	`v2`	select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`	NONE	YES	root@localhost	DEFINER	utf8	utf8_general_ci
+	`util_test`	`v1`	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	root@localhost	DEFINER	utf8	utf8_general_ci
 # TRIGGERS in util_test:
 TRIGGER_CATALOG	TRIGGER_SCHEMA	TRIGGER_NAME	EVENT_MANIPULATION	EVENT_OBJECT_CATALOG	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORDER	ACTION_CONDITION	ACTION_STATEMENT	ACTION_ORIENTATION	ACTION_TIMING	ACTION_REFERENCE_OLD_TABLE	ACTION_REFERENCE_NEW_TABLE	ACTION_REFERENCE_OLD_ROW	ACTION_REFERENCE_NEW_ROW	CREATED	SQL_MODE	DEFINER	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
 	`util_test`	`trg`	INSERT		`util_test`	`t1`	0		XXXXXX	XXXXXXXX	AFTER	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			root@localhost	utf8	utf8_general_ci	latin1_swedish_ci
@@ -4238,8 +4238,8 @@ NAME
 `p1`
 # VIEWS in util_test:
 TABLE_NAME
-`v1`
 `v2`
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
 `trg`
@@ -4551,20 +4551,20 @@ SET FOREIGN_KEY_CHECKS=0;
 # VIEWS in util_test:
 *************************       1. row *************************
          TABLE_SCHEMA: util_test
-           TABLE_NAME: v1
+           TABLE_NAME: v2
               DEFINER: root@localhost
         SECURITY_TYPE: DEFINER
-      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
+      VIEW_DEFINITION: select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`
          CHECK_OPTION: NONE
          IS_UPDATABLE: YES
  CHARACTER_SET_CLIENT: utf8
  COLLATION_CONNECTION: utf8_general_ci
 *************************       2. row *************************
          TABLE_SCHEMA: util_test
-           TABLE_NAME: v2
+           TABLE_NAME: v1
               DEFINER: root@localhost
         SECURITY_TYPE: DEFINER
-      VIEW_DEFINITION: select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`
+      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
          CHECK_OPTION: NONE
          IS_UPDATABLE: YES
  CHARACTER_SET_CLIENT: utf8
@@ -5317,8 +5317,8 @@ SET FOREIGN_KEY_CHECKS=0;
 *************************       1. row *************************
         TABLE_CATALOG: None
          TABLE_SCHEMA: util_test
-           TABLE_NAME: v1
-      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
+           TABLE_NAME: v2
+      VIEW_DEFINITION: select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`
          CHECK_OPTION: NONE
          IS_UPDATABLE: YES
               DEFINER: root@localhost
@@ -5328,8 +5328,8 @@ SET FOREIGN_KEY_CHECKS=0;
 *************************       2. row *************************
         TABLE_CATALOG: None
          TABLE_SCHEMA: util_test
-           TABLE_NAME: v2
-      VIEW_DEFINITION: select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`
+           TABLE_NAME: v1
+      VIEW_DEFINITION: select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`
          CHECK_OPTION: NONE
          IS_UPDATABLE: YES
               DEFINER: root@localhost
@@ -5671,9 +5671,9 @@ SET FOREIGN_KEY_CHECKS=0;
 1 row.
 # VIEWS in util_test:
 *************************       1. row *************************
- TABLE_NAME: v1
-*************************       2. row *************************
  TABLE_NAME: v2
+*************************       2. row *************************
+ TABLE_NAME: v1
 2 rows.
 # TRIGGERS in util_test:
 *************************       1. row *************************

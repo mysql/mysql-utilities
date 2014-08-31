@@ -264,8 +264,8 @@ CREATE TABLE `util_test`.`t5` (
 CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) DETERMINISTIC RETURN (SELECT 1);
 CREATE DEFINER=root@localhost FUNCTION `util_test`.`f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned DETERMINISTIC RETURN base_price + base_price*(tax_percentage/100);
 CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
-CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
 CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v2` AS select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`; 
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
 CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 GRANT ALTER ON `util_test`.* TO 'joe'@'user'
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user'
@@ -347,8 +347,8 @@ CREATE TABLE `util_test`.`t5` (
 CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) DETERMINISTIC RETURN (SELECT 1);
 CREATE DEFINER=root@localhost FUNCTION `util_test`.`f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned DETERMINISTIC RETURN base_price + base_price*(tax_percentage/100);
 CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
-CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
 CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v2` AS select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`; 
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
 CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 GRANT ALTER ON `util_test`.* TO 'joe'@'user'
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user'
@@ -423,8 +423,8 @@ CREATE TABLE `util_test`.`t5` (
 CREATE DEFINER=root@localhost FUNCTION `util_test`.`f1`() RETURNS int(11) DETERMINISTIC RETURN (SELECT 1);
 CREATE DEFINER=root@localhost FUNCTION `util_test`.`f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned DETERMINISTIC RETURN base_price + base_price*(tax_percentage/100);
 CREATE DEFINER=root@localhost PROCEDURE `util_test`.`p1`(p1 CHAR(20)) INSERT INTO util_test.t1 VALUES ("50");
-CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
 CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v2` AS select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`; 
+CREATE ALGORITHM=UNDEFINED DEFINER=root@localhost SQL SECURITY DEFINER VIEW `util_test`.`v1` AS select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`; 
 CREATE DEFINER=root@localhost TRIGGER `util_test`.`trg` AFTER INSERT ON `util_test`.`t1` FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 GRANT ALTER ON `util_test`.* TO 'joe'@'user'
 GRANT ALTER ROUTINE ON `util_test`.* TO 'joe'@'user'

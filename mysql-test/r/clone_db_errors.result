@@ -27,8 +27,8 @@ Test case 5 - No error: user with % - has permissions
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2

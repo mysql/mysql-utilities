@@ -294,7 +294,7 @@ CAUTION: The following warning messages were included in the import file:
 # WARNING: Using a password on the command line interface can be insecure.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test Case 23 : Testing import with CSV format and BRIEF display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -307,7 +307,7 @@ CAUTION: The following warning messages were included in the import file:
 # WARNING: Using a password on the command line interface can be insecure.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test Case 24 : Testing import with TAB format and BRIEF display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -320,7 +320,7 @@ CAUTION: The following warning messages were included in the import file:
 # WARNING: Using a password on the command line interface can be insecure.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test Case 25 : Testing import with GRID format and BRIEF display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -333,7 +333,7 @@ CAUTION: The following warning messages were included in the import file:
 # WARNING: Using a password on the command line interface can be insecure.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test Case 26 : Testing import with VERTICAL format and BRIEF display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -346,7 +346,7 @@ CAUTION: The following warning messages were included in the import file:
 # WARNING: Using a password on the command line interface can be insecure.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test Case 27 : Testing import with SQL format and FULL display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -359,7 +359,7 @@ CAUTION: The following warning messages were included in the import file:
 # WARNING: Using a password on the command line interface can be insecure.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test Case 28 : Testing import with CSV format and FULL display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -372,7 +372,7 @@ CAUTION: The following warning messages were included in the import file:
 # WARNING: Using a password on the command line interface can be insecure.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test Case 29 : Testing import with TAB format and FULL display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -385,7 +385,7 @@ CAUTION: The following warning messages were included in the import file:
 # WARNING: Using a password on the command line interface can be insecure.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test Case 30 : Testing import with GRID format and FULL display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -398,7 +398,7 @@ CAUTION: The following warning messages were included in the import file:
 # WARNING: Using a password on the command line interface can be insecure.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 
 Test Case 31 : Testing import with VERTICAL format and FULL display (using views with dependencies)
 BEFORE:
 OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
@@ -411,4 +411,4 @@ CAUTION: The following warning messages were included in the import file:
 # WARNING: Using a password on the command line interface can be insecure.
 #...done.
 AFTER:
-OBJECT COUNTS: tables = 1, views = 14, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 16, triggers = 0, procedures = 0, functions = 0, events = 0 

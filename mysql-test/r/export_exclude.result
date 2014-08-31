@@ -63,8 +63,8 @@ SET FOREIGN_KEY_CHECKS=0;
 # PROCEDURES in util_test:
 `p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,utf8,utf8_general_ci,latin1_swedish_ci
 # VIEWS in util_test:
-`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 `util_test`,`v2`,root@localhost,DEFINER,"select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`",NONE,YES,utf8,utf8_general_ci
+`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 # TRIGGERS in util_test:
 `trg`,root@localhost,INSERT,`util_test`,`t1`,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,utf8,utf8_general_ci,latin1_swedish_ci
 #...done.
@@ -86,8 +86,8 @@ SET FOREIGN_KEY_CHECKS=0;
 # PROCEDURES in util_test:
 `p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,utf8,utf8_general_ci,latin1_swedish_ci
 # VIEWS in util_test:
-`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 `util_test`,`v2`,root@localhost,DEFINER,"select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`",NONE,YES,utf8,utf8_general_ci
+`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 # TRIGGERS in util_test:
 `trg`,root@localhost,INSERT,`util_test`,`t1`,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,utf8,utf8_general_ci,latin1_swedish_ci
 #...done.
@@ -175,8 +175,8 @@ SET FOREIGN_KEY_CHECKS=0;
 # PROCEDURES in util_test:
 `p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,utf8,utf8_general_ci,latin1_swedish_ci
 # VIEWS in util_test:
-`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 `util_test`,`v2`,root@localhost,DEFINER,"select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`",NONE,YES,utf8,utf8_general_ci
+`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
 # TRIGGERS in util_test:
 `trg`,root@localhost,INSERT,`util_test`,`t1`,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,utf8,utf8_general_ci,latin1_swedish_ci
 #...done.

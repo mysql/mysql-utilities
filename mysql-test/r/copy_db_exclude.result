@@ -47,8 +47,8 @@ Test case 3 - exclude using SQL LIKE pattern.
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
@@ -66,8 +66,8 @@ Test case 4 - exclude using REGEXP pattern.
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
@@ -130,8 +130,8 @@ Test case 9a - SQL LIKE VS REGEXP pattern (match entire value VS match anywhere 
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3
