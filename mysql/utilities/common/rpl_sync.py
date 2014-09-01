@@ -154,7 +154,7 @@ class RPLSynchronizer(object):
                 if not has_privilege:
                     raise UtilError(ERROR_USER_WITHOUT_PRIVILEGES.format(
                         user=server.user, host=server.host, port=server.port,
-                        operation='the synchronization check',
+                        operation='perform the synchronization check',
                         req_privileges=master_priv_str
                     ))
 

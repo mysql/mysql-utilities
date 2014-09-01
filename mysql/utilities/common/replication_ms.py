@@ -250,7 +250,7 @@ class ReplicationMultiSource(Daemon):
                 if not has_privilege:
                     msg = ERROR_USER_WITHOUT_PRIVILEGES.format(
                         user=master.user, host=master.host, port=master.port,
-                        operation='replication',
+                        operation='perform replication',
                         req_privileges=master_priv_str
                     )
                     self._report(msg, logging.CRITICAL, False)

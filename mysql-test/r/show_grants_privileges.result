@@ -1,0 +1,9 @@
+Test case 1 - Try to use utility with user without any privileges.
+# Source on localhost: ... connected.
+ERROR: User 'grant_priv_test' on 'localhost@PORT1' does not have sufficient privileges to read the available grants (required: SELECT on mysql.*).
+Test case 2 - Test utility with user with minimum privileges.
+# Source on localhost: ... connected.
+
+# DATABASE `mysql`:
+# - 'grant_priv_test'@'localhost' : SELECT
+#...done.

@@ -1489,7 +1489,7 @@ class Server(object):
             return False
         return True
 
-    def get_all_databases(self):
+    def get_all_databases(self, ignore_internal_dbs=True):
         """Return a result set containing all databases on the server
         except for internal databases (mysql, INFORMATION_SCHEMA,
         PERFORMANCE_SCHEMA)
@@ -1497,13 +1497,20 @@ class Server(object):
         Returns result set
         """
 
-        _GET_DATABASES = """
-        SELECT SCHEMA_NAME
-        FROM INFORMATION_SCHEMA.SCHEMATA
-        WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
-        AND SCHEMA_NAME != 'PERFORMANCE_SCHEMA'
-        AND SCHEMA_NAME != 'mysql'
-        """
+        if ignore_internal_dbs:
+            _GET_DATABASES = """
+            SELECT SCHEMA_NAME
+            FROM INFORMATION_SCHEMA.SCHEMATA
+            WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
+            AND SCHEMA_NAME != 'PERFORMANCE_SCHEMA'
+            AND SCHEMA_NAME != 'mysql'
+            """
+        else:
+            _GET_DATABASES = """
+            SELECT SCHEMA_NAME
+            FROM INFORMATION_SCHEMA.SCHEMATA
+            """
+
         return self.exec_query(_GET_DATABASES)
 
     def get_storage_engines(self):

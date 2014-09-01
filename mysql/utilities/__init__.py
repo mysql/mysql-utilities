@@ -58,6 +58,7 @@ AVAILABLE_UTILITIES = {
     'mysqldiskusage': (),
     'mysqlfailover': (),
     'mysqlfrm': (),
+    'mysqlgrants': (),
     'mysqlindexcheck': (),
     'mysqlmetagrep': (),
     'mysqlprocgrep': (),

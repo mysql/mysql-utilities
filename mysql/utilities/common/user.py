@@ -19,12 +19,14 @@
 This module contains and abstraction of a MySQL user object.
 """
 
-from collections import namedtuple, defaultdict
-
 import re
 
+from collections import namedtuple, defaultdict
+
+from mysql.utilities.common.grants_info import filter_grants
 from mysql.utilities.exception import UtilError, UtilDBError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection, clean_IPv6
+from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   quote_with_backticks)
 
@@ -239,7 +241,7 @@ class User(object):
         return (res is not None and len(res) >= 1)
 
     @staticmethod
-    def _get_grants_as_dict(grant_list):
+    def _get_grants_as_dict(grant_list, verbosity=0):
         """Transforms list of grant string statements into a dictionary.
 
         grant_list[in]    List of grant strings as returned from the server
@@ -249,8 +251,12 @@ class User(object):
         grant_dict = defaultdict(lambda: defaultdict(set))
         for grant in grant_list:
             grant_tpl = User._parse_grant_statement(grant[0])
-            # Ignore PROXY privilege
-            if 'PROXY' not in grant_tpl.privileges:
+            # Ignore PROXY privilege, it is not yet supported
+            if verbosity > 0:
+                if 'PROXY' in grant_tpl:
+                    print("#WARNING: PROXY privilege will be ignored.")
+            grant_tpl.privileges.discard('PROXY')
+            if grant_tpl.privileges:
                 grant_dict[grant_tpl.db][grant_tpl.object].update(
                     grant_tpl.privileges)
         return grant_dict
@@ -292,7 +298,8 @@ class User(object):
 
             # Cache user grants
             self.grant_list = grants[:]
-            self.grant_dict = User._get_grants_as_dict(self.grant_list)
+            self.grant_dict = User._get_grants_as_dict(self.grant_list,
+                                                       self.verbosity)
             # If current user is already using global host wildcard '%', there
             # is no need to run the show grants again.
             if globals_privs:
@@ -305,7 +312,7 @@ class User(object):
                             grants.append(grant)
                         self.global_grant_list = grants[:]
                         self.global_grant_dict = User._get_grants_as_dict(
-                            self.global_grant_list)
+                            self.global_grant_list, self.verbosity)
                     except UtilDBError:
                         # User has no global privs, return the just the ones
                         # for current host
@@ -326,6 +333,70 @@ class User(object):
                 return self.grant_dict
             else:
                 return self.grant_list
+
+    def get_grants_for_object(self, qualified_obj_name, obj_type_str,
+                              global_privs=False):
+        """ Retrieves the list of grants that the current user has that that
+         have effect over a given object.
+
+        qualified_obj_name[in]   String with the qualified name of the object.
+        obj_type_str[in]         String with the type of the object that we are
+                                 working with, must be one of 'ROUTINE',
+                                 'TABLE' or 'DATABASE'.
+        global_privs[in]         If True, the wildcard'%' host privileges are
+                                 also taken into account
+
+
+        This method takes the MySQL privilege hierarchy into account, e.g,
+        if the qualified object is a table, it returns all the grant
+        statements for this user regarding that table, as well as the grant
+        statements for this user regarding the db where the table is at and
+        finally any global grants that the user might have.
+
+        Returns a list of strings with the grant statements.
+        """
+
+        grant_stm_lst = self.get_grants(global_privs)
+        obj_name_regexp = re.compile(REGEXP_QUALIFIED_OBJ_NAME)
+        m_obj = obj_name_regexp.match(qualified_obj_name)
+        grants = []
+        if not m_obj:
+            raise UtilError("Cannot parse the specified qualified name "
+                            "'{0}'".format(qualified_obj_name))
+        else:
+            db_name, obj_name = m_obj.groups()
+            # Quote database and object name if necessary
+            if not is_quoted_with_backticks(db_name):
+                db_name = quote_with_backticks(db_name)
+            if obj_name and obj_name != '*':
+                if not is_quoted_with_backticks(obj_name):
+                    obj_name = quote_with_backticks(obj_name)
+
+            # For each grant statement look for the ones that apply to this
+            # user and object
+            for grant_stm in grant_stm_lst:
+                grant_tpl = self._parse_grant_statement(grant_stm[0])
+                if grant_tpl:
+                    # Check if any of the privileges applies to this object
+                    # and if it does then check if it inherited from this
+                    # statement
+                    if filter_grants(grant_tpl.privileges, obj_type_str):
+                        # Add global grants
+                        if grant_tpl.db == '*':
+                            grants.append(grant_stm[0])
+                            continue
+                        # Add database level grants
+                        if grant_tpl.db == db_name and grant_tpl.object == '*':
+                            grants.append(grant_stm[0])
+                            continue
+                        # If it is an object, add existing object level grants
+                        # as well.
+                        if obj_name:
+                            if (grant_tpl.db == db_name and
+                                    grant_tpl.object == obj_name):
+                                grants.append(grant_stm[0])
+
+        return grants
 
     def has_privilege(self, db, obj, access, allow_skip_grant_tables=True):
         """Check to see user has a specific access to a db.object.
@@ -556,7 +627,6 @@ class User(object):
 
         grant_tpl_factory = namedtuple("grant_info", "privileges proxy_user "
                                                      "db object user")
-        grants = None
         match = re.match(grant_parse_re, statement)
 
         if match:

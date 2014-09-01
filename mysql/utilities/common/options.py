@@ -902,7 +902,8 @@ def get_absolute_path(path):
     return os.path.abspath(os.path.expanduser(os.path.normpath(path)))
 
 
-def db_objects_list_to_dictionary(parser, obj_list, option_desc):
+def db_objects_list_to_dictionary(parser, obj_list, option_desc,
+                                  db_over_tables=True):
     """Process database object list and convert to a dictionary.
 
     Check the qualified name format of the given database objects and convert
@@ -912,11 +913,16 @@ def db_objects_list_to_dictionary(parser, obj_list, option_desc):
     Note: It is assumed that the given object list is obtained from the
     arguments or an option returned by the parser.
 
-    parser[in]      Instance of the used option/arguments parser
-    obj_list[in]    List of objects to process.
-    option_desc[in] Short description of the option for the object list (e.g.,
-                    "the --exclude option", "the database/table arguments") to
-                    refer appropriately in any parsing error.
+    parser[in]            Instance of the used option/arguments parser
+    obj_list[in]          List of objects to process.
+    option_desc[in]       Short description of the option for the object list
+                          (e.g., "the --exclude option", "the database/table
+                          arguments") to refer appropriately in any parsing
+                          error.
+    db_over_tables[in]    If True specifying a db alone overrides all
+                          occurrences of table objects from that db (e.g.
+                          if True and we have both db and db.table1, db.table1
+                          is ignored).
 
     returns a dictionary with the objects grouped by database (without
     duplicates). None value associated to a database entry means that all
@@ -941,14 +947,22 @@ def db_objects_list_to_dictionary(parser, obj_list, option_desc):
                 else obj_name
             # Add database object to result dictionary.
             if not obj_name:
-                # If only the database is specified, then add entry with
-                # db name and value None (to include all object) even if a
-                # previous specific object was already added.
+                # If only the database is specified and db_over_tables is True,
+                # then add entry with db name and value None (to include all
+                # objects) even if a previous specific object was already
+                # added, else if db_over_tables is False, add None value to the
+                #  list, so that we know db was specified without any
+                # table/routine.
                 if db_name in db_objs_dict:
-                    if db_objs_dict[db_name]:
+                    if db_objs_dict[db_name] and not db_over_tables:
+                        db_objs_dict[db_name].add(None)
+                    else:
                         db_objs_dict[db_name] = None
                 else:
-                    db_objs_dict[db_name] = None
+                    if db_over_tables:
+                        db_objs_dict[db_name] = None
+                    else:
+                        db_objs_dict[db_name] = set([None])
             else:
                 # If a specific object object is given add it to the set
                 # associated to the database, except if the database entry

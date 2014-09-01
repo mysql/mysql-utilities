@@ -1,0 +1,23 @@
+Test case 1 - no server specified
+Usage: mysqlgrants --server=user:pass@host:port \
+                    [<db_name>[.<obj_name>]]
+
+mysqlgrants: error: You need to specify a server using the --server option.
+Test case 2 - no objects specified
+Usage: mysqlgrants --server=user:pass@host:port \
+                    [<db_name>[.<obj_name>]]
+
+mysqlgrants: error: You need to specify at least one object (database, table or routine) in order to get the list of grantees.
+Test case 3 - Using --show=users without specifying a privilege list.
+Usage: mysqlgrants --server=user:pass@host:port \
+                    [<db_name>[.<obj_name>]]
+
+mysqlgrants: error: The --show=users can only be used if you specify a list of privileges with the --privileges option.
+Test case 4 - Invalid privilege in the privilege list.
+Usage: mysqlgrants --server=user:pass@host:port \
+                    [<db_name>[.<obj_name>]]
+
+mysqlgrants: error: Unknown privilege: 'NOT_A_PRIVILEGE'. For a list of valid privileges, please check: http://dev.mysql.com/doc/en/privileges-provided.html
+Test case 5 - invalid server connection.
+# Source on localhost: ... 
+ERROR Can't connect to MySQL XXXXX

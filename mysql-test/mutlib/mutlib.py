@@ -1251,7 +1251,7 @@ class System_test(object):
             linenum += 1
 
     def replace_substring_portion(self, substring_start, substring_end,
-                                  replacement):
+                                  replacement, times=1):
         """Replace a sub-string in all results specifying its start and end.
 
         This method replaces a sub-string portion in all result lines,
@@ -1263,19 +1263,26 @@ class System_test(object):
         substring_start[in] start of the substring to be replaced.
         substring_end[in]   end of the substring to be replaced.
         replacement[in]     replacing string.
+        times[in]           upper number of times per line that the method
+                            will try to do the replacement.
         """
         for i, line in enumerate(self.results):
             # Search for the substring portion start.
-            start_idx = line.find(substring_start)
-            if start_idx != -1:  # Substring start found
-                # Search for the substring portion end.
-                next_search_idx = start_idx + len(substring_start)
-                substr_end_idx = line.find(substring_end, next_search_idx)
-                if substr_end_idx != -1:  # Substring end found.
-                    # Get substring portion and replace it.
-                    end_idx = substr_end_idx + len(substring_end)
-                    substr_portion = line[start_idx:end_idx]
-                    self.results[i] = line.replace(substr_portion, replacement)
+            next_search_idx = 0
+            for _ in range(times):
+                start_idx = line.find(substring_start, next_search_idx)
+                if start_idx != -1:  # Substring start found
+                    # Search for the substring portion end.
+                    next_search_idx = start_idx + len(substring_start)
+                    substr_end_idx = line.find(substring_end, next_search_idx)
+                    if substr_end_idx != -1:  # Substring end found.
+                        # Get substring portion and replace it.
+                        end_idx = substr_end_idx + len(substring_end)
+                        substr_portion = line[start_idx:end_idx]
+                        self.results[i] = self.results[i].replace(
+                            substr_portion, replacement)
+                else:  # Substring not found, move on to next line
+                    break
 
     def mask_result(self, prefix, target, mask):
         """Mask out a portion of a string for the results.

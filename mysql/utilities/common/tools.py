@@ -540,3 +540,23 @@ def print_elapsed_time(start_time):
     stop_time = time.time()
     display_time = stop_time - start_time
     print("Time: {0:.2f} sec\n".format(display_time))
+
+
+def join_and_build_str(list_of_strings, sep=', ', last_sep='and'):
+    """Buils and returns a string from a list of elems.
+
+    list_of_strings[in]    the list of strings that will be joined into a
+                           single string.
+    sep[in]                the separator that will be used to group all strings
+                           except the last one.
+    last_sep[in]           the separator that is used in last place
+    """
+    if list_of_strings:
+        if len(list_of_strings) > 1:
+            res_str = "{0} {1} {2}".format(
+                sep.join(list_of_strings[:-1]), last_sep, list_of_strings[-1])
+        else:  # list has a single elem
+            res_str = list_of_strings[0]
+    else:  # if list_of_str is empty, return empty string
+        res_str = ""
+    return res_str

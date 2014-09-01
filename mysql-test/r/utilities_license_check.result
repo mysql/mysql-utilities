@@ -284,7 +284,20 @@ Test Case 44: version mysqldbimport
 MySQL Utilities mysqldbimport version X.Y.Z
 License type: GPLv2
 
-Test Case 45: license mysqlauditadmin
+Test Case 45: license mysqlgrants
+MySQL Utilities mysqlgrants version X.Y.Z
+License type: GPLv2
+Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
+This is a release of dual licensed MySQL Utilities. For the avoidance of
+doubt, this particular copy of the software is released
+under the version 2 of the GNU General Public License.
+MySQL Utilities is brought to you by Oracle.
+
+Test Case 46: version mysqlgrants
+MySQL Utilities mysqlgrants version X.Y.Z
+License type: GPLv2
+
+Test Case 47: license mysqlauditadmin
 MySQL Utilities mysqlauditadmin version X.Y.Z
 License type: GPLv2
 Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
@@ -293,7 +306,7 @@ doubt, this particular copy of the software is released
 under the version 2 of the GNU General Public License.
 MySQL Utilities is brought to you by Oracle.
 
-Test Case 46: version mysqlauditadmin
+Test Case 48: version mysqlauditadmin
 MySQL Utilities mysqlauditadmin version X.Y.Z
 License type: GPLv2
 

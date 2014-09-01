@@ -21,7 +21,7 @@ This file contains output string messages used by MySQL Utilities.
 
 
 ERROR_USER_WITHOUT_PRIVILEGES = ("User '{user}' on '{host}@{port}' does not "
-                                 "have sufficient privileges to perform "
+                                 "have sufficient privileges to "
                                  "{operation} (required: {req_privileges}).")
 
 PARSE_ERR_DB_PAIR = ("Cannot parse the specified database(s): '{db_pair}'. "
