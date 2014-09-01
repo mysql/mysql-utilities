@@ -726,8 +726,16 @@ def _drop_compare_object(server, db_name, tbl_name):
         _COMPARE_TABLE_NAME.format(tbl=q_tbl_name))
 
     try:
+        # set autocommit=1 if it is 0, because CREATE TEMPORARY TABLE and
+        # DROP TEMPORARY TABLE can be executed in a non-transactional context
+        # only, and require that AUTOCOMMIT = 1.
+        toggle_server = not server.autocommit_set()
+        if toggle_server:
+            server.toggle_autocommit(enable=True)
         server.exec_query(_COMPARE_TABLE_DROP.format(db=q_db_name,
                                                      compare_tbl=q_tbl_name))
+        if toggle_server:
+            server.toggle_autocommit(enable=False)
     except:
         pass
 
@@ -899,8 +907,28 @@ def _setup_compare(table1, table2, span_key_size, use_indexes=None):
         raise UtilError("Cannot create compare table.")
 
     # Create the compare tables
+
+    # set autocommit=1 if it is 0, because CREATE TEMPORARY TABLE and DROP
+    # TEMPORARY TABLE can be executed in a non-transactional context only, and
+    # require that AUTOCOMMIT = 1.
+
+    # Check if server1 and server2 have autocommit=0, and if so set the flag
+    #  to 1 and execute the create temporary table query.
+    must_toggle_s1 = not server1.autocommit_set()
+    if must_toggle_s1:
+        server1.toggle_autocommit(enable=True)
     server1.exec_query(tbl1_table)
+
+    must_toggle_s2 = not server2.autocommit_set()
+    if must_toggle_s2:
+        server2.toggle_autocommit(enable=True)
     server2.exec_query(tbl2_table)
+
+    # if the autocommit flag was toggled, return it to its previous value.
+    if must_toggle_s1:
+        server1.toggle_autocommit(enable=False)
+    if must_toggle_s2:
+        server2.toggle_autocommit(enable=False)
 
     return (pri_idx1, pri_idx2, table1_idx, table1_idx_name, diag_msgs)
 

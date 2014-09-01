@@ -137,6 +137,8 @@ class test(mutlib.System_test):
                                     "WHERE qty > 2")
             self.server1.exec_query("INSERT INTO inventory.supplier "
                                     "VALUES (2, 'Never Enough Inc.')")
+            self.server1.exec_query("INSERT INTO inventory.supplier "
+                                    "VALUES (4, NULL)")
 
             self.server2.exec_query("USE inventory;")
             self.server2.exec_query("DROP VIEW inventory.cleaning")
@@ -150,6 +152,12 @@ class test(mutlib.System_test):
             self.server2.exec_query("DELETE FROM inventory.supplies "
                                     "WHERE cost = 10.00 AND "
                                     "type = 'cleaning'")
+            self.server2.exec_query("INSERT INTO inventory.supplier "
+                                    "VALUES (4, 'Acme Corporation')")
+            self.server2.exec_query("INSERT INTO inventory.supplier "
+                                    "VALUES (5, NULL)")
+            self.server2.exec_query("INSERT INTO inventory.supplier "
+                                    "VALUES (6, '')")
         except UtilError as err:
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
