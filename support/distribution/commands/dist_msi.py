@@ -14,6 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+from _bsddb import version
 
 """Implements custom DistUtils commands for the MS Windows platform
 
@@ -40,8 +41,8 @@ from support.distribution.msi_descriptor_parser import (add_exe_utils,
                                                         add_online_help_utils)
 
 
-WIX_INSTALL = r"C:\Program Files (x86)\Windows Installer XML v3.5"
-
+#WIX_INSTALL = r"C:\Program Files (x86)\Windows Installer XML v3.5"
+WIX_INSTALL = r"C:\Program Files (x86)\WiX Toolset v3.8"
 
 class _MSIDist(bdist):
     """Create a Windows Installer with Windows Executables"""
@@ -75,7 +76,7 @@ class _MSIDist(bdist):
         self.dist_type = None
         self.dist_target = None
         self.tag = ''
-        self.product_name = 'MySQL Utilities'
+        self.product_name = 'MySQL Utilities {0}'
         self.sub_version = ''
 
     def are_fabric_doctrine_present(self):
@@ -171,11 +172,14 @@ class _MSIDist(bdist):
             liscense_file = 'License_com.rtf'
         else:
             liscense_file = 'License.rtf'
+        version_utils = '.'.join([major, minor, patch])
+        product_name = self.product_name.format(version_utils)
+
         params = {
-            'ProductName': self.product_name,
+            'ProductName': product_name,
             'DocVersion': '.'.join([major, minor]),
             'Copyright': COPYRIGHT,
-            'Version': '.'.join([major, minor, patch]),
+            'Version': version_utils,
             'FullVersion': appver,
             'PythonVersion': pyver,
             'PythonMajor': pymajor,
@@ -289,6 +293,16 @@ class MSIBuiltDist(_MSIDist):
                     log.info('new msi descriptor not found')
             self.wxs = result_xml_path
 
+            try:
+                import mysql.fabric
+                self.product_name = (
+                    'MySQL Fabric {0} & MySQL Utilities {1}'
+                    ''.format(mysql.fabric.__version__, '{0}')
+                )
+            except ImportError:
+                # Use default product name
+                pass
+
     def _get_wixobj_name(self, app_version=None, python_version=None):
         """Get the name for the wixobj-file
 
@@ -353,6 +367,9 @@ class BuiltCommercialMSI(_MSIDist):
         ('sub-version=', 's',
          "adds a subversion after the current version, "
          "(default: %s)" % ""),
+        ('plat-name=', 'p',
+         "platform name to embed in generated filenames "
+         "(default: %s)" % get_platform()),
     ]
 
     boolean_options = [
@@ -402,7 +419,17 @@ class BuiltCommercialMSI(_MSIDist):
                     log.info('new msi descriptor found')
                 else:
                     log.info('new msi descriptor not found')
-        self.wxs = result_xml_path
+            self.wxs = result_xml_path
+
+            try:
+                import mysql.fabric
+                self.product_name = (
+                    'MySQL Fabric {0} & MySQL Utilities {1}'
+                    ''.format(mysql.fabric.__version__, '{0}')
+                )
+            except ImportError:
+                # Use default product name
+                pass
 
         self.fix_txtfiles = [('README_com.txt', 'README_com.txt'),
                              ('LICENSE_com.txt', 'LICENSE_com.txt')]
@@ -453,5 +480,3 @@ class BuiltCommercialMSI(_MSIDist):
         for src, dst in docfiles:
             self.copy_file(src, dst)
         self.bdist_base = cmdbdist.bdist_dir
-        # This sets name for various items as install directory.
-        self.product_name = 'MySQL Utilities commercial'
