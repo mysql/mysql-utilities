@@ -120,10 +120,14 @@
          Source="$(var.BuildDir)\unicodedata.pyd" DiskId="1"/>
         <File Id="pyd__ctypes" Name="_ctypes.pyd"
          Source="$(var.BuildDir)\_ctypes.pyd" DiskId="1"/>
+        <File Id="pyd__hashlib" Name="_hashlib.pyd"
+         Source="$(var.BuildDir)\_hashlib.pyd" DiskId="1"/>
         <File Id="pyd__multiprocessing" Name="_multiprocessing.pyd"
          Source="$(var.BuildDir)\_multiprocessing.pyd" DiskId="1"/>
         <File Id="pyd__socket" Name="_socket.pyd"
          Source="$(var.BuildDir)\_socket.pyd" DiskId="1"/>
+        <File Id="pyd__ssl" Name="_ssl.pyd"
+         Source="$(var.BuildDir)\_ssl.pyd" DiskId="1"/>
       </Component>
 
       <Component Id="UtilsPyLib" Guid="dbc3ab31-937d-452d-993f-7130c75188ac">
