@@ -1158,7 +1158,10 @@ def _get_formatted_rows(rows, table, fmt='GRID'):
     """
     result_rows = []
     outfile = tempfile.TemporaryFile()
-    print_list(outfile, fmt, table.get_col_names(), rows)
+    to_sql = False
+    if fmt.upper() == 'CSV':
+        to_sql = True
+    print_list(outfile, fmt, table.get_col_names(), rows, to_sql=to_sql)
     outfile.seek(0)
     for line in outfile.readlines():
         result_rows.append(line.strip('\n'))

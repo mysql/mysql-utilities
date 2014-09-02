@@ -210,7 +210,7 @@ def build_set_clauses(table, table_cols, dest_row, src_row):
 
     Returns string - WHERE clause or "" if no keys
     """
-    col_metadata = table.get_column_metadata()
+    table.get_column_metadata()
     # do SETs
     set_str = ""
     do_comma = False
@@ -223,8 +223,7 @@ def build_set_clauses(table, table_cols, dest_row, src_row):
                 set_str = "SET "
                 do_comma = True
             # Check for NULL for non-text fields that have no value in new row
-            if len(src_row[col_idx]) == 0 \
-               and not col_metadata[col_idx]['is_text']:
+            if src_row[col_idx] is None:
                 set_str += "%s = %s" % (table_cols[col_idx], "NULL")
             else:
                 set_str += "%s = %s" % (table_cols[col_idx],
