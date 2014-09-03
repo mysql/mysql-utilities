@@ -101,6 +101,8 @@ class _MSIDist(bdist):
         """Finalize opitons"""
         if self.plat_name is None:
             self.plat_name = self.get_finalized_command('build').plat_name
+            if self.plat_name == 'win64':
+                self.plat_name = 'winx64'
 
         if self.bdist_base is None:
             build_base = self.get_finalized_command('build').build_base
