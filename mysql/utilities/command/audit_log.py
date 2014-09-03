@@ -277,9 +277,9 @@ class AuditLog(object):
         This method changes the audit log policy by setting the appropriate
         variables according to the MySQL server version.
 
-        Note: For recent MySQL server versions (i.e. >= 5.5.40, >= 5.6.21, and
-        >= 5.7.5) the audit_log_policy is readonly and cannot be changed at
-        runtime (only when starting the server). For those versions, the policy
+        Note: For recent MySQL server versions (i.e. >= 5.6.20, and >= 5.7.5)
+        the audit_log_policy is readonly and cannot be changed at runtime
+        (only when starting the server). For those versions, the policy
         results from the combination of the values set for the
         'audit_log_connection_policy' and 'audit_log_statement_policy'
         variables (not available in previous versions).
@@ -289,9 +289,7 @@ class AuditLog(object):
                             'NONE', 'LOGINS', 'QUERIES', 'DEFAULT'.
         """
         # Check server version to set appropriate variables.
-        if ((server.check_version_compat(5, 5, 40) and  # >= 5.5.40 and < 5.6
-             not server.check_version_compat(5, 6, 0)) or
-            (server.check_version_compat(5, 6, 21) and  # >= 5.6.21 and < 5.7
+        if ((server.check_version_compat(5, 6, 20) and  # >= 5.6.20 and < 5.7
              not server.check_version_compat(5, 7, 0)) or
                 server.check_version_compat(5, 7, 5)):  # >= 5.7.5
             # Set the audit_log_connection_policy and

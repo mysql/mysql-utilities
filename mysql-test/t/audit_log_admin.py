@@ -30,8 +30,8 @@ class test(mutlib.System_test):
     """Audit log maintenance utility tests.
 
     This test runs the mysqlauditadmin utility to test its features. Requires
-    a server with the audit log plug-in enabled and a version >= 5.5.40 and
-    < 5.6.0, or >= 5.6.21 and < 5.7.0, or >= 5.7.5.
+    a server with the audit log plug-in enabled and a version >= 5.6.20 and
+    < 5.7.0, or >= 5.7.5.
     """
 
     server0 = None
@@ -45,14 +45,11 @@ class test(mutlib.System_test):
             raise MUTLibError("Test requires a server with the audit log "
                               "plug-in installed and enabled.")
         # Check the server version.
-        if (not srv.check_version_compat(5, 5, 40) or  # < 5.5.40
-            (srv.check_version_compat(5, 6, 0) and     # >= 5.6.0 and < 5.6.21
-             not srv.check_version_compat(5, 6, 21)) or
+        if (not srv.check_version_compat(5, 6, 20) or  # < 5.6.20
             (srv.check_version_compat(5, 7, 0) and     # >= 5.7.0 and < 5.7.5
              not srv.check_version_compat(5, 7, 5))):
-            raise MUTLibError("Test requires a server with version >= 5.5.40 "
-                              "and < 5.6.0, or >= 5.6.21 and < 5.7.0, or "
-                              ">= 5.7.5.")
+            raise MUTLibError("Test requires a server with version >= 5.6.20 "
+                              "and < 5.7.0, or >= 5.7.5.")
         return self.check_num_servers(1)
 
     def setup(self):

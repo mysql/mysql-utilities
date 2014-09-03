@@ -501,7 +501,6 @@ class Database(object):
         # Returns the tuple reconstructed with views sorted
         return (views[0], build_view_deps(views[1]),)
 
-
     def __add_db_objects(self, obj_type):
         """Get a list of objects from a database based on type.
 

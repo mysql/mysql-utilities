@@ -29,8 +29,7 @@ class test(audit_log_admin.test):
 
     This test runs the mysqlauditadmin utility to test its features for older
     MySQL server versions. Requires a server with the audit log plug-in
-    enabled and a version < 5.5.40, or >= 5.6.0 and < 5.6.21, or >= 5.7.0 and
-    < 5.7.5.
+    enabled and a version < 5.6.20, or >= 5.7.0 and < 5.7.5.
     """
 
     def check_prerequisites(self):
@@ -41,14 +40,11 @@ class test(audit_log_admin.test):
                               "plug-in installed and enabled.")
 
         # Check the server version.
-        if ((srv.check_version_compat(5, 5, 40) and  # >= 5.5.40 and < 5.6
-             not srv.check_version_compat(5, 6, 0)) or
-            (srv.check_version_compat(5, 6, 21) and  # >= 5.6.21 and < 5.7
+        if ((srv.check_version_compat(5, 6, 20) and  # >= 5.6.20 and < 5.7
              not srv.check_version_compat(5, 7, 0)) or
                 srv.check_version_compat(5, 7, 5)):  # >= 5.7.5
-            raise MUTLibError("Test requires a server with version < 5.5.40, "
-                              "or >= 5.6.0 and < 5.6.21, or >= 5.7.0 and "
-                              "< 5.7.5.")
+            raise MUTLibError("Test requires a server with version < 5.6.20, "
+                              "or >= 5.7.0 and < 5.7.5.")
         return self.check_num_servers(1)
 
     def run(self):
