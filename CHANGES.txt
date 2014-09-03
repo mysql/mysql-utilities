@@ -1,3 +1,18 @@
+Release-1.5.2 (Released September 03, 2014)
+-------------------------------------------
+- BUG#19380635: Add separated CHANGES & README Fabric files to Commercial dist
+- BUG#19303700: mysqlserverclone does not check for low free space
+- BUG#19302898: mysqldbcopy fails when views contain sub-views not yet copied
+- BUG#19320164: mysqldbcompare --disable-binary-logging not working properly
+- BUG#19259597: changing audit log policy fails using 5.6.21 server
+- BUG#19238432: utilities do not parse proxy and stored routines grant statements
+- BUG#19174364: mysqldbcompare crashes with python error
+- BUG#18958536: mut does not kill mysqld processes on MAC OS X
+- BUG#18753983: --skip-innodb option ignored in 5.7 servers
+- BUG#18632836: --skip-table-options does not work when difftype=sql
+- BUG#18304845: mysqldbcompare needs more privileges than documented
+
+
 Release 1.5.1 (Released July 25, 2014)
 -----------------------------------------
 
