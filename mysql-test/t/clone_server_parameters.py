@@ -138,7 +138,7 @@ class test(mutlib.System_test):
                     "--root-password=root ".format(
                         self.build_connection_string(
                             self.servers.get_server(0))))
-
+        os_quote = '"' if os.name == 'nt' else "'"
         #  (comment, command options, kill running server, restart_with_cmd)
         test_cases = [
             ("show help", " --help ", False, True, False),
@@ -155,10 +155,11 @@ class test(mutlib.System_test):
              " -w {0} ".format(self.start_cmd_fl), True, False,
              self.start_cmd_fl),
             ("use --skip-innodb",
-             ("--mysqld='--skip-innodb --default-storage-engine=MYISAM "
-              "--default-tmp-storage-engine=MYISAM'"), True, False, False),
-            ("use --innodb", "--mysqld='--innodb'", True, False,
-             False),
+             ("--mysqld={0}--skip-innodb --default-storage-engine=MYISAM "
+              "--default-tmp-storage-engine=MYISAM{0}".format(os_quote)),
+             True, False, False),
+            ("use --innodb", "--mysqld={0}--innodb{0}".format(os_quote),
+             True, False, False),
         ]
 
         test_num = 1
