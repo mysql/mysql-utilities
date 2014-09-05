@@ -11,8 +11,8 @@ WARNING: Using a password on the command line interface can be insecure.
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
@@ -117,8 +117,8 @@ WARNING: Using a password on the command line interface can be insecure.
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying GRANTS from util_test
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
@@ -140,8 +140,8 @@ WARNING: Using a password on the command line interface can be insecure.
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying GRANTS from util_test
 # Copying database wesaysocorp 
 # Copying TRIGGER util_test.trg

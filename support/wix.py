@@ -25,9 +25,10 @@ import subprocess
 from distutils import log
 from distutils.errors import DistutilsError
 
-WIX_INSTALL_PATH = r"C:\Program Files (x86)\Windows Installer XML v3.5"
+#WIX_INSTALL_PATH = r"C:\Program Files (x86)\Windows Installer XML v3.5"
+WIX_INSTALL_PATH = r"C:\Program Files (x86)\WiX Toolset v3.8"
 
-def check_wix_install(wix_install_path=None, required_version='3.5',
+def check_wix_install(wix_install_path=None, required_version='3.8',
                       dry_run=0):
     """Check the WiX installation
 

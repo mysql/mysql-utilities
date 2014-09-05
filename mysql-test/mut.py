@@ -618,6 +618,7 @@ if __name__ == "__main__":
             old_terminal_settings = termios.tcgetattr(sys.stdin)
         except termios.error as err:
             restore_terminal = False
+    exit_status = 0
     try:
         # Run the tests selected
         num_tests_run = 0
@@ -713,6 +714,7 @@ if __name__ == "__main__":
                                             "the comma")
                     test_case.remove_result("# WARNING: Using a password on "
                                             "the com")
+                    test_case.remove_result("# WARNING: The use of InnoDB is")
             except MUTLibError:
                 _, e, _ = sys.exc_info()
                 if debug_mode:
@@ -826,6 +828,7 @@ if __name__ == "__main__":
     # Catch and print exception stack trace
     except:
         print(traceback.format_exc())
+        exit_status=1
     # kill spawned servers and restore terminal settings even if something
     # goes wrong halfway.
     finally:
@@ -850,4 +853,4 @@ if __name__ == "__main__":
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN,
                               old_terminal_settings)
 
-        sys.exit(0)
+        sys.exit(exit_status)

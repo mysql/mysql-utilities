@@ -118,8 +118,8 @@ if __name__ == '__main__':
     # Add force option
     parser.add_option("--force", action="store_true", dest="force",
                       default=False,
-                      help="Ignore the maximum path length check for the"
-                           " --new-data option.")
+                      help="Ignore the maximum path length and the low space "
+                           "checks for the --new-data option.")
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()

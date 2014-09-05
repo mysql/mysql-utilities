@@ -7,7 +7,7 @@
   <?define PackageCode="*"?>
 
   <Product Id="*"
-   Name="MySQL Utilities"
+   Name="$(var.ProductName)"
    Version="$(var.Version)"
    Manufacturer="Oracle Corporation"
    Language="1033"
@@ -23,6 +23,14 @@
      DowngradeErrorMessage="A later version of $(var.ProductName) is already installed."/> -->
 
     <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
+    <Property Id="VCPPREDIST2013" Secure="yes">
+      <RegistrySearch Root="HKLM"
+                      Type="raw"
+                      Id="VCPP2013_Installed"
+                      Key="SOFTWARE\Microsoft\DevDiv\vc\Servicing\12.0\RuntimeMinimum"
+                      Win64="yes"
+                      Name="Install" />
+    </Property>
     <Upgrade Id="$(var.UpgradeCode)">  
     <!-- <UpgradeVersion
       Minimum="1.0.0"
@@ -220,6 +228,11 @@
       <Custom Action="PreventDowngrading" After="FindRelatedProducts">NEWPRODUCTFOUND</Custom>
       <RemoveExistingProducts After='InstallValidate' />
     </InstallExecuteSequence>
+
+    <!-- Check Visual c++ Redistributable Package for required dll -->
+    <Condition Message="This application requires the Visual C++ Redistributable Package for Visual Studio 2013. Please install the redistributable package and then run this installer again. See the online documentation for more details.">
+      <![CDATA[Installed OR VCPPREDIST2013]]>
+    </Condition>
 
     <!-- Launch mysqluc after installation -->
     <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="!(loc.ExitDialogOptionalText)"/>

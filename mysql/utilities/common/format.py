@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ METHODS
 import csv
 import os
 import textwrap
+from mysql.utilities.common.sql_transform import to_sql
 
 
 _MAX_WIDTH = 78
@@ -74,14 +75,14 @@ def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
 def format_tabular_list(f_out, columns, rows, options=None):
     """Format a list in a pretty grid format.
 
-    This method will format and write a list of rows in a grid or ?SV list.
+    This method will format and write a list of rows in a grid or CSV list.
 
     f_out[in]          file to print to (e.g. sys.stdout)
     columns[in]        list of column names
     rows[in]           list of rows to print
     options[in]        options controlling list:
         print_header   if False, do not print header
-        separator      if set, use the char specified for a ?SV output
+        separator      if set, use the char specified for a CSV output
         quiet          if True, do not print the grid text (no borders)
         print_footer   if False, do not print footer
         none_to_null   if True converts None values to NULL
@@ -93,6 +94,7 @@ def format_tabular_list(f_out, columns, rows, options=None):
     quiet = options.get("quiet", False)
     print_footer = options.get("print_footer", True)
     none_to_null = options.get("none_to_null", False)
+    convert_to_sql = options.get('to_sql', False)
 
     # do nothing if no rows.
     if len(rows) == 0:
@@ -106,9 +108,12 @@ def format_tabular_list(f_out, columns, rows, options=None):
         if print_header:
             csv_writer.writerow(columns)
         for row in rows:
+            if convert_to_sql:
+                # Convert value to SQL (i.e. add quotes if needed).
+                row = ['NULL' if col is None else to_sql(col) for col in row]
             if none_to_null:
                 # Convert None values to 'NULL'
-                row = ['NULL' if not val else val for val in row]
+                row = ['NULL' if val is None else val for val in row]
             csv_writer.writerow(row)
     else:
         # Calculate column width for each column
@@ -136,11 +141,15 @@ def format_tabular_list(f_out, columns, rows, options=None):
             _format_row_separator(f_out, columns, col_widths, columns, quiet)
         _format_col_separator(f_out, columns, col_widths, quiet)
         for row in rows:
+            # Note: lists need to be converted to tuple as expected by
+            # next method (to handle single column rows correctly)
+            if convert_to_sql:
+                # Convert value to SQL (i.e. add quotes if needed).
+                row = tuple(('NULL' if col is None else to_sql(col)
+                             for col in row))
             if none_to_null:
                 # Convert None values to 'NULL'
-                row = tuple(['NULL' if not val else val for val in row])
-                # Note: list need to be converted to tuple as expected by
-                # next method (to handle single column rows correctly)
+                row = tuple(('NULL' if val is None else val for val in row))
             _format_row_separator(f_out, columns, col_widths, row, quiet)
         if print_footer:
             _format_col_separator(f_out, columns, col_widths, quiet)
@@ -191,7 +200,8 @@ def format_vertical_list(f_out, columns, rows, options=None):
         f_out.write("{0} {1}.\n".format(row_num, row_str))
 
 
-def print_list(f_out, fmt, columns, rows, no_headers=False, sort=False):
+def print_list(f_out, fmt, columns, rows, no_headers=False, sort=False,
+               to_sql=False):
     """Print a list< based on format.
 
     Prints a list of rows in the format chosen. Default is GRID.
@@ -202,12 +212,15 @@ def print_list(f_out, fmt, columns, rows, no_headers=False, sort=False):
     rows[in]          Rows to print
     no_headers[in]    If True, do not print headings (column names)
     sort[in]          If True, sort list before printing
+    to_sql[out]       If True, converts columns to SQL format before
+                      printing them to the output.
     """
 
     if sort:
         rows.sort()
     list_options = {
-        'print_header': not no_headers
+        'print_header': not no_headers,
+        'to_sql': to_sql
     }
     if fmt == "vertical":
         format_vertical_list(f_out, columns, rows)

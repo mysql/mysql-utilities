@@ -428,34 +428,78 @@ class Database(object):
         else:
             name_idx = 1
 
-        def views_cmp(v1, v2):
-            """Custom comparison function of two views
-
-            This method tries to find v1 name in v2 definition, if found means
-            that there is dependency (v2 depends of v1).
-
-            v1[in]  Tuple containing the columns of the first view
-            v2[in]  Tuple containing the columns of the second view
-
-            Returns -1 if v1 name is in v2 definition.
+        def _get_dependent_views(view, v_name_dict):
+            """Get a list with all the dependent views for a given view
+            view          [in]  current view being analyzed
+            v_name_dict   [in]  mapping from short view names to used view_stm
             """
-            # Get the create statement of the view
-            stmt = self.get_create_statement(self.db_name, v2[name_idx], _VIEW)
-            # Name of the view with backticks to be found
-            search = quote_with_backticks(v1[name_idx]) \
-                if need_backtick else v1[name_idx]
-            index = stmt.find(search)
-            if index >= 0:
-                return -1  # Found
-            else:
-                return 0  # Not found
+            # Get view name and use backticks if necessary
+            v_name = view[name_idx]
+            if need_backtick:
+                v_name = quote_with_backticks(v_name)
 
+            # Get view create statement and for each view in views_to_check
+            # see if it is mentioned in the statement
+            stmt = self.get_create_statement(self.db_name, v_name, _VIEW)
+            base_views = []
+            for v in v_name_dict:
+                # No looking for itself
+                if v != v_name:
+                    index = stmt.find(v)
+                    if index >= 0:
+                        base_views.append(v_name_dict[v])
+            return base_views
+
+        def build_view_deps(view_lst):
+            """Get a list of views sorted by their dependencies.
+
+            view_lst   [in]   list with views yet to to be ordered
+
+            Returns the list of view sorted by their dependencies
+            """
+            # Mapping from view_names to views(brief, name or full)
+            v_name_dict = {}
+            for view in view_lst:
+                key = quote_with_backticks(view[name_idx]) if need_backtick \
+                    else view[name_idx]
+                v_name_dict[key] = view
+
+            # Initialize sorted_tpl
+            sorted_views = []
+            # set with view whose dependencies were/are being analyzed.key
+            visited_views = set()
+
+            # set with views that have already been processed
+            # (subset of processed_views). Contains the same elements as
+            # sorted_views.
+            processed_views = set()
+
+            # Init stack
+            view_stack = view_lst[:]
+            while view_stack:
+                curr_view = view_stack[-1]  # look at top of the stack
+                if curr_view in visited_views:
+                    view_stack.pop()
+                    if curr_view not in processed_views:
+                        sorted_views.append(curr_view)
+                        processed_views.add(curr_view)
+                else:
+                    visited_views.add(curr_view)
+                    children_views = _get_dependent_views(curr_view,
+                                                          v_name_dict)
+                    if children_views:
+                        for child in children_views:
+                            # store not yet processed base views the temp stack
+                            if child not in processed_views:
+                                view_stack.append(child)
+            # No more views on the stack, return list of sorted views
+            return sorted_views
         # Returns without columns names
         if isinstance(views[0], tuple):
-            return sorted(views, cmp=views_cmp)
+            return build_view_deps(views)
 
         # Returns the tuple reconstructed with views sorted
-        return (views[0], sorted(views[1], cmp=views_cmp),)
+        return (views[0], build_view_deps(views[1]),)
 
     def __add_db_objects(self, obj_type):
         """Get a list of objects from a database based on type.

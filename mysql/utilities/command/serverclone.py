@@ -28,12 +28,23 @@ import time
 import shlex
 import shutil
 
-from mysql.utilities.common.tools import check_port_in_use, get_tool_path
+from mysql.utilities.common.tools import (check_port_in_use,
+                                          estimate_free_space,
+                                          get_mysqld_version,
+                                          get_tool_path)
+from mysql.utilities.common.messages import WARN_OPT_SKIP_INNODB
 from mysql.utilities.common.server import Server
 from mysql.utilities.exception import UtilError
 
 MAX_DATADIR_SIZE = 200
 MAX_SOCKET_PATH_SIZE = 107
+# Required free disk space in MB to create the data directory.
+REQ_FREE_SPACE = 120
+LOW_SPACE_ERRR_MSG = ("The new data directory {directory} has low free space"
+                      "remaining, please free some space and try again. \n"
+                      "mysqlserverclone needs at least {megabytes} MB to run "
+                      "the new server instance.\nUse force option to ignore "
+                      "this Error.")
 
 
 def clone_server(conn_val, options):
@@ -91,6 +102,7 @@ def clone_server(conn_val, options):
                         "(> {1} characters). Please use a smaller one. "
                         "You can use the --force option to skip this "
                         "check".format(new_data, MAX_DATADIR_SIZE))
+
     # Clone running server
     if conn_val is not None:
         # Try to connect to the MySQL database server.
@@ -117,9 +129,11 @@ def clone_server(conn_val, options):
         if not quiet:
             print "# Cloning the MySQL server located at %s." % basedir
 
+    new_data_deleted = False
     # If datadir exists, has data, and user said it was Ok, delete it
     if os.path.exists(new_data) and options.get("delete", False) and \
        os.listdir(new_data):
+        new_data_deleted = True
         shutil.rmtree(new_data, True)
 
     # Create new data directory if it does not exist
@@ -128,14 +142,33 @@ def clone_server(conn_val, options):
             print "# Creating new data directory..."
         try:
             os.mkdir(new_data)
-        except:
-            raise UtilError("Unable to create directory '%s'" % new_data)
+        except OSError as err:
+            raise UtilError("Unable to create directory '{0}', reason: {1}"
+                            "".format(new_data, err.strerror))
+
+    # After create the new data directory, check for free space, so the errors
+    # regarding invalid or inaccessible path had been dismissed already.
+    # If not force specified verify and stop if there is not enough free space
+    if not force and os.path.exists(new_data) and \
+       estimate_free_space(new_data) < REQ_FREE_SPACE:
+        # Don't leave empty folders, delete new_data if was previously deleted
+        if os.path.exists(new_data) and new_data_deleted:
+            shutil.rmtree(new_data, True)
+        raise UtilError(LOW_SPACE_ERRR_MSG.format(directory=new_data,
+                                                  megabytes=REQ_FREE_SPACE))
+
+    # Check for warning of using --skip-innodb
+    mysqld_path = get_tool_path(basedir, "mysqld")
+    version = get_mysqld_version(mysqld_path)
+    if mysqld_options is not None and ("--skip-innodb" in mysqld_options or
+       "--innodb" in mysqld_options) and version is not None and \
+       int(version[0]) >= 5 and int(version[1]) >= 7 and int(version[2]) >= 5:
+        print("# WARNING: {0}".format(WARN_OPT_SKIP_INNODB))
 
     if not quiet:
         print "# Configuring new instance..."
         print "# Locating mysql tools..."
 
-    mysqld_path = get_tool_path(basedir, "mysqld")
     mysqladmin_path = get_tool_path(basedir, "mysqladmin")
     mysql_basedir = get_tool_path(basedir, "share/english/errgmsg.sys",
                                   False, False)

@@ -106,7 +106,6 @@ from itertools import groupby
 
 from info import find_packages
 
-_REQUIRED_PYTHON = (2, 7, 3) # Exact version
 _REQUIRED_CX_FREEZE = (4, 3, 1) # Or later
 _REQUIRED_MYCONNPY = (1, 0, 8) # Or later
 _REQUIRED_SPHINX = (1, 1, 3) # Or later
@@ -114,11 +113,9 @@ _REQUIRED_SPHINX = (1, 1, 3) # Or later
 # Make absolutely sure current working directory is looked in first
 sys.path.insert(0, '.')
 
-# Require Python
-if sys.version_info[0:3] != _REQUIRED_PYTHON:
-    log.error("Python v{0} is required.".format(
-        '.'.join([ str(val) for val in _REQUIRED_PYTHON ])))
-    sys.exit(1)
+# Required Python Version
+from mysql.utilities.common.tools import check_python_version
+check_python_version()
 
 # Require cx_Freeze
 try:

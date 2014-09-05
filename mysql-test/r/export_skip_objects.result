@@ -18,8 +18,8 @@ NAME
 `p1`
 # VIEWS in util_test:
 TABLE_NAME
-`v1`
 `v2`
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
 `trg`
@@ -86,8 +86,8 @@ NAME
 `p1`
 # VIEWS in util_test:
 TABLE_NAME
-`v1`
 `v2`
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
 `trg`
@@ -116,8 +116,8 @@ NAME
 `p1`
 # VIEWS in util_test:
 TABLE_NAME
-`v1`
 `v2`
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
 `trg`
@@ -139,8 +139,8 @@ NAME
 `p1`
 # VIEWS in util_test:
 TABLE_NAME
-`v1`
 `v2`
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
 `trg`
@@ -159,8 +159,8 @@ TABLE_NAME
 `t5`
 # VIEWS in util_test:
 TABLE_NAME
-`v1`
 `v2`
+`v1`
 # TRIGGERS in util_test:
 TRIGGER_NAME
 `trg`
@@ -179,8 +179,8 @@ TABLE_NAME
 `t5`
 # VIEWS in util_test:
 TABLE_NAME
-`v1`
 `v2`
+`v1`
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - no data,,grants,events,functions,procedures,triggers,views

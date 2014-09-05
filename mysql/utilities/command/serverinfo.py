@@ -181,18 +181,19 @@ def _server_info(server_val, get_defaults=False, options=None):
                 log_file = params_dict[log_tpl.log_name]
 
             # Now get the information about the size of the logs
-
-            try:
-                # Skip 'stderr' occurrences reported by pre-MySQL 5.7 servers
-                if log_file != 'stderr':
+            # If log file is stderr, we cannot get the correct size.
+            if log_file not in ["stderr", "stdout"]:
+                # Now get the information about the size of the logs
+                try:
                     params_dict[log_tpl.log_file_size] = "{0} bytes".format(
                         os.path.getsize(log_file))
 
-            except OSError:
-                # if we are unable to get the log_file_size
-                params_dict[log_tpl.log_file_size] = ''
-                warning_msg = _WARNING_TEMPLATE.format(msg, log_file)
-                params_dict['warnings'].append(warning_msg)
+                except os.error:
+                    # if we are unable to get the log_file_size
+                    params_dict[log_tpl.log_file_size] = ''
+                    warning_msg = _WARNING_TEMPLATE.format(msg, log_file)
+                    params_dict['warnings'].append(warning_msg)
+
         else:
             params_dict['warnings'].append("Unable to get information "
                                            "regarding variable '{0}'"
@@ -313,8 +314,15 @@ def _start_server(server_val, basedir, datadir, options=None):
     print "# Checking server version ...",
     version = get_mysqld_version(mysqld_path)
     print "done."
-    post_5_6 = version is not None and \
-        int(version[0]) >= 5 and int(version[1]) >= 6
+    if version is not None and int(version[0]) >= 5:
+        post_5_5 = int(version[1]) >= 5
+        post_5_6 = int(version[1]) >= 6
+        post_5_7_4 = int(version[1]) >= 7 and int(version[2]) > 4
+    else:
+        print("# Warning: cannot get server version.")
+        post_5_5 = False
+        post_5_6 = False
+        post_5_7_4 = False
 
     # Get the user executing the utility to use in the mysqld options.
     # Note: the option --user=user_name is mandatory to start mysqld as root.
@@ -337,15 +345,17 @@ def _start_server(server_val, basedir, datadir, options=None):
     ]
 
     # It the server is 5.6 or later, we must use additional parameters
-    if post_5_6:
-        args_5_6 = [
+    if post_5_5:
+        server_args = [
             "--skip-slave-start",
-            "--skip-innodb",
             "--default-storage-engine=MYISAM",
-            "--default-tmp-storage-engine=MYISAM",
             "--server-id=0",
         ]
-        args.extend(args_5_6)
+        if post_5_6:
+            server_args.append("--default-tmp-storage-engine=MYISAM")
+        if not post_5_7_4:
+            server_args.append("--skip-innodb")
+        args.extend(server_args)
     args.insert(0, mysqld_path)
 
     socket = server_val.get('unix_socket', None)

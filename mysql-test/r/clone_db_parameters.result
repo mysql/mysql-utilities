@@ -11,8 +11,8 @@ WARNING: Using a password on the command line interface can be insecure.
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
@@ -117,8 +117,8 @@ WARNING: Using a password on the command line interface can be insecure.
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying GRANTS from util_test
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
@@ -176,14 +176,14 @@ RETURN base_price + base_price*(tax_percentage/100)
 # Copying PROCEDURE util_test.p1
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_db_clone.t1 VALUES ("50")
-# Dropping new object VIEW util_db_clone.`v1`
-# WARNING: Unable to drop `v1` from source database (object may not exist): DROP VIEW `util_db_clone`.`v1`
-# Copying VIEW util_test.v1
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`
 # Dropping new object VIEW util_db_clone.`v2`
 # WARNING: Unable to drop `v2` from source database (object may not exist): DROP VIEW `util_db_clone`.`v2`
 # Copying VIEW util_test.v2
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_db_clone`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`
+# Dropping new object VIEW util_db_clone.`v1`
+# WARNING: Unable to drop `v1` from source database (object may not exist): DROP VIEW `util_db_clone`.`v1`
+# Copying VIEW util_test.v1
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`
 # Copying GRANTS from util_test
 GRANT ALTER ON `util_db_clone`.* TO 'joe'@'user'
 GRANT ALTER ROUTINE ON `util_db_clone`.* TO 'joe'@'user'

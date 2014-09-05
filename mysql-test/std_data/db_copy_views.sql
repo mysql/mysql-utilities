@@ -21,3 +21,6 @@ CREATE VIEW `views_test`.`v11` AS SELECT `views_test`.`t1`.`a`, (`views_test`.`t
 CREATE VIEW `views_test`.`v13` AS SELECT 1 AS value;
 CREATE VIEW `views_test`.`v12` AS SELECT * FROM `views_test`.`v13`;
 CREATE VIEW `views_test`.`v14` AS SELECT * FROM `views_test`.`v12`;
+# Create view with dependency on join of views
+CREATE VIEW `views_test`.`v0` (a, a1, b1) AS SELECT * FROM `views_test`.`v14` inner join `views_test`.`v2`;
+CREATE VIEW `views_test`.`v15` (a, a1, b1, a2, b2) AS SELECT * FROM `views_test`.`v0` inner join `views_test`.`v1`;

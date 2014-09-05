@@ -160,7 +160,7 @@ def get_GA_binaries_uris(versions):
     # build pattern list
     for version in versions:
         re_patterns[version] = re.compile(
-            '<a\shref="(mysql-({0}\.?\d*)[^/]*)/'.format(re.escape(version)))
+            '<a\shref="(mysql-({0}\.?\d*))/'.format(re.escape(version)))
     for line in lines:
         for version in versions:
             match = re.search(re_patterns[version], line)

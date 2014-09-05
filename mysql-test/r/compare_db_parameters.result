@@ -97,15 +97,17 @@ Test case 2 - Use  -a --difftype=unified --format=grid
 # Data differences found among rows:
 --- `inventory`.`supplier`
 +++ `inventory`.`supplier`
-@@ -1,5 +1,5 @@
+@@ -1,6 +1,6 @@
 -+-------+--------------------+
 -| code  | name               |
 -+-------+--------------------+
+-| 4     | None               |
 -| 2     | Never Enough Inc.  |
 -+-------+--------------------+
 ++-------+----------------------+
 +| code  | name                 |
 ++-------+----------------------+
++| 4     | Acme Corporation     |
 +| 2     | Wesayso Corporation  |
 ++-------+----------------------+
 
@@ -113,6 +115,8 @@ Test case 2 - Use  -a --difftype=unified --format=grid
 +-------+--------------------+
 | code  | name               |
 +-------+--------------------+
+| 6     |                    |
+| 5     | None               |
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
@@ -190,14 +194,18 @@ Test case 3 - Use  -a --difftype=unified --format=csv
 # Data differences found among rows:
 --- `inventory`.`supplier`
 +++ `inventory`.`supplier`
-@@ -1,2 +1,2 @@
+@@ -1,3 +1,3 @@
  code,name
--2,Never Enough Inc.
-+2,Wesayso Corporation
+-'4',NULL
+-'2','Never Enough Inc.'
++'4','Acme Corporation'
++'2','Wesayso Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-3,Never Enough Inc.
+'6',''
+'5',NULL
+'3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -210,27 +218,27 @@ code,name
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--11146,Speed shine,1,9.99,repair,,1
--11186,Plastic polish,1,9.99,polishing,,1
--11040,Leather care,1,9.99,other,,1
-+11146,Speed shine,1,10.00,repair,,1
-+11186,Plastic polish,1,10.00,polishing,,1
-+11040,Leather care,1,10.00,other,,1
+-'11146','Speed shine','1','9.99','repair','','1'
+-'11186','Plastic polish','1','9.99','polishing','','1'
+-'11040','Leather care','1','9.99','other','','1'
++'11146','Speed shine','1','10.00','repair','','1'
++'11186','Plastic polish','1','10.00','polishing','','1'
++'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11270,Carpet cleaner,1,9.99,cleaning,,1
-11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
-11106,Wheel cleaner,1,9.99,cleaning,,1
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11106','Wheel cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
-10665,Glass polish pad,3,10.00,polishing,,1
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+'11116','Microfiber wax removal towel','3','16.99','waxing','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
+'11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
 
 # Database consistency check failed.
@@ -260,13 +268,17 @@ Test case 4 - Use  -a --difftype=unified --format=tab
 # Data differences found among rows:
 --- `inventory`.`supplier`
 +++ `inventory`.`supplier`
-@@ -1,2 +1,2 @@
+@@ -1,3 +1,3 @@
  code	name
+-4	
 -2	Never Enough Inc.
++4	Acme Corporation
 +2	Wesayso Corporation
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code	name
+6	
+5	
 3	Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -330,18 +342,28 @@ Test case 5 - Use  -a --difftype=unified --format=vertical
 # Data differences found among rows:
 --- `inventory`.`supplier`
 +++ `inventory`.`supplier`
-@@ -1,4 +1,4 @@
+@@ -1,7 +1,7 @@
  *************************       1. row *************************
+  code: 4
+- name: None
++ name: Acme Corporation
+ *************************       2. row *************************
   code: 2
 - name: Never Enough Inc.
 + name: Wesayso Corporation
- 1 row.
+ 2 rows.
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 *************************       1. row *************************
+ code: 6
+ name: 
+*************************       2. row *************************
+ code: 5
+ name: None
+*************************       3. row *************************
  code: 3
  name: Never Enough Inc.
-1 row.
+3 rows.
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -487,16 +509,18 @@ Test case 6 - Use  -a --difftype=context --format=grid
 *** `inventory`.`supplier`
 --- `inventory`.`supplier`
 ***************
-*** 1,5 ****
+*** 1,6 ****
 ! +-------+--------------------+
 ! | code  | name               |
 ! +-------+--------------------+
+! | 4     | None               |
 ! | 2     | Never Enough Inc.  |
 ! +-------+--------------------+
---- 1,5 ----
+--- 1,6 ----
 ! +-------+----------------------+
 ! | code  | name                 |
 ! +-------+----------------------+
+! | 4     | Acme Corporation     |
 ! | 2     | Wesayso Corporation  |
 ! +-------+----------------------+
 
@@ -504,6 +528,8 @@ Test case 6 - Use  -a --difftype=context --format=grid
 +-------+--------------------+
 | code  | name               |
 +-------+--------------------+
+| 6     |                    |
+| 5     | None               |
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
@@ -584,16 +610,20 @@ Test case 7 - Use  -a --difftype=context --format=csv
 *** `inventory`.`supplier`
 --- `inventory`.`supplier`
 ***************
-*** 1,2 ****
+*** 1,3 ****
   code,name
-! 2,Never Enough Inc.
---- 1,2 ----
+! '4',NULL
+! '2','Never Enough Inc.'
+--- 1,3 ----
   code,name
-! 2,Wesayso Corporation
+! '4','Acme Corporation'
+! '2','Wesayso Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-3,Never Enough Inc.
+'6',''
+'5',NULL
+'3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -607,29 +637,29 @@ code,name
 ***************
 *** 1,4 ****
   stock_number,description,qty,cost,type,notes,supplier
-! 11146,Speed shine,1,9.99,repair,,1
-! 11186,Plastic polish,1,9.99,polishing,,1
-! 11040,Leather care,1,9.99,other,,1
+! '11146','Speed shine','1','9.99','repair','','1'
+! '11186','Plastic polish','1','9.99','polishing','','1'
+! '11040','Leather care','1','9.99','other','','1'
 --- 1,4 ----
   stock_number,description,qty,cost,type,notes,supplier
-! 11146,Speed shine,1,10.00,repair,,1
-! 11186,Plastic polish,1,10.00,polishing,,1
-! 11040,Leather care,1,10.00,other,,1
+! '11146','Speed shine','1','10.00','repair','','1'
+! '11186','Plastic polish','1','10.00','polishing','','1'
+! '11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11270,Carpet cleaner,1,9.99,cleaning,,1
-11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
-11106,Wheel cleaner,1,9.99,cleaning,,1
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11106','Wheel cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
-10665,Glass polish pad,3,10.00,polishing,,1
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+'11116','Microfiber wax removal towel','3','16.99','waxing','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
+'11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
 
 # Database consistency check failed.
@@ -660,15 +690,19 @@ Test case 8 - Use  -a --difftype=context --format=tab
 *** `inventory`.`supplier`
 --- `inventory`.`supplier`
 ***************
-*** 1,2 ****
+*** 1,3 ****
   code	name
+! 4	
 ! 2	Never Enough Inc.
---- 1,2 ----
+--- 1,3 ----
   code	name
+! 4	Acme Corporation
 ! 2	Wesayso Corporation
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code	name
+6	
+5	
 3	Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -736,22 +770,34 @@ Test case 9 - Use  -a --difftype=context --format=vertical
 *** `inventory`.`supplier`
 --- `inventory`.`supplier`
 ***************
-*** 1,4 ****
+*** 1,7 ****
   *************************       1. row *************************
+   code: 4
+!  name: None
+  *************************       2. row *************************
    code: 2
 !  name: Never Enough Inc.
-  1 row.
---- 1,4 ----
+  2 rows.
+--- 1,7 ----
   *************************       1. row *************************
+   code: 4
+!  name: Acme Corporation
+  *************************       2. row *************************
    code: 2
 !  name: Wesayso Corporation
-  1 row.
+  2 rows.
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 *************************       1. row *************************
+ code: 6
+ name: 
+*************************       2. row *************************
+ code: 5
+ name: None
+*************************       3. row *************************
  code: 3
  name: Never Enough Inc.
-1 row.
+3 rows.
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -927,7 +973,9 @@ Test case 10 - Use  -a --difftype=differ --format=grid
 - +-------+--------------------+
 + +-------+----------------------+
 ?                              ++
+- | 4     | None               |
 - | 2     | Never Enough Inc.  |
++ | 4     | Acme Corporation     |
 + | 2     | Wesayso Corporation  |
 - +-------+--------------------+
 + +-------+----------------------+
@@ -937,6 +985,8 @@ Test case 10 - Use  -a --difftype=differ --format=grid
 +-------+--------------------+
 | code  | name               |
 +-------+--------------------+
+| 6     |                    |
+| 5     | None               |
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
@@ -1020,12 +1070,16 @@ Test case 11 - Use  -a --difftype=differ --format=csv
 #
 # Data differences found among rows:
   code,name
-- 2,Never Enough Inc.
-+ 2,Wesayso Corporation
+- '4',NULL
+- '2','Never Enough Inc.'
++ '4','Acme Corporation'
++ '2','Wesayso Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-3,Never Enough Inc.
+'6',''
+'5',NULL
+'3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -1035,33 +1089,33 @@ code,name
 #
 # Data differences found among rows:
   stock_number,description,qty,cost,type,notes,supplier
-- 11146,Speed shine,1,9.99,repair,,1
-?                     ^ ^^
-+ 11146,Speed shine,1,10.00,repair,,1
-?                     ^^ ^^
-- 11186,Plastic polish,1,9.99,polishing,,1
-?                        ^ ^^
-+ 11186,Plastic polish,1,10.00,polishing,,1
-?                        ^^ ^^
-- 11040,Leather care,1,9.99,other,,1
-?                      ^ ^^
-+ 11040,Leather care,1,10.00,other,,1
-?                      ^^ ^^
+- '11146','Speed shine','1','9.99','repair','','1'
+?                            ^ ^^
++ '11146','Speed shine','1','10.00','repair','','1'
+?                            ^^ ^^
+- '11186','Plastic polish','1','9.99','polishing','','1'
+?                               ^ ^^
++ '11186','Plastic polish','1','10.00','polishing','','1'
+?                               ^^ ^^
+- '11040','Leather care','1','9.99','other','','1'
+?                             ^ ^^
++ '11040','Leather care','1','10.00','other','','1'
+?                             ^^ ^^
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11270,Carpet cleaner,1,9.99,cleaning,,1
-11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
-11106,Wheel cleaner,1,9.99,cleaning,,1
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11106','Wheel cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
-10665,Glass polish pad,3,10.00,polishing,,1
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+'11116','Microfiber wax removal towel','3','16.99','waxing','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
+'11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
 
 # Database consistency check failed.
@@ -1090,11 +1144,15 @@ Test case 12 - Use  -a --difftype=differ --format=tab
 #
 # Data differences found among rows:
   code	name
+- 4	
 - 2	Never Enough Inc.
++ 4	Acme Corporation
 + 2	Wesayso Corporation
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code	name
+6	
+5	
 3	Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -1160,16 +1218,26 @@ Test case 13 - Use  -a --difftype=differ --format=vertical
 #
 # Data differences found among rows:
   *************************       1. row *************************
+   code: 4
+-  name: None
++  name: Acme Corporation
+  *************************       2. row *************************
    code: 2
 -  name: Never Enough Inc.
 +  name: Wesayso Corporation
-  1 row.
+  2 rows.
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 *************************       1. row *************************
+ code: 6
+ name: 
+*************************       2. row *************************
+ code: 5
+ name: None
+*************************       3. row *************************
  code: 3
  name: Never Enough Inc.
-1 row.
+3 rows.
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -1317,45 +1385,49 @@ Test case 15 -  -d differ --format=csv --quiet -a
 #
 # Data differences found among rows:
   code,name
-- 2,Never Enough Inc.
-+ 2,Wesayso Corporation
+- '4',NULL
+- '2','Never Enough Inc.'
++ '4','Acme Corporation'
++ '2','Wesayso Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-3,Never Enough Inc.
+'6',''
+'5',NULL
+'3','Never Enough Inc.'
 
 #
 # Row counts are not the same among `inventory`.`supplies` and `inventory`.`supplies`.
 #
 # Data differences found among rows:
   stock_number,description,qty,cost,type,notes,supplier
-- 11146,Speed shine,1,9.99,repair,,1
-?                     ^ ^^
-+ 11146,Speed shine,1,10.00,repair,,1
-?                     ^^ ^^
-- 11186,Plastic polish,1,9.99,polishing,,1
-?                        ^ ^^
-+ 11186,Plastic polish,1,10.00,polishing,,1
-?                        ^^ ^^
-- 11040,Leather care,1,9.99,other,,1
-?                      ^ ^^
-+ 11040,Leather care,1,10.00,other,,1
-?                      ^^ ^^
+- '11146','Speed shine','1','9.99','repair','','1'
+?                            ^ ^^
++ '11146','Speed shine','1','10.00','repair','','1'
+?                            ^^ ^^
+- '11186','Plastic polish','1','9.99','polishing','','1'
+?                               ^ ^^
++ '11186','Plastic polish','1','10.00','polishing','','1'
+?                               ^^ ^^
+- '11040','Leather care','1','9.99','other','','1'
+?                             ^ ^^
++ '11040','Leather care','1','10.00','other','','1'
+?                             ^^ ^^
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11270,Carpet cleaner,1,9.99,cleaning,,1
-11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
-11106,Wheel cleaner,1,9.99,cleaning,,1
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11106','Wheel cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
-10665,Glass polish pad,3,10.00,polishing,,1
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+'11116','Microfiber wax removal towel','3','16.99','waxing','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
+'11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
 Test case 16 -  --format=csv -a --width=65
 # server1 on localhost: ... connected.
@@ -1381,14 +1453,18 @@ Test case 16 -  --format=csv -a --width=65
 # Data differences found among rows:
 --- `inventory`.`supplier`
 +++ `inventory`.`supplier`
-@@ -1,2 +1,2 @@
+@@ -1,3 +1,3 @@
  code,name
--2,Never Enough Inc.
-+2,Wesayso Corporation
+-'4',NULL
+-'2','Never Enough Inc.'
++'4','Acme Corporation'
++'2','Wesayso Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-3,Never Enough Inc.
+'6',''
+'5',NULL
+'3','Never Enough Inc.'
 
 # TABLE     supplies                      pass    FAIL    -       
 #           - Compare table checksum                      FAIL    
@@ -1401,27 +1477,27 @@ code,name
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--11146,Speed shine,1,9.99,repair,,1
--11186,Plastic polish,1,9.99,polishing,,1
--11040,Leather care,1,9.99,other,,1
-+11146,Speed shine,1,10.00,repair,,1
-+11186,Plastic polish,1,10.00,polishing,,1
-+11040,Leather care,1,10.00,other,,1
+-'11146','Speed shine','1','9.99','repair','','1'
+-'11186','Plastic polish','1','9.99','polishing','','1'
+-'11040','Leather care','1','9.99','other','','1'
++'11146','Speed shine','1','10.00','repair','','1'
++'11186','Plastic polish','1','10.00','polishing','','1'
++'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11270,Carpet cleaner,1,9.99,cleaning,,1
-11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
-11106,Wheel cleaner,1,9.99,cleaning,,1
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11106','Wheel cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
-10665,Glass polish pad,3,10.00,polishing,,1
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+'11116','Microfiber wax removal towel','3','16.99','waxing','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
+'11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
 
 # Database consistency check failed.
@@ -1451,14 +1527,18 @@ Test case 17 -  --format=csv -a --width=60
 # Data differences found among rows:
 --- `inventory`.`supplier`
 +++ `inventory`.`supplier`
-@@ -1,2 +1,2 @@
+@@ -1,3 +1,3 @@
  code,name
--2,Never Enough Inc.
-+2,Wesayso Corporation
+-'4',NULL
+-'2','Never Enough Inc.'
++'4','Acme Corporation'
++'2','Wesayso Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-3,Never Enough Inc.
+'6',''
+'5',NULL
+'3','Never Enough Inc.'
 
 # TABLE     supplies                 pass    FAIL    -       
 #           - Compare table checksum                 FAIL    
@@ -1471,27 +1551,27 @@ code,name
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--11146,Speed shine,1,9.99,repair,,1
--11186,Plastic polish,1,9.99,polishing,,1
--11040,Leather care,1,9.99,other,,1
-+11146,Speed shine,1,10.00,repair,,1
-+11186,Plastic polish,1,10.00,polishing,,1
-+11040,Leather care,1,10.00,other,,1
+-'11146','Speed shine','1','9.99','repair','','1'
+-'11186','Plastic polish','1','9.99','polishing','','1'
+-'11040','Leather care','1','9.99','other','','1'
++'11146','Speed shine','1','10.00','repair','','1'
++'11186','Plastic polish','1','10.00','polishing','','1'
++'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11270,Carpet cleaner,1,9.99,cleaning,,1
-11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
-11106,Wheel cleaner,1,9.99,cleaning,,1
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11106','Wheel cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
-10665,Glass polish pad,3,10.00,polishing,,1
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+'11116','Microfiber wax removal towel','3','16.99','waxing','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
+'11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
 
 # Database consistency check failed.
@@ -1547,14 +1627,18 @@ CREATE TABLE `supplier` (
 # Data differences found among rows:
 --- `inventory`.`supplier`
 +++ `inventory`.`supplier`
-@@ -1,2 +1,2 @@
+@@ -1,3 +1,3 @@
  code,name
--2,Never Enough Inc.
-+2,Wesayso Corporation
+-'4',NULL
+-'2','Never Enough Inc.'
++'4','Acme Corporation'
++'2','Wesayso Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-3,Never Enough Inc.
+'6',''
+'5',NULL
+'3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -1595,27 +1679,27 @@ CREATE TABLE `supplies` (
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--11146,Speed shine,1,9.99,repair,,1
--11186,Plastic polish,1,9.99,polishing,,1
--11040,Leather care,1,9.99,other,,1
-+11146,Speed shine,1,10.00,repair,,1
-+11186,Plastic polish,1,10.00,polishing,,1
-+11040,Leather care,1,10.00,other,,1
+-'11146','Speed shine','1','9.99','repair','','1'
+-'11186','Plastic polish','1','9.99','polishing','','1'
+-'11040','Leather care','1','9.99','other','','1'
++'11146','Speed shine','1','10.00','repair','','1'
++'11186','Plastic polish','1','10.00','polishing','','1'
++'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11270,Carpet cleaner,1,9.99,cleaning,,1
-11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
-11106,Wheel cleaner,1,9.99,cleaning,,1
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11106','Wheel cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
-10665,Glass polish pad,3,10.00,polishing,,1
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+'11116','Microfiber wax removal towel','3','16.99','waxing','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
+'11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
 
 # Database consistency check failed.
@@ -1671,14 +1755,18 @@ CREATE TABLE `supplier` (
 # Data differences found among rows:
 --- `inventory`.`supplier`
 +++ `inventory`.`supplier`
-@@ -1,2 +1,2 @@
+@@ -1,3 +1,3 @@
  code,name
--2,Never Enough Inc.
-+2,Wesayso Corporation
+-'4',NULL
+-'2','Never Enough Inc.'
++'4','Acme Corporation'
++'2','Wesayso Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-3,Never Enough Inc.
+'6',''
+'5',NULL
+'3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -1719,27 +1807,27 @@ CREATE TABLE `supplies` (
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--11146,Speed shine,1,9.99,repair,,1
--11186,Plastic polish,1,9.99,polishing,,1
--11040,Leather care,1,9.99,other,,1
-+11146,Speed shine,1,10.00,repair,,1
-+11186,Plastic polish,1,10.00,polishing,,1
-+11040,Leather care,1,10.00,other,,1
+-'11146','Speed shine','1','9.99','repair','','1'
+-'11186','Plastic polish','1','9.99','polishing','','1'
+-'11040','Leather care','1','9.99','other','','1'
++'11146','Speed shine','1','10.00','repair','','1'
++'11186','Plastic polish','1','10.00','polishing','','1'
++'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11270,Carpet cleaner,1,9.99,cleaning,,1
-11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
-11106,Wheel cleaner,1,9.99,cleaning,,1
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11106','Wheel cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
-10665,Glass polish pad,3,10.00,polishing,,1
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+'11116','Microfiber wax removal towel','3','16.99','waxing','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
+'11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
 
 # Database consistency check failed.
@@ -1795,14 +1883,18 @@ CREATE TABLE `supplier` (
 # Data differences found among rows:
 --- `inventory`.`supplier`
 +++ `inventory`.`supplier`
-@@ -1,2 +1,2 @@
+@@ -1,3 +1,3 @@
  code,name
--2,Never Enough Inc.
-+2,Wesayso Corporation
+-'2','Never Enough Inc.'
+-'4',NULL
++'2','Wesayso Corporation'
++'4','Acme Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-3,Never Enough Inc.
+'5',NULL
+'3','Never Enough Inc.'
+'6',''
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -1843,27 +1935,27 @@ CREATE TABLE `supplies` (
 +++ `inventory`.`supplies`
 @@ -1,4 +1,4 @@
  stock_number,description,qty,cost,type,notes,supplier
--11146,Speed shine,1,9.99,repair,,1
--11040,Leather care,1,9.99,other,,1
--11186,Plastic polish,1,9.99,polishing,,1
-+11146,Speed shine,1,10.00,repair,,1
-+11040,Leather care,1,10.00,other,,1
-+11186,Plastic polish,1,10.00,polishing,,1
+-'11146','Speed shine','1','9.99','repair','','1'
+-'11040','Leather care','1','9.99','other','','1'
+-'11186','Plastic polish','1','9.99','polishing','','1'
++'11146','Speed shine','1','10.00','repair','','1'
++'11040','Leather care','1','10.00','other','','1'
++'11186','Plastic polish','1','10.00','polishing','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11270,Carpet cleaner,1,9.99,cleaning,,1
-11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11106,Wheel cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11106','Wheel cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-10665,Glass polish pad,3,10.00,polishing,,1
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+'10665','Glass polish pad','3','10.00','polishing','','1'
+'11116','Microfiber wax removal towel','3','16.99','waxing','','1'
+'11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
 
 # Database consistency check failed.
@@ -2132,11 +2224,13 @@ Test case 27 - Use  -a --difftype=unified --format=grid --compact
 -+-------+--------------------+
 -| code  | name               |
 -+-------+--------------------+
+-| 4     | None               |
 -| 2     | Never Enough Inc.  |
 -+-------+--------------------+
 ++-------+----------------------+
 +| code  | name                 |
 ++-------+----------------------+
++| 4     | Acme Corporation     |
 +| 2     | Wesayso Corporation  |
 ++-------+----------------------+
 
@@ -2144,6 +2238,8 @@ Test case 27 - Use  -a --difftype=unified --format=grid --compact
 +-------+--------------------+
 | code  | name               |
 +-------+--------------------+
+| 6     |                    |
+| 5     | None               |
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
@@ -2217,12 +2313,16 @@ Test case 28 - Use  -a --difftype=unified --format=csv --compact
 #
 # Data differences found among rows:
  code,name
--2,Never Enough Inc.
-+2,Wesayso Corporation
+-'4',NULL
+-'2','Never Enough Inc.'
++'4','Acme Corporation'
++'2','Wesayso Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-3,Never Enough Inc.
+'6',''
+'5',NULL
+'3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -2232,27 +2332,27 @@ code,name
 #
 # Data differences found among rows:
  stock_number,description,qty,cost,type,notes,supplier
--11146,Speed shine,1,9.99,repair,,1
--11186,Plastic polish,1,9.99,polishing,,1
--11040,Leather care,1,9.99,other,,1
-+11146,Speed shine,1,10.00,repair,,1
-+11186,Plastic polish,1,10.00,polishing,,1
-+11040,Leather care,1,10.00,other,,1
+-'11146','Speed shine','1','9.99','repair','','1'
+-'11186','Plastic polish','1','9.99','polishing','','1'
+-'11040','Leather care','1','9.99','other','','1'
++'11146','Speed shine','1','10.00','repair','','1'
++'11186','Plastic polish','1','10.00','polishing','','1'
++'11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11270,Carpet cleaner,1,9.99,cleaning,,1
-11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
-11106,Wheel cleaner,1,9.99,cleaning,,1
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11106','Wheel cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
-10665,Glass polish pad,3,10.00,polishing,,1
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+'11116','Microfiber wax removal towel','3','16.99','waxing','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
+'11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
 
 # Database consistency check failed.
@@ -2281,11 +2381,15 @@ Test case 29 - Use  -a --difftype=unified --format=tab --compact
 #
 # Data differences found among rows:
  code	name
+-4	
 -2	Never Enough Inc.
++4	Acme Corporation
 +2	Wesayso Corporation
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code	name
+6	
+5	
 3	Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -2345,16 +2449,26 @@ Test case 30 - Use  -a --difftype=unified --format=vertical --compact
 #
 # Data differences found among rows:
  *************************       1. row *************************
+  code: 4
+- name: None
++ name: Acme Corporation
+ *************************       2. row *************************
   code: 2
 - name: Never Enough Inc.
 + name: Wesayso Corporation
- 1 row.
+ 2 rows.
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 *************************       1. row *************************
+ code: 6
+ name: 
+*************************       2. row *************************
+ code: 5
+ name: None
+*************************       3. row *************************
  code: 3
  name: Never Enough Inc.
-1 row.
+3 rows.
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -2496,12 +2610,14 @@ Test case 31 - Use  -a --difftype=context --format=grid --compact
 ! +-------+--------------------+
 ! | code  | name               |
 ! +-------+--------------------+
+! | 4     | None               |
 ! | 2     | Never Enough Inc.  |
 ! +-------+--------------------+
 ---
 ! +-------+----------------------+
 ! | code  | name                 |
 ! +-------+----------------------+
+! | 4     | Acme Corporation     |
 ! | 2     | Wesayso Corporation  |
 ! +-------+----------------------+
 
@@ -2509,6 +2625,8 @@ Test case 31 - Use  -a --difftype=context --format=grid --compact
 +-------+--------------------+
 | code  | name               |
 +-------+--------------------+
+| 6     |                    |
+| 5     | None               |
 | 3     | Never Enough Inc.  |
 +-------+--------------------+
 
@@ -2585,14 +2703,18 @@ Test case 32 - Use  -a --difftype=context --format=csv --compact
 # Data differences found among rows:
 ***
   code,name
-! 2,Never Enough Inc.
+! '4',NULL
+! '2','Never Enough Inc.'
 ---
   code,name
-! 2,Wesayso Corporation
+! '4','Acme Corporation'
+! '2','Wesayso Corporation'
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code,name
-3,Never Enough Inc.
+'6',''
+'5',NULL
+'3','Never Enough Inc.'
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
@@ -2603,29 +2725,29 @@ code,name
 # Data differences found among rows:
 ***
   stock_number,description,qty,cost,type,notes,supplier
-! 11146,Speed shine,1,9.99,repair,,1
-! 11186,Plastic polish,1,9.99,polishing,,1
-! 11040,Leather care,1,9.99,other,,1
+! '11146','Speed shine','1','9.99','repair','','1'
+! '11186','Plastic polish','1','9.99','polishing','','1'
+! '11040','Leather care','1','9.99','other','','1'
 ---
   stock_number,description,qty,cost,type,notes,supplier
-! 11146,Speed shine,1,10.00,repair,,1
-! 11186,Plastic polish,1,10.00,polishing,,1
-! 11040,Leather care,1,10.00,other,,1
+! '11146','Speed shine','1','10.00','repair','','1'
+! '11186','Plastic polish','1','10.00','polishing','','1'
+! '11040','Leather care','1','10.00','other','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11270,Carpet cleaner,1,9.99,cleaning,,1
-11056,Microfiber and foam pad cleaner,1,9.99,cleaning,,1
-11136,Rubber cleaner,1,9.99,cleaning,,1
-11104,Interior cleaner,1,9.99,cleaning,,1
-11173,Vinyl and rubber dressing,1,9.99,cleaning,,1
-11106,Wheel cleaner,1,9.99,cleaning,,1
+'11270','Carpet cleaner','1','9.99','cleaning','','1'
+'11056','Microfiber and foam pad cleaner','1','9.99','cleaning','','1'
+'11136','Rubber cleaner','1','9.99','cleaning','','1'
+'11104','Interior cleaner','1','9.99','cleaning','','1'
+'11173','Vinyl and rubber dressing','1','9.99','cleaning','','1'
+'11106','Wheel cleaner','1','9.99','cleaning','','1'
 
 # Rows in `inventory`.`supplies` not in `inventory`.`supplies`
 stock_number,description,qty,cost,type,notes,supplier
-11116,Microfiber wax removal towel,3,16.99,waxing,,1
-10665,Glass polish pad,3,10.00,polishing,,1
-11269,Microfiber spray on car wash towel,3,16.99,cleaning,,1
+'11116','Microfiber wax removal towel','3','16.99','waxing','','1'
+'10665','Glass polish pad','3','10.00','polishing','','1'
+'11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
 
 # Database consistency check failed.
@@ -2655,13 +2777,17 @@ Test case 33 - Use  -a --difftype=context --format=tab --compact
 # Data differences found among rows:
 ***
   code	name
+! 4	
 ! 2	Never Enough Inc.
 ---
   code	name
+! 4	Acme Corporation
 ! 2	Wesayso Corporation
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 code	name
+6	
+5	
 3	Never Enough Inc.
 
 # TABLE     supplies                                pass    FAIL    -       
@@ -2725,20 +2851,32 @@ Test case 34 - Use  -a --difftype=context --format=vertical --compact
 # Data differences found among rows:
 ***
   *************************       1. row *************************
+   code: 4
+!  name: None
+  *************************       2. row *************************
    code: 2
 !  name: Never Enough Inc.
-  1 row.
+  2 rows.
 ---
   *************************       1. row *************************
+   code: 4
+!  name: Acme Corporation
+  *************************       2. row *************************
    code: 2
 !  name: Wesayso Corporation
-  1 row.
+  2 rows.
 
 # Rows in `inventory`.`supplier` not in `inventory`.`supplier`
 *************************       1. row *************************
+ code: 6
+ name: 
+*************************       2. row *************************
+ code: 5
+ name: None
+*************************       3. row *************************
  code: 3
  name: Never Enough Inc.
-1 row.
+3 rows.
 
 # TABLE     supplies                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    

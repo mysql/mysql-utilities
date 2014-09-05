@@ -134,7 +134,7 @@ if __name__ == '__main__':
 
     # turn off binlog mode
     parser.add_option("--disable-binary-logging", action="store_true",
-                      default="False", dest="toggle_binlog",
+                      default=False, dest="toggle_binlog",
                       help="turn binary logging off during operation if "
                            "enabled (SQL_LOG_BIN=1). Note: may require SUPER "
                            "privilege. Prevents compare operations from being "

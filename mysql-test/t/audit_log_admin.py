@@ -27,9 +27,11 @@ from mysql.utilities.exception import MUTLibError
 
 
 class test(mutlib.System_test):
-    """audit log maintenance utility
+    """Audit log maintenance utility tests.
+
     This test runs the mysqlauditadmin utility to test its features. Requires
-    a server with the audit log plug-in enabled.
+    a server with the audit log plug-in enabled and a version >= 5.6.20 and
+    < 5.7.0, or >= 5.7.5.
     """
 
     server0 = None
@@ -38,16 +40,23 @@ class test(mutlib.System_test):
 
     def check_prerequisites(self):
         # First, make sure the server to be clone has the audit log included.
-        if not self.servers.get_server(0).supports_plugin("audit"):
+        srv = self.servers.get_server(0)
+        if not srv.supports_plugin("audit"):
             raise MUTLibError("Test requires a server with the audit log "
                               "plug-in installed and enabled.")
+        # Check the server version.
+        if (not srv.check_version_compat(5, 6, 20) or  # < 5.6.20
+            (srv.check_version_compat(5, 7, 0) and     # >= 5.7.0 and < 5.7.5
+             not srv.check_version_compat(5, 7, 5))):
+            raise MUTLibError("Test requires a server with version >= 5.6.20 "
+                              "and < 5.7.0, or >= 5.7.5.")
+        return self.check_num_servers(1)
+
+    def setup(self):
         self.server1 = None
         self.need_servers = False
         if not self.check_num_servers(2):
             self.need_servers = True
-        return self.check_num_servers(1)
-
-    def setup(self):
         self.server0 = self.servers.get_server(0)
         num_server = self.servers.num_servers()
         if self.need_servers:
@@ -127,6 +136,33 @@ class test(mutlib.System_test):
                    "QUERIES".format(num_test))
         cmd_opts = (" --show-options {0} policy --value="
                     "QUERIES ".format(s1_conn))
+        res = self.run_test_case(0, cmd_base + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        num_test += 1
+
+        comment = ("Test case {0} - change the policy to "
+                   "LOGINS".format(num_test))
+        cmd_opts = (" --show-options {0} policy --value="
+                    "LOGINS ".format(s1_conn))
+        res = self.run_test_case(0, cmd_base + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        num_test += 1
+
+        comment = ("Test case {0} - change the policy to "
+                   "ALL".format(num_test))
+        cmd_opts = (" --show-options {0} policy --value="
+                    "ALL ".format(s1_conn))
+        res = self.run_test_case(0, cmd_base + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        num_test += 1
+
+        comment = ("Test case {0} - change the policy to "
+                   "NONE".format(num_test))
+        cmd_opts = (" --show-options {0} policy --value="
+                    "NONE ".format(s1_conn))
         res = self.run_test_case(0, cmd_base + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

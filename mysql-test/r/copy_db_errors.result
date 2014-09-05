@@ -33,8 +33,8 @@ Test case 7 - users with minimal privileges
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
@@ -68,8 +68,8 @@ Test case 11 - source user has privileges needed
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
@@ -103,8 +103,8 @@ Test case 15 - dest user has privileges needed
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
@@ -143,8 +143,8 @@ WARNING: New storage engine NOTTHERE is not supported on the server.
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
@@ -167,8 +167,8 @@ WARNING: Default storage engine NOPENOTHERE is not supported on the server.
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying GRANTS from util_test
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
@@ -229,8 +229,8 @@ Test case 32 - dest user has privileges needed
 # Copying FUNCTION util_test.f1
 # Copying FUNCTION util_test.f2
 # Copying PROCEDURE util_test.p1
-# Copying VIEW util_test.v1
 # Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
 # Copying data for TABLE util_test.t1
 # Copying data for TABLE util_test.t2
 # Copying data for TABLE util_test.t3

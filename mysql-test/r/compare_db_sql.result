@@ -39,7 +39,10 @@ Test case 2 - check database with known differences generate SQL direction = ser
 #
 
 # Data differences found among rows:
+UPDATE `inventory`.`supplier` SET `name` = 'Acme Corporation' WHERE `code` = '4';
 UPDATE `inventory`.`supplier` SET `name` = 'Wesayso Corporation' WHERE `code` = '2';
+INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('6', '');
+INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('5', NULL);
 INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('3', 'Never Enough Inc.');
 
 
@@ -102,7 +105,10 @@ Test case 3 - check database with known differences generate SQL direction = ser
 #
 
 # Data differences found among rows:
+UPDATE `inventory`.`supplier` SET `name` = NULL WHERE `code` = '4';
 UPDATE `inventory`.`supplier` SET `name` = 'Never Enough Inc.' WHERE `code` = '2';
+DELETE FROM `inventory`.`supplier` WHERE `code` = '6';
+DELETE FROM `inventory`.`supplier` WHERE `code` = '5';
 DELETE FROM `inventory`.`supplier` WHERE `code` = '3';
 
 
@@ -167,14 +173,20 @@ Test case 4 - check database with known differences generate SQL direction = ser
 #
 
 # Data differences found among rows:
+UPDATE `inventory`.`supplier` SET `name` = 'Acme Corporation' WHERE `code` = '4';
 UPDATE `inventory`.`supplier` SET `name` = 'Wesayso Corporation' WHERE `code` = '2';
+INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('6', '');
+INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('5', NULL);
 INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('3', 'Never Enough Inc.');
 
 #
 # Transformation for reverse changes (--changes-for=server2):
 #
 # # Data differences found among rows:
+# UPDATE `inventory`.`supplier` SET `name` = NULL WHERE `code` = '4';
 # UPDATE `inventory`.`supplier` SET `name` = 'Never Enough Inc.' WHERE `code` = '2';
+# DELETE FROM `inventory`.`supplier` WHERE `code` = '6';
+# DELETE FROM `inventory`.`supplier` WHERE `code` = '5';
 # DELETE FROM `inventory`.`supplier` WHERE `code` = '3';
 #
 
@@ -267,14 +279,20 @@ Test case 5 - check database with known differences generate SQL direction = ser
 #
 
 # Data differences found among rows:
+UPDATE `inventory`.`supplier` SET `name` = NULL WHERE `code` = '4';
 UPDATE `inventory`.`supplier` SET `name` = 'Never Enough Inc.' WHERE `code` = '2';
+DELETE FROM `inventory`.`supplier` WHERE `code` = '6';
+DELETE FROM `inventory`.`supplier` WHERE `code` = '5';
 DELETE FROM `inventory`.`supplier` WHERE `code` = '3';
 
 #
 # Transformation for reverse changes (--changes-for=server1):
 #
 # # Data differences found among rows:
+# UPDATE `inventory`.`supplier` SET `name` = 'Acme Corporation' WHERE `code` = '4';
 # UPDATE `inventory`.`supplier` SET `name` = 'Wesayso Corporation' WHERE `code` = '2';
+# INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('6', '');
+# INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('5', NULL);
 # INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('3', 'Never Enough Inc.');
 #
 

@@ -27,6 +27,17 @@ from mysql.utilities.exception import MUTLibError
 _FORMATS = ['unified', 'context', 'differ']
 _DIRECTIONS = ['server1', 'server2']
 _COMPACT_OUTPUT = ['', ' --compact']
+_CREATE_FIRST_TABLE = (
+    "CREATE TABLE `util_test`.`a1` (`a` int(11) NOT NULL AUTO_INCREMENT, "
+    "`b` char(20) DEFAULT NULL, PRIMARY KEY (`a`)) ENGINE=InnoDB "
+    "DEFAULT CHARSET=latin1"
+)
+_CREATE_SECOND_TABLE = (
+    "CREATE TABLE `util_test`.`a1` (`a` int(11) NOT NULL AUTO_INCREMENT, "
+    "`b` char(20) DEFAULT NULL, `c` int(10) unsigned NOT NULL "
+    "COMMENT 'hello', PRIMARY KEY (`a`), KEY `bb` (`b`), KEY `cc` (`c`)) "
+    "ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1"
+)
 
 
 class test(diff.test):
@@ -157,6 +168,21 @@ class test(diff.test):
                 res = self.run_test_case(0, cmd, comment)
                 if not res:
                     raise MUTLibError("{0}: failed".format(comment))
+
+        # Now test for difftype=SQL and skip-table-options when there is
+        # only one table with table options.
+        self.server1.exec_query(_CREATE_FIRST_TABLE)
+        self.server2.exec_query(_CREATE_SECOND_TABLE)
+        test_num += 1
+        cmd = "{0}{1}{2}{3}{4} {5}".format("mysqldiff.py ",
+                                           "--difftype=SQL ",
+                                           "--skip-table-options ",
+                                           "util_test.a1:util_test.a1 ",
+                                           s1_conn, s2_conn)
+        comment = "Test case {0} - Use --skip-table-options ".format(test_num)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         # The following are necessary due to changes in character spaces
         # introduced with Python 2.7.X in the difflib.
