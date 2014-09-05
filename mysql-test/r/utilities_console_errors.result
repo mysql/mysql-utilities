@@ -43,6 +43,8 @@ WARNING: Unable to locate utility mysqlmetagrep.
 WARNING: mysqlmetagrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlserverinfo.
 WARNING: mysqlserverinfo failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlbinlogmove.
+WARNING: mysqlbinlogmove failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlprocgrep.
 WARNING: mysqlprocgrep failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqluserclone.

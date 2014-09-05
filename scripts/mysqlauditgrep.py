@@ -30,8 +30,6 @@ check_python_version()
 import os.path
 import sys
 
-from datetime import datetime
-
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.exception import UtilError
 from mysql.utilities.command import audit_log
@@ -41,6 +39,8 @@ from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_verbosity, add_regexp,
                                             add_format_option_with_extras,
                                             CaseInsensitiveChoicesOption,
+                                            check_date_time,
+                                            get_value_intervals_list,
                                             license_callback,
                                             UtilitiesParser,
                                             check_password_security)
@@ -184,37 +184,10 @@ if __name__ == '__main__':
     # Check date/time ranges
     start_date = None
     if opt.start_date and opt.start_date != "0":
-        date, sep, time = opt.start_date.partition("T")
-        if time:
-            try:
-                sdate = datetime.strptime(opt.start_date, "%Y-%m-%dT%H:%M:%S")
-            except ValueError:
-                parser.error("Invalid start date/time format "
-                             + "(yyyy-mm-ddThh:mm:ss): " + opt.start_date)
-        else:
-            try:
-                sdate = datetime.strptime(opt.start_date, "%Y-%m-%d")
-            except ValueError:
-                parser.error("Invalid start date format (yyyy-mm-dd): "
-                             + opt.start_date)
-        start_date = sdate.strftime("%Y-%m-%dT%H:%M:%S")
-
+        start_date = check_date_time(parser, opt.start_date, 'start')
     end_date = None
     if opt.end_date and opt.end_date != "0":
-        date, sep, time = opt.end_date.partition("T")
-        if time:
-            try:
-                edate = datetime.strptime(opt.end_date, "%Y-%m-%dT%H:%M:%S")
-            except ValueError:
-                parser.error("Invalid end date/time format "
-                             + "(yyyy-mm-ddThh:mm:ss): " + opt.end_date)
-        else:
-            try:
-                edate = datetime.strptime(opt.end_date, "%Y-%m-%d")
-            except ValueError:
-                parser.error("Invalid start date format (yyyy-mm-dd): "
-                             + opt.end_date)
-        end_date = edate.strftime("%Y-%m-%dT%H:%M:%S")
+        end_date = check_date_time(parser, opt.end_date, 'end')
 
     # Check if the value specified for the --users option is valid
     users = None
@@ -273,40 +246,8 @@ if __name__ == '__main__':
     # Check if the values specified for the --status option are valid
     status_list = []
     if opt.status:
-        # filter empty values and convert all to integers cases
-        status_values = opt.status.split(",")
-        status_values = [status for status in status_values if status]
-        if not len(status_values) > 0:
-            parser.error("The value for the option --status is not valid: "
-                         "'{0}'.".format(opt.status))
-        for value in status_values:
-            interval = value.split('-')
-            if len(interval) == 2:
-                try:
-                    lv = int(interval[0])
-                except ValueError:
-                    parser.error("Invalid status value '{0}' (must be a "
-                                 "non-negative integer) for interval "
-                                 "'{1}'.".format(interval[0], value))
-                try:
-                    hv = int(interval[1])
-                except ValueError:
-                    parser.error("Invalid status value '{0}' (must be a "
-                                 "non-negative integer) for interval "
-                                 "'{1}'.".format(interval[1], value))
-                # Add interval (tuple) to the status list.
-                status_list.append((lv, hv))
-            elif len(interval) == 1:
-                # Add single value to the status list.
-                try:
-                    status_list.append(int(value))
-                except ValueError:
-                    parser.error("Invalid status value '{0}' (must be a "
-                                 "non-negative integer).".format(value))
-            else:
-                # Invalid format.
-                parser.error("Invalid format for status interval (a single "
-                             "dash must be used): '{0}'.".format(value))
+        status_list = get_value_intervals_list(parser, opt.status, '--status',
+                                               'status')
 
     # Create dictionary of options
     options = {

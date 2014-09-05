@@ -1238,6 +1238,53 @@ class Server(object):
 
         return self.exec_query("SHOW VARIABLES LIKE '%s'" % variable)
 
+    def select_variable(self, var_name, var_type=None):
+        """Get server system variable value using SELECT statement.
+
+        This function displays the value of system variables using the SELECT
+        statement. This can be used as a workaround for variables with very
+        long values, as SHOW VARIABLES is subject to a version-dependent
+        display-width limit.
+
+        Note: Some variables may not be available using SELECT @@var_name, in
+        such cases use SHOW VARIABLES LIKE 'var_name'.
+
+        var_name[in]    Name of the variable to display.
+        var_type[in]    Type of the variable ('session' or 'global'). By
+                        default no type is used, meaning that the session
+                        value is returned if it exists and the global value
+                        otherwise.
+
+        Return the value for the given server system variable.
+        """
+        if var_type is None:
+            var_type = ''
+        elif var_type.lower() in ('global', 'session', ''):
+            var_type = '{0}.'.format(var_type)  # Add dot (.)
+        else:
+            raise UtilDBError("Invalid variable type: {0}. Supported types: "
+                              "'global' and 'session'.".format(var_type))
+        # Execute SELECT @@[var_type.]var_name.
+        # Note: An error is issued if the given variable is not known.
+        res = self.exec_query("SELECT @@{0}{1}".format(var_type, var_name))
+        return res[0][0]
+
+    def flush_logs(self, log_type=None):
+        """Execute the FLUSH [log_type] LOGS statement.
+
+        Reload internal logs cache and closes and reopens all log files, or
+        only of the specified log_type.
+
+        Note: The log_type option is available from MySQL 5.5.3.
+
+        log_type[in]    Type of the log files to be flushed. Supported values:
+                        BINARY, ENGINE, ERROR, GENERAL, RELAY, SLOW.
+        """
+        if log_type:
+            self.exec_query("FLUSH {0} LOGS".format(log_type))
+        else:
+            self.exec_query("FLUSH LOGS")
+
     def get_uuid(self):
         """Return the uuid for this server if it is GTID aware.
 

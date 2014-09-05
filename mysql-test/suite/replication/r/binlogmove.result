@@ -1,0 +1,60 @@
+Test case 1a - move binary logs from running server (master).
+#
+# Moving bin-log files...
+# - master-bin.000001
+# - master-bin.000002
+# - master-bin.000003
+# - master-bin.000004
+# - master-bin.000005
+#
+# Flushing binary logs...
+#
+#...done.
+#
+Test case 1b - check moved files and changes in index file:
+File moved: 'master-bin.000001' (index updated: True)
+File moved: 'master-bin.000002' (index updated: True)
+File moved: 'master-bin.000003' (index updated: True)
+File moved: 'master-bin.000004' (index updated: True)
+File moved: 'master-bin.000005' (index updated: True)
+
+Test case 2a - move binary logs from running server (slave 1).
+#
+# Moving bin-log files...
+# - slave1-bin.000001
+# - slave1-bin.000002
+# - slave1-bin.000003
+# - slave1-bin.000004
+# - slave1-bin.000005
+#
+# Flushing binary logs...
+#
+#...done.
+#
+Test case 2b - check moved files and changes in index file:
+File moved: 'slave1-bin.000001' (index updated: True)
+File moved: 'slave1-bin.000002' (index updated: True)
+File moved: 'slave1-bin.000003' (index updated: True)
+File moved: 'slave1-bin.000004' (index updated: True)
+File moved: 'slave1-bin.000005' (index updated: True)
+
+Test case 3a - move binary logs for stopped server (slave 2).
+#
+# Moving bin-log files...
+# - slave2-bin.000001
+# - slave2-bin.000002
+# - slave2-bin.000003
+# - slave2-bin.000004
+# - slave2-bin.000005
+# - slave2-bin.000006
+#
+#...done.
+#
+Test case 3b - check moved files and changes in index file:
+File moved: 'slave2-bin.000001' (index updated: True)
+File moved: 'slave2-bin.000002' (index updated: True)
+File moved: 'slave2-bin.000003' (index updated: True)
+File moved: 'slave2-bin.000004' (index updated: True)
+File moved: 'slave2-bin.000005' (index updated: True)
+File moved: 'slave2-bin.000006' (index updated: True)
+

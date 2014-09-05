@@ -81,6 +81,17 @@ PARSE_ERR_OPT_INVALID_CMD = "Invalid {opt} option for '{cmd}'."
 PARSE_ERR_OPT_INVALID_CMD_TIP = ("%s Use {opt_tip} instead."
                                  % PARSE_ERR_OPT_INVALID_CMD)
 
+PARSE_ERR_OPT_INVALID_DATE = "Invalid {0} date format (yyyy-mm-dd): {1}"
+
+PARSE_ERR_OPT_INVALID_DATE_TIME = ("Invalid {0} date/time format "
+                                   "(yyyy-mm-ddThh:mm:ss): {1}")
+
+PARSE_ERR_OPT_INVALID_NUM_DAYS = ("Invalid number of days (must be an integer "
+                                  "greater than zero) for {0} date: {1}")
+
+PARSE_ERR_OPT_INVALID_VALUE = ("The value for option {option} is not valid: "
+                               "'{value}'.")
+
 PARSE_ERR_OPT_REQ_NON_NEGATIVE_VALUE = ("Option '{opt}' requires a "
                                         "non-negative value.")
 
@@ -88,6 +99,9 @@ PARSE_ERR_OPT_REQ_GREATER_VALUE = ("Option '{opt}' requires a value greater "
                                    "than {val}.")
 
 PARSE_ERR_OPT_REQ_VALUE = "Option '{opt}' requires a non-empty value."
+
+PARSE_ERR_OPTS_EXCLD = ("Options {opt1} and {opt2} cannot be used "
+                        "together.")
 
 PARSE_ERR_OPTS_REQ = "Option '{opt}' is required."
 
@@ -100,9 +114,6 @@ PARSE_ERR_DISCO_REQ_MASTER = ("Option --discover-slaves-login requires use of "
 PARSE_ERR_SLAVE_DISCO_REQ = ("Option --discover-slaves-login or --slaves is "
                              "required.")
 
-PARSE_ERR_SLAVE_DISCO_EXC = ("Options --discover-slaves-login and --slaves "
-                             "cannot be used simultaneously.")
-
 PARSE_ERR_OPTS_REQ_GREATER_OR_EQUAL = ("The {opt} option requires a value "
                                        "greater than or equal to {value}.")
 
@@ -111,6 +122,10 @@ WARN_OPT_NOT_REQUIRED = ("WARNING: The {opt} option is not required for "
 
 WARN_OPT_NOT_REQUIRED_ONLY_FOR = ("%s Only used with the {only_cmd} command."
                                   % WARN_OPT_NOT_REQUIRED)
+
+WARN_OPT_NOT_REQUIRED_FOR_TYPE = (
+    "# WARNING: The {opt} option is not required for the {type} type "
+    "(option ignored).")
 
 WARN_OPT_ONLY_USED_WITH = ("# WARNING: The {opt} option is only used with "
                            "{used_with} (option ignored).")

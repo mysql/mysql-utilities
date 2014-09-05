@@ -1,0 +1,502 @@
+Test case 1 - help option.
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove - binary log relocate utility
+
+Options:
+  --version             show program's version number and exit
+  --help                display a help message and exit
+  --license             display program's license and exit
+  --server=SERVER       connection information for the server in the form:
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
+  --binlog-dir=BINLOG_DIR
+                        Source directory (full path) where the binary log
+                        files to move are located.
+  --bin-log-basename=BIN_LOG_BASENAME
+                        Basename for the binlog files. If not available it is
+                        assumed to be any name ended with '-bin'.
+  --relay-log-basename=RELAY_LOG_BASENAME
+                        Basename for the relay log files. If not available it
+                        is assumed to be any name ended with '-relay-bin'.
+  --bin-log-index=BIN_LOG_INDEX
+                        Location (full path) of the binlogs index file. If not
+                        specified it is assumed to be located in the binary
+                        log directory.
+  --relay-log-index=RELAY_LOG_INDEX
+                        Location (full path) of the relay logs index file. If
+                        not specified it is assumed to be located in the
+                        binary log directory.
+  -v, --verbose         control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+  --log-type=LOG_TYPE   type of the binary log files to relocate: 'bin' - bin-
+                        log files (default), 'relay' - relay-log files, 'all'
+                        - bin-log and relay-log files.
+  --sequence=SEQUENCE   relocate files with the specified sequence values.
+                        Accepts a comma-separated list of non-negative
+                        integers (corresponding to the file sequence number)
+                        or intervals marked with a dash. For example:
+                        3,5-12,16,21.
+  --modified-before=MODIFIED_BEFORE
+                        relocate files with the modified date prior to the
+                        specified date/time or number of days. Accepts a
+                        date/time in the format: yyyy-mm-ddThh:mm:ss or yyyy-
+                        mm-dd, or an integer for the elapsed days.
+  --skip-flush-binlogs  Skip the binary/relay flush operation to reload
+                        server's cache after moving files.
+
+Introduction
+------------
+The mysqlbinlogmove utility was designed to relocate binary log files to a new
+location in a simple and easy way. The use of this utility is recommended when
+you intend to change the base location for the binlog files (enabled with the
+server option --log-bin) moving all binlog files to the target location and
+updating all required index files. It is also useful to archive some binary
+log files to a different location.
+
+Note: In order to relocate all binary log files the mysql server must be
+stopped. This requirement is not needed if only some of binary log files are
+relocated.
+
+The behaviour of the utility depends on the options specified. Use the
+--binlog_dir option to relocate all binary logs. Use the --server option to
+relocate all binary logs except the ones currently in use (with the higher
+sequence number). The target destination directory must be specified as an
+argument and other option can be used to restrict the binary log files that
+will be moved, as shown in the following examples.
+
+  # Move all binlog files to a new location (from /old/location
+  # to /new/location).
+
+  $ mysqlbinlogmove --binlog-dir=/old/location /new/location
+
+  # Move all binlog files except the one currently in use to a new
+  # location (from the server log_bin_basename directory to /new/location).
+
+  $ mysqlbinlogmove --server=root:pass@host1:3306 /new/location
+
+  # Move all binlog files within a specific sequence range (10-100),
+  # except the one currently in use, to a new location (from the server
+  # log_bin_basename directory to /new/location).
+
+  $ mysqlbinlogmove --server=root:pass@host1:3306 --sequence=10-100 \
+                    /new/location
+
+  # Move all binlog files not modified in the last two days, except the one
+  # currently in use, to a new location (from the server log_bin_basename
+  # directory to /new/location).
+
+  $ mysqlbinlogmove --server=root:pass@host1:3306 --modified-before=2 \
+                    /new/location
+
+  # Move all binlog files older than a specific date (not modified),
+  # except the one currently in use, to a new location (from the server
+  # log_bin_basename directory to /new/location).
+
+  $ mysqlbinlogmove --server=root:pass@host1:3306 \
+                    --modified-before=2004-07-30 /new/location
+
+
+Helpful Hints
+-------------
+  - By default only binlog files are moved. To move relay log files or both
+    use the --log-type option with the desired value.
+  - By default the utility will try to automatically determine the base name
+    for the binary logs and index files by applying the default filename
+    formats and files location. If custom file names are used, you can specify
+    them using the options --bin-log-index, --bin-log-basename,
+    --relay-log-index, and --relay-log-basename, respectively for binlog and
+    relay log files.
+  - When the --server option is used by default binary logs are flushed at the
+    end of the relocate operation in order to update the server's info. Use
+    --skip-flush-binlogs to skip this step.
+Test case 2 - warning using --bin-log-index with relay type.
+# WARNING: The --bin-log-index option is not required for the relay log type (option ignored).
+# WARNING: No relay-log files found to move.
+#
+#...done.
+#
+Test case 3 - warning using --bin-log-basename with relay type.
+# WARNING: The --bin-log-basename option is not required for the relay log type (option ignored).
+# WARNING: No relay-log files found to move.
+#
+#...done.
+#
+Test case 4 - warning using --relay-log-index with bin type.
+# WARNING: The --relay-log-index option is not required for the binlog type (option ignored).
+# WARNING: No bin-log files found to move.
+#
+#...done.
+#
+Test case 5 - warning using --relay-log-basename with bin type.
+# WARNING: The --relay-log-basename option is not required for the binlog type (option ignored).
+# WARNING: No bin-log files found to move.
+#
+#...done.
+#
+Test case 6 - warning using --skip-flush-binlogs without --server.
+# WARNING: The --skip-flush-binlogs option is only used with --server (option ignored).
+# WARNING: No bin-log files found to move.
+#
+#...done.
+#
+Test case 7a - move (only) binlogs from slave .
+#
+# Moving bin-log files...
+# - slave1-bin.000001
+# - slave1-bin.000002
+# - slave1-bin.000003
+# - slave1-bin.000004
+# - slave1-bin.000005
+#
+# Flushing binary logs...
+#
+#...done.
+#
+Test case 7b - check moved files and changes in index file:
+File moved: 'slave1-bin.000001' (index updated: True)
+File moved: 'slave1-bin.000002' (index updated: True)
+File moved: 'slave1-bin.000003' (index updated: True)
+File moved: 'slave1-bin.000004' (index updated: True)
+File moved: 'slave1-bin.000005' (index updated: True)
+
+Test case 7c - SHOW BINARY LOGS (flush performed):
+file: slave1-bin.000001, size: 1??;
+file: slave1-bin.000002, size: 1??;
+file: slave1-bin.000003, size: 1??;
+file: slave1-bin.000004, size: 1??;
+file: slave1-bin.000005, size: 1??;
+file: slave1-bin.000006, size: 1??;
+file: slave1-bin.000007, size: 1??;
+Test case 7d - move files back.
+#
+# Moving bin-log files...
+# - slave1-bin.000001
+# - slave1-bin.000002
+# - slave1-bin.000003
+# - slave1-bin.000004
+# - slave1-bin.000005
+#
+#...done.
+#
+Test case 8a - move (only) relay logs from slave .
+#
+# Moving relay-log files...
+# - slave1-relay-bin.000001
+# - slave1-relay-bin.000002
+# - slave1-relay-bin.000003
+# - slave1-relay-bin.000004
+# - slave1-relay-bin.000005
+# - slave1-relay-bin.000006
+# - slave1-relay-bin.000007
+# - slave1-relay-bin.000008
+# - slave1-relay-bin.000009
+# - slave1-relay-bin.000010
+# - slave1-relay-bin.000011
+# - slave1-relay-bin.000012
+# - slave1-relay-bin.000013
+# - slave1-relay-bin.000014
+# - slave1-relay-bin.000015
+# - slave1-relay-bin.000016
+#
+# Flushing relay logs...
+#
+#...done.
+#
+Test case 8b - check moved files and changes in index file:
+File moved: 'slave1-relay-bin.000001' (index updated: True)
+File moved: 'slave1-relay-bin.000002' (index updated: True)
+File moved: 'slave1-relay-bin.000003' (index updated: True)
+File moved: 'slave1-relay-bin.000004' (index updated: True)
+File moved: 'slave1-relay-bin.000005' (index updated: True)
+File moved: 'slave1-relay-bin.000006' (index updated: True)
+File moved: 'slave1-relay-bin.000007' (index updated: True)
+File moved: 'slave1-relay-bin.000008' (index updated: True)
+File moved: 'slave1-relay-bin.000009' (index updated: True)
+File moved: 'slave1-relay-bin.000010' (index updated: True)
+File moved: 'slave1-relay-bin.000011' (index updated: True)
+File moved: 'slave1-relay-bin.000012' (index updated: True)
+File moved: 'slave1-relay-bin.000013' (index updated: True)
+File moved: 'slave1-relay-bin.000014' (index updated: True)
+File moved: 'slave1-relay-bin.000015' (index updated: True)
+File moved: 'slave1-relay-bin.000016' (index updated: True)
+
+Test case 8c - move files back.
+#
+# Moving relay-log files...
+# - slave1-relay-bin.000001
+# - slave1-relay-bin.000002
+# - slave1-relay-bin.000003
+# - slave1-relay-bin.000004
+# - slave1-relay-bin.000005
+# - slave1-relay-bin.000006
+# - slave1-relay-bin.000007
+# - slave1-relay-bin.000008
+# - slave1-relay-bin.000009
+# - slave1-relay-bin.000010
+# - slave1-relay-bin.000011
+# - slave1-relay-bin.000012
+# - slave1-relay-bin.000013
+# - slave1-relay-bin.000014
+# - slave1-relay-bin.000015
+# - slave1-relay-bin.000016
+#
+#...done.
+#
+Test case 9a - move (all) bin and relay logs from slave  (with --skip-flush-binlogs).
+#
+# Moving bin-log files...
+# - slave2-bin.000001
+# - slave2-bin.000002
+# - slave2-bin.000003
+# - slave2-bin.000004
+# - slave2-bin.000005
+#
+#
+# Moving relay-log files...
+# - slave2-relay-bin.000001
+# - slave2-relay-bin.000002
+# - slave2-relay-bin.000003
+# - slave2-relay-bin.000004
+# - slave2-relay-bin.000005
+# - slave2-relay-bin.000006
+# - slave2-relay-bin.000007
+# - slave2-relay-bin.000008
+# - slave2-relay-bin.000009
+# - slave2-relay-bin.000010
+# - slave2-relay-bin.000011
+# - slave2-relay-bin.000012
+# - slave2-relay-bin.000013
+# - slave2-relay-bin.000014
+# - slave2-relay-bin.000015
+# - slave2-relay-bin.000016
+#
+#...done.
+#
+Test case 9b - check moved files and changes in index file:
+File moved: 'slave2-bin.000001' (index updated: True)
+File moved: 'slave2-bin.000002' (index updated: True)
+File moved: 'slave2-bin.000003' (index updated: True)
+File moved: 'slave2-bin.000004' (index updated: True)
+File moved: 'slave2-bin.000005' (index updated: True)
+File moved: 'slave2-relay-bin.000001' (index updated: True)
+File moved: 'slave2-relay-bin.000002' (index updated: True)
+File moved: 'slave2-relay-bin.000003' (index updated: True)
+File moved: 'slave2-relay-bin.000004' (index updated: True)
+File moved: 'slave2-relay-bin.000005' (index updated: True)
+File moved: 'slave2-relay-bin.000006' (index updated: True)
+File moved: 'slave2-relay-bin.000007' (index updated: True)
+File moved: 'slave2-relay-bin.000008' (index updated: True)
+File moved: 'slave2-relay-bin.000009' (index updated: True)
+File moved: 'slave2-relay-bin.000010' (index updated: True)
+File moved: 'slave2-relay-bin.000011' (index updated: True)
+File moved: 'slave2-relay-bin.000012' (index updated: True)
+File moved: 'slave2-relay-bin.000013' (index updated: True)
+File moved: 'slave2-relay-bin.000014' (index updated: True)
+File moved: 'slave2-relay-bin.000015' (index updated: True)
+File moved: 'slave2-relay-bin.000016' (index updated: True)
+
+Test case 9c - SHOW BINARY LOGS (flush skipped):
+file: slave2-bin.000001, size: 0;
+file: slave2-bin.000002, size: 0;
+file: slave2-bin.000003, size: 0;
+file: slave2-bin.000004, size: 0;
+file: slave2-bin.000005, size: 0;
+file: slave2-bin.000006, size: 1??;
+Test case 9d - move files back.
+#
+# Moving bin-log files...
+# - slave2-bin.000001
+# - slave2-bin.000002
+# - slave2-bin.000003
+# - slave2-bin.000004
+# - slave2-bin.000005
+#
+#
+# Moving relay-log files...
+# - slave2-relay-bin.000001
+# - slave2-relay-bin.000002
+# - slave2-relay-bin.000003
+# - slave2-relay-bin.000004
+# - slave2-relay-bin.000005
+# - slave2-relay-bin.000006
+# - slave2-relay-bin.000007
+# - slave2-relay-bin.000008
+# - slave2-relay-bin.000009
+# - slave2-relay-bin.000010
+# - slave2-relay-bin.000011
+# - slave2-relay-bin.000012
+# - slave2-relay-bin.000013
+# - slave2-relay-bin.000014
+# - slave2-relay-bin.000015
+# - slave2-relay-bin.000016
+#
+#...done.
+#
+Test case 10a - move binary logs from slave matching specific sequence numbers.
+#
+# Applying sequence filter to bin-log files...
+#
+# Moving bin-log files...
+# - slave1-bin.000002
+# - slave1-bin.000004
+# - slave1-bin.000005
+# - slave1-bin.000006
+#
+# Flushing binary logs...
+#
+#
+# Applying sequence filter to relay-log files...
+#
+# Moving relay-log files...
+# - slave1-relay-bin.000002
+# - slave1-relay-bin.000004
+# - slave1-relay-bin.000005
+# - slave1-relay-bin.000006
+# - slave1-relay-bin.000007
+# - slave1-relay-bin.000011
+# - slave1-relay-bin.000013
+#
+# Flushing relay logs...
+#
+#...done.
+#
+Test case 10b - check moved files and changes in index file:
+File moved: 'slave1-bin.000002' (index updated: True)
+File moved: 'slave1-bin.000004' (index updated: True)
+File moved: 'slave1-bin.000005' (index updated: True)
+File moved: 'slave1-bin.000006' (index updated: True)
+File moved: 'slave1-relay-bin.000002' (index updated: True)
+File moved: 'slave1-relay-bin.000004' (index updated: True)
+File moved: 'slave1-relay-bin.000005' (index updated: True)
+File moved: 'slave1-relay-bin.000006' (index updated: True)
+File moved: 'slave1-relay-bin.000007' (index updated: True)
+File moved: 'slave1-relay-bin.000011' (index updated: True)
+File moved: 'slave1-relay-bin.000013' (index updated: True)
+
+Test case 10c - move files back.
+#
+# Applying sequence filter to bin-log files...
+#
+# Moving bin-log files...
+# - slave1-bin.000002
+# - slave1-bin.000004
+# - slave1-bin.000005
+# - slave1-bin.000006
+#
+#
+# Applying sequence filter to relay-log files...
+#
+# Moving relay-log files...
+# - slave1-relay-bin.000002
+# - slave1-relay-bin.000004
+# - slave1-relay-bin.000005
+# - slave1-relay-bin.000006
+# - slave1-relay-bin.000007
+# - slave1-relay-bin.000011
+# - slave1-relay-bin.000013
+#
+#...done.
+#
+Test case 11 - move binary logs from slave modified 3 days ago (no files to move).
+#
+# Applying modified date filter to bin-log files...
+#
+# No bin-log files will be moved.
+#
+#
+# Applying modified date filter to relay-log files...
+#
+# No relay-log files will be moved.
+#
+#...done.
+#
+Test case 12a - move binary logs from slave modified 2 days ago.
+#
+# Applying modified date filter to bin-log files...
+#
+# Moving bin-log files...
+# - slave2-bin.000002
+#
+# Flushing binary logs...
+#
+#
+# Applying modified date filter to relay-log files...
+#
+# Moving relay-log files...
+# - slave2-relay-bin.000005
+# - slave2-relay-bin.000010
+#
+# Flushing relay logs...
+#
+#...done.
+#
+Test case 12b - check moved files and changes in index file:
+File moved: 'slave2-bin.000002' (index updated: True)
+File moved: 'slave2-relay-bin.000005' (index updated: True)
+File moved: 'slave2-relay-bin.000010' (index updated: True)
+
+Test case 12c - move files back.
+#
+# Applying modified date filter to bin-log files...
+#
+# Moving bin-log files...
+# - slave2-bin.000002
+#
+#
+# Applying modified date filter to relay-log files...
+#
+# Moving relay-log files...
+# - slave2-relay-bin.000005
+# - slave2-relay-bin.000010
+#
+#...done.
+#
+Test case 13a - move binary logs from slave modified before yesterday.
+#
+# Applying modified date filter to bin-log files...
+#
+# Moving bin-log files...
+# - slave2-bin.000002
+#
+# Flushing binary logs...
+#
+#
+# Applying modified date filter to relay-log files...
+#
+# Moving relay-log files...
+# - slave2-relay-bin.000005
+# - slave2-relay-bin.000010
+#
+# Flushing relay logs...
+#
+#...done.
+#
+Test case 13b - check moved files and changes in index file:
+File moved: 'slave2-bin.000002' (index updated: True)
+File moved: 'slave2-relay-bin.000005' (index updated: True)
+File moved: 'slave2-relay-bin.000010' (index updated: True)
+
+Test case 13c - move files back.
+#
+# Applying modified date filter to bin-log files...
+#
+# Moving bin-log files...
+# - slave2-bin.000002
+#
+#
+# Applying modified date filter to relay-log files...
+#
+# Moving relay-log files...
+# - slave2-relay-bin.000005
+# - slave2-relay-bin.000010
+#
+#...done.
+#

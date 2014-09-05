@@ -28,13 +28,18 @@ import optparse
 import os.path
 import re
 
+from datetime import datetime
 from optparse import Option as CustomOption, OptionValueError
 from ip_parser import find_password
 
 from mysql.utilities import LICENSE_FRM, VERSION_FRM
 from mysql.utilities.exception import UtilError, FormatError
 from mysql.connector.conversion import MySQLConverter
-from mysql.utilities.common.messages import PARSE_ERR_OBJ_NAME_FORMAT
+from mysql.utilities.common.messages import (PARSE_ERR_OBJ_NAME_FORMAT,
+                                             PARSE_ERR_OPT_INVALID_DATE,
+                                             PARSE_ERR_OPT_INVALID_DATE_TIME,
+                                             PARSE_ERR_OPT_INVALID_NUM_DAYS,
+                                             PARSE_ERR_OPT_INVALID_VALUE)
 from mysql.utilities.common.my_print_defaults import (MyDefaultsReader,
                                                       my_login_config_exists)
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
@@ -884,16 +889,23 @@ def check_dir_option(parser, opt_value, opt_name, check_access=False,
     read_only[in]       Flag indicating if the access required is only for
                         read or read/write. By default, False (read/write
                         access). Note: only used if check_access=True.
+
+    Return the absolute path for the specified directory or None if an empty
+    value is specified.
     """
     # Check existence of specified directory.
-    if opt_value and not os.path.isdir(get_absolute_path(opt_value)):
-        parser.error("The specified path for {0} option is not a "
-                     "directory: {1}".format(opt_name, opt_value))
-    if check_access:
-        mode = os.R_OK if read_only else os.R_OK | os.W_OK
-        if not os.access(opt_value, mode):
-            parser.error("You do not have enough privileges to access the "
-                         "folder specified by {0}.".format(opt_name))
+    if opt_value:
+        full_path = get_absolute_path(opt_value)
+        if not os.path.isdir(full_path):
+            parser.error("The specified path for {0} option is not a "
+                         "directory: {1}".format(opt_name, opt_value))
+        if check_access:
+            mode = os.R_OK if read_only else os.R_OK | os.W_OK
+            if not os.access(full_path, mode):
+                parser.error("You do not have enough privileges to access the "
+                             "folder specified by {0}.".format(opt_name))
+        return full_path
+    return None
 
 
 def get_absolute_path(path):
@@ -998,6 +1010,113 @@ def get_ssl_dict(parser_options=None):
             certs_paths['ssl_key'] = parser_options.ssl_key
         conn_options.update(certs_paths)
     return conn_options
+
+
+def get_value_intervals_list(parser, option_value, option_name, value_name):
+    """Get and check the list of values for the given option.
+
+    Convert the string value for the given option to the corresponding
+    list of integer values and tuple of integers (for intervals). For example,
+    converts the option_value '3,5-8,11' to the list [3, (5,8), 11].
+
+    A parser error is issued if the used values or format are invalid.
+
+    parser[in]          Instance of the used option/arguments parser.
+    option_value[in]    Value specified for the option (e.g., '3,5-8,11').
+    option_name[in]     Name of the option (e.g., '--status').
+    value_name[in]      Name describing each option value (e.g., 'status').
+
+    Returns a list of integers and tuple of integers (for intervals)
+    representing the given option value string.
+    """
+    # Filter empty values and convert all to integers (values and intervals).
+    values = option_value.split(",")
+    values = [value for value in values if value]
+    if not len(values) > 0:
+        parser.error(PARSE_ERR_OPT_INVALID_VALUE.format(option=option_name,
+                                                        value=option_value))
+    res_list = []
+    for value in values:
+        interval = value.split('-')
+        if len(interval) == 2:
+            # Convert lower and higher value of the interval.
+            try:
+                lv = int(interval[0])
+            except ValueError:
+                parser.error("Invalid {0} value '{1}' (must be a "
+                             "non-negative integer) for interval "
+                             "'{2}'.".format(value_name, interval[0], value))
+            try:
+                hv = int(interval[1])
+            except ValueError:
+                parser.error("Invalid {0} value '{1}' (must be a "
+                             "non-negative integer) for interval "
+                             "'{2}'.".format(value_name, interval[1], value))
+            # Add interval (tuple) to the list.
+            res_list.append((lv, hv))
+        elif len(interval) == 1:
+            # Add single value to the status list.
+            try:
+                res_list.append(int(value))
+            except ValueError:
+                parser.error("Invalid {0} value '{1}' (must be a "
+                             "non-negative integer).".format(value_name,
+                                                             value))
+        else:
+            # Invalid format.
+            parser.error("Invalid format for {0} interval (a single "
+                         "dash must be used): '{1}'.".format(value_name,
+                                                             value))
+    return res_list
+
+
+def check_date_time(parser, date_value, date_type, allow_days=False):
+    """Check the date/time value for the given option.
+
+    Check if the date/time value for the option is valid. The supported
+    formats are 'yyyy-mm-ddThh:mm:ss' and 'yyyy-mm-dd'. If the allow days
+    flag is ON then an integer valuse representing the number of days is
+    also accepted.
+
+    A parser error is issued if the date/time value is invalid.
+
+    parser[in]        Instance of the used option/arguments parser.
+    date_value[in]    Date/time value specified for the option.
+    date_type[in]     Name describing the type of date being checked
+                      (e.g., start, end, modified).
+    allow_days[in]    Flag indicating if the specified value can also be an
+                      integer representing the number of of days (> 0).
+
+    Returns the date in the format 'yyyy-mm-ddThh:mm:ss' or an integer
+    representing the number of days.
+    """
+    if allow_days:
+        # Check if it is a valid number of days.
+        try:
+            days = int(date_value)
+        except ValueError:
+            # Not a valid integer (i.e., number of days).
+            days = None
+        if days:
+            if days < 1:
+                parser.error(PARSE_ERR_OPT_INVALID_NUM_DAYS.format(
+                    date_type, date_value))
+            return days
+    # Check if it is a valid date/time format.
+    _, _, time = date_value.partition("T")
+    if time:
+        try:
+            dt_date = datetime.strptime(date_value, '%Y-%m-%dT%H:%M:%S')
+        except ValueError:
+            parser.error(PARSE_ERR_OPT_INVALID_DATE_TIME.format(date_type,
+                                                                date_value))
+    else:
+        try:
+            dt_date = datetime.strptime(date_value, '%Y-%m-%d')
+        except ValueError:
+            parser.error(PARSE_ERR_OPT_INVALID_DATE.format(date_type,
+                                                           date_value))
+    return dt_date.strftime('%Y-%m-%dT%H:%M:%S')
 
 
 def check_password_security(options, args, prefix=""):

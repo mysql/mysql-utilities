@@ -1,0 +1,72 @@
+Test case 1 - server or binlog-dir required.
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: Option '--server' or '--binlog-dir' is required.
+Test case 2 - server and binlog-dir cannot be used at the same time.
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: Options --server and --binlog-dir cannot be used together.
+Test case 3 - invalid server connection format.
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: Server connection values invalid: Connection '@:invalid' cannot be parsed. Please review the used connection string (accepted formats: <user>[:<password>]@<host>[:<port>][:<socket>] or <login-path>[:<port>][:<socket>]).
+Test case 4 - invalid binlog-dir directory.
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: The specified path for --binlog-dir option is not a directory: /invalid/not/exist
+Test case 5 - missing destination directory.
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: You must specify the destination directory as argument.
+Test case 6 - multiple destinations.
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: You can only specify one destination directory. Multiple arguments found.
+Test case 7 - invalid destination directory.
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: The destination path specified as argument is not a valid directory: /invalid/not/exist
+Test case 8 - invalid binlog index file.
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: The specified value for --bin-index is not a file: invalid.index
+Test case 9 - invalid relay log index file.
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: The specified value for --relay-index is not a file: invalid.index
+Test case 10 - invalid log type.
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: option --log-type: invalid choice: 'fake' (choose from 'bin', 'relay', 'all')
+Test case 11 - invalid --sequence option value
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: The value for option --sequence is not valid: ',,'.
+Test case 12 - invalid SEQUENCE value
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: Invalid sequence value 'ABC' (must be a non-negative integer).
+Test case 13 - invalid SEQUENCE interval format
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: Invalid format for sequence interval (a single dash must be used): '200-250-300'.
+Test case 14 - invalid SEQUENCE interval lower bound
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: Invalid sequence value '.1' (must be a non-negative integer) for interval '.1-100'.
+Test case 15 - invalid SEQUENCE interval upper bound
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: Invalid sequence value '' (must be a non-negative integer) for interval '1-'.
+Test case 16 - invalid --modified-before option value
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: Invalid modified date format (yyyy-mm-dd): INVALID
+Test case 17 - invalid MODIFIED_BEFORE number of days
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: Invalid modified date format (yyyy-mm-dd): 0
+Test case 18 - invalid MODIFIED_BEFORE date/time format
+Usage: mysqlbinlogmove --server=user:pass@host:port <destination_directory>
+
+mysqlbinlogmove: error: Invalid modified date/time format (yyyy-mm-ddThh:mm:ss): 10:05:00T2014-07-21

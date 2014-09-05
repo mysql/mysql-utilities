@@ -34,7 +34,7 @@ from mysql.utilities.command.rpl_sync_check import check_data_consistency
 from mysql.utilities.common.messages import (
     ERROR_MASTER_IN_SLAVES, PARSE_ERR_DISCO_REQ_MASTER,
     PARSE_ERR_OPT_REQ_NON_NEGATIVE_VALUE, PARSE_ERR_OPT_REQ_GREATER_VALUE,
-    PARSE_ERR_OPT_REQ_VALUE, PARSE_ERR_SLAVE_DISCO_EXC,
+    PARSE_ERR_OPT_REQ_VALUE, PARSE_ERR_OPTS_EXCLD,
     PARSE_ERR_SLAVE_DISCO_REQ
 )
 from mysql.utilities.common.options import (add_discover_slaves_option,
@@ -187,7 +187,9 @@ if __name__ == '__main__':
     # The --discover-slaves-login and --slaves options cannot be used
     # simultaneously (only one).
     if opt.discover and opt.slaves:
-        parser.error(PARSE_ERR_SLAVE_DISCO_EXC)
+        parser.error(PARSE_ERR_OPTS_EXCLD.format(
+            opt1='--discover-slaves-login', opt2='--slaves'
+        ))
 
     if opt.discover and not opt.master:
         parser.error(PARSE_ERR_DISCO_REQ_MASTER)

@@ -45,9 +45,9 @@ from mysql.utilities.common.options import (add_format_option, add_verbosity,
                                             license_callback, UtilitiesParser,
                                             check_password_security)
 from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
+                                             PARSE_ERR_OPTS_EXCLD,
                                              PARSE_ERR_OPTS_REQ_BY_CMD,
                                              PARSE_ERR_SLAVE_DISCO_REQ,
-                                             PARSE_ERR_SLAVE_DISCO_EXC,
                                              WARN_OPT_NOT_REQUIRED,
                                              WARN_OPT_NOT_REQUIRED_ONLY_FOR,
                                              ERROR_SAME_MASTER,
@@ -161,7 +161,9 @@ if __name__ == '__main__':
     # --discover-slaves-login and --slaves cannot be used simultaneously
     # (only one)
     if opt.discover and opt.slaves:
-        parser.error(PARSE_ERR_SLAVE_DISCO_EXC)
+        parser.error(PARSE_ERR_OPTS_EXCLD.format(
+            opt1='--discover-slaves-login', opt2='--slaves'
+        ))
 
     # Check slaves list
     check_server_lists(parser, opt.master, opt.slaves)

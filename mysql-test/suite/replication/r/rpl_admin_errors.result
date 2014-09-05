@@ -84,27 +84,27 @@ mysqlrpladmin: error: 'reset' requires the following option(s): --slaves.
 Test case 21 - Start using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
 Test case 22 - Stop using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
 Test case 23 - Reset using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
 Test case 24 - Health using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
 Test case 25 - Failover using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
 Test case 26 - Switchover using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
 Test case 27 - Switchover using switchover new master is the actual master with --discover-slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 

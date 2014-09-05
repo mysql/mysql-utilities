@@ -82,6 +82,7 @@ Utility           Description
 ----------------  -----------------------------------------------------------
 mysqlauditadmin   audit log maintenance utility                              
 mysqlauditgrep    audit log search utility                                   
+mysqlbinlogmove   binary log relocate utility                                
 mysqldbcompare    compare databases for consistency                          
 mysqldbcopy       copy databases from one server to another                  
 mysqldbexport     export metadata and data from databases                    
@@ -178,6 +179,7 @@ Utility           Description
 ----------------  -----------------------------------------------------------
 mysqlauditadmin   audit log maintenance utility                              
 mysqlauditgrep    audit log search utility                                   
+mysqlbinlogmove   binary log relocate utility                                
 mysqldbcompare    compare databases for consistency                          
 mysqldbcopy       copy databases from one server to another                  
 mysqldbexport     export metadata and data from databases                    
@@ -207,6 +209,7 @@ Utility           Description
 ----------------  -----------------------------------------------------------
 mysqlauditadmin   audit log maintenance utility                              
 mysqlauditgrep    audit log search utility                                   
+mysqlbinlogmove   binary log relocate utility                                
 mysqldbcompare    compare databases for consistency                          
 mysqldbcopy       copy databases from one server to another                  
 mysqldbexport     export metadata and data from databases                    
@@ -250,6 +253,7 @@ Utility           Description
 ----------------  -----------------------------------------------------------
 mysqlauditadmin   audit log maintenance utility                              
 mysqlauditgrep    audit log search utility                                   
+mysqlbinlogmove   binary log relocate utility                                
 mysqldbcompare    compare databases for consistency                          
 mysqldbcopy       copy databases from one server to another                  
 mysqldbexport     export metadata and data from databases                    

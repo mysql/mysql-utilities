@@ -7,7 +7,7 @@ Test case 2 - slaves and discover-slaves cannot be used at the same time.
 Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]
 
-mysqlrplsync: error: Options --discover-slaves-login and --slaves cannot be used simultaneously.
+mysqlrplsync: error: Options --discover-slaves-login and --slaves cannot be used together.
 Test case 3 - discover-slaves requires --master.
 Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]

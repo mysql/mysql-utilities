@@ -24,7 +24,7 @@ mysqlauditgrep: error: Invalid start date/time format (yyyy-mm-ddThh:mm:ss): T12
 Test case 7 - Invalid --end-date format
 Usage: mysqlauditgrep [options] AUDIT_LOG_FILE 
 
-mysqlauditgrep: error: Invalid start date format (yyyy-mm-dd): 2012/09/30
+mysqlauditgrep: error: Invalid end date format (yyyy-mm-dd): 2012/09/30
 Test case 8 - Invalid --query-type option value
 Usage: mysqlauditgrep [options] AUDIT_LOG_FILE 
 
@@ -52,7 +52,7 @@ ERROR: Invalid Pattern: *.
 Test case 14 - Invalid --status option value
 Usage: mysqlauditgrep [options] AUDIT_LOG_FILE 
 
-mysqlauditgrep: error: The value for the option --status is not valid: ',,'.
+mysqlauditgrep: error: The value for option --status is not valid: ',,'.
 Test case 15 - Invalid STATUS value
 Usage: mysqlauditgrep [options] AUDIT_LOG_FILE 
 
