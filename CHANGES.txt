@@ -1,3 +1,10 @@
+Release-1.5.2 (Released September 08, 2014)
+-------------------------------------------
+- BUG#18543913: allow health report for list of slaves
+- BUG#14163181: mysqlprocgrep needs to show killed processes
+- WL#6260: show privileges for objects
+- WL#6187: Binary log relocate
+
 Release-1.5.2 (Released September 03, 2014)
 -------------------------------------------
 - BUG#19380635: add separated CHANGES & README Fabric files to Commercial dist
