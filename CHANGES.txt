@@ -1,4 +1,4 @@
-Release-1.5.2 (Released September 08, 2014)
+Release-1.6.0 (Released September 08, 2014)
 -------------------------------------------
 - BUG#18543913: allow health report for list of slaves
 - BUG#14163181: mysqlprocgrep needs to show killed processes

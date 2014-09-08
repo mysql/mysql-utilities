@@ -18,7 +18,7 @@
 """mysql.utilities"""
 
 # Major, Minor, Patch, Status
-VERSION = (1, 6, 0, 'Beta', 0)
+VERSION = (1, 6, 0, 'Alpha', 0)
 # Future versions will have to include only the X, Y (no Z).
 
 VERSION_STRING = "%s.%s.%s" % VERSION[0:3]
