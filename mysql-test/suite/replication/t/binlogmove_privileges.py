@@ -19,6 +19,9 @@
 Test privileges to run the mysqlbinlogmove utility.
 """
 
+import os
+import time
+
 import binlogmove
 
 from mysql.utilities.common.user import change_user_privileges
@@ -37,6 +40,27 @@ class test(binlogmove.test):
 
     NOTE: Test extend the base binlogmove test, having the same prerequisites.
     """
+
+    @staticmethod
+    def wait_for_file(source_dir, filename, timeout=10):
+        """Wait for the creation of the specific file.
+
+        This method checks if the specified file exists and waits for it to
+        appear during the specified amount of time (by default 10 seconds).
+
+        source_dir[in]  Source directory where the file is located.
+        filename[in]    Name of the file to wait for.
+        timeout[in]     Time to wait in seconds (by default 10 seconds).
+        """
+        file_path = os.path.normpath(os.path.join(source_dir, filename))
+        attempts = 0
+        while attempts < timeout:
+            # Check if the file exists.
+            if os.path.isfile(file_path):
+                return
+            # Wait 1 second before trying again.
+            time.sleep(1)
+            attempts += 1
 
     def run(self):
         cmd_base = "mysqlbinlogmove.py"
@@ -121,6 +145,9 @@ class test(binlogmove.test):
             print("\nServer {0}:{1} source directory (datadir): "
                   "{2}".format(self.server2.host, self.server2.port,
                                slave1_src))
+
+        # Wait for all relay log files to be created on the slave.
+        self.wait_for_file(slave1_src, 'slave1-relay-bin.000018')
 
         # Move all binary log files on slave with --skip-flush-binlogs, using
         # a user with no privileges.

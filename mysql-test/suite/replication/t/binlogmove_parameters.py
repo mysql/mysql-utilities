@@ -240,6 +240,11 @@ class test(binlogmove.test):
                   "{2}".format(self.server3.host, self.server3.port,
                                slave2_relay_basename))
 
+        # Workaround for Windows to avoid the next SHOW BINARY LOGS to display
+        # unexpected/wrong information after relocating the binary log files.
+        if os.name != 'posix':
+            self.server3.exec_query('SHOW BINARY LOGS')
+
         # Move all binary log (bin and relay) files.
         test_num += 1
         comment = ("Test case {0}a - move (all) bin and relay logs from slave "
