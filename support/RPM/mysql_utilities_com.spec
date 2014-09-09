@@ -125,6 +125,8 @@ rm -rf %{buildroot}
 %{_bindir}/mysqluserclone
 %{_bindir}/mysqlrplms
 %{_bindir}/mysqlrplsync
+%{_bindir}/mysqlbinlogmove
+%{_bindir}/mysqlgrants
 %{python_sitelib}/mysql
 %if 0%{?rhel} > 5 || 0%{?fedora} > 12
 %{python_sitelib}/mysql_utilities-*.egg-info
@@ -153,6 +155,9 @@ then
 fi
 
 %changelog
+* Tue Sep 09 2014 Balasubramanian Kandasamy <balasubramanian.kandasamy@oracle.com> - 1.6.0-1
+- Added new utilities mysqlgrants and mysqlbinlogmove
+
 * Fri May 23 2014 Balasubramanian Kandasamy <balasubramanian.kandasamy@oracle.com> - 1.4.3-1
 - Updated for commercial package
 
