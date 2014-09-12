@@ -1,5 +1,6 @@
 Release-1.6.0 (Released September 08, 2014)
 -------------------------------------------
+- BUG#19611879: msi distribution package sets wrong permissions on installed dir
 - BUG#18543913: allow health report for list of slaves
 - BUG#14163181: mysqlprocgrep needs to show killed processes
 - WL#6260: show privileges for objects
