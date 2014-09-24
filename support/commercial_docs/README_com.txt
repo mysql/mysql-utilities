@@ -1,4 +1,4 @@
-MySQL Utilities 1.5
+MySQL Utilities 1.6
 
 This is a release of MySQL Utilities, Oracle's dual-license
 MySQL Utilities complete database modeling, administration and

@@ -474,8 +474,8 @@ class BuiltCommercialMSI(_MSIDist):
              os.path.join(cmdbdist.bdist_dir, 'README_Utilities_com.txt')),
             (os.path.join(cmdbdist.dist_target, 'CHANGES_Utilities.txt'),
              os.path.join(cmdbdist.bdist_dir, 'CHANGES_Utilities.txt')),
-            (os.path.join(cmdbdist.dist_target, 'README_Fabric.txt'),
-             os.path.join(cmdbdist.bdist_dir, 'README_Fabric.txt')),
+            (os.path.join(cmdbdist.dist_target, 'README_Fabric_com.txt'),
+             os.path.join(cmdbdist.bdist_dir, 'README_Fabric_com.txt')),
             (os.path.join(cmdbdist.dist_target, 'CHANGES_Fabric.txt'),
              os.path.join(cmdbdist.bdist_dir, 'CHANGES_Fabric.txt'))
         ]

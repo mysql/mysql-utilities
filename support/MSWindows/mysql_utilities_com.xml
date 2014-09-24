@@ -146,8 +146,8 @@
          Source="$(var.BuildDir)\README_Utilities_com.txt" DiskId="1"/>
         <File Id="LICENSE" Name="LICENSE_com.txt"
          Source="$(var.BuildDir)\LICENSE_com.txt" DiskId="1"/>
-        <File Id="README_Fabric" Name="README_Fabric.txt"
-         Source="$(var.BuildDir)\README_Fabric.txt" DiskId="1"/>
+        <File Id="README_Fabric" Name="README_Fabric_com.txt"
+         Source="$(var.BuildDir)\README_Fabric_com.txt" DiskId="1"/>
         <File Id="CHANGES_Utilities" Name="CHANGES_Utilities.txt"
          Source="$(var.BuildDir)\CHANGES_Utilities.txt" DiskId="1"/>
         <File Id="CHANGES_Fabric" Name="CHANGES_Fabric.txt"
