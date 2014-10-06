@@ -32,7 +32,15 @@ Options:
   --skip-table-options  skip check of all table options (e.g., AUTO_INCREMENT,
                         ENGINE, CHARSET, etc.).
   --width=WIDTH         display width
-  -a, --run-all-tests   do not abort when a diff test fails
+  -t, --run-all-tests   do not abort when a diff test fails
+  -a, --all             check all databases
+  -x EXCLUDE, --exclude=EXCLUDE
+                        exclude one or more databases from the operation using
+                        either a specific name (e.g. db1), a LIKE pattern
+                        (e.g. db%) or a REGEXP search pattern. To use a REGEXP
+                        search pattern for all exclusions, you must also
+                        specify the --regexp option. Repeat the --exclude
+                        option for multiple exclusions.
   -c, --compact         compact output from a diff.
   --disable-binary-logging
                         turn binary logging off during operation if enabled
@@ -67,13 +75,16 @@ Options:
                         set to server1, also generate the transformation for
                         server2. Note: the reverse changes are annotated and
                         marked as comments.
+  -G, --basic-regexp, --regexp
+                        use 'REGEXP' operator to match pattern. Default is to
+                        use 'LIKE'.
   --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
                         CAs.
   --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
                         establishing a secure connection.
   --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
                         secure connection.
-Test case 2 - Use  -a --difftype=unified --format=grid
+Test case 2 - Use  -t --difftype=unified --format=grid
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -170,7 +181,7 @@ Test case 2 - Use  -a --difftype=unified --format=grid
 # Database consistency check failed.
 #
 # ...done
-Test case 3 - Use  -a --difftype=unified --format=csv
+Test case 3 - Use  -t --difftype=unified --format=csv
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -244,7 +255,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 4 - Use  -a --difftype=unified --format=tab
+Test case 4 - Use  -t --difftype=unified --format=tab
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -318,7 +329,7 @@ stock_number	description	qty	cost	type	notes	supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 5 - Use  -a --difftype=unified --format=vertical
+Test case 5 - Use  -t --difftype=unified --format=vertical
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -484,7 +495,7 @@ Test case 5 - Use  -a --difftype=unified --format=vertical
 # Database consistency check failed.
 #
 # ...done
-Test case 6 - Use  -a --difftype=context --format=grid
+Test case 6 - Use  -t --difftype=context --format=grid
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -585,7 +596,7 @@ Test case 6 - Use  -a --difftype=context --format=grid
 # Database consistency check failed.
 #
 # ...done
-Test case 7 - Use  -a --difftype=context --format=csv
+Test case 7 - Use  -t --difftype=context --format=csv
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -665,7 +676,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 8 - Use  -a --difftype=context --format=tab
+Test case 8 - Use  -t --difftype=context --format=tab
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -745,7 +756,7 @@ stock_number	description	qty	cost	type	notes	supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 9 - Use  -a --difftype=context --format=vertical
+Test case 9 - Use  -t --difftype=context --format=vertical
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -942,7 +953,7 @@ Test case 9 - Use  -a --difftype=context --format=vertical
 # Database consistency check failed.
 #
 # ...done
-Test case 10 - Use  -a --difftype=differ --format=grid
+Test case 10 - Use  -t --difftype=differ --format=grid
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -1047,7 +1058,7 @@ Test case 10 - Use  -a --difftype=differ --format=grid
 # Database consistency check failed.
 #
 # ...done
-Test case 11 - Use  -a --difftype=differ --format=csv
+Test case 11 - Use  -t --difftype=differ --format=csv
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -1121,7 +1132,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 12 - Use  -a --difftype=differ --format=tab
+Test case 12 - Use  -t --difftype=differ --format=tab
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -1195,7 +1206,7 @@ stock_number	description	qty	cost	type	notes	supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 13 - Use  -a --difftype=differ --format=vertical
+Test case 13 - Use  -t --difftype=differ --format=vertical
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -1369,7 +1380,7 @@ Test case 14 - without force
 # Checking databases inventory on server1 and inventory on server2
 #
 ERROR: The list of objects differs among database inventory and inventory.
-Test case 15 -  -d differ --format=csv --quiet -a
+Test case 15 -  -d differ --format=csv --quiet -t
 # Checking databases inventory on server1 and inventory on server2
 #
 # WARNING: Objects in server1.inventory but not in server2.inventory:
@@ -1429,7 +1440,7 @@ stock_number,description,qty,cost,type,notes,supplier
 '10665','Glass polish pad','3','10.00','polishing','','1'
 '11269','Microfiber spray on car wash towel','3','16.99','cleaning','','1'
 
-Test case 16 -  --format=csv -a --width=65
+Test case 16 -  --format=csv -t --width=65
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -1503,7 +1514,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 17 -  --format=csv -a --width=60
+Test case 17 -  --format=csv -t --width=60
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -1577,7 +1588,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 18 -  --format=csv -vvv -a
+Test case 18 -  --format=csv -vvv -t
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -1705,7 +1716,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 19 -  --format=csv -vvv -a --disable-binary-logging
+Test case 19 -  --format=csv -vvv -t --disable-binary-logging
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -1833,7 +1844,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 20 -  --format=csv -vvv -a --span-key-size=16
+Test case 20 -  --format=csv -vvv -t --span-key-size=16
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2199,7 +2210,7 @@ Test case 26b - Changes for server2 --difftype=sql (skipping table options).
 # Databases are consistent given skip options specified.
 #
 # ...done
-Test case 27 - Use  -a --difftype=unified --format=grid --compact
+Test case 27 - Use  -t --difftype=unified --format=grid --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2290,7 +2301,7 @@ Test case 27 - Use  -a --difftype=unified --format=grid --compact
 # Database consistency check failed.
 #
 # ...done
-Test case 28 - Use  -a --difftype=unified --format=csv --compact
+Test case 28 - Use  -t --difftype=unified --format=csv --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2358,7 +2369,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 29 - Use  -a --difftype=unified --format=tab --compact
+Test case 29 - Use  -t --difftype=unified --format=tab --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2426,7 +2437,7 @@ stock_number	description	qty	cost	type	notes	supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 30 - Use  -a --difftype=unified --format=vertical --compact
+Test case 30 - Use  -t --difftype=unified --format=vertical --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2584,7 +2595,7 @@ Test case 30 - Use  -a --difftype=unified --format=vertical --compact
 # Database consistency check failed.
 #
 # ...done
-Test case 31 - Use  -a --difftype=context --format=grid --compact
+Test case 31 - Use  -t --difftype=context --format=grid --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2679,7 +2690,7 @@ Test case 31 - Use  -a --difftype=context --format=grid --compact
 # Database consistency check failed.
 #
 # ...done
-Test case 32 - Use  -a --difftype=context --format=csv --compact
+Test case 32 - Use  -t --difftype=context --format=csv --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2753,7 +2764,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 33 - Use  -a --difftype=context --format=tab --compact
+Test case 33 - Use  -t --difftype=context --format=tab --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2827,7 +2838,7 @@ stock_number	description	qty	cost	type	notes	supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 34 - Use  -a --difftype=context --format=vertical --compact
+Test case 34 - Use  -t --difftype=context --format=vertical --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -3016,3 +3027,17 @@ Test case 34 - Use  -a --difftype=context --format=vertical --compact
 # Database consistency check failed.
 #
 # ...done
+Test case 35 - Warning using --exclude without --all
+# WARNING: The --exclude option is only used with the --all option (option ignored).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+#
+ERROR: The list of objects differs among database inventory and inventory.
+Test case 36 - Warning using --regexp without --exclude
+# WARNING: The --regexp option is only used with the --exclude option (option ignored).
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+#
+ERROR: The list of objects differs among database inventory and inventory.

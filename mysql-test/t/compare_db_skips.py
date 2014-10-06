@@ -59,14 +59,14 @@ class test(compare_db.test):
         for skip in _SKIPS:
             test_num += 1
             skip_all = skip_all + " --skip-" + skip
-            cmd_opts = " --skip-%s --format=csv -a" % skip
+            cmd_opts = " --skip-%s --format=csv -t" % skip
             comment = "Test case %d - %s " % (test_num, cmd_opts)
             res = self.run_test_case(1, cmd_str + cmd_opts, comment)
             if not res:
                 raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = " %s --format=csv -a" % skip_all
+        cmd_opts = " %s --format=csv -t" % skip_all
         comment = "Test case %d - %s " % (test_num, cmd_opts)
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:

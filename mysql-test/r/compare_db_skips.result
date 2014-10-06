@@ -1,4 +1,4 @@
-Test case 1 -  --skip-object-compare --format=csv -a 
+Test case 1 -  --skip-object-compare --format=csv -t 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -76,7 +76,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 2 -  --skip-row-count --format=csv -a 
+Test case 2 -  --skip-row-count --format=csv -t 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -154,7 +154,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 3 -  --skip-diff --format=csv -a 
+Test case 3 -  --skip-diff --format=csv -t 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -226,7 +226,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 4 -  --skip-checksum-table --format=csv -a 
+Test case 4 -  --skip-checksum-table --format=csv -t 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -308,7 +308,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 5 -  --skip-data-check --format=csv -a 
+Test case 5 -  --skip-data-check --format=csv -t 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -345,7 +345,7 @@ Test case 5 -  --skip-data-check --format=csv -a
 # Database consistency check failed.
 #
 # ...done
-Test case 6 -   --skip-object-compare --skip-row-count --skip-diff --skip-checksum-table --skip-data-check --format=csv -a 
+Test case 6 -   --skip-object-compare --skip-row-count --skip-diff --skip-checksum-table --skip-data-check --format=csv -t 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2

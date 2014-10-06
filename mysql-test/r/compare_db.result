@@ -675,7 +675,132 @@ Test case 14 - compare a database with objects of different types with the same 
 # Database consistency check failed.
 #
 # ...done
-Test case 15 - Test automatically picks up the not nullable unique index (No differences)
+Test case 15 - compare all databases
+# WARNING: Using a password on the command line interface can be insecure.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# The database inventory2 on server1 does not exist on server2.
+# Comparing databases: empty_db, no_primary_keys, inventory, multi_span_row, db.`:db, db_diff_test
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases empty_db on server1 and empty_db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases no_primary_keys on server1 and no_primary_keys on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     nonix_1_nix_2                           pass    pass    -       
+#           - Compare table checksum                                pass    
+# TABLE     nonix_1_simple                          pass    pass    -       
+#           - Compare table checksum                                pass    
+# TABLE     nonix_2_nix_2                           pass    pass    -       
+#           - Compare table checksum                                pass    
+# TABLE     nonix_2_nix_2_pk                        pass    pass    -       
+#           - Compare table checksum                                pass    
+# TABLE     nonix_`2_nix_`2                         pass    pass    -       
+#           - Compare table checksum                                pass    
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+#
+ERROR: The list of objects differs among database inventory and inventory.
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases multi_span_row on server1 and multi_span_row on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db.`:db on server1 and db.`:db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# PROCEDURE `t`export_1                             FAIL    ERROR: The object definitions do not match.
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_diff_test on server1 and db_diff_test on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     table-dash                              FAIL    ERROR: The object definitions do not match.
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 16 - compare all databases with --exclude option and LIKE pattern
+# WARNING: Using a password on the command line interface can be insecure.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# The database inventory2 on server1 does not exist on server2.
+# Comparing databases: empty_db, multi_span_row
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases empty_db on server1 and empty_db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases multi_span_row on server1 and multi_span_row on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
+
+
+# Databases are consistent.
+#
+# ...done
+Test case 17 - compare all databases with --exclude option and REGEXP pattern
+# WARNING: Using a password on the command line interface can be insecure.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Comparing databases: empty_db, multi_span_row
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases empty_db on server1 and empty_db on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases multi_span_row on server1 and multi_span_row on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
+
+
+# Databases are consistent.
+#
+# ...done
+Test case 18 - Test automatically picks up the not nullable unique index (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -703,7 +828,7 @@ Test case 15 - Test automatically picks up the not nullable unique index (No dif
 # Databases are consistent.
 #
 # ...done
-Test case 16 - real not nullable unique index for a specific table using --use-indexes (No differences)
+Test case 19 - real not nullable unique index for a specific table using --use-indexes (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -731,7 +856,7 @@ Test case 16 - real not nullable unique index for a specific table using --use-i
 # Databases are consistent.
 #
 # ...done
-Test case 17 - compare using--use-indexes for two tables (No differences)
+Test case 20 - compare using--use-indexes for two tables (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -759,7 +884,7 @@ Test case 17 - compare using--use-indexes for two tables (No differences)
 # Databases are consistent.
 #
 # ...done
-Test case 18 - using --use-indexes for same table (No differences)
+Test case 21 - using --use-indexes for same table (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -787,7 +912,7 @@ Test case 18 - using --use-indexes for same table (No differences)
 # Databases are consistent.
 #
 # ...done
-Test case 19 - using --use-indexes for same table verbose unique index over primary key (No differences)
+Test case 22 - using --use-indexes for same table verbose unique index over primary key (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1015,7 +1140,7 @@ CREATE TABLE `nonix_``2_nix_``2` (
 # Databases are consistent.
 #
 # ...done
-Test case 20 - using --use-indexes with backticks verbose (No differences)
+Test case 23 - using --use-indexes with backticks verbose (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1241,7 +1366,7 @@ CREATE TABLE `nonix_``2_nix_``2` (
 # Databases are consistent.
 #
 # ...done
-Test case 21 - using --use-indexes with backticks verbose (Differences) 
+Test case 24 - using --use-indexes with backticks verbose (Differences) 
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1329,7 +1454,7 @@ Test case 21 - using --use-indexes with backticks verbose (Differences)
 # Database consistency check failed.
 #
 # ...done
-Test case 22 - compare two equal databases with different names (including VIEWS)
+Test case 25 - compare two equal databases with different names (including VIEWS)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1360,7 +1485,7 @@ Test case 22 - compare two equal databases with different names (including VIEWS
 # Databases are consistent.
 #
 # ...done
-Test case 23 - data with multiple lines per span (no differences).
+Test case 26 - data with multiple lines per span (no differences).
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1375,7 +1500,7 @@ Test case 23 - data with multiple lines per span (no differences).
 # Databases are consistent.
 #
 # ...done
-Test case 24 - data with multiple lines per span (with changed rows).
+Test case 27 - data with multiple lines per span (with changed rows).
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1407,7 +1532,7 @@ Test case 24 - data with multiple lines per span (with changed rows).
 # Database consistency check failed.
 #
 # ...done
-Test case 25 - data with multiple lines per span (with missing row and CSV format).
+Test case 28 - data with multiple lines per span (with missing row and CSV format).
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.

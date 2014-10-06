@@ -242,7 +242,7 @@ class test(test_sql_template.test):
             new_test_obj['error_codes'] = tbl_check[3]
             self.test_objects.append(new_test_obj)
 
-        self.utility = 'mysqldbcompare.py -a'
+        self.utility = 'mysqldbcompare.py -t'
 
         return test_sql_template.test.setup(self)
 

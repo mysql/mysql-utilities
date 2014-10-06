@@ -144,7 +144,7 @@ class test(mutlib.System_test):
         cmd_str = ("mysqldbcompare.py --server1={0} --server2={1} "
                    "util_test_mysql_client:util_test_mysql_client "
                    "--difftype=sql --changes-for=server1 "
-                   "-a ".format(srv1_con, srv2_con))
+                   "-t ".format(srv1_con, srv2_con))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -188,7 +188,7 @@ class test(mutlib.System_test):
         cmd_str = ("mysqldbcompare.py --server1={0} --server2={1} "
                    "util_test_mysql_client:util_test_mysql_client "
                    "--difftype=sql --changes-for=server1 "
-                   "-a > {2}".format(srv1_con, srv2_con, _INPUT_SQL_FILE))
+                   "-t > {2}".format(srv1_con, srv2_con, _INPUT_SQL_FILE))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -209,7 +209,7 @@ class test(mutlib.System_test):
         cmd_str = ("mysqldbcompare.py --server1={0} --server2={1} "
                    "util_test_mysql_client:util_test_mysql_client "
                    "--difftype=sql --changes-for=server1 "
-                   "-a".format(srv1_con, srv2_con))
+                   "-t".format(srv1_con, srv2_con))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -255,7 +255,7 @@ class test(mutlib.System_test):
         cmd_str = ("mysqldbcompare.py --server1={0} --server2={1} "
                    "util_test_mysql_client:util_test_mysql_client "
                    "--difftype=sql --changes-for=server1 "
-                   "-a > {2}".format(srv1_con, srv2_con, _INPUT_SQL_FILE))
+                   "-t > {2}".format(srv1_con, srv2_con, _INPUT_SQL_FILE))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -276,7 +276,7 @@ class test(mutlib.System_test):
         cmd_str = ("mysqldbcompare.py --server1={0} --server2={1} "
                    "util_test_mysql_client:util_test_mysql_client "
                    "--difftype=sql --changes-for=server1 "
-                   "-a".format(srv1_con, srv2_con))
+                   "-t".format(srv1_con, srv2_con))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
