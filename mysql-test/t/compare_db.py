@@ -385,8 +385,11 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - compare all databases with --exclude "
                    "option and REGEXP pattern").format(test_num)
-        cmd_arg = ('--all --exclude=inventory --exclude=^db* --exclude=$k.ys '
-                   '--regexp')
+        if os.name == 'posix':
+            exclude_arg = "--exclude='^db*' --exclude='k.ys$'"
+        else:
+            exclude_arg = '--exclude="^db*" --exclude="k.ys$"'
+        cmd_arg = '--all --exclude=inventory {0} --regexp'.format(exclude_arg)
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(0, cmd, comment)
         if not res:
