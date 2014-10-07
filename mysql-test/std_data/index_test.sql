@@ -4,6 +4,7 @@ CREATE DATABASE `util_test_c`
 CREATE DATABASE `util_test_d`
 CREATE DATABASE `util_test_e`
 CREATE DATABASE `util_test_f`
+CREATE DATABASE `util_test_g`
 
 CREATE TABLE `util_test_a`.`t1` (`A` int(11) NOT NULL DEFAULT '0', `b` varchar(2) DEFAULT NULL, `c` varchar(255) DEFAULT NULL, `d` point NOT NULL, `e` geometry NOT NULL, PRIMARY KEY (`A`), SPATIAL KEY `s1` (`e`), SPATIAL KEY `s2` (`d`), SPATIAL KEY `s4` (`d`)) ENGINE=MyISAM DEFAULT CHARSET=latin1
 CREATE TABLE `util_test_a`.`t2` (`id` int(11) DEFAULT NULL, KEY `id` (`id`) USING HASH) ENGINE=MyISAM DEFAULT CHARSET=latin1
@@ -26,3 +27,7 @@ CREATE TABLE `util_test_e`.`t2` (a int(11), b int(11), c int(11), key(`b`)) ENGI
 CREATE TABLE `util_test_e`.`t3` (a int(11), b int(11), c int(11), UNIQUE key(`b`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE `util_test_e`.`t4` (a int(11), b int(11), c int(11), PRIMARY key(`b`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 CREATE TABLE `util_test_e`.`t5` (a int(11) NOT NULL, b int(11), c int(11), UNIQUE key(`a`)) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+# These test cases are designed to test redundant index detection on indexes that are only a partial match
+
+CREATE TABLE `util_test_g`.`t1` (`id` int(11) NOT NULL, `a1` int(11) NOT NULL, `a2` int(11) NOT NULL, `a3` int(11) NOT NULL, `a4` int(11) NOT NULL, PRIMARY KEY (`id`), UNIQUE KEY (`id`,`a1`), UNIQUE KEY `bti2` (`a1`,`a3`,`a4`), KEY `bti1` (`a1`,`a2`,`a3`), KEY `bti3` (`a1`,`a2`), KEY `bti4` (`a1`,`a3`), KEY `bti5` (`a2`,`a3`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;

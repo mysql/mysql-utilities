@@ -21,6 +21,7 @@ This module contains abstractions of a MySQL table and an index.
 
 import multiprocessing
 import sys
+from itertools import izip
 
 from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.connector.conversion import MySQLConverter
@@ -129,23 +130,16 @@ class Index(object):
         Returns True if column list is a subset of index.
         """
 
-#        # Uniqueness counts - can't be duplicate if uniquess differs
-#        #                     except for primary keys which are always unique
-#        if index.name != "PRIMARY": # or self.name != "PRIMARY":
-#            if self.unique != index.unique:
-#                return False
         num_cols_this = len(self.columns)
         num_cols_that = len(index.columns)
         num_cols_same = 0
         if self.type == "BTREE":
-            i = 0
-            while (i < num_cols_this) and (i < num_cols_that):
-                if num_cols_same <= i:  # Ensures first N cols are the same
-                    if self.__cmp_columns(self.columns[i], index.columns[i]):
-                        num_cols_same = num_cols_same + 1
-                    else:
-                        break
-                i = i + 1
+            indexes = izip(self.columns, index.columns)
+            for idx_pair in indexes:
+                if not self.__cmp_columns(*idx_pair):
+                    return False
+            # All index pairs are the same
+            return num_cols_this <= num_cols_that
         else:  # HASH, RTREE, FULLTEXT
             if (self.type == "FULLTEXT") and (num_cols_this != num_cols_that):
                 return False

@@ -135,14 +135,6 @@ CREATE INDEX `ix_no``nulls_``2` ON `util_test_f`.`qted_``2_quoted_``2` (`c``2`, 
 #     may be redundant or duplicate of:
 CREATE UNIQUE INDEX `uk_no``nonulls` ON `util_test_f`.`qted_``2_quoted_``2` (`c``2`, `c6`) USING BTREE
 #
-CREATE INDEX `ix_1` ON `util_test_f`.`qted_``2_quoted_``2` (`c``1`, `c5`) USING BTREE
-#     may be redundant or duplicate of:
-CREATE UNIQUE INDEX `ix``_c` ON `util_test_f`.`qted_``2_quoted_``2` (`c``1`, `c6`) USING BTREE
-#
-CREATE INDEX `ix_2` ON `util_test_f`.`qted_``2_quoted_``2` (`c``1`, `c5`) USING BTREE
-#     may be redundant or duplicate of:
-CREATE UNIQUE INDEX `ix``_c` ON `util_test_f`.`qted_``2_quoted_``2` (`c``1`, `c6`) USING BTREE
-#
 CREATE UNIQUE INDEX `ix``_c` ON `util_test_f`.`qted_``2_quoted_``2` (`c``1`, `c6`) USING BTREE
 #     may be redundant or duplicate of:
 CREATE UNIQUE INDEX `ix_c2` ON `util_test_f`.`qted_``2_quoted_``2` (`c``1`, `c6`, `c``2`) USING BTREE
@@ -151,13 +143,16 @@ CREATE UNIQUE INDEX `uk_no``nonulls` ON `util_test_f`.`qted_``2_quoted_``2` (`c`
 #     may be redundant or duplicate of:
 CREATE INDEX `ix_no``nulls` ON `util_test_f`.`qted_``2_quoted_``2` (`c``2`, `c6`, `c4`) USING BTREE
 #
+CREATE INDEX `ix_2` ON `util_test_f`.`qted_``2_quoted_``2` (`c``1`, `c5`) USING BTREE
+#     may be redundant or duplicate of:
+CREATE INDEX `ix_1` ON `util_test_f`.`qted_``2_quoted_``2` (`c``1`, `c5`) USING BTREE
+#
 # DROP statements:
 #
 ALTER TABLE `util_test_f`.`qted_``2_quoted_``2` DROP INDEX `ix_no``nulls_``2`;
-ALTER TABLE `util_test_f`.`qted_``2_quoted_``2` DROP INDEX `ix_1`;
-ALTER TABLE `util_test_f`.`qted_``2_quoted_``2` DROP INDEX `ix_2`;
 ALTER TABLE `util_test_f`.`qted_``2_quoted_``2` DROP INDEX `ix``_c`;
 ALTER TABLE `util_test_f`.`qted_``2_quoted_``2` DROP INDEX `uk_no``nonulls`;
+ALTER TABLE `util_test_f`.`qted_``2_quoted_``2` DROP INDEX `ix_2`;
 #
 # The following indexes for table util_test_f.qted_`2_quoted_`2 contain the clustered index and might be redundant:
 #
@@ -178,20 +173,15 @@ ALTER TABLE `util_test_f`.`qted_``2_quoted_``2` DROP INDEX `ix_no``nulls_``2`;
 #
 #
 # Getting indexes for util_test_f.t1
-# The following indexes are duplicates or redundant for table util_test_f.t1:
+# The following index is a duplicate or redundant for table util_test_f.t1:
 #
 CREATE UNIQUE INDEX `id` ON `util_test_f`.`t1` (`id`, `a1`) USING BTREE
 #     may be redundant or duplicate of:
 ALTER TABLE `util_test_f`.`t1` ADD PRIMARY KEY (`id`)
 #
-CREATE INDEX `i1` ON `util_test_f`.`t1` (`a1`, `a2`, `a3`) USING BTREE
-#     may be redundant or duplicate of:
-CREATE UNIQUE INDEX `i2` ON `util_test_f`.`t1` (`a1`, `a3`, `a4`) USING BTREE
-#
-# DROP statements:
+# DROP statement:
 #
 ALTER TABLE `util_test_f`.`t1` DROP INDEX `id`;
-ALTER TABLE `util_test_f`.`t1` DROP INDEX `i1`;
 #
 #
 # Getting indexes for util_test_f.t2
@@ -205,10 +195,6 @@ CREATE UNIQUE INDEX `a1` ON `util_test_f`.`t2` (`id`) USING BTREE
 #     may be redundant or duplicate of:
 ALTER TABLE `util_test_f`.`t2` ADD PRIMARY KEY (`id`, `a1`)
 #
-CREATE INDEX `i1` ON `util_test_f`.`t2` (`a1`, `a2`, `a3`) USING BTREE
-#     may be redundant or duplicate of:
-CREATE UNIQUE INDEX `i2` ON `util_test_f`.`t2` (`a1`, `a3`, `a4`) USING BTREE
-#
 CREATE UNIQUE INDEX `id3` ON `util_test_f`.`t2` (`id`, `a1`, `a2`) USING BTREE
 #     may be redundant or duplicate of:
 ALTER TABLE `util_test_f`.`t2` ADD PRIMARY KEY (`id`, `a1`)
@@ -217,8 +203,34 @@ ALTER TABLE `util_test_f`.`t2` ADD PRIMARY KEY (`id`, `a1`)
 #
 ALTER TABLE `util_test_f`.`t2` DROP INDEX `id`;
 ALTER TABLE `util_test_f`.`t2` DROP INDEX `a1`;
-ALTER TABLE `util_test_f`.`t2` DROP INDEX `i1`;
 ALTER TABLE `util_test_f`.`t2` DROP INDEX `id3`;
+#
+#
+# ...done.
+Test case 9 - check redundancy in indexes with multiple columns, include drops
+WARNING: Using a password on the command line interface can be insecure.
+# Source on XXXX-XXXX: ... connected.
+# Checking indexes...
+# Getting indexes for util_test_g.t1
+# The following indexes are duplicates or redundant for table util_test_g.t1:
+#
+CREATE UNIQUE INDEX `id` ON `util_test_g`.`t1` (`id`, `a1`) USING BTREE
+#     may be redundant or duplicate of:
+ALTER TABLE `util_test_g`.`t1` ADD PRIMARY KEY (`id`)
+#
+CREATE INDEX `bti4` ON `util_test_g`.`t1` (`a1`, `a3`) USING BTREE
+#     may be redundant or duplicate of:
+CREATE UNIQUE INDEX `bti2` ON `util_test_g`.`t1` (`a1`, `a3`, `a4`) USING BTREE
+#
+CREATE INDEX `bti3` ON `util_test_g`.`t1` (`a1`, `a2`) USING BTREE
+#     may be redundant or duplicate of:
+CREATE INDEX `bti1` ON `util_test_g`.`t1` (`a1`, `a2`, `a3`) USING BTREE
+#
+# DROP statements:
+#
+ALTER TABLE `util_test_g`.`t1` DROP INDEX `id`;
+ALTER TABLE `util_test_g`.`t1` DROP INDEX `bti4`;
+ALTER TABLE `util_test_g`.`t1` DROP INDEX `bti3`;
 #
 #
 # ...done.

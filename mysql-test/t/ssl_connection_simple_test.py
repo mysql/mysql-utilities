@@ -221,7 +221,7 @@ class test(mutlib.System_test):
         # Drop databases
         databases = ["util_test_a", "util_test_b", "util_test_c",
                      "util_test_d", "util_test_e", "util_test_f",
-                     "util_test"]
+                     "util_test_g", "util_test"]
         for db in databases:
             try:
                 self.server1.exec_query("DROP DATABASE IF EXISTS "
