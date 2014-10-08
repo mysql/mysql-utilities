@@ -539,7 +539,6 @@ def stop_running_server(server, wait=10, drop=True):
         return True
 
     # Build the shutdown command
-    cmd = ""
     res = server.show_server_variable("basedir")
     mysqladmin_client = "mysqladmin"
     if not os.name == "posix":
@@ -557,10 +556,14 @@ def stop_running_server(server, wait=10, drop=True):
         mysqladmin_path = os.path.normpath(os.path.join(res[0][1],
                                                         "client/release",
                                                         mysqladmin_client))
-    cmd += mysqladmin_path
+    if os.name == 'posix':
+        cmd = "'{0}'".format(mysqladmin_path)
+    else:
+        cmd = '"{0}"'.format(mysqladmin_path)
     if server.socket is None and server.host == 'localhost':
         server.host = '127.0.0.1'
-    cmd += " shutdown --user={0} --host={1} ".format(server.user, server.host)
+    cmd = "{0} shutdown --user={1} --host={2} ".format(cmd, server.user,
+                                                       server.host)
     if server.passwd:
         cmd = "{0} --password={1} ".format(cmd, server.passwd)
     # Use of server socket only works with 'localhost' (not with 127.0.0.1).
