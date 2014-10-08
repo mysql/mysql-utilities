@@ -1437,3 +1437,54 @@ Test case 25 - data with multiple lines per span (with missing row and CSV forma
 # Database consistency check failed.
 #
 # ...done
+Test case 26 - data with quotes and sql format
+# WARNING: Using a password on the command line interface can be insecure.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases compare_db_quotes_1 on server1 and compare_db_quotes_2 on server2
+#
+
+# WARNING: Cannot generate SQL statements for these objects.
+# Check the difference output for other discrepencies.
+--- `compare_db_quotes_1`
++++ `compare_db_quotes_2`
+@@ -1,1 +1,1 @@
+-CREATE DATABASE `compare_db_quotes_1` /*!40100 DEFAULT CHARACTER SET latin1 */
++CREATE DATABASE `compare_db_quotes_2` /*!40100 DEFAULT CHARACTER SET latin1 */
+# WARNING: Could not generate SQL statements for differences between `compare_db_quotes_1` and `compare_db_quotes_2`. No changes required or not supported difference.
+
+# WARNING: Cannot generate SQL statements for these objects.
+# Check the difference output for other discrepencies.
+--- `compare_db_quotes_1`
++++ `compare_db_quotes_2`
+@@ -1,1 +1,1 @@
+-CREATE DATABASE `compare_db_quotes_1` /*!40100 DEFAULT CHARACTER SET latin1 */
++CREATE DATABASE `compare_db_quotes_2` /*!40100 DEFAULT CHARACTER SET latin1 */
+
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t1                                      pass    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#
+# Transformation for --changes-for=server1:
+#
+
+# Data differences found among rows:
+UPDATE `compare_db_quotes_1`.`t1` SET `name` = 'single quote bug' WHERE `id` = '1';
+
+#
+# Transformation for reverse changes (--changes-for=server2):
+#
+# # Data differences found among rows:
+# UPDATE `compare_db_quotes_2`.`t1` SET `name` = 'single quote\' bug' WHERE `id` = '1';
+#
+
+
+
+# Database consistency check failed.
+#
+# ...done

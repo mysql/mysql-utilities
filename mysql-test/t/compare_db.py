@@ -62,7 +62,8 @@ class test(mutlib.System_test):
         data_files = [
             os.path.normpath("./std_data/db_compare_test.sql"),
             os.path.normpath("./std_data/db_compare_backtick.sql"),
-            os.path.normpath("./std_data/db_compare_use_indexes.sql")
+            os.path.normpath("./std_data/db_compare_use_indexes.sql"),
+            os.path.normpath("./std_data/db_compare_quotes.sql"),
         ]
         for data_file in data_files:
             try:
@@ -536,6 +537,16 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - data with quotes and sql "
+                   "format".format(test_num))
+        cmd_arg = ('compare_db_quotes_1:compare_db_quotes_2 --run-all-tests '
+                   '--difftype=sql --show-reverse')
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.do_replacements()
 
         return True
@@ -583,6 +594,10 @@ class test(mutlib.System_test):
         self.drop_db(self.server2, "no_primary_keys")
         self.drop_db(self.server1, "multi_span_row")
         self.drop_db(self.server2, "multi_span_row")
+        self.drop_db(self.server1, "compare_db_quotes_1")
+        self.drop_db(self.server1, "compare_db_quotes_2")
+        self.drop_db(self.server2, "compare_db_quotes_1")
+        self.drop_db(self.server2, "compare_db_quotes_2")
         return True
 
     def cleanup(self):

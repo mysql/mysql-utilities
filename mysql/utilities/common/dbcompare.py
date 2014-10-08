@@ -675,8 +675,9 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
         for line in diff_list:
             print line
 
-        print("# WARNING: Could not generate changes for {0}. No changes "
-              "required or not supported difference.")
+        print("# WARNING: Could not generate SQL statements for differences "
+              "between {0} and {1}. No changes required or not supported "
+              "difference.".format(object1, object2))
 
         return diff_list
 
