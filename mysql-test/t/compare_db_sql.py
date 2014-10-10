@@ -49,7 +49,7 @@ class test(compare_db.test):
         test_num = 1
         comment = ("Test case {0} - check a sample database generate "
                    "SQL".format(test_num))
-        res = self.run_test_case(0, cmd_str + "inventory:inventory -a "
+        res = self.run_test_case(0, cmd_str + "inventory:inventory -t "
                                               "--difftype=sql", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -60,7 +60,7 @@ class test(compare_db.test):
         comment = ("Test case {0} - check database with known differences "
                    "generate SQL direction = server1 "
                    "(default)".format(test_num))
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
+        res = self.run_test_case(1, cmd_str + "inventory:inventory -t "
                                               "--difftype=sql --format=CSV",
                                  comment)
         if not res:
@@ -69,7 +69,7 @@ class test(compare_db.test):
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
                    "generate SQL direction = server2".format(test_num))
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
+        res = self.run_test_case(1, cmd_str + "inventory:inventory -t "
                                               "--difftype=sql --format=CSV "
                                               "--changes-for=server2", comment)
         if not res:
@@ -79,7 +79,7 @@ class test(compare_db.test):
         comment = ("Test case {0} - check database with known differences "
                    "generate SQL direction = server1 with "
                    "reverse".format(test_num))
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
+        res = self.run_test_case(1, cmd_str + "inventory:inventory -t "
                                               "--difftype=sql --format=CSV "
                                               "--changes-for=server1 "
                                               "--show-reverse",
@@ -91,7 +91,7 @@ class test(compare_db.test):
         comment = ("Test case {0} - check database with known differences "
                    "generate SQL direction = server2 with "
                    "reverse".format(test_num))
-        res = self.run_test_case(1, cmd_str + "inventory:inventory -a "
+        res = self.run_test_case(1, cmd_str + "inventory:inventory -t "
                                               "--difftype=sql --format=CSV "
                                               "--changes-for=server2 "
                                               "--show-reverse",
@@ -103,7 +103,7 @@ class test(compare_db.test):
         test_num += 1
         comment = ("Test case {0} - data with multiple lines per span "
                    "(no differences).".format(test_num))
-        cmd_arg = 'multi_span_row:multi_span_row -a --difftype=sql'
+        cmd_arg = 'multi_span_row:multi_span_row -t --difftype=sql'
         cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(0, cmd, comment)
         if not res:
@@ -117,7 +117,7 @@ class test(compare_db.test):
         test_num += 1
         comment = ("Test case {0} - data with multiple lines per span "
                    "(changed rows).".format(test_num))
-        cmd_arg = 'multi_span_row:multi_span_row -a --difftype=sql'
+        cmd_arg = 'multi_span_row:multi_span_row -t --difftype=sql'
         cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -131,7 +131,7 @@ class test(compare_db.test):
         test_num += 1
         comment = ("Test case {0} - data with multiple lines per span "
                    "(missing row).".format(test_num))
-        cmd_arg = 'multi_span_row:multi_span_row -a --difftype=sql'
+        cmd_arg = 'multi_span_row:multi_span_row -t --difftype=sql'
         cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -140,7 +140,7 @@ class test(compare_db.test):
         test_num += 1
         comment = ("Test case {0} - data with multiple lines per span "
                    "(missing row; changes for server2).".format(test_num))
-        cmd_arg = ('multi_span_row:multi_span_row -a --difftype=sql '
+        cmd_arg = ('multi_span_row:multi_span_row -t --difftype=sql '
                    '--changes-for=server2')
         cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(1, cmd, comment)

@@ -1152,10 +1152,13 @@ class System_test(object):
                     line_num -= 1
             line_num += 1
 
-    def remove_result(self, prefix):
+    def remove_result(self, prefix, except_list=None):
         """Remove a string in the results.
 
-        prefix[in]         starting prefix of string to mask
+        prefix[in]          Starting prefix of string to mask.
+        except_list[in]     List of exceptions not to remove, each element
+                            containing the text immediately after the prefix.
+                            By default None, no exceptions.
         """
         linenums = []
         linenum = 0
@@ -1167,7 +1170,16 @@ class System_test(object):
             for line in self.results:
                 index = line.find(prefix)
                 if index == 0:
-                    linenums.append(linenum)
+                    # Line start with prefix, check exceptions to skip.
+                    skip = False
+                    if except_list:
+                        for except_item in except_list:
+                            skip_prefix = prefix + except_item
+                            if line.startswith(skip_prefix):
+                                skip = True
+                                break
+                    if not skip:
+                        linenums.append(linenum)
                 linenum += 1
             # Must remove lines in reverse order
             for linenum in reversed(linenums):

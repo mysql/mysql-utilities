@@ -71,7 +71,7 @@ class test(compare_db.test):
         for diff in _DIFF_FORMATS:
             for fmt in _OUTPUT_FORMATS:
                 test_num += 1
-                cmd_opts = (" -a --difftype={0} --format={1}"
+                cmd_opts = (" -t --difftype={0} --format={1}"
                             "").format(diff, fmt)
                 comment = "Test case {0} - Use {1}".format(test_num, cmd_opts)
                 res = self.run_test_case(1,
@@ -88,14 +88,14 @@ class test(compare_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts += " --quiet -a"
+        cmd_opts += " --quiet -t"
         comment = "Test case {0} - {1}".format(test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = " --format=csv -a"
+        cmd_opts = " --format=csv -t"
         cmd_opts += " --width=65"
         comment = "Test case {0} - {1}".format(test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
@@ -103,7 +103,7 @@ class test(compare_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = " --format=csv -a"
+        cmd_opts = " --format=csv -t"
         cmd_opts += " --width=60"  # Minimum width for data check results.
         comment = "Test case {0} - {1}".format(test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
@@ -111,21 +111,21 @@ class test(compare_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = " --format=csv -vvv -a"
+        cmd_opts = " --format=csv -vvv -t"
         comment = "Test case {0} - {1}".format(test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = " --format=csv -vvv -a --disable-binary-logging"
+        cmd_opts = " --format=csv -vvv -t --disable-binary-logging"
         comment = "Test case {0} - {1}".format(test_num, cmd_opts)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = " --format=csv -vvv -a --span-key-size=16"
+        cmd_opts = " --format=csv -vvv -t --span-key-size=16"
         comment = "Test case {0} - {1}".format(test_num, cmd_opts)
         cmd = "{0}{1}".format(cmd_str, cmd_opts)
         res = self.run_test_case(1, cmd, comment)
@@ -135,7 +135,7 @@ class test(compare_db.test):
         # Test use of --skip-table-options (different AUTO_INCREMENT)
         difftype_options = ['', '--difftype=context', '--difftype=sql']
         cmd_base = ("mysqldbcompare.py {0} {1} "
-                    "db_diff_test:db_diff_test -a --skip-row-count "
+                    "db_diff_test:db_diff_test -t --skip-row-count "
                     "--skip-data-check".format(s1_conn, s2_conn))
 
         for difftype_opt in difftype_options:
@@ -164,7 +164,7 @@ class test(compare_db.test):
         for diff in _DIFF_FORMATS:
             for fmt in _OUTPUT_FORMATS:
                 test_num += 1
-                cmd_opts = (" -a --difftype={0} --format={1}{2}"
+                cmd_opts = (" -t --difftype={0} --format={1}{2}"
                             "").format(diff, fmt, _COMPACT_OUTPUT[1])
                 comment = "Test case {0} - Use {1}".format(test_num,
                                                            cmd_opts)
@@ -173,6 +173,24 @@ class test(compare_db.test):
                                          comment)
                 if not res:
                     raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - Warning using --exclude without "
+                   "--all").format(test_num)
+        cmd_opts = "--exclude=%"
+        cmd = "{0}{1}".format(cmd_str, cmd_opts)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - Warning using --regexp without "
+                   "--exclude").format(test_num)
+        cmd_opts = "--regexp"
+        cmd = "{0}{1}".format(cmd_str, cmd_opts)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask version
         self.replace_result(

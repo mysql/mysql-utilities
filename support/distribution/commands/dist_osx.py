@@ -142,7 +142,7 @@ class BuildDistOSX(bdist):
                 (os.path.join(cwd, com_path, "README_com.txt"),
                  os.path.join(data_path, "README_com.txt")),
                 (os.path.join(cwd, com_path, "LICENSE_com.txt"),
-                 os.path.join(data_path, "LICENSE.txt")),
+                 os.path.join(data_path, "LICENSE_com.txt")),
                 (os.path.join(cwd, "CHANGES.txt"),
                  os.path.join(data_path, "CHANGES_Utilities.txt")),
                 (os.path.join(cwd, "README_Fabric_com.txt"),

@@ -56,7 +56,7 @@ class test(compare_db.test):
         s2_conn = "--server2=" + self.build_connection_string(self.server2)
 
         test_num = 1
-        cmd_str = "mysqldbcompare.py -a -vvv inventory:inventory "
+        cmd_str = "mysqldbcompare.py -t -vvv inventory:inventory "
         cmd_opts = "--server1=joeunk:@:dooer " + s2_conn
         comment = "Test case {0} - Invalid --server1 ".format(test_num)
         res = self.run_test_case(2, cmd_str + cmd_opts, comment)
@@ -104,7 +104,7 @@ class test(compare_db.test):
 
         test_num += 1
         cmd_str = ("mysqldbcompare.py {0} {1} {2} "
-                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+                   "".format(s1_conn, s2_conn, "inventory:inventory -t"))
         cmd_opts = "--span-key-size=A"
         comment = ("Test case {0} - invalid value for {1} "
                    "".format(test_num, cmd_opts))
@@ -114,7 +114,7 @@ class test(compare_db.test):
 
         test_num += 1
         cmd_str = ("mysqldbcompare.py {0} {1} {2} "
-                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+                   "".format(s1_conn, s2_conn, "inventory:inventory -t"))
         cmd_opts = "--span-key-size=-4"
         comment = ("Test case {0} - size too low for {1} "
                    "".format(test_num, cmd_opts))
@@ -152,7 +152,7 @@ class test(compare_db.test):
 
         test_num += 1
         cmd_str = ("mysqldbcompare.py {0} {1} {2} "
-                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+                   "".format(s1_conn, s2_conn, "inventory:inventory -t"))
         comment = ("Test case {0} - No pri key".format(test_num, cmd_opts))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
@@ -161,7 +161,7 @@ class test(compare_db.test):
         test_num += 1
         cmd_str = ("mysqldbcompare.py {0} {1} {2} "
                    "--character-set=unsupported_charset"
-                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+                   "".format(s1_conn, s2_conn, "inventory:inventory -t"))
         comment = ("Test case {0} - Invalid --character-set"
                    "".format(test_num, cmd_opts))
         res = self.run_test_case(1, cmd_str, comment)
@@ -199,13 +199,52 @@ class test(compare_db.test):
         test_num += 1
         cmd_str = ("mysqldbcompare.py {0} {1} {2} --skip-checksum-table "
                    "--use-indexes=box_3.invalid_index --skip-diff"
-                   "".format(s1_conn, s2_conn, "inventory:inventory -a"))
+                   "".format(s1_conn, s2_conn, "inventory:inventory -t"))
         comment = ("Test case {0} - Invalid --use-indexes and different "
                    "indexes".format(test_num, cmd_opts))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - Cannot use --all with a database argument"
+                   ".").format(test_num)
+        cmd_str = ("mysqldbcompare.py {0} {1} {2}"
+                   "".format(s1_conn, s2_conn, "--all inventory:inventory"))
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_str = "mysqldbcompare.py {0}".format("inventory")
+        comment = ("Test case {0} - Option --server1 is required"
+                   ".").format(test_num)
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_str = "mysqldbcompare.py {0} {1}".format(s1_conn, "--all")
+        comment = ("Test case {0} - Option --server2 is required"
+                   ".").format(test_num)
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - Cannot compare all databases on the same "
+                   "server.").format(test_num)
+        s1_conn_local = s1_conn.replace('localhost', '127.0.0.1')
+        s2_conn_same_srv = s1_conn.replace('127.0.0.1', 'localhost')
+        s2_conn_same_srv = s2_conn_same_srv.replace('--server1', '--server2')
+        cmd_str = ("mysqldbcompare.py {0} {1} {2}"
+                   "".format(s1_conn_local, s2_conn_same_srv, "--all"))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Mask output..
+        self.replace_substring(str(self.server1.port), "PORT1")
         self.replace_result("mysqldbcompare: error: Server1 connection "
                             "values invalid",
                             "mysqldbcompare: error: Server1 connection "

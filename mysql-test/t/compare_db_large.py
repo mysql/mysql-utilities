@@ -127,7 +127,7 @@ class test(mutlib.System_test):
         comment = ("Test case {0} - check database with No differences "
                    "".format(test_case))
 
-        parameters = ("{0}:{1} -a --changes-for=server2 --difftype=sql -vv"
+        parameters = ("{0}:{1} -t --changes-for=server2 --difftype=sql -vv"
                       "".format(self.db_test_name, self.db_test_name))
         res = self.run_test_case(0, cmd_str.format(params=parameters), comment)
         if not res:

@@ -207,7 +207,7 @@ class test(mutlib.System_test):
 
         test_num = 1
         comment = "Test case {0} - check a sample database".format(test_num)
-        cmd = "{0} inventory:inventory -a".format(cmd_base)
+        cmd = "{0} inventory:inventory -t".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -217,7 +217,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
                    "(extra table)".format(test_num))
-        cmd = "{0} inventory:inventory -a".format(cmd_base)
+        cmd = "{0} inventory:inventory -t".format(cmd_base)
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -228,7 +228,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
                    "direction = server1 (default)".format(test_num))
-        cmd = "{0} inventory:inventory -a --format=CSV".format(cmd_base)
+        cmd = "{0} inventory:inventory -t --format=CSV".format(cmd_base)
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -236,7 +236,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
                    "direction = server2".format(test_num))
-        cmd = ("{0} inventory:inventory -a --format=CSV "
+        cmd = ("{0} inventory:inventory -t --format=CSV "
                "--changes-for=server2".format(cmd_base))
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -245,7 +245,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
                    "direction = server1 and reverse".format(test_num))
-        cmd = ("{0} inventory:inventory -a --format=CSV --changes-for=server1 "
+        cmd = ("{0} inventory:inventory -t --format=CSV --changes-for=server1 "
                "--show-reverse".format(cmd_base))
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -254,7 +254,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - check database with known differences "
                    "direction = server2 and reverse".format(test_num))
-        cmd = ("{0} inventory:inventory -a --format=CSV --changes-for=server2 "
+        cmd = ("{0} inventory:inventory -t --format=CSV --changes-for=server2 "
                "--show-reverse".format(cmd_base))
         res = self.run_test_case(1, cmd, comment)
         if not res:
@@ -268,7 +268,7 @@ class test(mutlib.System_test):
         comment = ("Test case {0} - compare two databases on same server "
                    "w/server2".format(test_num))
         cmd = ("mysqldbcompare.py {0} {1} inventory:inventory2 "
-               "-a".format(s1_conn, s2_conn_dupe))
+               "-t".format(s1_conn, s2_conn_dupe))
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -276,16 +276,16 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - compare two databases on same "
                    "server".format(test_num))
-        cmd = "mysqldbcompare.py {0} inventory:inventory2 -a".format(s1_conn)
+        cmd = "mysqldbcompare.py {0} inventory:inventory2 -t".format(s1_conn)
         res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
-            cmd_arg = "'`db.``:db`:`db.``:db`' -a"
+            cmd_arg = "'`db.``:db`:`db.``:db`' -t"
         else:
-            cmd_arg = '"`db.``:db`:`db.``:db`" -a'
+            cmd_arg = '"`db.``:db`:`db.``:db`" -t'
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         test_num += 1
         comment = ("Test case {0} - compare a database with weird names "
@@ -298,7 +298,7 @@ class test(mutlib.System_test):
         comment = "Test case {0} - compare two empty databases".format(
             test_num)
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn,
-                                                     "empty_db:empty_db -a")
+                                                     "empty_db:empty_db -t")
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -307,7 +307,7 @@ class test(mutlib.System_test):
         comment = ("Test case {0} - compare a sample database containing "
                    "tables with weird names (no backticks) and different "
                    "table options.".format(test_num))
-        cmd_arg = ("db_diff_test:db_diff_test -a "
+        cmd_arg = ("db_diff_test:db_diff_test -t "
                    "--skip-row-count --skip-data-check")
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(1, cmd, comment)
@@ -318,7 +318,7 @@ class test(mutlib.System_test):
         comment = ("Test case {0} - compare a sample database containing "
                    "tables with weird names (no backticks) and skipping "
                    "table options.".format(test_num))
-        cmd_arg = ("db_diff_test:db_diff_test -a --skip-table-options "
+        cmd_arg = ("db_diff_test:db_diff_test -t --skip-table-options "
                    "--skip-row-count --skip-data-check")
         cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
         res = self.run_test_case(0, cmd, comment)
@@ -336,10 +336,10 @@ class test(mutlib.System_test):
             "CREATE PROCEDURE `db.``:db`.```t``export_1`() "
             "SELECT 1")
         if os.name == 'posix':
-            cmd_arg = "'`db.``:db`:`db.``:db`' -a"
+            cmd_arg = "'`db.``:db`:`db.``:db`' -t"
         else:
-            cmd_arg = '"`db.``:db`:`db.``:db`" -a'
-            # Execute test (no differences expected)
+            cmd_arg = '"`db.``:db`:`db.``:db`" -t'
+        # Execute test (no differences expected)
         test_num += 1
         comment = ("Test case {0} - compare a database with objects of "
                    "different types with the same name "
@@ -365,13 +365,46 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Test comparison of all common databases (i.e., with the same name).
+        test_num += 1
+        comment = "Test case {0} - compare all databases".format(test_num)
+        cmd = "mysqldbcompare.py {0} {1} --all".format(s1_conn, s2_conn)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - compare all databases with --exclude "
+                   "option and LIKE pattern").format(test_num)
+        cmd_arg = ('--all --exclude=inventory --exclude=db% '
+                   '--exclude=%quotes% --exclude=___________keys')
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - compare all databases with --exclude "
+                   "option and REGEXP pattern").format(test_num)
+        if os.name == 'posix':
+            exclude_arg = ("--exclude='^db.*' --exclude='quotes' "
+                           "--exclude='k.ys$'")
+        else:
+            exclude_arg = ('--exclude="^db.*" --exclude="quotes" '
+                           '--exclude="k.ys$"')
+        cmd_arg = '--all --exclude=inventory {0} --regexp'.format(exclude_arg)
+        cmd = "mysqldbcompare.py {0} {1} {2}".format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Tests for tables with no primary keys but with unique indexes
         # nullable and not nullable columns
 
         # Test automatically pick up the not nullable unique indexes.
         # Note: All previews test had primary keys. Skip checksum table
         # otherwise no indexes are used if there are no differences.
-        cmd_arg = "no_primary_keys -a --skip-checksum-table"
+        cmd_arg = "no_primary_keys -t --skip-checksum-table"
         test_num += 1
         comment = ("Test case {0} - Test automatically picks up the not "
                    "nullable unique index (No differences)".format(test_num))
@@ -385,7 +418,7 @@ class test(mutlib.System_test):
         # Note: skip checksum table otherwise no indexes are used if there are
         # no differences.
         cmd_arg = ("no_primary_keys "
-                   "--use-indexes=nonix_1_simple.uk_nonullclmns -a "
+                   "--use-indexes=nonix_1_simple.uk_nonullclmns -t "
                    "--skip-checksum-table")
         test_num += 1
         comment = ("Test case {0} - real not nullable unique index for a "
@@ -402,7 +435,7 @@ class test(mutlib.System_test):
         # no differences.
         cmd_arg = ('no_primary_keys '
                    '--use-indexes="nonix_1_nix_2.uk_nonulls;'
-                   'nonix_2_nix_2.uk2_nonulls" -a --skip-checksum-table')
+                   'nonix_2_nix_2.uk2_nonulls" -t --skip-checksum-table')
         test_num += 1
         comment = ("Test case {0} - compare using--use-indexes for two tables "
                    "(No differences)".format(test_num))
@@ -418,7 +451,7 @@ class test(mutlib.System_test):
         cmd_arg = ('no_primary_keys '
                    '--use-indexes="nonix_2_nix_2.uk2_nonulls;'
                    'nonix_2_nix_2.uk_nonulls;'
-                   'nonix_1_nix_2.uk_nonulls;nonix_1_simple.ix_nonull" -a '
+                   'nonix_1_nix_2.uk_nonulls;nonix_1_simple.ix_nonull" -t '
                    '--skip-checksum-table')
         test_num += 1
         comment = ("Test case {0} - using --use-indexes for same table "
@@ -434,7 +467,7 @@ class test(mutlib.System_test):
         cmd_arg = (
             'no_primary_keys --use-indexes="nonix_2_nix_2.uk2_nonulls;'
             'nonix_2_nix_2.uk_nonulls;nonix_1_nix_2.uk_nonulls;'
-            'nonix_2_nix_2_pk.uk2_nonulls;nonix_1_simple.ix_nonull" -a -vvv '
+            'nonix_2_nix_2_pk.uk2_nonulls;nonix_1_simple.ix_nonull" -t -vvv '
             '--skip-checksum-table'
         )
         test_num += 1
@@ -452,10 +485,10 @@ class test(mutlib.System_test):
         # Note: skip checksum table to show index info.
         if os.name == 'posix':
             cmd_arg = ("no_primary_keys --use-indexes='`nonix_``2_nix_``2`."
-                       "`uk_no``nulls`' -a -vvv --skip-checksum-table")
+                       "`uk_no``nulls`' -t -vvv --skip-checksum-table")
         else:
             cmd_arg = ('no_primary_keys --use-indexes="`nonix_``2_nix_``2`.'
-                       '`uk_no``nulls`" -a -vvv --skip-checksum-table')
+                       '`uk_no``nulls`" -t -vvv --skip-checksum-table')
         test_num += 1
         comment = ("Test case {0} - using --use-indexes with backticks "
                    "verbose (No differences)".format(test_num))
@@ -470,10 +503,10 @@ class test(mutlib.System_test):
         # using --use-indexes with backticks and Differences
         if os.name == 'posix':
             cmd_arg = ("no_primary_keys --use-indexes='`nonix_``2_nix_``2`."
-                       "`uk_no``nulls`' -a")
+                       "`uk_no``nulls`' -t")
         else:
             cmd_arg = ('no_primary_keys --use-indexes="`nonix_``2_nix_``2`.'
-                       '`uk_no``nulls`" -a')
+                       '`uk_no``nulls`" -t')
         test_num += 1
         comment = ("Test case {0} - using --use-indexes with backticks "
                    "verbose (Differences) ".format(test_num))
@@ -494,7 +527,7 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - compare two equal databases with "
                    "different names (including VIEWS)").format(test_num)
-        cmd = "{0} inventory:inventory_clone -a".format(cmd_base)
+        cmd = "{0} inventory:inventory_clone -t".format(cmd_base)
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -547,6 +580,11 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Remove other unexpected databases that might be available on the
+        # base server.
+        self.remove_result("# The database ",
+                           except_list=["inventory2"])
+        # Mask non-deterministic output.
         self.do_replacements()
 
         return True

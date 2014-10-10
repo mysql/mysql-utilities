@@ -9,6 +9,8 @@ Release-1.6.0 (Released September 08, 2014)
 
 Release-1.5.2 (Released September 03, 2014)
 -------------------------------------------
+- BUG#19675964: README file name in DMG packages is not congruent to other pkgs
+- BUG#19611879: msi distribution package sets wrong permissions on installed dir
 - BUG#19380635: add separated CHANGES & README Fabric files to Commercial dist
 - BUG#19303700: mysqlserverclone does not check for low free space
 - BUG#19302898: mysqldbcopy fails when views contain sub-views not yet copied
