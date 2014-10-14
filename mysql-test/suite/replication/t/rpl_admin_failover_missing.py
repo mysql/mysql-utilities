@@ -150,7 +150,8 @@ class test(rpl_admin.test):
         format_tabular_list(f_out, ['a', 'b'], rows, {"separator": ","})
         f_out.seek(0)
         for row in f_out.readlines():
-            self.results.append(row)
+            # Convert line terminator to '\n' for test to pass on Windows.
+            self.results.append('{0}\n'.format(row.rstrip()))
             if self.debug:
                 print row,
 

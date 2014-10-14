@@ -101,10 +101,12 @@ def format_tabular_list(f_out, columns, rows, options=None):
         return
     if separator is not None:
         if os.name == "posix":
-            csv_writer = csv.writer(f_out, delimiter=separator)
-        else:
+            # Use \n as line terminator in POSIX (non-Windows) systems.
             csv_writer = csv.writer(f_out, delimiter=separator,
                                     lineterminator='\n')
+        else:
+            # Use the default line terminator '\r\n' on Windows.
+            csv_writer = csv.writer(f_out, delimiter=separator)
         if print_header:
             csv_writer.writerow(columns)
         for row in rows:
