@@ -680,7 +680,7 @@ Test case 15 - compare all databases
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # The database inventory2 on server1 does not exist on server2.
-# Comparing databases: empty_db, compare_db_quotes_1, compare_db_quotes_2, no_primary_keys, inventory, db_diff_test, db.`:db, multi_span_row
+# Comparing databases: empty_db, compare_db_quotes_1, compare_db_quotes_2, no_primary_keys, compare_db_pkeys_db1, compare_db_pkeys_db2, inventory, db_diff_test, db.`:db, multi_span_row
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases empty_db on server1 and empty_db on server2
@@ -729,6 +729,26 @@ Test case 15 - compare all databases
 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
+# Checking databases compare_db_pkeys_db1 on server1 and compare_db_pkeys_db1 on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases compare_db_pkeys_db2 on server1 and compare_db_pkeys_db2 on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 ERROR: The list of objects differs among database inventory and inventory.
@@ -770,7 +790,7 @@ Test case 16 - compare all databases with --exclude option and LIKE pattern
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # The database inventory2 on server1 does not exist on server2.
-# Comparing databases: empty_db, multi_span_row
+# Comparing databases: empty_db, compare_db_pkeys_db1, compare_db_pkeys_db2, multi_span_row
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases empty_db on server1 and empty_db on server2
@@ -778,6 +798,26 @@ Test case 16 - compare all databases with --exclude option and LIKE pattern
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases compare_db_pkeys_db1 on server1 and compare_db_pkeys_db1 on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases compare_db_pkeys_db2 on server1 and compare_db_pkeys_db2 on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -797,7 +837,7 @@ Test case 17 - compare all databases with --exclude option and REGEXP pattern
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
-# Comparing databases: empty_db, multi_span_row
+# Comparing databases: empty_db, compare_db_pkeys_db1, compare_db_pkeys_db2, multi_span_row
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases empty_db on server1 and empty_db on server2
@@ -805,6 +845,26 @@ Test case 17 - compare all databases with --exclude option and REGEXP pattern
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases compare_db_pkeys_db1 on server1 and compare_db_pkeys_db1 on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
+
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases compare_db_pkeys_db2 on server1 and compare_db_pkeys_db2 on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                pass    
 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1582,7 +1642,100 @@ Test case 28 - data with multiple lines per span (with missing row and CSV forma
 # Database consistency check failed.
 #
 # ...done
-Test case 29 - data with quotes and sql format
+Test case 29 - table with primary keys and different data and SQL format.
+# WARNING: Using a password on the command line interface can be insecure.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases compare_db_pkeys_db1 on server1 and compare_db_pkeys_db2 on server2
+#
+
+# WARNING: Cannot generate SQL statements for these objects.
+# Check the difference output for other discrepencies.
+--- `compare_db_pkeys_db1`
++++ `compare_db_pkeys_db2`
+@@ -1,1 +1,1 @@
+-CREATE DATABASE `compare_db_pkeys_db1` /*!40100 DEFAULT CHARACTER SET latin1 */
++CREATE DATABASE `compare_db_pkeys_db2` /*!40100 DEFAULT CHARACTER SET latin1 */
+# WARNING: Could not generate SQL statements for differences between `compare_db_pkeys_db1` and `compare_db_pkeys_db2`. No changes required or not supported difference.
+
+# WARNING: Cannot generate SQL statements for these objects.
+# Check the difference output for other discrepencies.
+--- `compare_db_pkeys_db1`
++++ `compare_db_pkeys_db2`
+@@ -1,1 +1,1 @@
+-CREATE DATABASE `compare_db_pkeys_db1` /*!40100 DEFAULT CHARACTER SET latin1 */
++CREATE DATABASE `compare_db_pkeys_db2` /*!40100 DEFAULT CHARACTER SET latin1 */
+
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#
+# Transformation for --changes-for=server1:
+#
+
+# Data differences found among rows:
+UPDATE `compare_db_pkeys_db1`.`t` SET `c` = '4' WHERE `a` = '1' AND `b` = '2';
+
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 30 - table with primary keys and missing data and SQL format and --show-reverse.
+# WARNING: Using a password on the command line interface can be insecure.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases compare_db_pkeys_db1 on server1 and compare_db_pkeys_db2 on server2
+#
+
+# WARNING: Cannot generate SQL statements for these objects.
+# Check the difference output for other discrepencies.
+--- `compare_db_pkeys_db1`
++++ `compare_db_pkeys_db2`
+@@ -1,1 +1,1 @@
+-CREATE DATABASE `compare_db_pkeys_db1` /*!40100 DEFAULT CHARACTER SET latin1 */
++CREATE DATABASE `compare_db_pkeys_db2` /*!40100 DEFAULT CHARACTER SET latin1 */
+# WARNING: Could not generate SQL statements for differences between `compare_db_pkeys_db1` and `compare_db_pkeys_db2`. No changes required or not supported difference.
+
+# WARNING: Cannot generate SQL statements for these objects.
+# Check the difference output for other discrepencies.
+--- `compare_db_pkeys_db1`
++++ `compare_db_pkeys_db2`
+@@ -1,1 +1,1 @@
+-CREATE DATABASE `compare_db_pkeys_db1` /*!40100 DEFAULT CHARACTER SET latin1 */
++CREATE DATABASE `compare_db_pkeys_db2` /*!40100 DEFAULT CHARACTER SET latin1 */
+
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     t                                       pass    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#
+# Row counts are not the same among `compare_db_pkeys_db1`.`t` and `compare_db_pkeys_db2`.`t`.
+#
+# Transformation for --changes-for=server1:
+#
+
+INSERT INTO `compare_db_pkeys_db1`.`t` (`a`, `b`, `c`) VALUES('1', '2', '4');
+
+#
+# Transformation for reverse changes (--changes-for=server2):
+#
+# DELETE FROM `compare_db_pkeys_db2`.`t` WHERE `a` = '1' AND `b` = '2';
+#
+
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 31 - data with quotes and sql format
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.

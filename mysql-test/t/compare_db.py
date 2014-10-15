@@ -63,6 +63,7 @@ class test(mutlib.System_test):
             os.path.normpath("./std_data/db_compare_test.sql"),
             os.path.normpath("./std_data/db_compare_backtick.sql"),
             os.path.normpath("./std_data/db_compare_use_indexes.sql"),
+            os.path.normpath("./std_data/db_compare_pkeys.sql"),
             os.path.normpath("./std_data/db_compare_quotes.sql"),
         ]
         for data_file in data_files:
@@ -571,6 +572,30 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
+        comment = ("Test case {0} - table with primary keys and different "
+                   "data and SQL format.".format(test_num))
+        cmd_arg = ('compare_db_pkeys_db1:compare_db_pkeys_db2 --run-all-tests '
+                   '--difftype=sql')
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        # Drop column from table for diff to include DELETE and INSERT
+        # statements
+        self.server1.exec_query("DELETE FROM compare_db_pkeys_db1.t WHERE "
+                                "a=1 AND b=2")
+        comment = ("Test case {0} - table with primary keys and missing "
+                   "data and SQL format and --show-reverse.".format(test_num))
+        cmd_arg = ('compare_db_pkeys_db1:compare_db_pkeys_db2 --run-all-tests '
+                   '--difftype=sql --show-reverse')
+        cmd = 'mysqldbcompare.py {0} {1} {2}'.format(s1_conn, s2_conn, cmd_arg)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
         comment = ("Test case {0} - data with quotes and sql "
                    "format".format(test_num))
         cmd_arg = ('compare_db_quotes_1:compare_db_quotes_2 --run-all-tests '
@@ -620,6 +645,10 @@ class test(mutlib.System_test):
         self.drop_db(self.server1, "inventory")
         self.drop_db(self.server1, "inventory1")
         self.drop_db(self.server1, "inventory2")
+        self.drop_db(self.server1, "compare_db_pkeys_db1")
+        self.drop_db(self.server1, "compare_db_pkeys_db2")
+        self.drop_db(self.server2, "compare_db_pkeys_db1")
+        self.drop_db(self.server2, "compare_db_pkeys_db2")
         self.drop_db(self.server2, "inventory")
         self.drop_db(self.server2, "inventory_clone")
         self.drop_db(self.server1, 'db.`:db')

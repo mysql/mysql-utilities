@@ -192,12 +192,15 @@ def build_pkey_where_clause(table, row):
     if len(pkeys) > 0:
         col_names = table.get_col_names()
         where_str += "WHERE "
+        pkey_cond_lst = []
         for pkey in pkeys:
             key_col = pkey[0]                         # get the column name
             col_data = row[col_names.index(key_col)]  # get column value
             # quote key column with backticks
             q_key_col = quote_with_backticks(key_col)
-            where_str += "%s = %s" % (q_key_col, to_sql(col_data))
+            pkey_cond_lst.append("{0} = {1}".format(q_key_col,
+                                                    to_sql(col_data)))
+        where_str = "{0}{1}".format(where_str, ' AND '.join(pkey_cond_lst))
 
     return where_str
 
