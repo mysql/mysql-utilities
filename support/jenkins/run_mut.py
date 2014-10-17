@@ -24,6 +24,8 @@ import glob
 import shutil
 from collections import namedtuple
 
+from support.jenkins.get_server_binaries import (GA_DIR_SUFFIX,
+                                                 UPCOMING_DIR_SUFFIX)
 from support.jenkins.common import (
     MUTOutputParser, get_server_info, working_path, copy_connector,
     extract_file, get_major_version, pprint_mysql_version, mysql_server,
@@ -119,7 +121,14 @@ if __name__ == '__main__':
     server_list = []
     exit_status = 0
     archive_wildcard = "*.zip" if os.name == 'nt' else "*.tar.gz"
-    for server in glob.glob(os.path.join(BINARIES_HOME, archive_wildcard)):
+
+    # Get servers  from GA and UPCOMING folders
+    servers = []
+    servers.extend(glob.glob(os.path.join(BINARIES_HOME, GA_DIR_SUFFIX,
+                                          archive_wildcard)))
+    servers.extend(glob.glob(os.path.join(BINARIES_HOME, UPCOMING_DIR_SUFFIX,
+                                          archive_wildcard)))
+    for server in servers:
         server_info = get_server_info(server)
         if server_info is not None:
             ((is_commercial, mysql_version), shortname) = server_info

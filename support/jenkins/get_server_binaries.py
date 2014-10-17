@@ -34,7 +34,7 @@ OS = {
         "5.6":   ("daily-5.6",
                   "binary-release-advanced_el6-x86-64bit_tar-gz"),
         "trunk": ("daily-trunk",
-                  "binary-release-advanced_el6-x86-64bit_tar-gz"),
+                  "binary-release-advanced_el7-x86-64bit_tar-gz"),
     },
     "Windows": {
         #"5.5":   ("daily-5.5",
@@ -61,6 +61,9 @@ SPECIAL_GA_WIN = {
     # "5.6.9-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.9-rc/"
     #             "dist/packages/mysql-advanced-5.6.9-rc-winx64.zip",
 }
+
+GA_DIR_SUFFIX = "GA"
+UPCOMING_DIR_SUFFIX = "UPCOMING"
 
 
 def download_binary(uri, download_dir, filename):
@@ -259,18 +262,33 @@ if __name__ == "__main__":
     else:
         print("ERROR: '{0}' is not a valid path".format(outdir))
 
-    uri_to_retrieve = []
-    uri_to_retrieve.extend(get_latest_uris(os_dict))
+    uri_to_retrieve_pb = []
+    uri_to_retrieve_ga = []
+    uri_to_retrieve_pb.extend(get_latest_uris(os_dict))
     latest_ga_dict = get_GA_binaries_uris(['5.5', '5.6'])
     if platform.system() == 'Windows':
-        uri_to_retrieve.extend(SPECIAL_GA_WIN.values())
-        uri_to_retrieve.extend(latest_ga_dict['Windows'].values())
+        uri_to_retrieve_ga.extend(SPECIAL_GA_WIN.values())
+        uri_to_retrieve_ga.extend(latest_ga_dict['Windows'].values())
     elif platform.system() == 'Linux':
-        uri_to_retrieve.extend(SPECIAL_GA_LINUX.values())
-        uri_to_retrieve.extend(latest_ga_dict['Linux'].values())
+        uri_to_retrieve_ga.extend(SPECIAL_GA_LINUX.values())
+        uri_to_retrieve_ga.extend(latest_ga_dict['Linux'].values())
     else:
         print("ERROR: This operating system is not yet supported")
+
     # Get filename and retrieve it
-    for uri in uri_to_retrieve:
+    # Create directories to download upcoming and ga versions
+    upcoming_dir = os.path.join(outdir, UPCOMING_DIR_SUFFIX)
+    ga_dir = os.path.join(outdir, GA_DIR_SUFFIX)
+
+    for directory in [ga_dir, upcoming_dir]:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+    # Download binaries
+    for uri in uri_to_retrieve_pb:
         fname = get_filename(uri)
-        download_binary(uri, outdir, fname)
+        download_binary(uri, upcoming_dir, fname)
+
+    for uri in uri_to_retrieve_ga:
+        fname = get_filename(uri)
+        download_binary(uri, ga_dir, fname)
