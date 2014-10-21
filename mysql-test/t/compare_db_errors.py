@@ -103,23 +103,52 @@ class test(compare_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = ("mysqldbcompare.py {0} {1} {2} "
-                   "".format(s1_conn, s2_conn, "inventory:inventory -t"))
         cmd_opts = "--span-key-size=A"
+        cmd_str = ("mysqldbcompare.py {0} {1} inventory:inventory "
+                   "{2}").format(s1_conn, s2_conn, cmd_opts)
         comment = ("Test case {0} - invalid value for {1} "
-                   "".format(test_num, cmd_opts))
-        res = self.run_test_case(2, cmd_str + cmd_opts, comment)
+                   "").format(test_num, cmd_opts)
+        res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_str = ("mysqldbcompare.py {0} {1} {2} "
-                   "".format(s1_conn, s2_conn, "inventory:inventory -t"))
+        cmd_opts = "--span-key-size=16.6"
+        cmd_str = ("mysqldbcompare.py {0} {1} inventory:inventory "
+                   "{2}").format(s1_conn, s2_conn, cmd_opts)
+        comment = ("Test case {0} - invalid value for {1} "
+                   "").format(test_num, cmd_opts)
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = "--span-key-size=0"
+        cmd_str = ("mysqldbcompare.py {0} {1} inventory:inventory "
+                   "{2}").format(s1_conn, s2_conn, cmd_opts)
+        comment = ("Test case {0} - span size equal to zero: {1} "
+                   "").format(test_num, cmd_opts)
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
         cmd_opts = "--span-key-size=-4"
+        cmd_str = ("mysqldbcompare.py {0} {1} inventory:inventory "
+                   "{2}").format(s1_conn, s2_conn, cmd_opts)
         comment = ("Test case {0} - size too low for {1} "
-                   "".format(test_num, cmd_opts))
-        cmd = "{0}{1}".format(cmd_str, cmd_opts)
-        res = self.run_test_case(2, cmd, comment)
+                   "").format(test_num, cmd_opts)
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = "--span-key-size=33"
+        cmd_str = ("mysqldbcompare.py {0} {1} inventory:inventory "
+                   "{2}").format(s1_conn, s2_conn, cmd_opts)
+        comment = ("Test case {0} - size too high for {1} "
+                   "").format(test_num, cmd_opts)
+        res = self.run_test_case(2, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

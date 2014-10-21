@@ -1972,7 +1972,14 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 21a - Changes for server1  (not skipping table options).
+Test case 21 - Warning span size must be an even number: --span-key-size=9
+# WARNING: The value for the --span-key-size option must be an even number. The value 8 will be used instead.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases inventory on server1 and inventory on server2
+#
+ERROR: The list of objects differs among database inventory and inventory.
+Test case 22a - Changes for server1  (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -1998,7 +2005,7 @@ Test case 21a - Changes for server1  (not skipping table options).
 # Database consistency check failed.
 #
 # ...done
-Test case 21b - Changes for server1  (skipping table options).
+Test case 22b - Changes for server1  (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -2011,7 +2018,7 @@ Test case 21b - Changes for server1  (skipping table options).
 # Databases are consistent given skip options specified.
 #
 # ...done
-Test case 22a - Changes for server2  (not skipping table options).
+Test case 23a - Changes for server2  (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -2037,7 +2044,7 @@ Test case 22a - Changes for server2  (not skipping table options).
 # Database consistency check failed.
 #
 # ...done
-Test case 22b - Changes for server2  (skipping table options).
+Test case 23b - Changes for server2  (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -2050,7 +2057,7 @@ Test case 22b - Changes for server2  (skipping table options).
 # Databases are consistent given skip options specified.
 #
 # ...done
-Test case 23a - Changes for server1 --difftype=context (not skipping table options).
+Test case 24a - Changes for server1 --difftype=context (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -2081,7 +2088,7 @@ Test case 23a - Changes for server1 --difftype=context (not skipping table optio
 # Database consistency check failed.
 #
 # ...done
-Test case 23b - Changes for server1 --difftype=context (skipping table options).
+Test case 24b - Changes for server1 --difftype=context (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -2094,7 +2101,7 @@ Test case 23b - Changes for server1 --difftype=context (skipping table options).
 # Databases are consistent given skip options specified.
 #
 # ...done
-Test case 24a - Changes for server2 --difftype=context (not skipping table options).
+Test case 25a - Changes for server2 --difftype=context (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -2125,7 +2132,7 @@ Test case 24a - Changes for server2 --difftype=context (not skipping table optio
 # Database consistency check failed.
 #
 # ...done
-Test case 24b - Changes for server2 --difftype=context (skipping table options).
+Test case 25b - Changes for server2 --difftype=context (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -2138,7 +2145,7 @@ Test case 24b - Changes for server2 --difftype=context (skipping table options).
 # Databases are consistent given skip options specified.
 #
 # ...done
-Test case 25a - Changes for server1 --difftype=sql (not skipping table options).
+Test case 26a - Changes for server1 --difftype=sql (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -2161,7 +2168,7 @@ AUTO_INCREMENT=50000005;
 # Database consistency check failed.
 #
 # ...done
-Test case 25b - Changes for server1 --difftype=sql (skipping table options).
+Test case 26b - Changes for server1 --difftype=sql (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -2174,7 +2181,7 @@ Test case 25b - Changes for server1 --difftype=sql (skipping table options).
 # Databases are consistent given skip options specified.
 #
 # ...done
-Test case 26a - Changes for server2 --difftype=sql (not skipping table options).
+Test case 27a - Changes for server2 --difftype=sql (not skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -2197,7 +2204,7 @@ AUTO_INCREMENT=50000010;
 # Database consistency check failed.
 #
 # ...done
-Test case 26b - Changes for server2 --difftype=sql (skipping table options).
+Test case 27b - Changes for server2 --difftype=sql (skipping table options).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases db_diff_test on server1 and db_diff_test on server2
@@ -2210,7 +2217,7 @@ Test case 26b - Changes for server2 --difftype=sql (skipping table options).
 # Databases are consistent given skip options specified.
 #
 # ...done
-Test case 27 - Use  -t --difftype=unified --format=grid --compact
+Test case 28 - Use  -t --difftype=unified --format=grid --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2301,7 +2308,7 @@ Test case 27 - Use  -t --difftype=unified --format=grid --compact
 # Database consistency check failed.
 #
 # ...done
-Test case 28 - Use  -t --difftype=unified --format=csv --compact
+Test case 29 - Use  -t --difftype=unified --format=csv --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2369,7 +2376,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 29 - Use  -t --difftype=unified --format=tab --compact
+Test case 30 - Use  -t --difftype=unified --format=tab --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2437,7 +2444,7 @@ stock_number	description	qty	cost	type	notes	supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 30 - Use  -t --difftype=unified --format=vertical --compact
+Test case 31 - Use  -t --difftype=unified --format=vertical --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2595,7 +2602,7 @@ Test case 30 - Use  -t --difftype=unified --format=vertical --compact
 # Database consistency check failed.
 #
 # ...done
-Test case 31 - Use  -t --difftype=context --format=grid --compact
+Test case 32 - Use  -t --difftype=context --format=grid --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2690,7 +2697,7 @@ Test case 31 - Use  -t --difftype=context --format=grid --compact
 # Database consistency check failed.
 #
 # ...done
-Test case 32 - Use  -t --difftype=context --format=csv --compact
+Test case 33 - Use  -t --difftype=context --format=csv --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2764,7 +2771,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 33 - Use  -t --difftype=context --format=tab --compact
+Test case 34 - Use  -t --difftype=context --format=tab --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -2838,7 +2845,7 @@ stock_number	description	qty	cost	type	notes	supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 34 - Use  -t --difftype=context --format=vertical --compact
+Test case 35 - Use  -t --difftype=context --format=vertical --compact
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
@@ -3027,14 +3034,14 @@ Test case 34 - Use  -t --difftype=context --format=vertical --compact
 # Database consistency check failed.
 #
 # ...done
-Test case 35 - Warning using --exclude without --all
+Test case 36 - Warning using --exclude without --all
 # WARNING: The --exclude option is only used with the --all option (option ignored).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory on server2
 #
 ERROR: The list of objects differs among database inventory and inventory.
-Test case 36 - Warning using --regexp without --exclude
+Test case 37 - Warning using --regexp without --exclude
 # WARNING: The --regexp option is only used with the --exclude option (option ignored).
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.

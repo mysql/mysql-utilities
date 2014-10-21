@@ -34,13 +34,15 @@ from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command.dbcompare import (compare_all_databases,
                                                database_compare)
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.dbcompare import DEFAULT_SPAN_KEY_SIZE
+from mysql.utilities.common.dbcompare import (DEFAULT_SPAN_KEY_SIZE,
+                                              MAX_SPAN_KEY_SIZE)
 from mysql.utilities.common.pattern_matching import REGEXP_OBJ_NAME
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.messages import (PARSE_ERR_DB_PAIR,
                                              PARSE_ERR_DB_PAIR_EXT,
                                              PARSE_ERR_DB_MISSING_CMP,
                                              PARSE_ERR_OPTS_REQ,
+                                             PARSE_ERR_SPAN_KEY_SIZE_TOO_HIGH,
                                              PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW,
                                              WARN_OPT_ONLY_USED_WITH)
 from mysql.utilities.common.options import (add_difftype, add_regexp,
@@ -302,11 +304,20 @@ if __name__ == '__main__':
             _, err, _ = sys.exc_info()
             parser.error("Server2 connection values invalid: %s." % err.errmsg)
 
-    # Check minimum value for --span-key-size.
-    if opt.span_key_size and opt.span_key_size < DEFAULT_SPAN_KEY_SIZE:
-        parser.error(
-            PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW.format(
-                s_value=opt.span_key_size, default=DEFAULT_SPAN_KEY_SIZE))
+    # Check --span-key-size value.
+    if opt.span_key_size is not None:
+        if opt.span_key_size < DEFAULT_SPAN_KEY_SIZE:
+            parser.error(
+                PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW.format(
+                    s_value=opt.span_key_size, default=DEFAULT_SPAN_KEY_SIZE))
+        if opt.span_key_size > MAX_SPAN_KEY_SIZE:
+            parser.error(
+                PARSE_ERR_SPAN_KEY_SIZE_TOO_HIGH.format(
+                    s_value=opt.span_key_size, max=MAX_SPAN_KEY_SIZE))
+        if opt.span_key_size % 2 != 0:
+            print("# WARNING: The value for the --span-key-size option must "
+                  "be an even number. The value {0} will be used instead."
+                  "".format(opt.span_key_size - 1))
 
     # Operations to perform:
     # 1) databases exist

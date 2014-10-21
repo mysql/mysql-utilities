@@ -51,6 +51,10 @@ _COMPARE_TABLE_DROP = """
 # the key length could be calculated by the number of rows.
 DEFAULT_SPAN_KEY_SIZE = 8
 
+# Max allowed size for the span_key. Must be smaller or equal than the size of
+# the key hash because it is a substring of it. Note: 32 = binary(16).
+MAX_SPAN_KEY_SIZE = 32
+
 # Note: Use a composed index (span, pk_hash) instead of only for column "span"
 # due to the "ORDER BY pk_hash" in the _COMPARE_DIFF query.
 _COMPARE_TABLE = """

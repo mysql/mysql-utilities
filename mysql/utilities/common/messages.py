@@ -73,6 +73,11 @@ PARSE_ERR_OBJ_NAME_FORMAT = ("Cannot parse the specified qualified name "
                              "[.<tbl_name>]) and that backtick quotes are "
                              "properly used if required.")
 
+PARSE_ERR_SPAN_KEY_SIZE_TOO_HIGH = (
+    "The value {s_value} specified for option --span-key-size is too big. It "
+    "must be smaller or equal than {max} (size of the key hash values for "
+    "comparison).")
+
 PARSE_ERR_SPAN_KEY_SIZE_TOO_LOW = (
     "The value {s_value} specified for option --span-key-size is too small "
     "and would cause inaccurate results, please retry with a bigger value "
