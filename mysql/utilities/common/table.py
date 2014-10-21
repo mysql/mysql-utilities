@@ -132,28 +132,29 @@ class Index(object):
 
         num_cols_this = len(self.columns)
         num_cols_that = len(index.columns)
-        num_cols_same = 0
+        same_size = num_cols_this == num_cols_that
         if self.type == "BTREE":
             indexes = izip(self.columns, index.columns)
             for idx_pair in indexes:
                 if not self.__cmp_columns(*idx_pair):
                     return False
-            # All index pairs are the same
+            # All index pairs are the same, so return index with smaller number
+            # of columns.
             return num_cols_this <= num_cols_that
         else:  # HASH, RTREE, FULLTEXT
-            if (self.type == "FULLTEXT") and (num_cols_this != num_cols_that):
-                return False
-            i = 0
-            while (i < num_cols_this) and (i < num_cols_that):
-                if self.__cmp_columns(self.columns[i], index.columns[i]):
-                    num_cols_same = num_cols_same + 1
-                else:  # Ensures column lists must match
-                    num_cols_same = 0
-                    break
-                i = i + 1
-        if (num_cols_same > 0) and (num_cols_this <= num_cols_that):
-            return True
-        return False
+            if self.type != "FULLTEXT":
+                # For RTREE or HASH type indexes, an index is redundant if
+                # it has the exact same columns on the exact same order.
+                indexes = izip(self.columns, index.columns)
+                return (same_size and
+                        all((self.__cmp_columns(*idx_pair)
+                            for idx_pair in indexes)))
+            else:  # FULLTEXT index
+                # A FULLTEXT index A is redundant of FULLTEXT index B if
+                # the columns of A are a subset of B's columns, the order
+                # does not matter.
+                return all(any(self.__cmp_columns(col, icol) for
+                               icol in index.columns) for col in self.columns)
 
     def is_duplicate(self, index):
         """Compare this index with another
@@ -1243,10 +1244,6 @@ class Table(object):
         # if there are duplicates, add them to the dupes list
         if res[0]:
             dupes.extend(res[1])
-        # We sort the fulltext index columns - easier to do it once here
-        for index in self.fulltext_indexes:
-            cols = index.columns
-            cols.sort(key=lambda cols: cols[0])
         res = self.__check_index_list(self.fulltext_indexes)
         # if there are duplicates, add them to the dupes list
         if res[0]:

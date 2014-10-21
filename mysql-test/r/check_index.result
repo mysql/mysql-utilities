@@ -29,11 +29,19 @@ CREATE FULLTEXT INDEX `ft1` ON `util_test_c`.`t5` (`y`)
 #     may be redundant or duplicate of:
 CREATE FULLTEXT INDEX `ft` ON `util_test_c`.`t5` (`y`) 
 #
-CREATE FULLTEXT INDEX `ft6` ON `util_test_c`.`t5` (`a`, `b`, `c`) 
+CREATE FULLTEXT INDEX `ft3` ON `util_test_c`.`t5` (`a`, `b`) 
 #     may be redundant or duplicate of:
 CREATE FULLTEXT INDEX `ft2` ON `util_test_c`.`t5` (`a`, `b`, `c`) 
 #
-CREATE FULLTEXT INDEX `ft5` ON `util_test_c`.`t5` (`a`, `b`, `y`) 
+CREATE FULLTEXT INDEX `ft6` ON `util_test_c`.`t5` (`c`, `a`, `b`) 
+#     may be redundant or duplicate of:
+CREATE FULLTEXT INDEX `ft2` ON `util_test_c`.`t5` (`a`, `b`, `c`) 
+#
+CREATE FULLTEXT INDEX `ft` ON `util_test_c`.`t5` (`y`) 
+#     may be redundant or duplicate of:
+CREATE FULLTEXT INDEX `ft4` ON `util_test_c`.`t5` (`a`, `b`, `y`) 
+#
+CREATE FULLTEXT INDEX `ft5` ON `util_test_c`.`t5` (`y`, `a`, `b`) 
 #     may be redundant or duplicate of:
 CREATE FULLTEXT INDEX `ft4` ON `util_test_c`.`t5` (`a`, `b`, `y`) 
 #
@@ -231,6 +239,51 @@ CREATE INDEX `bti1` ON `util_test_g`.`t1` (`a1`, `a2`, `a3`) USING BTREE
 ALTER TABLE `util_test_g`.`t1` DROP INDEX `id`;
 ALTER TABLE `util_test_g`.`t1` DROP INDEX `bti4`;
 ALTER TABLE `util_test_g`.`t1` DROP INDEX `bti3`;
+#
+#
+# Getting indexes for util_test_g.t2
+# The following index is a duplicate or redundant for table util_test_g.t2:
+#
+CREATE INDEX `hi5` ON `util_test_g`.`t2` (`b1`, `b2`) 
+#     may be redundant or duplicate of:
+CREATE INDEX `hi1` ON `util_test_g`.`t2` (`b1`, `b2`) 
+#
+# DROP statement:
+#
+ALTER TABLE `util_test_g`.`t2` DROP INDEX `hi5`;
+#
+#
+# Getting indexes for util_test_g.t3
+# Table `util_test_g`.`t3` does not contain neither a PRIMARY nor UNIQUE key.
+# The following indexes are duplicates or redundant for table util_test_g.t3:
+#
+CREATE FULLTEXT INDEX `ft` ON `util_test_g`.`t3` (`c`) 
+#     may be redundant or duplicate of:
+CREATE FULLTEXT INDEX `ft2` ON `util_test_g`.`t3` (`a`, `b`, `c`) 
+#
+CREATE FULLTEXT INDEX `ft3` ON `util_test_g`.`t3` (`a`, `b`) 
+#     may be redundant or duplicate of:
+CREATE FULLTEXT INDEX `ft2` ON `util_test_g`.`t3` (`a`, `b`, `c`) 
+#
+CREATE FULLTEXT INDEX `ft6` ON `util_test_g`.`t3` (`c`, `a`, `b`) 
+#     may be redundant or duplicate of:
+CREATE FULLTEXT INDEX `ft2` ON `util_test_g`.`t3` (`a`, `b`, `c`) 
+#
+CREATE FULLTEXT INDEX `ft1` ON `util_test_g`.`t3` (`y`) 
+#     may be redundant or duplicate of:
+CREATE FULLTEXT INDEX `ft4` ON `util_test_g`.`t3` (`a`, `b`, `y`) 
+#
+CREATE FULLTEXT INDEX `ft5` ON `util_test_g`.`t3` (`y`, `a`, `b`) 
+#     may be redundant or duplicate of:
+CREATE FULLTEXT INDEX `ft4` ON `util_test_g`.`t3` (`a`, `b`, `y`) 
+#
+# DROP statements:
+#
+ALTER TABLE `util_test_g`.`t3` DROP INDEX `ft`;
+ALTER TABLE `util_test_g`.`t3` DROP INDEX `ft3`;
+ALTER TABLE `util_test_g`.`t3` DROP INDEX `ft6`;
+ALTER TABLE `util_test_g`.`t3` DROP INDEX `ft1`;
+ALTER TABLE `util_test_g`.`t3` DROP INDEX `ft5`;
 #
 #
 # ...done.
