@@ -49,7 +49,6 @@ Test case 3a - move binary logs (succeed) with --skip-flush-binlogs using: 's_us
 # - slave1-relay-bin.000014
 # - slave1-relay-bin.000015
 # - slave1-relay-bin.000016
-# - slave1-relay-bin.000017
 #
 #...done.
 #
@@ -75,5 +74,4 @@ File moved: 'slave1-relay-bin.000013' (index updated: True)
 File moved: 'slave1-relay-bin.000014' (index updated: True)
 File moved: 'slave1-relay-bin.000015' (index updated: True)
 File moved: 'slave1-relay-bin.000016' (index updated: True)
-File moved: 'slave1-relay-bin.000017' (index updated: True)
 

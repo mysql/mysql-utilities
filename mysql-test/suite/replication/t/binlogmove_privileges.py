@@ -97,6 +97,9 @@ class test(binlogmove.test):
             for _ in range(5):
                 srv.exec_query('FLUSH LOCAL LOGS')
 
+        # Stop slave to avoid the creation of more relay logs.
+        self.server2.exec_query('STOP SLAVE')
+
         master_src = self.server1.select_variable('datadir')
         if self.debug:
             print("\nServer {0}:{1} source directory (datadir): "

@@ -155,6 +155,10 @@ class test(rpl_admin.test):
             for _ in range(5):
                 srv.exec_query('FLUSH LOCAL LOGS')
 
+        # Stop slaves to avoid the creation of more relay logs.
+        for srv in [self.server2, self.server3]:
+            srv.exec_query('STOP SLAVE')
+
         test_num = 1
         comment = ("Test case {0}a - move binary logs from running server "
                    "(master).").format(test_num)
