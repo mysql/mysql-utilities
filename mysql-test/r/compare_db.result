@@ -223,8 +223,6 @@ Test case 5 - check database with known differences direction = server1 and reve
 # TABLE     supplier                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
 #           - Find row differences                                  FAIL    
-#           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -263,8 +261,6 @@ code,name
 
 
 # TABLE     supplies                                pass    FAIL    -       
-#           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL    
 #           - Compare table checksum                                FAIL    
 #           - Find row differences                                  FAIL    
 #
@@ -368,8 +364,6 @@ Test case 6 - check database with known differences direction = server2 and reve
 # TABLE     supplier                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
 #           - Find row differences                                  FAIL    
-#           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -408,8 +402,6 @@ code,name
 
 
 # TABLE     supplies                                pass    FAIL    -       
-#           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL    
 #           - Compare table checksum                                FAIL    
 #           - Find row differences                                  FAIL    
 #
@@ -1714,8 +1706,6 @@ Test case 30 - table with primary keys and missing data and SQL format and --sho
 # TABLE     t                                       pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
 #           - Find row differences                                  FAIL    
-#           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `compare_db_pkeys_db1`.`t` and `compare_db_pkeys_db2`.`t`.
 #
@@ -1763,8 +1753,6 @@ Test case 31 - data with quotes and sql format
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
 # TABLE     t1                                      pass    pass    -       
-#           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL    
 #           - Compare table checksum                                FAIL    
 #           - Find row differences                                  FAIL    
 #

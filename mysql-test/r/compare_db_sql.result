@@ -164,8 +164,6 @@ Test case 4 - check database with known differences generate SQL direction = ser
 # TABLE     supplier                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
 #           - Find row differences                                  FAIL    
-#           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -192,8 +190,6 @@ INSERT INTO `inventory`.`supplier` (`code`, `name`) VALUES('3', 'Never Enough In
 
 
 # TABLE     supplies                                pass    FAIL    -       
-#           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL    
 #           - Compare table checksum                                FAIL    
 #           - Find row differences                                  FAIL    
 #
@@ -270,8 +266,6 @@ Test case 5 - check database with known differences generate SQL direction = ser
 # TABLE     supplier                                pass    FAIL    -       
 #           - Compare table checksum                                FAIL    
 #           - Find row differences                                  FAIL    
-#           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL    
 #
 # Row counts are not the same among `inventory`.`supplier` and `inventory`.`supplier`.
 #
@@ -298,8 +292,6 @@ DELETE FROM `inventory`.`supplier` WHERE `code` = '3';
 
 
 # TABLE     supplies                                pass    FAIL    -       
-#           - Compare table checksum                                FAIL    
-#           - Find row differences                                  FAIL    
 #           - Compare table checksum                                FAIL    
 #           - Find row differences                                  FAIL    
 #

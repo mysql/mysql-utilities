@@ -1174,6 +1174,95 @@ def _get_formatted_rows(rows, table, fmt='GRID'):
     return result_rows
 
 
+def _generate_data_diff_output(diff_data, table1, table2, used_index, options):
+    """Generates the data difference output.
+
+    This function generates the output data for the found data differences
+    between two tables, according to the provided options (difftype and
+    format).
+
+    diff_data[in]   Tuple with three elements containing the data differences
+                    between two tables. The first element contains the rows on
+                    both tables but with different values, the second contains
+                    the rows found in table1 but not in table2, and the third
+                    contains the rows found in table2 but not in table1.
+    table1[in]      First compared table (source).
+    table2[in]      Second compared table (target).
+    used_index[in]  Index (key) used to identify rows.
+    options[in]     Dictionary of option (format, difftype, compact, etc.).
+
+    Return a list of difference (strings) generated according to the
+    specified options.
+    """
+    difftype = options.get('difftype', 'unified')
+    fmt = options.get('format', 'grid')
+    compact_diff = options.get("compact", False)
+    table1_name = table1.q_table
+    table2_name = table2.q_table
+    changed_rows, extra1, extra2 = diff_data
+    data_diffs = []
+
+    if len(changed_rows) > 0:
+        data_diffs.append("# Data differences found among rows:")
+        # Get original changed/extra rows for each table within the given
+        # span set 'changed_rows' (excluding unchanged rows).
+        # Note: each span can refer to multiple rows.
+        tbl1_rows, tbl2_rows = _get_changed_rows_span(table1, table2,
+                                                      changed_rows,
+                                                      used_index)
+
+        if difftype == 'sql':
+            # Compute SQL diff for changed rows.
+            data_diffs.extend(transform_data(table1, table2, "UPDATE",
+                                             (tbl1_rows[0], tbl2_rows[0])))
+            # Compute SQL diff for extra rows in table 1.
+            if tbl1_rows[1]:
+                data_diffs.extend(transform_data(table1, table2,
+                                                 "DELETE", tbl1_rows[1]))
+            # Compute SQL diff for extra rows in table 2.
+            if tbl2_rows[1]:
+                data_diffs.extend(transform_data(table1, table2,
+                                                 "INSERT", tbl2_rows[1]))
+        else:
+            # Join changed and extra rows for table 1.
+            tbl1_rows = tbl1_rows[0] + tbl1_rows[1]
+            rows1 = _get_formatted_rows(tbl1_rows, table1, fmt)
+            # Join changed and extra rows for table 2.
+            tbl2_rows = tbl2_rows[0] + tbl2_rows[1]
+            rows2 = _get_formatted_rows(tbl2_rows, table2, fmt)
+            # Compute diff for all changes between table 1 and 2.
+            diff_str = _get_diff(rows1, rows2, table1_name, table2_name,
+                                 difftype, compact=compact_diff)
+            if len(diff_str) > 0:
+                data_diffs.extend(diff_str)
+
+    if len(extra1) > 0:
+        # Compute diff for extra rows in table 1.
+        rows = _get_rows_span(table1, extra1, used_index)
+        if difftype == 'sql':
+            data_diffs.extend(transform_data(table1, table2,
+                                             "DELETE", rows))
+        else:
+            data_diffs.append("\n# Rows in {0} not in {1}"
+                              "".format(table1_name, table2_name))
+            res = _get_formatted_rows(rows, table1, fmt)
+            data_diffs.extend(res)
+
+    if len(extra2) > 0:
+        # Compute diff for extra rows in table 2.
+        rows = _get_rows_span(table2, extra2, used_index)
+        if difftype == 'sql':
+            data_diffs.extend(transform_data(table1, table2,
+                                             "INSERT", rows))
+        else:
+            data_diffs.append("\n# Rows in {0} not in {1}"
+                              "".format(table2_name, table1_name))
+            res = _get_formatted_rows(rows, table2, fmt)
+            data_diffs.extend(res)
+
+    return data_diffs
+
+
 def check_consistency(server1, server2, table1_name, table2_name,
                       options=None, diag_msgs=None, reporter=None):
     """Check the data consistency of two tables
@@ -1238,8 +1327,12 @@ def check_consistency(server1, server2, table1_name, table2_name,
        used to form a formatted list of the results for presentation to the
        user.
 
+       Note: The differences output is generated considering the specified
+       changes directions (for server1, server2, or both).
+
     9. The compare databases are destroyed and differences (if any) are
-       returned. A return value of None indicates the data is consistent.
+       returned according to the specified change direction in the options.
+       A return value of (None, None) indicates the data is consistent.
 
     10. Turn binary logging on if turned off in step (1).
 
@@ -1258,16 +1351,16 @@ def check_consistency(server1, server2, table1_name, table2_name,
 
     Returns tuple - string representations of the primary index columns
 
-    Returns None = data is consistent
-            list of differences - data is not consistent
+    Returns a tuple with the list of differences for server1 and/or server2
+            according to the specified direction. If the data is consistent
+            then the tuple (None, None) is returned.
     """
     if options is None:
         options = {}
-    fmt = options.get('format', 'grid')
-    difftype = options.get('difftype', 'unified')
     span_key_size = options.get('span_key_size', DEFAULT_SPAN_KEY_SIZE)
-    compact_diff = options.get("compact", False)
     use_indexes = options.get('use_indexes', None)
+    direction = options.get('changes-for', 'server1')
+    reverse = options.get('reverse', False)
 
     table1 = Table(server1, table1_name)
     table2 = Table(server2, table2_name)
@@ -1288,7 +1381,7 @@ def check_consistency(server1, server2, table1_name, table2_name,
         if checksum1 == checksum2:
             if reporter:
                 reporter.report_state("pass")
-            return None  # No data diffs
+            return None, None  # No data diffs (in any direction)
         else:
             if reporter:
                 reporter.report_state("FAIL")
@@ -1325,7 +1418,8 @@ def check_consistency(server1, server2, table1_name, table2_name,
         binlog_server1 = False
         binlog_server2 = False
 
-    data_diffs = None
+    data_diffs1 = None
+    data_diffs2 = None
 
     # Now, execute algorithm to find row differences.
     if reporter:
@@ -1356,7 +1450,6 @@ def check_consistency(server1, server2, table1_name, table2_name,
     if len(in1_not2) != 0 or len(in2_not1) != 0:
         table1_diffs = []
         table2_diffs = []
-        data_diffs = []
 
         # Get keys for diffs on table1
         for row in in1_not2:
@@ -1370,61 +1463,17 @@ def check_consistency(server1, server2, table1_name, table2_name,
         changed_rows, extra1, extra2 = get_common_lists(table1_diffs,
                                                         table2_diffs)
 
-        if len(changed_rows) > 0:
-            data_diffs.append("# Data differences found among rows:")
-            # Get original changed/extra rows for each table within the given
-            # span set 'changed_rows' (excluding unchanged rows).
-            # Note: each span can refer to multiple rows.
-            tbl1_rows, tbl2_rows = _get_changed_rows_span(table1, table2,
-                                                          changed_rows,
-                                                          used_index)
-
-            if difftype == 'sql':
-                # Compute SQL diff for changed rows.
-                data_diffs.extend(transform_data(table1, table2, "UPDATE",
-                                                 (tbl1_rows[0], tbl2_rows[0])))
-                # Compute SQL diff for extra rows in table 1.
-                if tbl1_rows[1]:
-                    data_diffs.extend(transform_data(table1, table2,
-                                                     "DELETE", tbl1_rows[1]))
-                # Compute SQL diff for extra rows in table 2.
-                if tbl2_rows[1]:
-                    data_diffs.extend(transform_data(table1, table2,
-                                                     "INSERT", tbl2_rows[1]))
-            else:
-                # Join changed and extra rows for table 1.
-                tbl1_rows = tbl1_rows[0] + tbl1_rows[1]
-                rows1 = _get_formatted_rows(tbl1_rows, table1, fmt)
-                # Join changed and extra rows for table 2.
-                tbl2_rows = tbl2_rows[0] + tbl2_rows[1]
-                rows2 = _get_formatted_rows(tbl2_rows, table2, fmt)
-                # Compute diff for all changes between table 1 and 2.
-                diff_str = _get_diff(rows1, rows2, table1_name, table2_name,
-                                     difftype, compact=compact_diff)
-                if len(diff_str) > 0:
-                    data_diffs.extend(diff_str)
-
-        if len(extra1) > 0:
-            rows = _get_rows_span(table1, extra1, used_index)
-            if difftype == 'sql':
-                data_diffs.extend(transform_data(table1, table2,
-                                                 "DELETE", rows))
-            else:
-                data_diffs.append("\n# Rows in {0} not in {1}"
-                                  "".format(table1_name, table2_name))
-                res = _get_formatted_rows(rows, table1, fmt)
-                data_diffs.extend(res)
-
-        if len(extra2) > 0:
-            rows = _get_rows_span(table2, extra2, used_index)
-            if difftype == 'sql':
-                data_diffs.extend(transform_data(table1, table2,
-                                                 "INSERT", rows))
-            else:
-                data_diffs.append("\n# Rows in {0} not in {1}"
-                                  "".format(table2_name, table1_name))
-                res = _get_formatted_rows(rows, table2, fmt)
-                data_diffs.extend(res)
+        # Generate data differences output according to direction.
+        if direction == 'server1' or reverse:
+            data_diffs1 = _generate_data_diff_output(
+                (changed_rows, extra1, extra2), table1, table2, used_index,
+                options
+            )
+        if direction == 'server2' or reverse:
+            data_diffs2 = _generate_data_diff_output(
+                (changed_rows, extra2, extra1), table2, table1, used_index,
+                options
+            )
 
     if binlog_server1:
         # Commit to avoid error setting sql_log_bin inside a transaction.
@@ -1436,8 +1485,8 @@ def check_consistency(server1, server2, table1_name, table2_name,
         server2.toggle_binlog("ENABLE")
 
     if reporter:
-        if data_diffs:
+        if data_diffs1 or data_diffs2:
             reporter.report_state('FAIL')
         else:
             reporter.report_state('pass')
-    return data_diffs
+    return data_diffs1, data_diffs2

@@ -305,23 +305,14 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
 
     errors = []
     debug_msgs = []
-    diff_server1 = []
-    diff_server2 = []
     # For each table, do row data consistency check
     if not options['no_data']:
         reporter.report_state('-')
         try:
-            # Do the comparison based on direction
-            if direction == 'server1' or reverse:
-                diff_server1 = check_consistency(server1, server2,
-                                                 obj1, obj2, options,
-                                                 diag_msgs=debug_msgs,
-                                                 reporter=reporter)
-            if direction == 'server2' or reverse:
-                diff_server2 = check_consistency(server2, server1,
-                                                 obj2, obj1, options,
-                                                 diag_msgs=debug_msgs,
-                                                 reporter=reporter)
+            # Do the comparison considering the direction.
+            diff_server1, diff_server2 = check_consistency(
+                server1, server2, obj1, obj2, options, diag_msgs=debug_msgs,
+                reporter=reporter)
 
             # if no differences, return
             if (diff_server1 is None and diff_server2 is None) or \
