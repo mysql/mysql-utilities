@@ -250,8 +250,7 @@ class test(rpl_admin.test):
                 os.unlink(self.res_fname)
             except OSError:
                 pass
-        # Remove temp directory.
-        shutil.rmtree(os.path.normpath(_TEMP_BINLOG_DIR))
+
         # Kill all spawned servers.
         self.kill_server_list(
             ['rep_master', 'rep_slave1']
@@ -262,4 +261,8 @@ class test(rpl_admin.test):
         except OperationalError:
             # Ignore error if server is not available (already stopped).
             pass
+
+        # Remove temp directory.
+        shutil.rmtree(os.path.normpath(_TEMP_BINLOG_DIR))
+
         return True
