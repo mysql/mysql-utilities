@@ -712,6 +712,30 @@ def format_IPv6(host_address):
     return host_address
 
 
+def parse_login_values_config_path(login_values, quietly=True):
+    """Parse the login values to retrieve the user and password from a
+    configuration file.
+
+    login_values[in]    The login values to be parsed.
+    quietly[in]         Do not raise exceptions (Default True).
+
+    returns parsed (user, password) tuple or (login_values, None) tuple.
+    """
+    try:
+        matches = _match(_CONN_CONFIGPATH, login_values, trow_error=False)
+        if matches:
+            path = matches[0]
+            group = matches[1]
+            data = handle_config_path(path, group, use_default=False)
+            user = data.get('user', None)
+            passwd = data.get('password', None)
+            return user, passwd
+    except (FormatError, UtilError):
+        if not quietly:
+            raise
+    return login_values, None
+
+
 def find_password(value):
     """Search for password in a string
 

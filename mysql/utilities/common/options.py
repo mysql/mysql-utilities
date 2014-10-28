@@ -30,7 +30,7 @@ import re
 
 from datetime import datetime
 from optparse import Option as CustomOption, OptionValueError
-from ip_parser import find_password
+from ip_parser import find_password, parse_login_values_config_path
 
 from mysql.utilities import LICENSE_FRM, VERSION_FRM
 from mysql.utilities.exception import UtilError, FormatError
@@ -789,13 +789,14 @@ def parse_user_password(userpass_values, my_defaults_reader=None,
     """ This function parses a string with the user/password credentials.
 
     This function parses the login string, determines the used format, i.e.
-    user[:password] or login-path. If the ':' (colon) is not in the login
-    string, the it can refer to a login-path or to a username (without a
-    password). In this case, first it is assumed that the specified value is a
-    login-path and the function attempts to retrieve the associated username
-    and password, in a quiet way (i.e., without raising exceptions). If it
-    fails to retrieve the login-path data, then the value is assumed to be a
-    username.
+    user[:password], config-path or login-path. If the ':' (colon) is not in
+    the login string, the it can refer to a config-path, login-path or to a
+    username (without a password). In this case, first it is assumed that the
+    specified value is a config-path and tries to retrive the user and password
+    from the configuration file secondly assume it is a login-path and the
+    function attempts to retrieve the associated username and password, in a
+    quiet way (i.e., without raising exceptions). If it fails to retrieve the
+    login-path data, then the value is assumed to be a username.
 
     userpass_values[in]     String indicating the user/password credentials. It
                             must be in the form: user[:password] or login-path.
@@ -814,13 +815,20 @@ def parse_user_password(userpass_values, my_defaults_reader=None,
     # Split on the ':' to determine if a login-path is used.
     login_values = userpass_values.split(':')
     if len(login_values) == 1:
-        # Format is login-path or user (without a password): First, assume it
-        # is a login-path and quietly try to retrieve the user and password.
-        # If it fails, assume a user name is being specified.
+        # Format is config-path, login-path or user (without a password):
+        # First check if the value is a config-path
+        # The following method call also initializes the user and passwd with
+        # default values in case the login_values are not from a config-path
+        user, passwd = parse_login_values_config_path(login_values[0],
+                                                      quietly=True)
+
+        # Second assume it's a login-path and quietly try to retrieve the user
+        # and password, in case of success overwrite the values previously set
+        # and in case of failure return these ones instead.
 
         # Check if the login configuration file (.mylogin.cnf) exists
         if login_values[0] and not my_login_config_exists():
-            return login_values[0], None
+            return user, passwd
 
         if not my_defaults_reader:
             # Attempt to create the MyDefaultsReader
@@ -828,19 +836,19 @@ def parse_user_password(userpass_values, my_defaults_reader=None,
                 my_defaults_reader = MyDefaultsReader(options)
             except UtilError:
                 # Raise an UtilError when my_print_defaults tool is not found.
-                return login_values[0], None
+                return user, passwd
         elif not my_defaults_reader.tool_path:
             # Try to find the my_print_defaults tool
             try:
                 my_defaults_reader.search_my_print_defaults_tool()
             except UtilError:
                 # Raise an UtilError when my_print_defaults tool is not found.
-                return login_values[0], None
+                return user, passwd
 
         # Check if the my_print_default tool is able to read a login-path from
         # the mylogin configuration file
         if not my_defaults_reader.check_login_path_support():
-            return login_values[0], None
+            return user, passwd
 
         # Read and parse the login-path data (i.e., user and password)
         try:
@@ -850,10 +858,10 @@ def parse_user_password(userpass_values, my_defaults_reader=None,
                 passwd = loginpath_data.get('password', None)
                 return user, passwd
             else:
-                return login_values[0], None
+                return user, passwd
         except UtilError:
             # Raise an UtilError if unable to get the login-path group data
-            return login_values[0], None
+            return user, passwd
 
     elif len(login_values) == 2:
         # Format is user:password; return a tuple with the user and password

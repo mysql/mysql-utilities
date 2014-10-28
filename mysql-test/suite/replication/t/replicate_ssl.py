@@ -30,6 +30,8 @@ from mysql.utilities.common.server import Server
 from mysql.utilities.common.user import grant_proxy_ssl_privileges
 from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
 
+_RPL_USER_GROUP_NAME = 'rpl_user_01'
+
 
 class test(mutlib.System_test):
     """setup replication
@@ -113,6 +115,12 @@ class test(mutlib.System_test):
                 config_p.set(group_name, 'ssl-ca', server.ssl_ca)
                 config_p.set(group_name, 'ssl-cert', server.ssl_cert)
                 config_p.set(group_name, 'ssl-key', server.ssl_key)
+            # rpl_user group
+            group_name = _RPL_USER_GROUP_NAME
+            self.test_server_names.append(group_name)
+            config_p.add_section(group_name)
+            config_p.set(group_name, 'user', group_name)
+            config_p.set(group_name, 'password', "rpl_user_pass")
             config_p.write(config_f)
 
         self.s1_serverid = 'server_{0}'.format(self.server1.port)
@@ -123,16 +131,22 @@ class test(mutlib.System_test):
                      save_for_compare=False, expected_result=0,
                      save_results=True, ssl=False, config_path=False,
                      rpl_user='rpl', rpl_pass='rpl',
-                     ssl_opts=ssl_util_opts()):
+                     ssl_opts=ssl_util_opts(), use_rpl_user_group=False):
         """Run replication test.
 
-        slave[in]           Slave instance.
-        master[in]          Master instance.
-        comment[in]         Comment.
-        options[in]         Options.
-        save_for_compare    True for save compare
-        expected_result     Expected result.
-        save_results        True for save results.
+        slave[in]               Slave instance.
+        master[in]              Master instance.
+        comment[in]             Test case comment.
+        options[in]             Options.
+        save_for_compare[in]    True for save compare
+        expected_result[in]     Expected result.
+        save_results[in]        True for save results.
+        ssl[in]                 use ssl by default False.
+        config_path[in]         use config-path by default False.
+        rpl_user[in]            the rpl user name to use by default 'rpl'.
+        rpl_pass[in]            the rpl user password to use by default 'rpl'.
+        ssl_opts[in]            the ssl certificate options.
+        use_rpl_user_group[in]  use rpl user from config-path by default false.
         """
         if not config_path:
             master_str = "--master={0}".format(
@@ -153,8 +167,13 @@ class test(mutlib.System_test):
         # Test case 1 - setup replication among two servers
         if not save_for_compare:
             self.results.append(comment)
-        cmd = ("mysqlreplicate.py --rpl-user={0}:{1} {2}"
-               ).format(rpl_user, rpl_pass, conn_str)
+        if use_rpl_user_group:
+            cmd = ("mysqlreplicate.py --rpl-user={0}[{1}] {2}"
+                   ).format(self.config_file_path, _RPL_USER_GROUP_NAME,
+                            conn_str)
+        else:
+            cmd = ("mysqlreplicate.py --rpl-user={0}:{1} {2}"
+                   ).format(rpl_user, rpl_pass, conn_str)
         if ssl:
             cmd = "{0} {1}".format(cmd, ssl_opts)
         if options:
@@ -241,6 +260,34 @@ class test(mutlib.System_test):
                                 comment, None, ssl=True, config_path=True,
                                 rpl_user=ssl_user, rpl_pass=ssl_pass,
                                 ssl_opts='')
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        try:
+            self.server2.exec_query("STOP SLAVE")
+        except UtilError:
+            raise MUTLibError("{0}: Failed to stop slave.".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - replicate server1 as slave of "
+                   "server2 with rpl_user=config-path ".format(test_num))
+        res = self.run_rpl_test(self.server1, self.server2, self.s1_serverid,
+                                comment, None, config_path=True,
+                                use_rpl_user_group=True)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        try:
+            self.server1.exec_query("STOP SLAVE")
+        except UtilError:
+            raise MUTLibError("{0}: Failed to stop slave.".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - replicate server2 as slave of "
+                   "server1 with rpl_user=config-path ".format(test_num))
+        res = self.run_rpl_test(self.server2, self.server1, self.s2_serverid,
+                                comment, None, ssl=True, config_path=False,
+                                use_rpl_user_group=True)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
