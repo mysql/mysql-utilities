@@ -20,6 +20,7 @@ import_errors test.
 """
 
 import os
+import subprocess
 
 import import_basic
 
@@ -32,6 +33,8 @@ class test(import_basic.test):
     It tests the error conditions for importing data.
     It uses the import_basic test for setup and teardown methods.
     """
+
+    perms_test_file = "not_readable.sql"
 
     def check_prerequisites(self):
         return import_basic.test.check_prerequisites(self)
@@ -275,6 +278,35 @@ class test(import_basic.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - error: Is not a valid path to a file."
+                   "").format(test_num)
+        cmd_str = ("{0} --format=sql --import=both not_exist.sql"
+                   "").format(import_cmd)
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - error: Without permission to read a file."
+                   "").format(test_num)
+        cmd_str = ("{0} --format=sql --import=both {1}"
+                   "").format(import_cmd, self.perms_test_file)
+
+        # Create file without read permission.
+        with open(self.perms_test_file, "w"):
+            pass
+        if os.name == "posix":
+            os.chmod(self.perms_test_file, 0200)
+        else:
+            proc = subprocess.Popen(["icacls", self.perms_test_file, "/deny",
+                                     "everyone:(R)"], stdout=subprocess.PIPE)
+            proc.communicate()
+
+        res = self.run_test_case(2, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Handle message with path (replace '\' by '/').
         if os.name != "posix":
             self.replace_result("# Importing definitions and data from "
@@ -314,6 +346,18 @@ class test(import_basic.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
+        try:
+            if os.path.exists(self.perms_test_file):
+                if os.name != "posix":
+                    # Add write permission to the permissions test file so
+                    # that its deletion is possible when using MS Windows.
+                    proc = subprocess.Popen(["icacls", self.perms_test_file,
+                                             "/grant", "everyone:(W)"],
+                                            stdout=subprocess.PIPE)
+                    proc.communicate()
+                os.unlink(self.perms_test_file)
+        except OSError:
+            pass
         try:
             self.server2.exec_query("DROP USER 'joe'@'localhost'")
         except UtilError:

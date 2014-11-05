@@ -172,3 +172,8 @@ PARSE_ERR_SSL_REQ_SERVER = ("Options --ssl-ca, --ssl-cert and --ssl-key "
 WARN_OPT_SKIP_INNODB = ("The use of InnoDB is mandatory since MySQL 5.7. The "
                         "former options like '--innodb=0/1/OFF/ON' or "
                         "'--skip-innodb' are ignored.")
+
+FILE_DOES_NOT_EXIST = "The following path is invalid, '{path}'."
+
+INSUFFICIENT_FILE_PERMISSIONS = ("You do not have permission to {permissions} "
+                                 "file '{path}'.")

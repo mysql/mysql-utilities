@@ -34,7 +34,9 @@ import re
 
 from mysql.utilities.command import dbimport
 from mysql.utilities.common.ip_parser import parse_connection
-from mysql.utilities.common.messages import WARN_OPT_ONLY_USED_WITH
+from mysql.utilities.common.messages import (WARN_OPT_ONLY_USED_WITH,
+                                             FILE_DOES_NOT_EXIST,
+                                             INSUFFICIENT_FILE_PERMISSIONS)
 from mysql.utilities.common.options import (add_character_set_option,
                                             add_engines, add_format_option,
                                             add_no_headers_option,
@@ -277,6 +279,18 @@ if __name__ == '__main__':
     # Build list of files to import
     file_list = []
     for file_name in args:
+        # Test if is a file
+        if not os.path.isfile(file_name):
+            parser.error(FILE_DOES_NOT_EXIST.format(path=file_name))
+        # Test if is readable
+        try:
+            with open(file_name, "r"):
+                pass
+        except IOError:
+            parser.error(
+                INSUFFICIENT_FILE_PERMISSIONS.format(permissions="read",
+                                                     path=file_name))
+
         file_list.append(file_name)
 
     try:

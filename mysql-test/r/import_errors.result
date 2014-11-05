@@ -132,3 +132,11 @@ Test case 25 - error: Use --drop-first to drop the database before importing.
 # Source on XXXX-XXXX: ... connected.
 # Importing definitions and data from std_data/basic_data.sql.
 ERROR: The database `util_test` exists. Use --drop-first to drop the database before importing.
+Test case 26 - error: Is not a valid path to a file.
+Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+
+mysqldbimport: error: The following path is invalid, 'not_exist.sql'.
+Test case 27 - error: Without permission to read a file.
+Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
+
+mysqldbimport: error: You do not have permission to read file 'not_readable.sql'.
