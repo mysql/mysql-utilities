@@ -223,7 +223,16 @@ class test(ssl_connection_simple_test.test):
         """
         self.replace_substring("localhost", "XXXX-XXXX")
         self.replace_substring("127.0.0.1", "XXXX-XXXX")
+        self.replace_substring(repr(self.server1.port), "XXXX")
+        self.replace_result("# Starting the spawned server on port",
+                            "# Starting the spawned server on port...\n")
         self.replace_substring("1045 (28000): ", "")
+        self.replace_result("+---", "+---+\n")
+        self.mask_column_result("| root", "|", 2, " root[...]  ")
+        self.replace_result("| root[...]",
+                            "| root[...]\n")
+        self.remove_result_and_lines_after("              config_file:", 16)
+        self.remove_result_and_lines_after("| db_name             |", 12)
 
     def get_result(self):
         return self.compare(__name__, self.results)

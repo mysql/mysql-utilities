@@ -21,12 +21,12 @@ This file contains grep for objects.
 import sys
 
 import mysql.connector
-from mysql.connector.constants import ClientFlag
 
 from mysql.utilities.exception import FormatError, EmptyResultError, UtilError
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.options import obj2sql
+from mysql.utilities.common.server import set_ssl_opts_in_connection_info
 
 
 # Mapping database object to information schema names and fields. I
@@ -280,21 +280,7 @@ class ObjectGrep(object):
             conn['host'] = conn['host'].replace("]", "")
 
             if connector == mysql.connector:
-                # Add SSL parameters ONLY if they are not None
-                add_ssl_flag = False
-                if ssl_opts.get('ssl_ca') is not None:
-                    info['ssl_ca'] = ssl_opts.get('ssl_ca')
-                    add_ssl_flag = True
-                if ssl_opts.get('ssl_cert') is not None:
-                    info['ssl_cert'] = ssl_opts.get('ssl_cert')
-                    add_ssl_flag = True
-                if ssl_opts.get('ssl_key') is not None:
-                    info['ssl_key'] = ssl_opts.get('ssl_key')
-                    add_ssl_flag = True
-                if add_ssl_flag:
-                    cpy_flags = [ClientFlag.SSL,
-                                 ClientFlag.SSL_VERIFY_SERVER_CERT]
-                    info['client_flags'] = cpy_flags
+                set_ssl_opts_in_connection_info(ssl_opts, info)
 
             connection = connector.connect(**info)
 

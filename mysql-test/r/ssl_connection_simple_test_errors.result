@@ -146,49 +146,106 @@ ERROR: Missing ssl_ca argument.
 --> --ssl-key and --ssl-cert options only
 ##############################################################################
 Test case 34 - indexcheck with ssl connection all tables for a single database
-# Source on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+# Source on XXXX-XXXX: ... connected.
+# The following indexes are duplicates or redundant for table util_test_a.t1:
+#
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
+#
+CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32)) 
+#     may be redundant or duplicate of:
+CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 
 Test case 35 - basic serverinfo with ssl
-ERROR: Missing ssl_ca argument.
+# Source on XXXX-XXXX: ... connected.
+*************************       1. row *************************
+                   server: XXXX-XXXX:XXXX
+1 row.
+#...done.
 
 Test case 36 - userclone dump grants with ssl
-# Source on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+# Source on XXXX-XXXX: ... connected.
+# Dumping grants for user joe_pass@user
+GRANT USAGE ON *.* TO 'joe_pass'@'user' IDENTIFIED BY PASSWORD '*6DA88CFC20231681AB7287BB201D08136A9A7369'
+GRANT SELECT ON `util_test`.* TO 'joe_pass'@'user'
 
 Test case 37 - basic dbexport with ssl
-# Source on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+# Source on XXXX-XXXX: ... connected.
+# Exporting metadata from util_test_a
+DROP DATABASE IF EXISTS `util_test_a`;
+CREATE DATABASE `util_test_a`;
+USE `util_test_a`;
+# TABLE: util_test_a.t1
+CREATE TABLE `t1` (
+  `A` int(11) NOT NULL DEFAULT '0',
+  `b` varchar(2) DEFAULT NULL,
+  `c` varchar(255) DEFAULT NULL,
+  `d` point NOT NULL,
+  `e` geometry NOT NULL,
+  PRIMARY KEY (`A`),
+  SPATIAL KEY `s1` (`e`),
+  SPATIAL KEY `s2` (`d`),
+  SPATIAL KEY `s4` (`d`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+# TABLE: util_test_a.t2
+CREATE TABLE `t2` (
+  `id` int(11) DEFAULT NULL,
+  KEY `id` (`id`) USING HASH
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+#...done.
 
 Test case 38 - basic dbimport with ssl
-# Source on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+# Source on XXXX-XXXX: ... connected.
+# Importing definitions from ./std_data/import_data.sql.
+#...done.
 
 Test case 39 - basic metagrep with ssl
-ERROR: Missing ssl_ca argument.
++---+
+| Connection                 | Object Type  | Object Name  | Database  | Field Type  | Matches  |
++---+
+| root[...]
++---+
 
 Test case 40 - basic procgrep with ssl
-ERROR: Missing ssl_ca argument.
++---+
+| Connection                 | Id  | User      | Host             | Db    | Command  | Time  | State      | Info                                                                                                                          |
++---+
+| root[...]
+  Id, User, Host, Db, Command, Time, State, Info
+FROM
+  INFORMATION_SCHEMA.PROCESSLIST
+WHERE
+    USER LIKE 'root_ssl'  |
+| root[...]
++---+
 
 Test case 41 - basic diskusage with ssl
-# Source on XXXX-XXXX: ... 
-Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
-
-mysqldiskusage: error: Missing ssl_ca argument.
+# Source on XXXX-XXXX: ... connected.
++---+
 
 Test case 42 - basic mysqlfrm with ssl
-# Source on XXXX-XXXX: ... 
-Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
-
-mysqlfrm: error: Missing ssl_ca argument.
+# Source on XXXX-XXXX: ... connected.
+# NOTE: No .frm files found in folder ./.
+# Starting the spawned server on port...
+# Reading .frm files
+#...done.
 
 Test case 43 - basic mysqldbcopy with ssl
-# Source on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test_a renamed as util_test_z
+# Copying TABLE util_test_a.t1
+# Copying TABLE util_test_a.t2
+# Copying data for TABLE util_test_a.t1
+# Copying data for TABLE util_test_a.t2
+#...done.
 
 Test case 44 - basic mysqldiff with ssl
-# server1 on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+# server1 on XXXX-XXXX: ... connected.
+# server2 on XXXX-XXXX: ... connected.
+# Comparing util_test_a.t1 to util_test_z.t1                       [PASS]
+Success. All objects are the same.
 
 ##############################################################################
 --> invalid --ssl-ca option

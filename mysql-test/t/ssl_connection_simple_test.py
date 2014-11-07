@@ -245,4 +245,5 @@ class test(mutlib.System_test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        return self.drop_all()
+        self.drop_all()
+        return self.kill_server_list(['ssl_server'])

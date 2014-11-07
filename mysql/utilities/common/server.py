@@ -142,6 +142,46 @@ def get_connection_dictionary(conn_info, ssl_dict=None):
     return conn_val
 
 
+def set_ssl_opts_in_connection_info(ssl_opts, connection_info):
+    """Sets the ssl options in a connection information to be used with C/py.
+
+    ssl_opts[in]           A dictionary with the ssl options (ssl_ca, ssl_cert
+                           and ssl_key).
+    connection_info[out]   A dictionary to set the ssl options after validate
+                           them.
+
+    The ssl options will be set on the connection_info if they are not None.
+    In addition the SSL client flags are added if at least one ssl option is
+    set.
+    """
+    # Add SSL parameters ONLY if they are not None
+    add_ssl_flag = False
+    if ssl_opts.get('ssl_ca') is not None:
+        connection_info['ssl_ca'] = ssl_opts.get('ssl_ca')
+        add_ssl_flag = True
+    if ssl_opts.get('ssl_cert') is not None:
+        connection_info['ssl_cert'] = ssl_opts.get('ssl_cert')
+        add_ssl_flag = True
+    if ssl_opts.get('ssl_key') is not None:
+        connection_info['ssl_key'] = ssl_opts.get('ssl_key')
+        add_ssl_flag = True
+
+    # When cert and key options are specified the ca option is not
+    # absolutely required for stablishing the encrypted connection,
+    # but C/py will not allow the None value for the ca option, so
+    # we use an empty string i.e '' to avoid an error from C/py
+    # about ca option being the None value.
+    if 'ssl_cert' in connection_info.keys() and \
+       'ssl_key' in connection_info.keys() and \
+       'ssl_ca' not in connection_info.keys():
+        connection_info['ssl_ca'] = ''
+
+    if add_ssl_flag:
+        cpy_flags = [ClientFlag.SSL,
+                     ClientFlag.SSL_VERIFY_SERVER_CERT]
+        connection_info['client_flags'] = cpy_flags
+
+
 def _print_connection(prefix, conn_info):
     """Print connection information
 
@@ -1024,6 +1064,17 @@ class Server(object):
                 parameters['ssl_cert'] = self.ssl_cert
             if self.ssl_key is not None:
                 parameters['ssl_key'] = self.ssl_key
+
+            # When cert and key options are specified the ca option is not
+            # absolutely required for stablishing the encrypted connection, but
+            # C/py will not allow the None value for the ca option, so we use an
+            # empty string i.e '' to avoid an error from C/py about ca option
+            # being the None value.
+            if 'ssl_cert' in parameters.keys() and \
+               'ssl_key' in parameters.keys() and \
+               'ssl_ca' not in parameters:
+                parameters['ssl_ca'] = ''
+
             if self.has_ssl:
                 cpy_flags = [ClientFlag.SSL, ClientFlag.SSL_VERIFY_SERVER_CERT]
                 parameters['client_flags'] = cpy_flags
