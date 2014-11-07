@@ -263,6 +263,11 @@ class TestUserPrivileges(unittest.TestCase):
             "REQUIRE SSL WITH GRANT OPTION"),
             (set(['GRANT OPTION', 'UPDATE', 'SELECT']), None, '`mysql`',
                 '*', "'user2'@'%'"))
+        self.assertEquals(user.User._parse_grant_statement(
+            "GRANT UPDATE, SELECT ON `mysql`.* TO 'user2'@'%' IDENTIFIED BY "
+            "PASSWORD REQUIRE SSL WITH GRANT OPTION"),
+            (set(['GRANT OPTION', 'UPDATE', 'SELECT']), None, '`mysql`',
+                '*', "'user2'@'%'"))
         # Test proxy privileges
         self.assertEquals(user.User._parse_grant_statement(
             "GRANT PROXY ON ''@'' TO 'root'@'localhost' WITH GRANT OPTION"),

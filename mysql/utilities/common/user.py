@@ -619,7 +619,7 @@ class User(object):
             (?:(?:(\*|`?[^']+`?)\.(\*|`?[^']+`?)) # object where grant applies
             | ('[^']*'@'[^']*')) # For proxy grants user/host
             \sTO\s([^@]+@[\S]+) # grantee
-            (?:\sIDENTIFIED\sBY\sPASSWORD\s\'[^\']+\')? # optional password
+            (?:\sIDENTIFIED\sBY\sPASSWORD(?:\s\'[^\']+\')?)? # optional pwd
             (?:\sREQUIRE\sSSL)? # optional SSL
             (\sWITH\sGRANT\sOPTION)? # optional grant option
             $ # End of grant statement
