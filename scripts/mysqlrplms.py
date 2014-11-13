@@ -30,11 +30,13 @@ import os.path
 import sys
 import logging
 
+from mysql.utilities import VERSION_STRING
 from mysql.utilities.exception import FormatError, UtilError, UtilRplError
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.messages import (
     PARSE_ERR_OPTS_REQ_GREATER_OR_EQUAL,
-    PARSE_ERR_OPTS_REQ
+    PARSE_ERR_OPTS_REQ,
+    MSG_UTILITIES_VERSION
 )
 from mysql.utilities.common.options import (setup_common_options,
                                             add_verbosity, add_rpl_user,
@@ -132,6 +134,7 @@ if not check_connector_python():
 
 if __name__ == '__main__':
     # Setup the command parser
+    program = os.path.basename(sys.argv[0]).replace(".py", "")
     parser = setup_common_options(os.path.basename(sys.argv[0]),
                                   DESCRIPTION, USAGE, True, False,
                                   extended_help=EXTENDED_HELP)
@@ -368,6 +371,10 @@ if __name__ == '__main__':
     # Add ssl values to options instead of connection.
     options.update(get_ssl_dict(opt))
 
+    # Log MySQL Utilities version string
+    if opt.log_file:
+        logging.info(MSG_UTILITIES_VERSION.format(utility=program,
+                                                  version=VERSION_STRING))
     try:
         start_ms_replication(slave_vals, masters_vals, options)
     except UtilError:

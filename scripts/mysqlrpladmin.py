@@ -30,7 +30,7 @@ import logging
 import os.path
 import sys
 
-from mysql.utilities import VERSION_FRM
+from mysql.utilities import VERSION_FRM, VERSION_STRING
 from mysql.utilities.exception import UtilError, UtilRplError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.server import Server, check_hostname_alias
@@ -53,7 +53,8 @@ from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
                                              ERROR_SAME_MASTER,
                                              ERROR_MASTER_IN_SLAVES,
                                              SCRIPT_THRESHOLD_WARNING, SLAVES,
-                                             CANDIDATES)
+                                             CANDIDATES,
+                                             MSG_UTILITIES_VERSION)
 from mysql.utilities.command.rpl_admin import (RplCommands, purge_log,
                                                get_valid_rpl_commands,
                                                get_valid_rpl_command_text)
@@ -370,6 +371,11 @@ if __name__ == '__main__':
     except IOError:
         _, e, _ = sys.exc_info()
         parser.error("Error opening log file: %s" % str(e.args[1]))
+
+    # Log MySQL Utilities version string
+    if opt.log_file:
+        logging.info(MSG_UTILITIES_VERSION.format(utility=program,
+                                                  version=VERSION_STRING))
 
     try:
         rpl_cmds = RplCommands(master_val, slaves_val, options)

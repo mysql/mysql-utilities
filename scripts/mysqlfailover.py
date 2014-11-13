@@ -31,10 +31,11 @@ import os.path
 import signal
 import sys
 
-from mysql.utilities import VERSION_FRM
+from mysql.utilities import VERSION_FRM, VERSION_STRING
 from mysql.utilities.exception import UtilError, UtilRplError
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
-from mysql.utilities.common.messages import SCRIPT_THRESHOLD_WARNING
+from mysql.utilities.common.messages import (SCRIPT_THRESHOLD_WARNING,
+                                             MSG_UTILITIES_VERSION)
 from mysql.utilities.common.server import check_hostname_alias
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.topology import parse_topology_connections
@@ -354,6 +355,10 @@ if __name__ == '__main__':
     if opt.pidfile and not opt.daemon:
         parser.error("The option --daemon is required when using --pidfile.")
 
+    # Log MySQL Utilities version string
+    if opt.log_file:
+        logging.info(MSG_UTILITIES_VERSION.format(utility=program,
+                                                  version=VERSION_STRING))
     try:
         rpl_cmds = RplCommands(master_val, slaves_val, options)
         if opt.daemon:

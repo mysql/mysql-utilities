@@ -29,11 +29,17 @@ import rpl_admin_gtid
 from mysql.utilities.common.server import get_local_servers
 from mysql.utilities.common.tools import delete_directory
 from mysql.utilities.command.rpl_admin import WARNING_SLEEP_TIME
+from mysql.utilities.common.server import get_connection_dictionary
+from mysql.utilities.common.messages import (MSG_UTILITIES_VERSION,
+                                             MSG_MYSQL_VERSION)
 from mysql.utilities.exception import MUTLibError, UtilError
+from mysql.utilities import VERSION_STRING
 
 
 FAILOVER_LOG = "{0}fail_log.txt"
 _TIMEOUT = 30
+_UTILITIES_VERSION_PHRASE = MSG_UTILITIES_VERSION.format(
+    utility="mysqlfailover", version=VERSION_STRING)
 
 
 class test(rpl_admin_gtid.test):
@@ -169,6 +175,7 @@ class test(rpl_admin_gtid.test):
         comment = test_case[4]
         key_phrase = test_case[5]
         unregister = test_case[6]
+        server_version = server.get_version()
 
         if unregister:
             # Unregister any failover instance from server
@@ -330,6 +337,31 @@ class test(rpl_admin_gtid.test):
                 found_row = True
                 if self.debug:
                     print("# Found in row = '{0}'.".format(row[:len(row) - 1]))
+
+        # Find MySQL Utilities version in the log
+        if self.debug:
+            print("# Looking in log for: {0}"
+                  "".format(_UTILITIES_VERSION_PHRASE))
+        for row in rows:
+            if _UTILITIES_VERSION_PHRASE in row:
+                found_row = True
+                if self.debug:
+                    print("# Found in row = '{0}'.".format(row[:-1]))
+                break
+
+        # Find MySQL server version in the log
+        host_port = "{host}:{port}".format(**get_connection_dictionary(server))
+        key_phrase = MSG_MYSQL_VERSION.format(server=host_port,
+                                              version=server_version)
+        if self.debug:
+            print("# Looking in log for: {0}".format(key_phrase))
+        for row in rows:
+            if key_phrase in row:
+                found_row = True
+                if self.debug:
+                    print("# Found in row = '{0}'.".format(row[:-1]))
+                break
+
         log_file.close()
 
         if not found_row:

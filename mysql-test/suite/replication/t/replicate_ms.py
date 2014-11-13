@@ -28,6 +28,11 @@ import rpl_admin
 
 from mysql.utilities.exception import MUTLibError, UtilError
 from mutlib.mutlib import stop_process
+from mysql.utilities.common.server import get_connection_dictionary
+from mysql.utilities.common.messages import (MSG_UTILITIES_VERSION,
+                                             MSG_MYSQL_VERSION)
+from mysql.utilities import VERSION_STRING
+
 
 _RPLMS_LOG = "{0}rplms_log.txt"
 _TIMEOUT = 30
@@ -300,6 +305,20 @@ class test(rpl_admin.test):
         # Find stop phrase
         if stop_phrase:
             self.find_stop_phrase(logfile, comment, stop_phrase)
+
+        # Find MySQL Utilities version in the log
+        utils_phrase = MSG_UTILITIES_VERSION.format(utility="mysqlrplms",
+                                                    version=VERSION_STRING)
+        self.find_stop_phrase(logfile, comment, utils_phrase)
+
+        # Find MySQL servers versions in the log
+        for server in (self.server1, self.server2, self.server3,):
+            host_port = "{host}:{port}".format(
+                **get_connection_dictionary(server))
+            server_version = server.get_version()
+            mysql_phrase = MSG_MYSQL_VERSION.format(server=host_port,
+                                                    version=server_version)
+            self.find_stop_phrase(logfile, comment, mysql_phrase)
 
         # Cleanup after test case
         try:

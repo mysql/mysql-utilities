@@ -26,9 +26,15 @@ import mutlib
 import rpl_admin
 
 from mysql.utilities.exception import MUTLibError
+from mysql.utilities.common.server import get_connection_dictionary
+from mysql.utilities.common.messages import (MSG_UTILITIES_VERSION,
+                                             MSG_MYSQL_VERSION)
+from mysql.utilities import VERSION_STRING
 
 
 _LOGNAME = "temp_log.txt"
+_UTILITIES_VERSION_PHRASE = MSG_UTILITIES_VERSION.format(
+    utility="mysqlrpladmin", version=VERSION_STRING)
 
 
 class test(rpl_admin.test):
@@ -44,6 +50,38 @@ class test(rpl_admin.test):
     def setup(self):
         self.res_fname = "result.txt"
         return rpl_admin.test.setup(self)
+
+    def find_stop_phrase(self, logfile, comment, stop_phrase):
+        """Find stop phrase in the log file.
+
+        logfile[in]       Log filename.
+        comment[in]       Test comment.
+        stop_phrase[in]   Phrase to be found.
+
+        Raises a MUTLibError if the phrase is not found.
+        """
+        # Check result code from stop_process then read the log to find the
+        # key phrase.
+        found_row = False
+        with open(logfile, "r") as file_:
+            rows = file_.readlines()
+            if self.debug:
+                print("# Looking in log for: {0}".format(stop_phrase))
+            for row in rows:
+                if stop_phrase in row:
+                    found_row = True
+                    if self.debug:
+                        print("# Found in row = '{0}'."
+                              "".format(row[:-1]))
+                    break
+
+        if not found_row:
+            if self.debug:
+                print("# ERROR: Cannot find entry in log:")
+                for row in rows:
+                    print(row)
+            raise MUTLibError("{0}: failed - cannot find entry in log."
+                              "".format(comment))
 
     def run(self):
         master_conn = self.build_connection_string(self.server1).strip(' ')
@@ -88,6 +126,22 @@ class test(rpl_admin.test):
             self, 2, ' '.join(cmd), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
+
+        # Find MySQL and Utilities versions in the log
+        self.find_stop_phrase(_LOGNAME, comment, MSG_UTILITIES_VERSION.format(
+            utility="mysqlrpladmin", version=VERSION_STRING))
+
+        # Find master MySQL server version in the log
+        master_host_port = (
+            "{host}:{port}".format(**get_connection_dictionary(master_conn)))
+        self.find_stop_phrase(_LOGNAME, comment, MSG_MYSQL_VERSION.format(
+            server=master_host_port, version=self.server1.get_version()))
+
+        # Find slave MySQL server version in the log
+        slave_host_port = (
+            "{host}:{port}".format(**get_connection_dictionary(slave_conn)))
+        self.find_stop_phrase(_LOGNAME, comment, MSG_MYSQL_VERSION.format(
+            server=slave_host_port, version=self.server2.get_version()))
 
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)

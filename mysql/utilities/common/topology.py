@@ -36,7 +36,8 @@ from mysql.utilities.common.tools import execute_script
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.user import User
 from mysql.utilities.common.server import (get_server_state, get_server,
-                                           get_connection_dictionary)
+                                           get_connection_dictionary,
+                                           log_server_version)
 
 
 _HEALTH_COLS = ["host", "port", "role", "state", "gtid_mode", "health"]
@@ -260,12 +261,16 @@ class Topology(Replication):
         # attempt to connect to the master
         if master_vals:
             master = get_server('master', master_vals, True, verbose=verbose)
+            if self.logging:
+                log_server_version(master)
 
         for slave_val in slave_vals:
             host = slave_val['host']
             port = slave_val['port']
             try:
                 slave = get_server('slave', slave_val, True, verbose=verbose)
+                if self.logging:
+                    log_server_version(slave)
             except:
                 msg = "Cannot connect to slave %s:%s as user '%s'." % \
                       (host, port, slave_val['user'])
@@ -410,6 +415,8 @@ class Topology(Replication):
                             self._report(msg, logging.INFO, False)
                             if output_log:
                                 print("# {0}".format(msg))
+                            if self.logging:
+                                log_server_version(slave_conn)
                             new_slaves_found = True
                         else:
                             msg = ("Slave skipped (IO not running): "

@@ -28,6 +28,7 @@ import string
 import subprocess
 import tempfile
 import threading
+import logging
 
 import mysql.connector
 from mysql.connector.constants import ClientFlag
@@ -40,6 +41,7 @@ from mysql.utilities.common.tools import (delete_directory, execute_script,
                                           ping_host)
 from mysql.utilities.common.ip_parser import (parse_connection, hostname_is_ip,
                                               clean_IPv6, format_IPv6)
+from mysql.utilities.common.messages import MSG_MYSQL_VERSION
 
 
 _FOREIGN_KEY_SET = "SET foreign_key_checks = {0}"
@@ -659,6 +661,22 @@ def stop_running_server(server, wait=10, drop=True):
     return True
 
 
+def log_server_version(server, level=logging.INFO):
+    """Log server version message.
+
+    This method will log the server version message.
+    If no log file is provided it will also print the message to stdout.
+
+    server[in]           Server instance.
+    level[in]            Level of message to log. Default = INFO.
+    print_version[in]    If True, print the message to stdout. Default = True.
+    """
+    host_port = "{host}:{port}".format(**get_connection_dictionary(server))
+    version_msg = MSG_MYSQL_VERSION.format(server=host_port,
+                                           version=server.get_version())
+    logging.log(level, version_msg)
+
+
 class Server(object):
     """The Server class can be used to connect to a running MySQL server.
     The following utilities are provided:
@@ -1006,11 +1024,13 @@ class Server(object):
 
         return conn_vals
 
-    def connect(self):
+    def connect(self, log_version=False):
         """Connect to server
 
         Attempts to connect to the server as specified by the connection
         parameters.
+
+        log_version[in]      If True, log server version. Default = False.
 
         Note: This method must be called before executing queries.
 
@@ -1018,6 +1038,8 @@ class Server(object):
         """
         try:
             self.db_conn = self.get_connection()
+            if log_version:
+                log_server_version(self)
             # If no charset provided, get it from the "character_set_client"
             # server variable.
             if not self.charset:
