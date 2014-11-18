@@ -6,7 +6,7 @@
 
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
 Name:          mysql-utilities
-Version:       1.6.0
+Version:       1.6.1
 Release:       1%{?dist}
 License:       GPLv2
 Group:         Development/Libraries

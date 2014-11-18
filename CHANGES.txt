@@ -1,3 +1,7 @@
+Release-1.5.3 (Released October 20, 2014)
+-------------------------------------------
+- BUG#19430737: missing mysqldbcompare feature to compare all databases
+
 Release-1.6.0 (Released September 08, 2014)
 -------------------------------------------
 - BUG#19675964: README file name in DMG packages is not congruent to other pkgs
