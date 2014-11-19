@@ -47,6 +47,9 @@ OS = {
 }
 
 SPECIAL_GA_LINUX = {
+    "5.7.5-m15": ("http://alvheim.se.oracle.com/trees/mysql/mysql-5.7.5-m15/"
+                  "dist/packages/mysql-advanced-5.7.5-m15-"
+                  "linux-glibc2.5-x86_64.tar.gz"),
     # Disabled until we get a better machine to run the tests
     # "5.6.8-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.8-rc/"
     #             "dist/packages/mysql-5.6.8-rc-linux2.6-x86_64.tar.gz",
@@ -55,6 +58,8 @@ SPECIAL_GA_LINUX = {
 }
 
 SPECIAL_GA_WIN = {
+    "5.7.5-m15": ("http://alvheim.se.oracle.com/trees/mysql/mysql-5.7.5-m15/"
+                  "dist/packages/mysql-advanced-5.7.5-m15-winx64.zip")
     # Disabled until we get a better machine to run the tests
     # "5.6.8-rc": "http://alvheim.se.oracle.com/trees/mysql/mysql-5.6.8-rc/"
     #             "dist/packages/mysql-5.6.8-rc-winx64.zip",
@@ -174,11 +179,14 @@ def get_GA_binaries_uris(versions):
     # Convert version string to ints to correctly get the maximum version
     max_func = lambda tpl: (map(int, tpl[1].split('.')), tpl[0])
     for version in versions:
-        version_dict[version] = max(version_dict[version], key=max_func)[0]
-
+        if version_dict[version]:
+            version_dict[version] = max(version_dict[version], key=max_func)[0]
+        else:
+            print("Warning: No GA versions found for MySQL "
+                  "{0}".format(version))
+            del version_dict[version]
     # Build download uri for each OS and version
-    for version in versions:
-        v_name = version_dict[version]
+    for version, v_name in version_dict.iteritems():
         # Get the 64 bit advanced version for linux and windows
         try:
             download_uri_linux = _get_mysql_uri(v_name, 'linux')
@@ -265,7 +273,7 @@ if __name__ == "__main__":
     uri_to_retrieve_pb = []
     uri_to_retrieve_ga = []
     uri_to_retrieve_pb.extend(get_latest_uris(os_dict))
-    latest_ga_dict = get_GA_binaries_uris(['5.5', '5.6'])
+    latest_ga_dict = get_GA_binaries_uris(['5.5', '5.6', '5.7'])
     if platform.system() == 'Windows':
         uri_to_retrieve_ga.extend(SPECIAL_GA_WIN.values())
         uri_to_retrieve_ga.extend(latest_ga_dict['Windows'].values())

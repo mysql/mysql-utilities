@@ -59,7 +59,7 @@ class test(mutlib.System_test):
             self.server1.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file"
-                              " {0}: {1}".format((data_file, err.errmsg)))
+                              " {0}: {1}".format(data_file, err.errmsg))
         self.server1.disable_foreign_key_checks(False)
         return True
 

@@ -143,7 +143,7 @@ class test(mutlib.System_test):
                 server1.read_and_exec_SQL(self.data_file, self.debug)
             except UtilError as err:
                 raise MUTLibError("Failed to read commands from file {0}: "
-                                  "{1}".format((self.data_file, err.errmsg)))
+                                  "{1}".format(self.data_file, err.errmsg))
 
         comment = "Test case {0} (export phase) {1}".format(test_num,
                                                             test_case)
