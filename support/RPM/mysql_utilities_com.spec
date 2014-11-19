@@ -36,7 +36,7 @@ Source0:        %{name}-commercial%{version}-py%{python_version}.tar.gz
 BuildRoot:     %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires: python-devel > 2.6
-Requires:      mysql-connector-python >= 2.0.0
+Requires:      mysql-connector-python-commercial >= 2.0.0
 Obsoletes:      %{name} <= %{version}, mysql-utilities <= %{version},
 AutoReq:        no
 
