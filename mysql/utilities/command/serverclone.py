@@ -46,6 +46,24 @@ LOW_SPACE_ERRR_MSG = ("The new data directory {directory} has low free space"
                       "the new server instance.\nUse force option to ignore "
                       "this Error.")
 
+# Set of sql statements to use during server bootstrap to create the
+# root@localhost user account for MySQL versions equal or greater than 5.7.5
+_CREATE_ROOT_USER = [
+    "CREATE TEMPORARY TABLE tmp_user LIKE user;\n",
+    ("REPLACE INTO tmp_user (Host, User, Password, Select_priv, Insert_priv, "
+     "Update_priv, Delete_priv, Create_priv, Drop_priv, Reload_priv, "
+     "Shutdown_priv, Process_priv, File_priv, Grant_priv, References_priv, "
+     "Index_priv, Alter_priv, Show_db_priv, Super_priv, "
+     "Create_tmp_table_priv, Lock_tables_priv, Execute_priv, Repl_slave_priv, "
+     "Repl_client_priv, Create_view_priv, Show_view_priv, "
+     "Create_routine_priv, Alter_routine_priv, Create_user_priv, Event_priv, "
+     "Trigger_priv, Create_tablespace_priv, ssl_cipher, x509_issuer, "
+     "x509_subject) VALUES ('localhost', 'root', '', 'Y', 'Y', 'Y', 'Y', 'Y', "
+     "'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', "
+     "'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', '','', '');\n"),
+    "REPLACE INTO user SELECT * FROM tmp_user WHERE @had_user_table=0;\n"
+    "DROP TABLE tmp_user;\n"]
+
 
 def clone_server(conn_val, options):
     """Clone an existing server
@@ -159,10 +177,15 @@ def clone_server(conn_val, options):
 
     # Check for warning of using --skip-innodb
     mysqld_path = get_tool_path(basedir, "mysqld")
-    version = get_mysqld_version(mysqld_path)
+    version_str = get_mysqld_version(mysqld_path)
+    # convert version_str from str tuple to integer tuple if possible
+    if version_str is not None:
+        version = tuple([int(digit) for digit in version_str])
+    else:
+        version = None
     if mysqld_options is not None and ("--skip-innodb" in mysqld_options or
        "--innodb" in mysqld_options) and version is not None and \
-       int(version[0]) >= 5 and int(version[1]) >= 7 and int(version[2]) >= 5:
+       version >= (5, 7, 5):
         print("# WARNING: {0}".format(WARN_OPT_SKIP_INNODB))
 
     if not quiet:
@@ -215,6 +238,13 @@ def clone_server(conn_val, options):
     for sqlfile in [system_tables, system_tables_data, test_data_timezone,
                     help_data]:
         lines = open(sqlfile, 'r').readlines()
+        # Starting with MySQL 5.7.5, the root@localhost account creation was
+        # moved from the system_tables_data sql file into the mysql_install_db
+        # binary. Since we don't use mysql_install_db directly we need to
+        # create the root user account ourselves.
+        if (version is not None and version >= (5, 7, 5) and
+                sqlfile == system_tables_data):
+            lines.extend(_CREATE_ROOT_USER)
         for line in lines:
             line = line.strip()
             # Don't fail when InnoDB is turned off (Bug#16369955) (Ugly hack)
