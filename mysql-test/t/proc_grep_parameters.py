@@ -26,7 +26,8 @@ import tempfile
 import time
 
 from mutlib.mutlib import kill_process
-from mysql.utilities.exception import MUTLibError
+from mysql.utilities.common.tools import get_tool_path
+from mysql.utilities.exception import MUTLibError, UtilError
 from mysql.utilities.common.server import get_connection_dictionary
 
 
@@ -36,11 +37,28 @@ class test(proc_grep.test):
     It uses the proc_grep test as a parent for setup and teardown methods.
     """
 
+    mysql_path = None
+
     def check_prerequisites(self):
         return proc_grep.test.check_prerequisites(self)
 
     def setup(self):
-        return proc_grep.test.setup(self)
+        proc_grep.test.setup(self)
+        rows = self.server1.exec_query("SHOW VARIABLES LIKE 'basedir'")
+        if rows:
+            basedir = rows[0][1]
+        else:
+            raise MUTLibError("Unable to determine 'basedir' for base server.")
+
+        try:
+            self.mysql_path = get_tool_path(basedir, "mysql")
+        except UtilError as err:
+            raise MUTLibError("Unable to find mysql client tool for server "
+                              "{0}@{1} on basedir={2}. "
+                              "ERROR: {3}".format(self.server1.host,
+                                                  self.server1.port, basedir,
+                                                  err.errmsg))
+        return True
 
     def run(self):
         self.res_fname = "result.txt"
@@ -70,7 +88,7 @@ class test(proc_grep.test):
         # execute the mysql client to create a new connection
         conn_dict = get_connection_dictionary(self.server1)
         arguments = [
-            "mysql",
+            self.mysql_path,
             "-u{0}".format(conn_dict['user']),
             "-p{0}".format(conn_dict['passwd']),
             "-h127.0.0.1",

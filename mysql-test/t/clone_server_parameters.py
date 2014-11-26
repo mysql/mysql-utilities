@@ -65,11 +65,15 @@ class test(mutlib.System_test):
         capture_all[in]   True for capture all rows.
         restart[in]       True for restart server.
         """
+        quote_char = "'" if os.name == "posix" else '"'
         self.results.append(comment + "\n")
         port1 = int(self.servers.get_next_port())
         cmd_str = "{0} --new-port={1} ".format(cmd_str, port1)
-        full_datadir = os.path.join(os.getcwd(), "temp_{0}".format(port1))
-        cmd_str = "{0} --new-data={1} --delete ".format(cmd_str, full_datadir)
+        full_datadir = os.path.join(os.getcwd(),
+                                    "temp with spaces".format(port1))
+        cmd_str = "{0} --new-data={2}{1}{2} --delete ".format(cmd_str,
+                                                              full_datadir,
+                                                              quote_char)
         res = self.exec_util(cmd_str, "start.txt")
         with open("start.txt") as f:
             for line in f:

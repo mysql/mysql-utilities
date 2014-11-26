@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2014 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 This files contains unit tests for reading the MySQL login configuration file.
 """
 import os
+import shlex
 import subprocess
 import tempfile
 import time
@@ -56,7 +57,7 @@ class TestMyPrintDefaults(unittest.TestCase):
         # Find mysql_config_editor to manipulate data from .mylogin.cnf
         try:
             cls.edit_tool_path = get_tool_path(None, "mysql_config_editor",
-                                               search_PATH=True)
+                                               search_PATH=True, quote=True)
         except UtilError as err:
             raise UtilError("MySQL client tools must be accessible to run "
                             "this test (%s). Please add the location of the "
@@ -70,7 +71,8 @@ class TestMyPrintDefaults(unittest.TestCase):
                          host=_TEST_HOST, user=_TEST_USER)
 
         # Execute command to create login-path data
-        proc = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE,
+        cmd_list = shlex.split(cmd)
+        proc = subprocess.Popen(cmd_list, stdout=subprocess.PIPE,
                                 stdin=subprocess.PIPE)
         # Overwrite login-path if already exists (i.e. answer 'y' to question)
         proc.communicate(input='y')
@@ -81,12 +83,13 @@ class TestMyPrintDefaults(unittest.TestCase):
         cmd = "{mysql_config_editor} remove --login-path={login_path}"
         cmd = cmd.format(mysql_config_editor=cls.edit_tool_path,
                          login_path=_TEST_LOGIN_PATH)
+        cmd_list = shlex.split(cmd)
 
         # Create a temporary file to redirect stdout
         out_file = tempfile.TemporaryFile()
 
         # Execute command to remove login-path data
-        subprocess.call(cmd.split(' '), stdout=out_file)
+        subprocess.call(cmd_list, stdout=out_file)
 
     def setUp(self):
         # For safety, store the current PATH (to be restored)

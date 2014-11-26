@@ -72,6 +72,7 @@ class test(mutlib.System_test):
         return new_server
 
     def run(self):
+        quote_char = "'" if os.name == "posix" else '"'
         self.server0 = self.servers.get_server(0)
         cmd_str = "mysqlserverclone.py --server={0} --delete-data ".format(
             self.build_connection_string(self.server0))
@@ -86,7 +87,8 @@ class test(mutlib.System_test):
         o_path_size = 108 - (len(os.getcwd()) + 22 + len(str(port1)))
         full_datadir = os.path.join(os.getcwd(), "temp_{0}_lo{1}ng".format(
             port1, 'o' * o_path_size))
-        cmd_str = "{0}--new-data={1} ".format(cmd_str, full_datadir)
+        cmd_str = ("{0}--new-data={2}{1}{2} "
+                   "".format(cmd_str, full_datadir, quote_char))
         res = self.exec_util(cmd_str, "start.txt")
         with open("start.txt") as f:
             for line in f:
@@ -104,17 +106,20 @@ class test(mutlib.System_test):
         if not rows:
             raise UtilError("Unable to determine basedir of running server.")
 
-        basedir = rows[0][1]
+        basedir = os.path.normpath(rows[0][1])
         port2 = int(self.servers.get_next_port())
         cmd_str = ("mysqlserverclone.py --root-password=root --delete-data "
-                   "--new-port={0} --basedir={1} ".format(port2, basedir))
+                   "--new-port={0} --basedir={2}{1}{2} "
+                   "".format(port2, basedir, quote_char))
 
         test_num += 1
         comment = ("Test case {0} - clone a server from "
                    "basedir".format(test_num))
         self.results.append(comment + "\n")
         full_datadir = os.path.join(os.getcwd(), "temp_{0}".format(port2))
-        cmd_str = "{0} --new-data={1} ".format(cmd_str, full_datadir)
+        cmd_str = ("{0} --new-data={2}{1}{2} "
+                   "".format(cmd_str, full_datadir, quote_char))
+
         res = self.exec_util(cmd_str, "start.txt")
         with open("start.txt") as f:
             for line in f:
@@ -150,16 +155,18 @@ class test(mutlib.System_test):
         ssl_server.exec_query(CREATE_SSL_USER_2)
 
         test_num += 1
-        comment = ("Test case {0} - clone a running server with SSL"
-                   ).format(test_num)
+        comment = ("Test case {0} - clone a running server with SSL "
+                   "and using spaces in the path".format(test_num))
         port3 = int(self.servers.get_next_port())
         self.results.append(comment + "\n")
-        full_datadir = os.path.join(os.getcwd(), "temp_{0}".format(port3))
+        full_datadir = os.path.join(os.getcwd(), "temp with spaces "
+                                                 "{0}".format(port3))
         cmd_str = ("mysqlserverclone.py --server={0} --delete-data "
                    ).format(self.build_custom_connection_string(ssl_server,
                                                                 "root_ssl",
                                                                 "root_ssl"))
-        cmd_str = "{0} --new-data={1} ".format(cmd_str, full_datadir)
+        cmd_str = ("{0} --new-data={2}{1}{2} "
+                   "".format(cmd_str, full_datadir, quote_char))
         cmd_str = ('{0} {1} --new-port={2} --root-password=root --mysqld='
                    '"{3}"').format(cmd_str,
                                    SSL_OPTS_UTIL.format(STD_DATA_PATH),

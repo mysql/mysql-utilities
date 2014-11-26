@@ -622,7 +622,7 @@ def stop_running_server(server, wait=10, drop=True):
             cmd = "{0} --ssl-key={1} ".format(cmd, server.ssl_key)
 
     res = server.show_server_variable("datadir")
-    datadir = res[0][1]
+    datadir = os.path.normpath(res[0][1])
 
     # Kill all connections so shutdown will work correctly
     res = server.exec_query("SHOW PROCESSLIST")

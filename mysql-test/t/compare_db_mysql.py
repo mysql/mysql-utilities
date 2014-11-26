@@ -59,7 +59,7 @@ class test(mutlib.System_test):
             raise MUTLibError("Unable to determine 'basedir' for base server.")
 
         try:
-            self.mysql_path = get_tool_path(basedir, "mysql")
+            self.mysql_path = get_tool_path(basedir, "mysql", quote=True)
         except UtilError as err:
             raise MUTLibError("Unable to find mysql client tool for server "
                               "{0}@{1} on basedir={2}. "

@@ -20,6 +20,7 @@ This file contains the reporting mechanisms for reporting disk usage.
 """
 import getpass
 import os
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -247,7 +248,7 @@ def _server_info(server_val, get_defaults=False, options=None):
         if server.is_alias('localhost'):
             try:
                 my_def_path = get_tool_path(params_dict['basedir'],
-                                            "my_print_defaults")
+                                            "my_print_defaults", quote=True)
             except UtilError as err:
                 raise UtilError("Unable to retrieve the defaults data "
                                 "(requires access to my_print_defaults): {0} "
@@ -256,7 +257,9 @@ def _server_info(server_val, get_defaults=False, options=None):
                                 )
             out_file = tempfile.TemporaryFile()
             # Execute tool: <basedir>/my_print_defaults mysqld
-            subprocess.call([my_def_path, "mysqld"], stdout=out_file)
+            cmd_list = shlex.split(my_def_path)
+            cmd_list.append("mysqld")
+            subprocess.call(cmd_list, stdout=out_file)
             out_file.seek(0)
             # Get defaults data from temp output file.
             defaults.append("\nDefaults for server {0}".format(server_id))
@@ -306,7 +309,7 @@ def _start_server(server_val, basedir, datadir, options=None):
     verbosity = options.get("verbosity", 0)
     start_timeout = options.get("start_timeout", 10)
 
-    mysqld_path = get_tool_path(basedir, "mysqld")
+    mysqld_path = get_tool_path(basedir, "mysqld", quote=True)
 
     print "# Server is offline."
 
@@ -334,7 +337,8 @@ def _start_server(server_val, basedir, datadir, options=None):
         print "# --- BEGIN (server output) ---"
     else:
         print "# Starting read-only instance of the server ...",
-    args = [
+    args = shlex.split(mysqld_path)
+    args.extend([
         "--no-defaults",
         "--skip-grant-tables",
         "--read_only",
@@ -342,7 +346,7 @@ def _start_server(server_val, basedir, datadir, options=None):
         "--basedir=" + basedir,
         "--datadir=" + datadir,
         "--user={0}".format(user_name),
-    ]
+    ])
 
     # It the server is 5.6 or later, we must use additional parameters
     if post_5_5:
@@ -356,7 +360,6 @@ def _start_server(server_val, basedir, datadir, options=None):
         if not post_5_7_4:
             server_args.append("--skip-innodb")
         args.extend(server_args)
-    args.insert(0, mysqld_path)
 
     socket = server_val.get('unix_socket', None)
     if socket is not None:
@@ -422,7 +425,7 @@ def _stop_server(server_val, basedir, options=None):
         options = {}
     verbosity = options.get("verbosity", 0)
     socket = server_val.get("unix_socket", None)
-    mysqladmin_path = get_tool_path(basedir, "mysqladmin")
+    mysqladmin_path = get_tool_path(basedir, "mysqladmin", quote=True)
 
     # Stop the instance
     if verbosity > 0:

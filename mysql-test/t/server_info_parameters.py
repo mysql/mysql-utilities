@@ -18,6 +18,7 @@
 """
 server_info_parameters test.
 """
+import os
 
 import server_info
 
@@ -42,6 +43,7 @@ class test(server_info.test):
         return server_info.test.setup(self)
 
     def run(self):
+        quote_char = "'" if os.name == "posix" else '"'
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
@@ -101,9 +103,9 @@ class test(server_info.test):
 
         # Now, stop the server then run verbose test again
         res = self.server3.show_server_variable('basedir')
-        self.basedir = res[0][1]
+        self.basedir = os.path.normpath(res[0][1])
         res = self.server3.show_server_variable('datadir')
-        self.datadir3 = res[0][1]
+        self.datadir3 = os.path.normpath(res[0][1])
 
         self.servers.stop_server(self.server3, 10, False)
         self.servers.remove_server(self.server3.role)
@@ -113,8 +115,9 @@ class test(server_info.test):
 
         test_num += 1
         comment = "Test case {0} - run against offline server".format(test_num)
-        cmd_opts = ("--format=vertical --start --basedir={0} --datadir={1} "
-                    "--start-timeout=0".format(self.basedir, self.datadir3))
+        cmd_opts = ("--format=vertical --start --basedir={2}{0}{2} "
+                    "--datadir={2}{1}{2} --start-timeout=0"
+                    "".format(self.basedir, self.datadir3, quote_char))
         cmd = "{0} {1}".format(cmd_str, cmd_opts)
         res = self.run_test_case(0, cmd, comment)
         if not res:

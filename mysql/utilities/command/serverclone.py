@@ -109,6 +109,7 @@ def clone_server(conn_val, options):
     start_timeout = int(options.get('start_timeout', 10))
     mysqld_options = options.get('mysqld_options', '')
     force = options.get('force', False)
+    quote_char = "'" if os.name == "posix" else '"'
 
     if not check_port_in_use('localhost', int(new_port)):
         raise UtilError("Port {0} in use. Please choose an "
@@ -264,7 +265,7 @@ def clone_server(conn_val, options):
         "--datadir={0}".format(new_data),
         "--basedir={0}".format(os.path.abspath(mysql_basedir)),
     ]
-    proc = None
+
     if verbosity >= 1 and not quiet:
         proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE)
     else:
@@ -307,8 +308,6 @@ def clone_server(conn_val, options):
         subprocess.call(['chown', '-R', user, new_data])
         subprocess.call(['chgrp', '-R', user, new_data])
 
-    cmd = [mysqld_path, '--no-defaults']
-
     socket_path = os.path.join(new_data, 'mysql.sock')
     # If socket path is too long, use mkdtemp to create a tmp dir and
     # use it instead to store the socket
@@ -320,38 +319,46 @@ def clone_server(conn_val, options):
                       os.path.join(new_data, 'mysql.sock'),
                       MAX_SOCKET_PATH_SIZE, socket_path))
 
-    cmd.extend([
-        '--datadir={0}'.format(new_data),
-        '--tmpdir={0}'.format(new_data),
-        '--pid-file={0}'.format(os.path.join(new_data, "clone.pid")),
-        '--port={0}'.format(new_port),
-        '--server-id={0}'.format(options.get('new_id', 2)),
-        '--basedir={0}'.format(mysql_basedir),
-        '--socket={0}'.format(socket_path),
-    ])
+    cmd = {
+        'datadir': '--datadir={0}'.format(new_data),
+        'tmpdir': '--tmpdir={0}'.format(new_data),
+        'pid-file': '--pid-file={0}'.format(
+            os.path.join(new_data, "clone.pid")),
+        'port': '--port={0}'.format(new_port),
+        'server': '--server-id={0}'.format(options.get('new_id', 2)),
+        'basedir': '--basedir={0}'.format(mysql_basedir),
+        'socket': '--socket={0}'.format(socket_path),
+    }
     if user:
-        cmd.append('--user={0}'.format(user))
-
+        cmd.update({'user': '--user={0}'.format(user)})
     if mysqld_options:
         if isinstance(mysqld_options, (list, tuple)):
-            cmd.extend(mysqld_options)
+            cmd.update(dict(zip(mysqld_options, mysqld_options)))
         else:
             new_opts = mysqld_options.strip(" ")
             # Drop the --mysqld=
             if new_opts.startswith("--mysqld="):
                 new_opts = new_opts[9:]
             if new_opts.startswith('"') and new_opts.endswith('"'):
-                cmd.extend(shlex.split(new_opts.strip('"')))
+                list_ = shlex.split(new_opts.strip('"'))
+                cmd.update(dict(zip(list_, list_)))
             elif new_opts.startswith("'") and new_opts.endswith("'"):
-                cmd.extend(shlex.split(new_opts.strip("'")))
+                list_ = shlex.split(new_opts.strip("'"))
+                cmd.update(dict(zip(list_, list_)))
             # Special case where there is only 1 option
             elif len(new_opts.split("--")) == 1:
-                cmd.append(mysqld_options)
+                cmd.update({mysqld_options: mysqld_options})
             else:
-                cmd.extend(shlex.split(new_opts))
+                list_ = shlex.split(new_opts)
+                cmd.update(dict(zip(list_, list_)))
+
+    # set of options that must be surrounded with quotes
+    options_to_quote = set(["datadir", "tmpdir", "basedir", "socket",
+                            "pid-file"])
 
     # Strip spaces from each option
-    cmd = [opt.strip(' ') for opt in cmd]
+    for key in cmd:
+        cmd[key] = cmd[key].strip(' ')
 
     # Write startup command if specified
     if cmd_file is not None:
@@ -366,19 +373,32 @@ def clone_server(conn_val, options):
             cfile.write("REM{0}".format(comment))
         else:
             cfile.write("#{0}".format(comment))
-        cfile.write("{0}\n".format(" ".join(cmd)))
+
+        start_cmd_lst = ["{0}{1}{0} --no-defaults".format(quote_char,
+                                                          mysqld_path)]
+
+        # build start command
+        for key, val in cmd.iteritems():
+            if key in options_to_quote:
+                val = "{0}{1}{0}".format(quote_char, val)
+            start_cmd_lst.append(val)
+        cfile.write("{0}\n".format(" ".join(start_cmd_lst)))
         cfile.close()
 
     if os.name == "nt" and verbosity >= 1:
-        cmd.append("--console")
+        cmd.update({"console": "--console"})
 
+    start_cmd_lst = [mysqld_path, "--no-defaults"]
+    sorted_keys = sorted(cmd.keys())
+    start_cmd_lst.extend([cmd[val] for val in sorted_keys])
     if verbosity >= 1 and not quiet:
         if verbosity >= 2:
             print("# Startup command for new server:\n"
-                  "{0}".format(" ".join(cmd)))
-        proc = subprocess.Popen(cmd, shell=False)
+                  "{0}".format(" ".join(start_cmd_lst)))
+        proc = subprocess.Popen(start_cmd_lst, shell=False)
     else:
-        proc = subprocess.Popen(cmd, shell=False, stdout=fnull, stderr=fnull)
+        proc = subprocess.Popen(start_cmd_lst, shell=False, stdout=fnull,
+                                stderr=fnull)
 
     # Try to connect to the new MySQL instance
     if not quiet:

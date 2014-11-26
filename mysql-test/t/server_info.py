@@ -120,9 +120,9 @@ class test(mutlib.System_test):
 
         # Now, stop the server then run verbose test again
         res = self.server3.show_server_variable('basedir')
-        self.basedir = res[0][1]
+        self.basedir = os.path.normpath(res[0][1])
         res = self.server3.show_server_variable('datadir')
-        self.datadir3 = res[0][1]
+        self.datadir3 = os.path.normpath(res[0][1])
         if stop_server:
             self.servers.stop_server(self.server3, 12, False)
         if delete_log:
@@ -153,6 +153,7 @@ class test(mutlib.System_test):
 
     def run(self):
         self.mask_global = False  # Turn off global masks
+        quote_char = "'" if os.name == "posix" else '"'
         self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
@@ -192,8 +193,9 @@ class test(mutlib.System_test):
 
         cmd_str = self.start_stop_newserver()
         test_num += 1
-        cmd_opts = (' --format=vertical --basedir={0} --datadir={1} '
-                    '--start'.format(self.basedir, self.datadir3))
+        cmd_opts = (' --format=vertical --basedir={2}{0}{2} --datadir={2}{1}'
+                    '{2} --start'.format(self.basedir, self.datadir3,
+                                         quote_char))
         comment = ("Test case {0} - re-started server prints "
                    "results ".format(test_num))
         #cmd_str_wrong = cmd_str.replace("root:root", "wrong:wrong")

@@ -55,7 +55,7 @@ def _add_basedir(search_paths, path_str):
 
 
 def get_tool_path(basedir, tool, fix_ext=True, required=True,
-                  defaults_paths=None, search_PATH=False):
+                  defaults_paths=None, search_PATH=False, quote=False):
     """Search for a MySQL tool and return the full path
 
     basedir[in]         The initial basedir to search (from mysql server)
@@ -71,12 +71,17 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True,
                         the PATH environment variable will be used to search
                         for the tool. By default the PATH will not be searched,
                         i.e. search_PATH=False.
+    quote[in]           If True, the result path is surrounded with the OS
+                        quotes.
     Returns (string) full path to tool
     """
     if not defaults_paths:
         defaults_paths = []
     search_paths = []
-
+    if quote:
+        quote_char = "'" if os.name == "posix" else '"'
+    else:
+        quote_char = ''
     if basedir:
         # Add specified basedir path to search paths
         _add_basedir(search_paths, basedir)
@@ -103,12 +108,12 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True,
         if os.path.isdir(norm_path):
             toolpath = os.path.join(norm_path, tool)
             if os.path.isfile(toolpath):
-                return toolpath
+                return r"{0}{1}{0}".format(quote_char, toolpath)
             else:
                 if tool == "mysqld.exe":
                     toolpath = os.path.join(norm_path, "mysqld-nt.exe")
                     if os.path.isfile(toolpath):
-                        return toolpath
+                        return r"{0}{1}{0}".format(quote_char, toolpath)
     if required:
         raise UtilError("Cannot find location of %s." % tool)
 
@@ -251,7 +256,11 @@ def get_mysqld_version(mysqld_path):
 
     if line is None:
         return None
-    version = line.split(' ', 5)[3]
+    pattern = r"mysqld(?:\.exe)?\s+Ver\s+(\d+\.\d+\.\S+)\s"
+    match = re.search(pattern, line)
+    if not match:
+        return None
+    version = match.group(1)
     try:
         maj_ver, min_ver, dev = version.split(".")
         rel = dev.split("-")
