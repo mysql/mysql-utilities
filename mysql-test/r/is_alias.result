@@ -43,7 +43,7 @@ Pass
 test case 15 - test alias: oracle.com is not alias for server localhost
 Pass
 
-test case 16 - test alias: python.org is not alias for server localhost
+test case 16 - test alias: TEST_DOMAIN is not alias for server localhost
 Pass
 
 test case 17 - test alias: 127.0.0.1 is alias for server ::1
@@ -91,7 +91,7 @@ Pass
 test case 31 - test alias: oracle.com is not alias for server ::1
 Pass
 
-test case 32 - test alias: python.org is not alias for server ::1
+test case 32 - test alias: TEST_DOMAIN is not alias for server ::1
 Pass
 
 test case 33 - test alias: alias_reuseness is alias for server alias_reuseness
@@ -103,21 +103,21 @@ Pass
 test case 35 - test alias: alias_reuseness is not alias for server mock_no_local_host
 Pass
 
-test case 36 - test alias: oracle.com is not alias for server python.org
+test case 36 - test alias: oracle.com is not alias for server TEST_DOMAIN
 Pass
 
 test case 37 - test alias: oracle.com is not alias for server mock_no_local_host
 Pass
 
-test case 38 - test alias: PYTHON.ORG_IP is not alias for server mock_no_local_host
+test case 38 - test alias: TEST_DOMAIN_IP is not alias for server mock_no_local_host
 Pass
 
 test case 39 - test alias: ORACLE_IP is alias for server oracle.com
 Pass
 
-test case 40 - test alias: python.org is alias for server PYTHON.ORG_IP
+test case 40 - test alias: TEST_DOMAIN is alias for server TEST_DOMAIN_IP
 Pass
 
-test case 41 - test alias: python.org is alias for server PYTHON.ORG_IP
+test case 41 - test alias: TEST_DOMAIN is alias for server TEST_DOMAIN_IP
 Pass
 

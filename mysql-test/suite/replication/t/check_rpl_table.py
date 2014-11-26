@@ -182,6 +182,15 @@ class test(replicate.test):
 
         self.remove_result("                 Auto_Position :")
 
+        # Remove information only available for server version >= 5.7.3
+        self.remove_result("          Replicate_Rewrite_DB :")
+
+        # Mask Slave_SQL_Running_State value that has changed for 5.7 servers.
+        self.replace_result("       Slave_SQL_Running_State : "
+                            "Slave has read all relay log; waiting for",
+                            "       Slave_SQL_Running_State : "
+                            "Slave has read all relay log; waiting for ...\n")
+
     def get_result(self):
         return self.compare(__name__, self.results)
 

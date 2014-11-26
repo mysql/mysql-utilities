@@ -29,17 +29,17 @@ _TABLE_PRIV_QUERY = ("SELECT GRANTEE, IS_GRANTABLE, "
                      "GROUP_CONCAT(PRIVILEGE_TYPE) "
                      "FROM INFORMATION_SCHEMA.TABLE_PRIVILEGES WHERE "
                      "TABLE_SCHEMA='{0}' AND TABLE_NAME='{1}' "
-                     "GROUP BY GRANTEE")
+                     "GROUP BY GRANTEE, IS_GRANTABLE")
 
 _DB_PRIVS_QUERY = ("SELECT GRANTEE, IS_GRANTABLE, "
                    "GROUP_CONCAT(PRIVILEGE_TYPE) "
                    "FROM INFORMATION_SCHEMA.SCHEMA_PRIVILEGES WHERE "
-                   "TABLE_SCHEMA='{0}' GROUP BY GRANTEE")
+                   "TABLE_SCHEMA='{0}' GROUP BY GRANTEE, IS_GRANTABLE")
 
 _GLOBAL_PRIV_QUERY = ("SELECT grantee, IS_GRANTABLE, "
                       "GROUP_CONCAT(privilege_type) FROM "
-                      "information_schema.USER_PRIVILEGES GROUP BY GRANTEE")
-
+                      "information_schema.USER_PRIVILEGES GROUP BY GRANTEE,"
+                      " IS_GRANTABLE")
 
 _PROCS_PRIV_QUERY = ("SELECT User, Host, Proc_priv FROM "
                      "mysql.procs_priv WHERE db='{0}' AND "

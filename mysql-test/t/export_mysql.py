@@ -175,6 +175,10 @@ class test(mutlib.System_test):
         self.show_data("t4")
 
         self.remove_result("Warning: Using a password on the")
+        # mysql client might also issue a warning if a password is used on the
+        # command line.
+        self.remove_result("mysql: [Warning] Using a password on the command "
+                           "line interface can be insecure.")
 
         return True
 

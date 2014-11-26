@@ -27,36 +27,42 @@ import test_sql_template
 # (comment, def1, def2, expected result, error_codes)
 _TABLE_TESTS = [
     ("Table single column change",
-     "CREATE TABLE diff_table.t1(a int);",
-     "CREATE TABLE diff_table.t1(b int);", 0, None),
+     "CREATE TABLE diff_table.t1(a int) ENGINE=InnoDB;",
+     "CREATE TABLE diff_table.t1(b int) ENGINE=InnoDB;", 0, None),
     ("Table columns reversed",
-     "CREATE TABLE diff_table.t1(a int, b char(20));",
-     "CREATE TABLE diff_table.t1(b char(20), a int);", 0, None),
+     "CREATE TABLE diff_table.t1(a int, b char(20)) ENGINE=InnoDB;",
+     "CREATE TABLE diff_table.t1(b char(20), a int) ENGINE=InnoDB;", 0, None),
     ("Table columns null vs not null",
-     "CREATE TABLE diff_table.t1(a INT NOT NULL);",
-     "CREATE TABLE diff_table.t1(a INT NULL);", 0, None),
+     "CREATE TABLE diff_table.t1(a INT NOT NULL) ENGINE=InnoDB;",
+     "CREATE TABLE diff_table.t1(a INT NULL) ENGINE=InnoDB;", 0, None),
     ("Table columns default",
-     "CREATE TABLE diff_table.t1(a int default -1);",
-     "CREATE TABLE diff_table.t1(a int);", 0, None),
+     "CREATE TABLE diff_table.t1(a int default -1) ENGINE=InnoDB;",
+     "CREATE TABLE diff_table.t1(a int) ENGINE=InnoDB;", 0, None),
     ("Table columns different defaults",
-     "CREATE TABLE diff_table.t1(a int default 2);",
-     "CREATE TABLE diff_table.t1(a int default 1);", 0, None),
+     "CREATE TABLE diff_table.t1(a int default 2) ENGINE=InnoDB;",
+     "CREATE TABLE diff_table.t1(a int default 1) ENGINE=InnoDB;", 0, None),
     ("Table columns extra",
      "CREATE TABLE diff_table.t1(a int, t timestamp "
-     "on update CURRENT_TIMESTAMP);",
-     "CREATE TABLE diff_table.t1(a int, t timestamp);", 0, None),
+     "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB;",
+     "CREATE TABLE diff_table.t1(a int, t timestamp "
+     "DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB;", 0, None),
     ("Table columns comment",
-     "CREATE TABLE diff_table.t1(a INT COMMENT 'boys');",
-     "CREATE TABLE diff_table.t1(a int comment 'girls');", 0, None),
+     "CREATE TABLE diff_table.t1(a INT COMMENT 'boys') ENGINE=InnoDB;",
+     "CREATE TABLE diff_table.t1(a int comment 'girls') ENGINE=InnoDB;",
+     0, None),
     ("Table columns minor order change",
-     "CREATE TABLE diff_table.t1(a int, b char(20), c datetime);",
-     "CREATE TABLE diff_table.t1(c datetime, b char(20), a int);", 0, None),
+     "CREATE TABLE diff_table.t1(a int, b char(20), c datetime) "
+     "ENGINE=InnoDB;",
+     "CREATE TABLE diff_table.t1(c datetime, b char(20), a int) "
+     "ENGINE=InnoDB;", 0, None),
     ("Table columns drop column",
-     "CREATE TABLE diff_table.t1(a int, b char(30));",
-     "CREATE TABLE diff_table.t1(a int);", 0, None),
+     "CREATE TABLE diff_table.t1(a int, b char(30)) ENGINE=InnoDB;",
+     "CREATE TABLE diff_table.t1(a int) ENGINE=InnoDB;", 0, None),
     ("Table columns various",
-     "CREATE TABLE diff_table.t1(a int, b char(30), c float, d char(33));",
-     "CREATE TABLE diff_table.t1(a int, c float, d char(50));", 0, None),
+     "CREATE TABLE diff_table.t1(a int, b char(30), c float, d char(33)) "
+     "ENGINE=InnoDB;",
+     "CREATE TABLE diff_table.t1(a int, c float, d char(50)) "
+     "ENGINE=InnoDB;", 0, None),
 ]
 
 

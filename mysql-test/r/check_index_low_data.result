@@ -35,9 +35,9 @@ Test case 7 - best indexes - low data
       column: str_text
     sequence: 1
  num columns: 1
- cardinality: 16
+ cardinality: XX
    est. rows: 16
-     percent: 100.00
+     percent: XXX.XX
 1 row.
 Test case 8 - worst indexes - low data
 # Getting indexes for util_test_a.test_low
@@ -52,7 +52,7 @@ Test case 8 - worst indexes - low data
       column: str_text
     sequence: 1
  num columns: 1
- cardinality: 16
+ cardinality: XX
    est. rows: 16
-     percent: 100.00
+     percent: XXX.XX
 1 row.

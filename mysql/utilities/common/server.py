@@ -1088,10 +1088,10 @@ class Server(object):
                 parameters['ssl_key'] = self.ssl_key
 
             # When cert and key options are specified the ca option is not
-            # absolutely required for stablishing the encrypted connection, but
-            # C/py will not allow the None value for the ca option, so we use an
-            # empty string i.e '' to avoid an error from C/py about ca option
-            # being the None value.
+            # absolutely required for establishing the encrypted connection,
+            # but C/py will not allow the None value for the ca option, so we
+            # use an empty string i.e '' to avoid an error from C/py about ca
+            # option being the None value.
             if 'ssl_cert' in parameters.keys() and \
                'ssl_key' in parameters.keys() and \
                'ssl_ca' not in parameters:

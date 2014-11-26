@@ -1373,15 +1373,25 @@ class Database(object):
                 TABLES.TABLE_SCHEMA = REFERENTIAL_CONSTRAINTS.CONSTRAINT_SCHEMA
                 AND
                 TABLES.TABLE_NAME = REFERENTIAL_CONSTRAINTS.TABLE_NAME
-            LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE ON
+            LEFT JOIN (
+                  SELECT CONSTRAINT_SCHEMA, TABLE_NAME, CONSTRAINT_NAME,
+                         GROUP_CONCAT(COLUMN_NAME) AS COLUMN_NAME,
+                         REFERENCED_TABLE_SCHEMA, REFERENCED_COLUMN_NAME
+                  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+                  GROUP BY CONSTRAINT_SCHEMA, TABLE_NAME, CONSTRAINT_NAME,
+                           REFERENCED_TABLE_SCHEMA, REFERENCED_COLUMN_NAME
+            ) AS KEY_COLUMN_USAGE ON
                 TABLES.TABLE_SCHEMA = KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA
                 AND
                 TABLES.TABLE_NAME = KEY_COLUMN_USAGE.TABLE_NAME
             WHERE TABLES.TABLE_SCHEMA = '%s' AND TABLE_TYPE <> 'VIEW' %s
-            GROUP BY TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME,
-                     COLUMNS.ORDINAL_POSITION
+            """
+            _ORDER_BY_DEFAULT = """
             ORDER BY TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME,
                      COLUMNS.ORDINAL_POSITION
+            """
+            _ORDER_BY_NAME = """
+            ORDER BY TABLES.TABLE_NAME
             """
             exclude_param = "TABLES.TABLE_NAME"
 
@@ -1406,6 +1416,8 @@ class Database(object):
             FROM INFORMATION_SCHEMA.VIEWS
             WHERE TABLE_SCHEMA = '%s' %s
             """
+            _ORDER_BY_DEFAULT = ""
+            _ORDER_BY_NAME = ""
             exclude_param = "VIEWS.TABLE_NAME"
         elif obj_type == _TRIG:
             _NAMES = """
@@ -1438,6 +1450,8 @@ class Database(object):
             FROM INFORMATION_SCHEMA.TRIGGERS
             WHERE TRIGGER_SCHEMA = '%s' %s
             """
+            _ORDER_BY_DEFAULT = ""
+            _ORDER_BY_NAME = ""
             exclude_param = "TRIGGERS.TRIGGER_NAME"
         elif obj_type == _PROC:
             _NAMES = """
@@ -1464,6 +1478,8 @@ class Database(object):
             FROM mysql.proc
             WHERE DB = '%s' AND TYPE = 'PROCEDURE' %s
             """
+            _ORDER_BY_DEFAULT = ""
+            _ORDER_BY_NAME = ""
             exclude_param = "NAME"
         elif obj_type == _FUNC:
             _NAMES = """
@@ -1490,6 +1506,8 @@ class Database(object):
             FROM mysql.proc
             WHERE DB = '%s' AND TYPE = 'FUNCTION' %s
             """
+            _ORDER_BY_DEFAULT = ""
+            _ORDER_BY_NAME = ""
             exclude_param = "NAME"
         elif obj_type == _EVENT:
             _NAMES = """
@@ -1516,6 +1534,8 @@ class Database(object):
             FROM mysql.event
             WHERE DB = '%s' %s
             """
+            _ORDER_BY_DEFAULT = ""
+            _ORDER_BY_NAME = ""
             exclude_param = "NAME"
         elif obj_type == _GRANT:
             _OBJECT_QUERY = """
@@ -1558,19 +1578,23 @@ class Database(object):
                 prefix = _NAMES
                 if need_backtick:
                     pos_to_quote = names_pos_to_quote
+                sufix = _ORDER_BY_NAME
             elif columns == "full":
                 prefix = _FULL
                 if need_backtick:
                     pos_to_quote = full_pos_to_quote
+                sufix = _ORDER_BY_DEFAULT
             else:
                 prefix = _MINIMAL
                 if need_backtick:
                     pos_to_quote = minimal_pos_to_quote
+                sufix = _ORDER_BY_DEFAULT
             # Form exclusion string
             exclude_str = ""
             if self.exclude_patterns:
                 exclude_str = self.__build_exclude_patterns(exclude_param)
-            query = prefix + _OBJECT_QUERY % (self.db_name, exclude_str)
+            query = (prefix + _OBJECT_QUERY + sufix) % (self.db_name,
+                                                        exclude_str)
             res = self.source.exec_query(query, col_options)
 
             # Quote required identifiers with backticks

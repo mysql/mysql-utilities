@@ -98,6 +98,14 @@ class test(check_index_parameters.test):
         self.server1.exec_query(INSERT_ROWS3)
         self.run_test_cases()
 
+        # Mask results
+        if self.servers.get_server(0).check_version_compat(5, 7, 5):
+            self.replace_substring("cardinality: 12", "cardinality: XX")
+            self.replace_substring("percent: 75.00", "percent: XXX.XX")
+        else:
+            self.replace_substring("cardinality: 16", "cardinality: XX")
+            self.replace_substring("percent: 100.00", "percent: XXX.XX")
+
         return True
 
     def get_result(self):

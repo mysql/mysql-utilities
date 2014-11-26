@@ -118,6 +118,11 @@ class test(export_rpl_errors.test):
         self.replace_substring(str(self.server1.port), "PORT1")
         self.replace_substring(str(self.server2.port), "PORT2")
 
+        # Mask error message if --rpl-user is not specified. For 5.7 servers
+        # the message is different because only one root account is available.
+        self.replace_result("ERROR: No --rpl-user specified and ",
+                            "ERROR: No --rpl-user specified and ...\n")
+
         return True
 
     def get_result(self):

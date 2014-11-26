@@ -89,7 +89,8 @@ def parse_user_host(user_name):
 
 def grant_proxy_ssl_privileges(server, user, passw, at='localhost',
                                privs="ALL PRIVILEGES", grant_opt=True,
-                               ssl=True, grant_proxy=True):
+                               ssl=True, grant_proxy=True, proxy_user='root',
+                               proxy_host='localhost'):
     """Grant privileges to an user in a server with GRANT OPTION or/and
     REQUIRE SSL if required.
 
@@ -101,6 +102,8 @@ def grant_proxy_ssl_privileges(server, user, passw, at='localhost',
     grant_opt[in]      if True, it will grant with GRANT OPTION (default True).
     ssl[in]            if True, it will set REQUIRE SSL (default True).
     grant_proxy[in]    if True, it will grant GRANT PROXY (default True).
+    proxy_user[in]     username for the proxied account (default: root)
+    proxy_host[in]     hostname for the proxied account (default: localhost)
 
     Note: Raises UtilError on any Error.
     """
@@ -118,21 +121,19 @@ def grant_proxy_ssl_privileges(server, user, passw, at='localhost',
         server.exec_query(" ".join(grant))
     except UtilDBError as err:
         raise UtilError("Cannot create new user {0} at {1}:{2} reason:"
-                        "{3}".format(user, server.host, server.host,
+                        "{3}".format(user, server.host, server.port,
                                      err.errmsg))
 
     if grant_proxy:
-        grant = [
-            "GRANT PROXY ON ''@''",
-            "TO '{0}'@'{1}'".format(user, at),
-            "WITH GRANT OPTION"
-        ]
+        grant = ("GRANT PROXY ON '{0}'@'{1}' "
+                 "TO '{2}'@'{3}' "
+                 "WITH GRANT OPTION").format(proxy_user, proxy_host, user, at)
         try:
-            server.exec_query(" ".join(grant))
+            server.exec_query(grant)
         except UtilDBError as err:
             raise UtilError("Cannot grant proxy to user {0} at {1}:{2} "
                             "reason:{3}".format(user, server.host,
-                                                server.host, err.errmsg))
+                                                server.port, err.errmsg))
 
 
 class User(object):

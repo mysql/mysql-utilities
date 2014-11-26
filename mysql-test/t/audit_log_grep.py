@@ -516,6 +516,10 @@ class test(mutlib.System_test):
         self.replace_result("      OS_VERSION:", "      OS_VERSION: ...\n")
         self.replace_result("         VERSION:", "         VERSION: ...\n")
 
+        # Remove RECORD_ID which was added to the 'Audit' record type for
+        # audit log files from 5.7 servers.
+        self.remove_result("       RECORD_ID:")
+
         # Remove version information
         self.remove_result_and_lines_after("MySQL Utilities mysqlauditgrep "
                                            "version", 6)

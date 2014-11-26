@@ -68,8 +68,8 @@ class test(server_info.test):
             try:
                 grant_proxy_ssl_privileges(server, ssl_user, ssl_pass)
             except UtilError as err:
-                raise MUTLibError("{0} on:{1}".format(err.errmsg,
-                                                      server.role))
+                raise MUTLibError("{0} on: {1}".format(err.errmsg,
+                                                       server.role))
 
         conn_info = {
             'user': ssl_user,

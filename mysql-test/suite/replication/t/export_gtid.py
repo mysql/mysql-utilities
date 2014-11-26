@@ -150,8 +150,16 @@ class test(mutlib.System_test):
         cmd_str = "{0}{1} > {2}".format(exp_cmd, conn1, self.export_file)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res:
+            # Output additional information if the executed command fails
+            # in order to help determine the issue.
+            print("Test output (results):")
             for row in self.results:
                 print row,
+            print("Command failing: {0}".format(cmd_str))
+            print("Export file {0}:".format(self.export_file))
+            with open(self.export_file.strip()) as f:
+                for row in f:
+                    print row,
             raise MUTLibError("{0}: failed".format(comment))
 
         # Display the export file if in debug mode
@@ -167,8 +175,16 @@ class test(mutlib.System_test):
         cmd_str = "{0}{1} {2}".format(imp_cmd, conn2, self.export_file)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
         if not res == ret_val:
+            # Output additional information if the executed command fails
+            # in order to help determine the issue.
+            print("Test output (results):")
             for row in self.results:
                 print row,
+            print("Command failing: {0}".format(cmd_str))
+            print("Export file {0}:".format(self.export_file))
+            with open(self.export_file.strip()) as f:
+                for row in f:
+                    print row,
             raise MUTLibError("{0}: failed".format(comment))
         self.drop_all()
 

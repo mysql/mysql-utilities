@@ -46,8 +46,8 @@ _mock_no_local_host = 'mock_no_local_host'
 _oracle_com = 'oracle.com'
 _oracle_ip = socket.getaddrinfo(_oracle_com, None)[0][4][0]
 # this address must return the same host_name using his IP
-_python_org = "python.org"
-_python_ip = socket.getaddrinfo(_python_org, None)[0][4][0]
+TEST_DOMAIN = "google.com"
+TEST_DOMAIN_IP = socket.getaddrinfo(TEST_DOMAIN, None)[0][4][0]
 
 _special_test_cases = [
     {_desc: "This test reuse of aliases", _test_case_name: _alias_reuseness,
@@ -64,7 +64,7 @@ _special_test_cases = [
 
     {_desc: ("This test non local server host name,"
              " lookup of his aliases"), _test_case_name: _oracle_com,
-     _aliases: set(), _host_name: _python_org, _result: False},
+     _aliases: set(), _host_name: TEST_DOMAIN, _result: False},
 
     {_desc: ("This test non local server, lookup"
              " of aliases for the given hostname"),
@@ -73,7 +73,7 @@ _special_test_cases = [
 
     {_desc: ("This test non local server,"
              "lookup of aliases for the given ip"),
-     _test_case_name: _python_ip, _aliases: set([_mock_no_local_host]),
+     _test_case_name: TEST_DOMAIN_IP, _aliases: set([_mock_no_local_host]),
      _host_name: _mock_no_local_host, _result: False},
 
     {_desc: ("This test lookup of aliases for non "
@@ -81,13 +81,13 @@ _special_test_cases = [
      _aliases: set(), _host_name: _oracle_com, _result: True},
 
     {_desc: ("This test lookups of aliases for non "
-             "local server by hostname."), _test_case_name: _python_org,
-     _aliases: set(), _host_name: _python_ip, _result: True},
+             "local server by hostname."), _test_case_name: TEST_DOMAIN,
+     _aliases: set(), _host_name: TEST_DOMAIN_IP, _result: True},
 
     {_desc: ("It test the reuse of aliases for the "
              "given non local server by hostname."),
-     _test_case_name: _python_org, _aliases: set([_python_ip]),
-     _host_name: _python_ip, _result: True}]
+     _test_case_name: TEST_DOMAIN, _aliases: set([TEST_DOMAIN_IP]),
+     _host_name: TEST_DOMAIN_IP, _result: True}]
 
 
 class test(mutlib.System_test):
@@ -137,7 +137,7 @@ class test(mutlib.System_test):
                                 "0::0:1", "[0::1]", "0::0:0:1"]
         # All elements of List of bad test cases are expected to return False.
         self.bad_test_cases = ["0.0.0.2", "[::2]", "host_local", "::2",
-                               "0:0:0:0:0:0:0:2", "oracle.com", "python.org"]
+                               "0:0:0:0:0:0:0:2", "oracle.com", "TEST_DOMAIN"]
 
         return True
 
@@ -203,7 +203,8 @@ class test(mutlib.System_test):
         # Mask Known results values.
         self.replace_substring(self.host_name, "<computer_name>")
         self.replace_substring(_oracle_ip, "ORACLE_IP")
-        self.replace_substring(_python_ip, "PYTHON.ORG_IP")
+        self.replace_substring(TEST_DOMAIN, "TEST_DOMAIN")
+        self.replace_substring(TEST_DOMAIN_IP, "TEST_DOMAIN_IP")
 
         return True
 

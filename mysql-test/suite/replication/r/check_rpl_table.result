@@ -133,7 +133,7 @@ Checking slave delay (seconds behind master)                         [pass]
               Master_Info_File : mysql.slave_master_info
                      SQL_Delay : 0
            SQL_Remaining_Delay : None
-       Slave_SQL_Running_State : Slave has read all relay log; waiting for the slave I/O thread to update it
+       Slave_SQL_Running_State : Slave has read all relay log; waiting for ...
             Master_Retry_Count : 86400
                    Master_Bind : 
        Last_IO_Error_Timestamp : 

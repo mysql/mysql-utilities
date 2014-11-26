@@ -22,7 +22,7 @@ Test case 6 - warning: --rpl-user missing
 STOP SLAVE;
 #...done.
 # Connecting to the current server as master
-# WARNING: No --rpl-user specified and multiple users found with replication privileges.
+# WARNING: No --rpl-user specified and ...
 CHANGE MASTER <goes here>
 START SLAVE;
 Test case 7 - error: --rpl-user missing user

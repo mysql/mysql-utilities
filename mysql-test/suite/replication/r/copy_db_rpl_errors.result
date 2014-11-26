@@ -5,7 +5,7 @@ mysqldbcopy: error: option --rpl: invalid choice: 'both' (choose from 'master', 
 Test case 2 - warning: --rpl-user missing
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
-ERROR: No --rpl-user specified and multiple users found with replication privileges.
+ERROR: No --rpl-user specified and ...
 Test case 3 - error: --rpl-user missing user
 # Source on localhost: ... connected.
 # Destination on localhost: ... connected.
