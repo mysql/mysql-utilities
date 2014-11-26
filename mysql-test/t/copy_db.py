@@ -305,6 +305,35 @@ class test(mutlib.System_test):
         if res != 0:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        # Change SQL_MODE to 'NO_BACKSLASH_ESCAPES' in the destination server
+        try:
+            previous_sql_mode = self.server2.select_variable("SQL_MODE")
+            self.server2.exec_query("SET @@GLOBAL.SQL_MODE="
+                                    "'NO_BACKSLASH_ESCAPES'")
+        except UtilError as err:
+            raise MUTLibError("Failed to change SQL_MODE: "
+                              "{0}".format(err.errmsg))
+
+        comment = ("Test case {0} - Copy database with blobs and the "
+                   "destination server with SQL_MODE='NO_BACKSLASH_ESCAPES'"
+                   "").format(test_num)
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server2))
+        cmd = ("mysqldbcopy.py --skip-gtid {0} {1} {2}".format(
+            from_conn, to_conn, "blob_test:blob_test_no_backslash_escapes"))
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Restore previous SQL_MODE in the destination server
+        try:
+            self.server2.exec_query("SET @@GLOBAL.SQL_MODE='{0}'"
+                                    "".format(previous_sql_mode))
+        except UtilError as err:
+            raise MUTLibError("Failed to restore SQL_MODE: "
+                              "{0}".format(err.errmsg))
+
         return True
 
     def get_result(self):
@@ -313,7 +342,8 @@ class test(mutlib.System_test):
                                 'util_test_multi', 'db`:db_clone',
                                 'db`:db', 'views_test_clone',
                                 'util_db_privileges', 'blob_test_clone',
-                                'blob_test_multi']
+                                'blob_test_multi',
+                                'blob_test_no_backslash_escapes']
         copied_db_on_server1 = ["util_test_default_collation_copy",
                                 "util_test_default_charset_copy"]
 
@@ -350,7 +380,8 @@ class test(mutlib.System_test):
                              '`util_test_multi`', '`util_db_privileges`')),
             ('`db``:db`', ('`db``:db`', '`db``:db_clone`')),
             ('`views_test`', ('`views_test_clone`',)),
-            ('blob_test', ('blob_test_clone', 'blob_test_multi'))
+            ('blob_test', ('blob_test_clone', 'blob_test_multi',
+                           'blob_test_no_backslash_escapes'))
         ]
         for cmp_data in dbs2compare:
             self.server1.exec_query("USE {0}".format(cmp_data[0]))
@@ -432,7 +463,8 @@ class test(mutlib.System_test):
 
         db_drops_on_server2 = ["util_test", 'db`:db', "util_db_clone",
                                'db`:db_clone', "views_test_clone",
-                               "blob_test_clone"]
+                               "blob_test_clone", "blob_test_multi",
+                               "blob_test_no_backslash_escapes"]
         for db in db_drops_on_server2:
             self.drop_db(self.server2, db)
 

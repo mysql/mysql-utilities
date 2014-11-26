@@ -6,6 +6,7 @@ INSERT INTO `blob_test`.`blob_table` VALUES (NULL, 'test', 0xff0e);
 CREATE TABLE `blob_test`.`text_table`( text_col TINYTEXT);
 INSERT INTO `blob_test`.`text_table` VALUES ('This is a test');
 INSERT INTO `blob_test`.`text_table` VALUES ('This is a test 2');
+INSERT INTO `blob_test`.`text_table` VALUES ('This is a test 3 with special characters: \0\'\"\b\n\r\t\Z\\\%\_');
 
 CREATE TABLE blob_test.blobs(text_col TINYTEXT, bin_col BINARY, blob_col BLOB) ENGINE=InnoDB;
 INSERT INTO blob_test.blobs VALUES('playing guitar must be cool!', 1, 0xff0e);

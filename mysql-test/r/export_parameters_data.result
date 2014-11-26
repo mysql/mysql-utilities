@@ -1461,4 +1461,5 @@ UPDATE `blob_test`.`blob_table` SET `b` = 'test', `c` = 'ÿ' WHERE `a` = '1';
 # Blob data for table text_table:
 INSERT INTO `blob_test`.`text_table` VALUES  ('This is a test');
 INSERT INTO `blob_test`.`text_table` VALUES  ('This is a test 2');
+INSERT INTO `blob_test`.`text_table` VALUES  ('This is a test 3 with special characters: \0\'\"\b\n\r\t\Z\\\%\_');
 #...done.

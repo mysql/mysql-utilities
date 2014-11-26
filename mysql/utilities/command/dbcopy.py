@@ -169,6 +169,11 @@ def copy_db(src_val, dest_val, db_list, options):
         destination = servers[0]
     else:
         destination = servers[1]
+        # Test if SQL_MODE is 'NO_BACKSLASH_ESCAPES' in the destination server
+        if destination.select_variable("SQL_MODE") == "NO_BACKSLASH_ESCAPES":
+            print("# WARNING: The SQL_MODE in the destination server is "
+                  "'NO_BACKSLASH_ESCAPES', it will be changed temporarily "
+                  "for data insertion.")
 
     src_gtid = source.supports_gtid() == 'ON'
     dest_gtid = destination.supports_gtid() == 'ON'if destination else False

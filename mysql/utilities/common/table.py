@@ -564,7 +564,8 @@ class Table(object):
                     if do_commas:
                         blob_insert += ", "
                     blob_insert += "%s = " % col_name + "%s" % \
-                                   MySQLConverter().quote(row[col])
+                                   MySQLConverter().quote(
+                                       convert_special_characters(row[col]))
                     has_data = True
                     do_commas = True
             else:
@@ -596,7 +597,8 @@ class Table(object):
         # Deal with blob, special characters and NULL values.
         for index, column in enumerate(row):
             if index in self.blob_columns:
-                row_vals.append(converter.quote(column))
+                row_vals.append(converter.quote(
+                    convert_special_characters(column)))
             elif index in self.text_columns:
                 if column is None:
                     row_vals.append("NULL")
@@ -827,6 +829,11 @@ class Table(object):
         }
         dest = Server(server_options)
         dest.connect()
+
+        # Test if SQL_MODE is 'NO_BACKSLASH_ESCAPES' in the destination server
+        if dest.select_variable("SQL_MODE") == "NO_BACKSLASH_ESCAPES":
+            # Change temporarily the SQL_MODE in the destination server
+            dest.exec_query("SET @@SESSION.SQL_MODE=''")
 
         # Issue the write lock
         lock_list = [("%s.%s" % (new_db, self.q_tbl_name), 'WRITE')]
