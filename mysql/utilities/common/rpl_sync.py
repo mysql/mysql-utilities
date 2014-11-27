@@ -28,11 +28,11 @@ from multiprocessing.pool import ThreadPool
 
 from mysql.utilities.command.dbcompare import diff_objects, get_common_objects
 from mysql.utilities.common.database import Database
+from mysql.utilities.common.gtid import (get_last_server_gtid,
+                                         gtid_set_cardinality,
+                                         gtid_set_union)
 from mysql.utilities.common.messages import ERROR_USER_WITHOUT_PRIVILEGES
 from mysql.utilities.common.pattern_matching import convertSQL_LIKE2REGEXP
-from mysql.utilities.common.replication import (get_last_server_gtid,
-                                                gtid_set_cardinality,
-                                                gtid_set_union)
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.topology import Topology
 from mysql.utilities.common.user import User

@@ -677,7 +677,7 @@ def add_slaves_option(parser):
                       help="connection information for slave servers in "
                       "the form: <user>[:<password>]@<host>[:<port>]"
                       "[:<socket>] or <login-path>[:<port>][:<socket>]"
-                      " or <config-path>[<[group]>]."
+                      " or <config-path>[<[group]>]. "
                       "List multiple slaves in comma-separated list.")
 
 
@@ -1125,6 +1125,51 @@ def check_date_time(parser, date_value, date_type, allow_days=False):
             parser.error(PARSE_ERR_OPT_INVALID_DATE.format(date_type,
                                                            date_value))
     return dt_date.strftime('%Y-%m-%dT%H:%M:%S')
+
+
+def check_gtid_set_format(parser, gtid_set):
+    """Check the format of the GTID set given for the option.
+
+    Perform some basic checks to verify the syntax of the specified string
+    for the GTID set value. A parse error is issued if the format is incorrect.
+
+    parser[in]      Instance of the used option/arguments parser.
+    gtid_set[in]    GTID set value specified for the option.
+    """
+
+    # UUID format: hhhhhhhh-hhhh-hhhh-hhhh-hhhhhhhhhhhh
+    re_uuid = re.compile(
+        r"(?:[a-f]|\d){8}(?:-(?:[a-f]|\d){4}){3}-(?:[a-f]|\d){12}",
+        re.IGNORECASE)
+    # interval format: n[-n]
+    re_interval = re.compile(r"(?:\d+)(?:-\d+)?")
+    uuid_sets = gtid_set.split(',')
+    for uuid_set in uuid_sets:
+        uuid_set_elements = uuid_set.split(':')
+        if len(uuid_set_elements) < 2:
+            parser.error("Invalid GTID set '{0}' for option --gtid-set, "
+                         "missing UUID or interval. Valid format: "
+                         "uuid:interval[:interval].".format(uuid_set))
+        # Check server UUID format.
+        if not re_uuid.match(uuid_set_elements[0]):
+            parser.error("Invalid UUID '{0}' for option --gtid-set. Valid "
+                         "format: hhhhhhhh-hhhh-hhhh-hhhh-hhhhhhhhhhhh."
+                         "".format(uuid_set_elements[0]))
+        # Check intervals.
+        for interval in uuid_set_elements[1:]:
+            if not re_interval.match(interval):
+                parser.error("Invalid interval '{0}' for option --gtid-set. "
+                             "Valid format: n[-n].".format(interval))
+            try:
+                start_val, end_val = interval.split('-')
+                if int(start_val) >= int(end_val):
+                    parser.error(
+                        "Invalid interval '{0}' for option --gtid-set. Start "
+                        "value must be lower than the end value."
+                        "".format(interval))
+            except ValueError:
+                # Error raised for intervals with a single value.
+                pass  # Ignore no need to compare start and end value.
 
 
 def check_password_security(options, args, prefix=""):

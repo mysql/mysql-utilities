@@ -1,0 +1,20 @@
+Test case 1 - Skip GTIDs (fail) using 's_user': no privileges on all slaves.
+ERROR: Not enough privileges.
+User 's_user' on 'localhost@PORT2' does not have sufficient privileges to inject empty transactions (required: SUPER).
+User 's_user' on 'localhost@PORT3' does not have sufficient privileges to inject empty transactions (required: SUPER).
+
+Test case 2 - Skip GTIDs (fail) using 's_user': SUPER for slave1 and no privileges for slave2.
+ERROR: Not enough privileges.
+User 's_user' on 'localhost@PORT3' does not have sufficient privileges to inject empty transactions (required: SUPER).
+
+Test case 3 - Skip GTIDs (succeed) using 's_user': SUPER for all slaves.
+#
+# GTID set to be skipped for each server:
+# - localhost@PORT2: UUID_m:7,UUID_s1:7,UUID_s2:7
+# - localhost@PORT3: UUID_m:7,UUID_s1:7,UUID_s2:7
+#
+# Injecting empty transactions for 'localhost:PORT2'...
+# Injecting empty transactions for 'localhost:PORT3'...
+#
+#...done.
+#

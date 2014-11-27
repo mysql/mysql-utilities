@@ -71,6 +71,7 @@ AVAILABLE_UTILITIES = {
     'mysqlrplsync': (),
     'mysqlserverclone': (),
     'mysqlserverinfo': (),
+    'mysqlslavetrx': (),
     'mysqluc': (),
     'mysqluserclone': (),
 }

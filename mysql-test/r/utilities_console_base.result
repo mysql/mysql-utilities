@@ -104,6 +104,7 @@ mysqlrplshow      show slaves attached to a master
 mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 
 mysqlserverinfo   show server information                                    
+mysqlslavetrx     skip transactions on slaves                                
 mysqluserclone    clone a MySQL user account to one or more new users        
 
 Test Case 5: Show Options
@@ -201,6 +202,7 @@ mysqlrplshow      show slaves attached to a master
 mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 
 mysqlserverinfo   show server information                                    
+mysqlslavetrx     skip transactions on slaves                                
 mysqluserclone    clone a MySQL user account to one or more new users        
 
 Test Case 11: Show Utilities + Options
@@ -231,6 +233,7 @@ mysqlrplshow      show slaves attached to a master
 mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 
 mysqlserverinfo   show server information                                    
+mysqlslavetrx     skip transactions on slaves                                
 mysqluserclone    clone a MySQL user account to one or more new users        
 
 
@@ -275,6 +278,7 @@ mysqlrplshow      show slaves attached to a master
 mysqlrplsync      replication synchronization checker utility                
 mysqlserverclone  start another instance of a running server                 
 mysqlserverinfo   show server information                                    
+mysqlslavetrx     skip transactions on slaves                                
 mysqluserclone    clone a MySQL user account to one or more new users        
 
 

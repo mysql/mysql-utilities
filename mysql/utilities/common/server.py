@@ -1500,12 +1500,40 @@ class Server(object):
         """
         from mysql.utilities.common.topology import _GTID_SUBTRACT_TO_EXECUTED
         try:
-            return self.exec_query(
+            result = self.exec_query(
                 _GTID_SUBTRACT_TO_EXECUTED.format(gtid_set)
             )[0][0]
+            # Remove newlines (\n and/or \r) from the GTID set string returned
+            # by the server.
+            return result.replace('\n', '').replace('\r', '')
         except IndexError:
             # If no rows are returned by query then return an empty string.
             return ''
+
+    def inject_empty_trx(self, gtid, gtid_next_automatic=True):
+        """ Inject an empty transaction.
+
+        This method injects an empty transaction on the server for the given
+        GTID.
+
+        Note: SUPER privilege is required for this operation, more precisely
+        to set the GTID_NEXT variable.
+
+        gtid[in]                    GTID for the empty transaction to inject.
+        gtid_next_automatic[in]     Indicate if the GTID_NEXT is set to
+                                    AUTOMATIC after injecting the empty
+                                    transaction. By default True.
+        """
+        self.exec_query("SET GTID_NEXT='{0}'".format(gtid))
+        self.exec_query("BEGIN")
+        self.commit()
+        if gtid_next_automatic:
+            self.exec_query("SET GTID_NEXT='AUTOMATIC'")
+
+    def set_gtid_next_automatic(self):
+        """ Set GTID_NEXT to AUTOMATIC.
+        """
+        self.exec_query("SET GTID_NEXT='AUTOMATIC'")
 
     def checksum_table(self, tbl_name, exec_timeout=0):
         """Compute checksum of specified table (CHECKSUM TABLE tbl_name).

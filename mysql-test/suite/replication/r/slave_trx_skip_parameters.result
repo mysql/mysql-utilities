@@ -1,0 +1,147 @@
+Test case 1 - Help.
+Usage: mysqlslavetrx --gtid-set=gtid_set --slaves=user:pass@host:port
+
+mysqlslavetrx - skip transactions on slaves
+
+Options:
+  --version            show program's version number and exit
+  --help               display a help message and exit
+  --license            display program's license and exit
+  --ssl-ca=SSL_CA      The path to a file that contains a list of trusted SSL
+                       CAs.
+  --ssl-cert=SSL_CERT  The name of the SSL certificate file to use for
+                       establishing a secure connection.
+  --ssl-key=SSL_KEY    The name of the SSL key file to use for establishing a
+                       secure connection.
+  --gtid-set=GTID_SET  set of Global Transaction Identifiers (GTID) to skip.
+  --slaves=SLAVES      connection information for slave servers in the form:
+                       <user>[:<password>]@<host>[:<port>][:<socket>] or
+                       <login-path>[:<port>][:<socket>] or <config-
+                       path>[<[group]>]. List multiple slaves in comma-
+                       separated list.
+  --dryrun             determine the transactions (GTID) to be skipped for
+                       each slave but without effectively skipping them
+                       (injecting empty transactions) - useful to test the
+                       transactions that would be skipped.
+  -v, --verbose        control how much information is displayed. e.g., -v =
+                       verbose, -vv = more verbose, -vvv = debug
+
+Introduction
+------------
+The mysqlslavetrx utility is designed to skip multiple transactions on slaves
+in a quick and easy way. More specifically, it injects empty transactions
+on the slaves for each GTID that will be skipped.
+
+The utility requires GTIDs to be enabled on all slaves. It does not require
+replication to be stopped. However, in some situation it is recommended.
+For example, in order to skip a transaction from the master  on a slave, that
+slave should be stopped otherwise the target transaction might still be
+replicated (and not skipped).
+
+Note: Only transactions (GTIDs) that were not committed can be skipped, since
+two transactions cannot be applied with the same GTID. GTIDs already in the
+GTID_EXECUTED set of a slave will be ignored.
+
+The utility requires the specification of the GTID set to skip and the list of
+target slaves as shown in the following example.
+
+  # Skip the specified GTID set (three transaction: 10, 11, 12) on two slaves.
+
+  $ mysqlslavetrx --gtid-set=ee2655ae-2e88-11e4-b7a3-606720440b68:10-12 \
+                  --slaves=rpl:pass@host2:3306,rpl:pass@host3:3306
+
+Helpful Hints
+-------------
+  - Use the --dryrun option to execute the utility in dry run mode and confirm
+    which transactions would be skipped with the provided input values without
+    effectively skipping them.
+
+WARNING: Skipping transactions is a useful technique to recover from erroneous
+situations with replication. However, it must be applied with extreme caution
+and with full knowledge of its consequences as it might lead to data
+inconsistencies between the replication servers. For example, if a transaction
+that insert some data 'row1' in table 't1' fails on one slave and that
+transaction is skipped to solve the issue, then that data will be missing from
+the slave (and no longer replicated). As a consequence the data for table 't1'
+will be inconsistent with the one on the master and the other slaves because
+'row1' will be missing.
+
+Test case 2 - Skip only one GTID on a single slave.
+#
+# GTID set to be skipped for each server:
+# - localhost@PORT2: UUID_m:10
+#
+# Injecting empty transactions for 'localhost:PORT2'...
+#
+#...done.
+#
+Test case 3a - [DRYRUN] Skip GTID set on all slaves (previous skipped GTID is ignored).
+#
+# WARNING: Executing utility in dry run mode (read only).
+#
+# GTID set to be skipped for each server:
+# - localhost@PORT2: UUID_m:8-9:12,UUID_s1:7-9,UUID_s2:7:9
+# - localhost@PORT3: UUID_m:8-10:12,UUID_s1:7-9,UUID_s2:7:9
+#
+# (dry run) Injecting empty transactions for 'localhost:PORT2'...
+# (dry run) Injecting empty transactions for 'localhost:PORT3'...
+#
+#...done.
+#
+Test case 3b - Skip GTID set on all slaves (previous skipped GTID is ignored).
+#
+# GTID set to be skipped for each server:
+# - localhost@PORT2: UUID_m:8-9:12,UUID_s1:7-9,UUID_s2:7:9
+# - localhost@PORT3: UUID_m:8-10:12,UUID_s1:7-9,UUID_s2:7:9
+#
+# Injecting empty transactions for 'localhost:PORT2'...
+# Injecting empty transactions for 'localhost:PORT3'...
+#
+#...done.
+#
+Test case 4 - Repeat previous command (No GTIDs will be skipped).
+#
+# GTID set to be skipped for each server:
+# - localhost@PORT2: None
+# - localhost@PORT3: None
+#
+# No transaction to skip.
+#
+#...done.
+#
+Test case 5a - [DRYRUN] Skip GTID set on all slaves (with verbose).
+#
+# WARNING: Executing utility in dry run mode (read only).
+#
+# GTID set to be skipped for each server:
+# - localhost@PORT2: UUID_m:11:13,UUID_s2:8
+# - localhost@PORT3: UUID_m:11:13,UUID_s2:8
+#
+# (dry run) Injecting empty transactions for 'localhost:PORT2'...
+# - UUID_m:11
+# - UUID_m:13
+# - UUID_s2:8
+# (dry run) Injecting empty transactions for 'localhost:PORT3'...
+# - UUID_m:11
+# - UUID_m:13
+# - UUID_s2:8
+#
+#...done.
+#
+Test case 5b - Skip GTID set on all slaves (with verbose).
+#
+# GTID set to be skipped for each server:
+# - localhost@PORT2: UUID_m:11:13,UUID_s2:8
+# - localhost@PORT3: UUID_m:11:13,UUID_s2:8
+#
+# Injecting empty transactions for 'localhost:PORT2'...
+# - UUID_m:11
+# - UUID_m:13
+# - UUID_s2:8
+# Injecting empty transactions for 'localhost:PORT3'...
+# - UUID_m:11
+# - UUID_m:13
+# - UUID_s2:8
+#
+#...done.
+#

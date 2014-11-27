@@ -1,0 +1,34 @@
+Test case 1 - No option (gtid-set and slaves required).
+Usage: mysqlslavetrx --gtid-set=gtid_set --slaves=user:pass@host:port
+
+mysqlslavetrx: error: Option '--gtid-set' is required.
+Test case 2 - Missing slaves.
+Usage: mysqlslavetrx --gtid-set=gtid_set --slaves=user:pass@host:port
+
+mysqlslavetrx: error: Option '--slaves' is required.
+Test case 3 - Missing gtid-set.
+Usage: mysqlslavetrx --gtid-set=gtid_set --slaves=user:pass@host:port
+
+mysqlslavetrx: error: Option '--gtid-set' is required.
+Test case 4 - Invalid gtid-set.
+Usage: mysqlslavetrx --gtid-set=gtid_set --slaves=user:pass@host:port
+
+mysqlslavetrx: error: Invalid GTID set 'invalid_gtid' for option --gtid-set, missing UUID or interval. Valid format: uuid:interval[:interval].
+Test case 5 - Invalid gtid-set (uuid).
+Usage: mysqlslavetrx --gtid-set=gtid_set --slaves=user:pass@host:port
+
+mysqlslavetrx: error: Invalid UUID 'invalid_uuid' for option --gtid-set. Valid format: hhhhhhhh-hhhh-hhhh-hhhh-hhhhhhhhhhhh.
+Test case 6 - Invalid gtid-set (interval).
+Usage: mysqlslavetrx --gtid-set=gtid_set --slaves=user:pass@host:port
+
+mysqlslavetrx: error: Invalid interval '-1' for option --gtid-set. Valid format: n[-n].
+Test case 7 - Invalid gtid-set (interval. start = end).
+Usage: mysqlslavetrx --gtid-set=gtid_set --slaves=user:pass@host:port
+
+mysqlslavetrx: error: Invalid interval '1-1' for option --gtid-set. Start value must be lower than the end value.
+Test case 8 - Invalid gtid-set (interval. start > end).
+Usage: mysqlslavetrx --gtid-set=gtid_set --slaves=user:pass@host:port
+
+mysqlslavetrx: error: Invalid interval '5-1' for option --gtid-set. Start value must be lower than the end value.
+Test case 9 - Invalid slave connection format.
+ERROR: Slave connection values invalid or cannot be parsed: @:invalid (Connection '@:invalid' cannot be parsed. Please review the used connection string (accepted formats: <user>[:<password>]@<host>[:<port>][:<socket>] or <login-path>[:<port>][:<socket>]))

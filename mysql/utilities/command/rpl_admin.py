@@ -28,8 +28,11 @@ import time
 from datetime import datetime, timedelta
 
 from mysql.utilities.exception import UtilRplError
+from mysql.utilities.common.gtid import gtid_set_itemize
 from mysql.utilities.common.ip_parser import hostname_is_ip
-from mysql.utilities.common.messages import ERROR_SAME_MASTER, HOST_IP_WARNING
+from mysql.utilities.common.messages import (ERROR_SAME_MASTER,
+                                             ERROR_USER_WITHOUT_PRIVILEGES,
+                                             HOST_IP_WARNING)
 from mysql.utilities.common.tools import ping_host, execute_script
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.topology import Topology
@@ -78,7 +81,7 @@ _DATE_LEN = 22
 
 _ERRANT_TNX_ERROR = "Errant transaction(s) found on slave(s)."
 
-_GTID_ON_REQ = "Slave election requires GTID_MODE=ON for all servers."
+_GTID_ON_REQ = "{action} requires GTID_MODE=ON for all servers."
 
 WARNING_SLEEP_TIME = 10
 
@@ -137,6 +140,101 @@ def purge_log(filename, age):
     except:
         return False
     return True
+
+
+def skip_slaves_trx(gtid_set, slaves_cnx_val, options):
+    """Skip transactions on slaves.
+
+    This method skips the given transactions (GTID set) on all the specified
+    slaves. That is, an empty transaction is injected for each GTID in
+    the given set for one of each slaves. In case a slave already has an
+    executed transaction for a given GTID then that GTID is ignored for this
+    slave.
+
+    gtid_set[in]            String representing the set of GTIDs to skip.
+    slaves_cnx_val[in]      List of the dictionaries with the connection
+                            values for each target slave.
+    options[in]             Dictionary of options (dry_run, verbosity).
+
+    Throws an UtilError exception if an error occurs during the execution.
+    """
+    verbosity = options.get('verbosity')
+    dryrun = options.get('dry_run')
+
+    # Connect to slaves.
+    rpl_topology = Topology(None, slaves_cnx_val, options)
+
+    # Check required privileges.
+    errors = rpl_topology.check_privileges(skip_master=True)
+    if errors:
+        err_details = ''
+        for err in errors:
+            err_msg = ERROR_USER_WITHOUT_PRIVILEGES.format(
+                user=err[0], host=err[1], port=err[2],
+                operation='inject empty transactions', req_privileges=err[3])
+            err_details = '{0}{1}\n'.format(err_details, err_msg)
+        err_details.strip()
+        raise UtilRplError("Not enough privileges.\n{0}".format(err_details))
+
+    # GTID must be enabled on all servers.
+    srv_list = rpl_topology.get_servers_with_gtid_not_on()
+    if srv_list:
+        if verbosity:
+            print("# Slaves with GTID not enabled:")
+            for srv in srv_list:
+                msg = "#  - GTID_MODE={0} on {1}:{2}".format(srv[2], srv[0],
+                                                             srv[1])
+                print(msg)
+        raise UtilRplError(_GTID_ON_REQ.format(action='Transaction skip'))
+
+    if dryrun:
+        print("#")
+        print("# WARNING: Executing utility in dry run mode (read only).")
+
+    # Get GTID set that can be skipped, i.e., not in GTID_EXECUTED.
+    gtids_by_slave = rpl_topology.slaves_gtid_subtract_executed(gtid_set)
+
+    # Output GTID set that will be skipped.
+    print("#")
+    print("# GTID set to be skipped for each server:")
+    has_gtid_to_skip = False
+    for host, port, gtids_to_skip in gtids_by_slave:
+        if not gtids_to_skip:
+            gtids_to_skip = 'None'
+        else:
+            # Set flag to indicate that there is at least one GTID to skip.
+            has_gtid_to_skip = True
+        print("# - {0}@{1}: {2}".format(host, port, gtids_to_skip))
+
+    # Create dictionary to directly access the slaves instances.
+    slaves_dict = rpl_topology.get_slaves_dict()
+
+    # Skip transactions for the given list of slaves.
+    print("#")
+    if has_gtid_to_skip:
+        for host, port, gtids_to_skip in gtids_by_slave:
+            if gtids_to_skip:
+                # Decompose GTID set into a list of single transactions.
+                gtid_items = gtid_set_itemize(gtids_to_skip)
+                dryrun_mark = '(dry run) ' if dryrun else ''
+                print("# {0}Injecting empty transactions for '{1}:{2}'"
+                      "...".format(dryrun_mark, host, port))
+                slave_key = '{0}@{1}'.format(host, port)
+                slave_srv = slaves_dict[slave_key]['instance']
+                for uuid, trx_list in gtid_items:
+                    for trx_num in trx_list:
+                        trx_to_skip = '{0}:{1}'.format(uuid, trx_num)
+                        if verbosity:
+                            print("# - {0}".format(trx_to_skip))
+                        if not dryrun:
+                            # Inject empty transaction.
+                            slave_srv.inject_empty_trx(
+                                trx_to_skip, gtid_next_automatic=False)
+                if not dryrun:
+                    slave_srv.set_gtid_next_automatic()
+    else:
+        print("# No transaction to skip.")
+    print("#\n#...done.\n#")
 
 
 class RplCommands(object):
@@ -405,8 +503,9 @@ class RplCommands(object):
         is issued.
         """
         if not self.topology.gtid_enabled():
-            print("# WARNING: {0}".format(_GTID_ON_REQ))
-            self._report(_GTID_ON_REQ, logging.WARN, False)
+            warn_msg = _GTID_ON_REQ.format(action='Slave election')
+            print("# WARNING: {0}".format(warn_msg))
+            self._report(warn_msg, logging.WARN, False)
             return
 
         # Check for mixing IP and hostnames
@@ -446,15 +545,16 @@ class RplCommands(object):
             options = {}
         srv_list = self.topology.get_servers_with_gtid_not_on()
         if srv_list:
-            print("# ERROR: {0}".format(_GTID_ON_REQ))
-            self._report(_GTID_ON_REQ, logging.ERROR, False)
+            err_msg = _GTID_ON_REQ.format(action='Slave election')
+            print("# ERROR: {0}".format(err_msg))
+            self._report(err_msg, logging.ERROR, False)
             for srv in srv_list:
                 msg = "#  - GTID_MODE={0} on {1}:{2}".format(srv[2], srv[0],
                                                              srv[1])
                 self._report(msg, logging.ERROR)
 
-            self._report(_GTID_ON_REQ, logging.CRITICAL, False)
-            raise UtilRplError(_GTID_ON_REQ)
+            self._report(err_msg, logging.CRITICAL, False)
+            raise UtilRplError(err_msg)
 
         # Check for --master-info-repository=TABLE if rpl_user is None
         if not self._check_master_info_type():

@@ -44,7 +44,7 @@ Test case 1 - show help
   --slaves=SLAVES       connection information for slave servers in the form:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>] or <config-
-                        path>[<[group]>].List multiple slaves in comma-
+                        path>[<[group]>]. List multiple slaves in comma-
                         separated list.
   --timeout=TIMEOUT     maximum timeout in seconds to wait for each
                         replication command to complete. For example, timeout

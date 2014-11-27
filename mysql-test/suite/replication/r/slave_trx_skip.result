@@ -1,0 +1,11 @@
+Test case 1 - Skip specified GTIDs on all slaves.
+#
+# GTID set to be skipped for each server:
+# - localhost@PORT2: UUID_m:7,UUID_s1:7,UUID_s2:7
+# - localhost@PORT3: UUID_m:7,UUID_s1:7,UUID_s2:7
+#
+# Injecting empty transactions for 'localhost:PORT2'...
+# Injecting empty transactions for 'localhost:PORT3'...
+#
+#...done.
+#

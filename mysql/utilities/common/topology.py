@@ -1513,11 +1513,12 @@ class Topology(Replication):
                     res.append((slave.host, slave.port, not_in_set))
             return res
 
-    def check_privileges(self, failover=False):
+    def check_privileges(self, failover=False, skip_master=False):
         """Check privileges for the master and all known servers
 
-        failover[in]   if True, check permissions for switchover and
-                       failover commands. Default is False.
+        failover[in]        if True, check permissions for switchover and
+                            failover commands. Default is False.
+        skip_master[in]     Skip the check for the master.
 
         Returns list - [(user, host)] if not enough permissions,
                        [] if no errors
@@ -1526,14 +1527,23 @@ class Topology(Replication):
         errors = []
 
         # Collect all users first.
-        if self.master is not None:
-            servers.append(self.master)
+        if skip_master:
             for slave_conn in self.slaves:
                 slave = slave_conn['instance']
                 # A slave instance is None if the connection failed during the
                 # creation of the topology. In this case ignore the slave.
                 if slave is not None:
                     servers.append(slave)
+        else:
+            if self.master is not None:
+                servers.append(self.master)
+                for slave_conn in self.slaves:
+                    slave = slave_conn['instance']
+                    # A slave instance is None if the connection failed during
+                    # the creation of the topology. In this case ignore the
+                    # slave.
+                    if slave is not None:
+                        servers.append(slave)
 
         # If candidates were specified, check those too.
         candidates = self.options.get("candidates", None)
