@@ -252,7 +252,7 @@ CREATE TABLE `util_test`.`t4` (
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
-  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `util_test`.`t3` (`a`)
 ) ENGINE=InnoDB;
 CREATE TABLE `util_test`.`t5` (
   `product_id` int(10) unsigned NOT NULL,
@@ -335,7 +335,7 @@ CREATE TABLE `util_test`.`t4` (
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
-  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `util_test`.`t3` (`a`)
 ) ENGINE=InnoDB;
 CREATE TABLE `util_test`.`t5` (
   `product_id` int(10) unsigned NOT NULL,
@@ -411,7 +411,7 @@ CREATE TABLE `util_test`.`t4` (
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
-  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
+  CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `util_test`.`t3` (`a`)
 ) ENGINE=InnoDB;
 CREATE TABLE `util_test`.`t5` (
   `product_id` int(10) unsigned NOT NULL,

@@ -472,6 +472,7 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
     col_key_index = col_ref.get("COLUMN_KEY", 4)
     const_name_index = col_ref.get("CONSTRAINT_NAME", 7)
     ref_tbl_index = col_ref.get("REFERENCED_TABLE_NAME", 8)
+    ref_schema_index = col_ref.get("REFERENCED_TABLE_SCHEMA", 18)
     ref_col_index = col_ref.get("COL_NAME", 13)
     ref_col_ref = col_ref.get("REFERENCED_COLUMN_NAME", 15)
     constraints = []
@@ -507,8 +508,10 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
         if const_name and not is_quoted_with_backticks(const_name):
             const_name = quote_with_backticks(const_name)
         key_str = ",\n  KEY %s (" % const_name
-        constraints.append([const_name, cur_col[ref_tbl_index],
-                            cur_col[ref_col_index], cur_col[ref_col_ref]])
+        constraints.append([const_name, cur_col[ref_schema_index],
+                            cur_col[ref_tbl_index],
+                            cur_col[ref_col_index],
+                            cur_col[ref_col_ref]])
     if len(key_str) > 0:
         stop = len(key_list)
         fixed_keys = []
@@ -526,10 +529,11 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
                 if key and not is_quoted_with_backticks(key):
                     key = quote_with_backticks(key)
             c_str = ("  CONSTRAINT {cstr} FOREIGN KEY ({fk}) REFERENCES "
-                     "{ref1} ({ref2})")
-            constraint_str = c_str.format(cstr=constraint[0], fk=constraint[2],
-                                          ref1=constraint[1],
-                                          ref2=constraint[3])
+                     "{ref_schema}.{ref_table} ({ref_column})")
+            constraint_str = c_str.format(cstr=constraint[0], fk=constraint[3],
+                                          ref_schema=constraint[1],
+                                          ref_table=constraint[2],
+                                          ref_column=constraint[4])
             create_str = "%s,\n%s" % (create_str, constraint_str)
     create_str = "%s\n)" % create_str
     if engine and len(engine) > 0:
