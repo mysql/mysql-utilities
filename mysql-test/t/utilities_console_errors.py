@@ -98,12 +98,14 @@ class test(mutlib.System_test):
         hide_utils = "--hide-utils"
         add_util = "--add-util=mysqlfakeutility"
         cmd_str = 'mysqluc.py --width=77 --utildir={0} {1} {2}'
+        native_q, other_q = ("'", '"') if os.name == 'posix' else ('"', "'")
 
         test_num = 1
         comment = ("Test case {0} - Test {1} missing "
                    "{2} option".format(test_num, hide_utils, add_util))
         execute = "help utilities"
-        command = cmd_str.format(self.tmp_dir, hide_utils, '--execute="{0}"')
+        command = cmd_str.format(self.tmp_dir, hide_utils,
+                                 '--execute {0}{1}{0}'.format(native_q, "{0}"))
         res = self.run_test_case(2, command.format(execute), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -113,7 +115,8 @@ class test(mutlib.System_test):
                    " option".format(test_num, hide_utils, add_util))
         execute = "help utilities"
         params = "{0} {1}".format(hide_utils, add_util)
-        command = cmd_str.format(self.tmp_dir, params, '--execute="{0}"')
+        command = cmd_str.format(self.tmp_dir, params,
+                                 '--execute {0}{1}{0}'.format(native_q, "{0}"))
         res = self.run_test_case(0, command.format(execute), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -122,7 +125,8 @@ class test(mutlib.System_test):
         comment = ("Test case {0} - Test {1} option without "
                    "{2}".format(test_num, add_util, hide_utils))
         execute = "help utilities"
-        command = cmd_str.format(self.tmp_dir, add_util, '--execute="{0}"')
+        command = cmd_str.format(self.tmp_dir, add_util,
+                                 '--execute {0}{1}{0}'.format(native_q, "{0}"))
         res = self.run_test_case(0, command.format(execute), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -132,7 +136,8 @@ class test(mutlib.System_test):
             test_num, add_util))
         execute = "fakeutility --help"
         params = "{0} {1}".format(hide_utils, add_util)
-        command = cmd_str.format(self.tmp_dir, params, '--execute="{0}"')
+        command = cmd_str.format(self.tmp_dir, params,
+                                 '--execute {0}{1}{0}'.format(native_q, "{0}"))
         res = self.run_test_case(0, command.format(execute), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -142,7 +147,8 @@ class test(mutlib.System_test):
             test_num))
         execute = "fakeutility --return-code=1"
         params = "{0} {1}".format(hide_utils, add_util)
-        command = cmd_str.format(self.tmp_dir, params, '--execute="{0}"')
+        command = cmd_str.format(self.tmp_dir, params,
+                                 '--execute {0}{1}{0}'.format(native_q, "{0}"))
         res = self.run_test_case(0, command.format(execute), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -150,9 +156,10 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - Test fakeutility --return-code=2 "
                    "and no message".format(test_num))
-        execute = "fakeutility  -e2 --message-error=' '"
+        execute = "fakeutility  -e2 --message-error={0}{0}".format(other_q)
         params = "{0} {1}".format(hide_utils, add_util)
-        command = cmd_str.format(self.tmp_dir, params, '--execute="{0}"')
+        command = cmd_str.format(self.tmp_dir, params,
+                                 '--execute {0}{1}{0}'.format(native_q, "{0}"))
         res = self.run_test_case(0, command.format(execute), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -160,9 +167,10 @@ class test(mutlib.System_test):
         test_num += 1
         comment = ("Test case {0} - Test missing quote".format(test_num))
         execute = ("mysqluserclone --source=root:root@localhost:3395"
-                   " --dump 'ssluser'@'%")
+                   " --dump {0}ssluser{0}@{0}%".format(other_q))
         utildir = os.path.abspath(os.path.join('../scripts', os.path.curdir))
-        command = cmd_str.format(utildir, '', '--execute="{0}"')
+        command = cmd_str.format(utildir, '',
+                                 '--execute {0}{1}{0}'.format(native_q, "{0}"))
         res = self.run_test_case(0, command.format(execute), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

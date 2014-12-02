@@ -1515,8 +1515,20 @@ class System_test(object):
             server = self.servers.get_server(index)
             if self.debug:
                 print "# Killing server {0}.".format(server.role)
-            self.servers.stop_server(server)
-            self.servers.remove_server(server.role)
+            try:
+                self.servers.stop_server(server)
+            except:
+                if self.debug:
+                    print("# Kill failed! Unable to stop server "
+                          "'{0}'".format(name))
+                return False
+            try:
+                self.servers.remove_server(server.role)
+            except:
+                if self.debug:
+                    print("# Kill failed! Unable to remove server "
+                          "'{0}'".format(name))
+                return False
             return True
         else:
             if self.debug:

@@ -32,7 +32,9 @@ from mysql.utilities.common.gtid import gtid_set_itemize
 from mysql.utilities.common.ip_parser import hostname_is_ip
 from mysql.utilities.common.messages import (ERROR_SAME_MASTER,
                                              ERROR_USER_WITHOUT_PRIVILEGES,
-                                             HOST_IP_WARNING)
+                                             HOST_IP_WARNING,
+                                             EXTERNAL_SCRIPT_DOES_NOT_EXIST,
+                                             INSUFFICIENT_FILE_PERMISSIONS)
 from mysql.utilities.common.tools import ping_host, execute_script
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.topology import Topology
@@ -832,14 +834,6 @@ class RplCommands(object):
                 WARNING_SLEEP_TIME))
             time.sleep(WARNING_SLEEP_TIME)
 
-        # Test failover script. If it doesn't exist, fail.
-        no_exec_fail_msg = "Failover check script cannot be found. Please " + \
-                           "check the path and filename for accuracy and " + \
-                           "restart the failover console."
-        if exec_fail is not None and not os.path.exists(exec_fail):
-            self._report(no_exec_fail_msg, logging.CRITICAL, False)
-            raise UtilRplError(no_exec_fail_msg)
-
         # Check existence of errant transactions on slaves
         errant_tnx = self.topology.find_errant_transactions()
         if errant_tnx:
@@ -877,9 +871,16 @@ class RplCommands(object):
             # using connectivity checks.
             if exec_fail is not None:
                 # Execute failover check script
-                if not os.path.exists(exec_fail):
-                    self._report(no_exec_fail_msg, logging.CRITICAL, False)
-                    raise UtilRplError(no_exec_fail_msg)
+                if not os.path.isfile(exec_fail):
+                    message = EXTERNAL_SCRIPT_DOES_NOT_EXIST.format(
+                        path=exec_fail)
+                    self._report(message, logging.CRITICAL, False)
+                    raise UtilRplError(message)
+                elif not os.access(exec_fail, os.X_OK):
+                    message = INSUFFICIENT_FILE_PERMISSIONS.format(
+                        path=exec_fail, permissions='execute')
+                    self._report(message, logging.CRITICAL, False)
+                    raise UtilRplError(message)
                 else:
                     self._report("# Spawning external script for failover "
                                  "checking.")

@@ -43,7 +43,8 @@ from mysql.utilities.common.options import (add_format_option, add_verbosity,
                                             check_server_lists,
                                             get_ssl_dict,
                                             license_callback, UtilitiesParser,
-                                            check_password_security)
+                                            check_password_security,
+                                            check_script_option)
 from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
                                              PARSE_ERR_OPTS_EXCLD,
                                              PARSE_ERR_OPTS_REQ_BY_CMD,
@@ -347,6 +348,13 @@ if __name__ == '__main__':
         'rpl_user': opt.rpl_user,
         'script_threshold': opt.script_threshold,
     }
+
+    # Check if script files exist and are executable and warn users if they
+    # are not.
+    script_opts = ['after', 'before']
+    for key in script_opts:
+        parameter_val = options[key]
+        check_script_option(parser, parameter_val)
 
     # Add ssl options to options instead of connection.
     options.update(get_ssl_dict(opt))

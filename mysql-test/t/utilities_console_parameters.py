@@ -157,6 +157,22 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
         test_num += 1
 
+        # Does not allow shell injection
+        comment = "Test shell injection"
+        test_case = "Test Case {0}: {1}".format(test_num, comment)
+        # Note: In this test we use '&&' as an alternative to  ';' since with
+        # the '-e' option mysqluc already uses the ';' internally to allow for
+        # multiple commands at once. Moreover '&&' is valid on both windows and
+        # posix systems.
+        cmd_opt = ('mysqluc.py -e "mysqlserverinfo --help && echo '
+                   '\'this comment should not appear\'"')
+        res = self.run_test_case(0, cmd_opt, test_case)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        test_num += 1
+
+        self.replace_result("MySQL Utilities mysqlserverinfo version",
+                            "MySQL Utilities mysqlserverinfo version XXXXXX\n")
         self.replace_result("SERVER", "SERVER      XXXXXXXXXXXXXXXXXXXXXXXX\n")
         self.replace_result("utildir", "utildir    XXXXXXXXXXXXXX\n")
         self.replace_result("Quiet mode, saving output to",

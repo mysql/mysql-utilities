@@ -19,6 +19,9 @@
 This file contains output string messages used by MySQL Utilities.
 """
 
+EXTERNAL_SCRIPT_DOES_NOT_EXIST = ("'{path}' script cannot be found. Please "
+                                  "check the path and filename for accuracy "
+                                  "and try again.")
 
 ERROR_USER_WITHOUT_PRIVILEGES = ("User '{user}' on '{host}@{port}' does not "
                                  "have sufficient privileges to "

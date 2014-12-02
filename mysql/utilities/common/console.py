@@ -598,7 +598,7 @@ class Console(object):
         """Display the help for either all commands or the help for a
         custom command.
 
-        parameter[in]      Any parameters for the help command.
+        parameter[in]      Any parameter for the help command.
                            For example, 'help commands'
         """
         if self.quiet:
@@ -763,10 +763,9 @@ class Console(object):
             if cmd is None:
                 return False
             else:
-                cmd = cmd.strip()
-                parameters = parameters.strip()
                 if cmd.lower() == 'help':
-                    self.show_help(parameters)
+                    token = parameters[0] if parameters else ''
+                    self.show_help(token)
                     self.cmd_line.clear()
                     self.tab_count = 0
                 elif cmd == '':
@@ -777,7 +776,7 @@ class Console(object):
                 elif self.custom_commands:
                     if not self.is_valid_custom_command(cmd):
                         print("\n\nUnknown command: {0} {1}\n"
-                              "".format(cmd, parameters))
+                              "".format(cmd, ' '.join(parameters)))
                     else:
                         try:
                             self.execute_custom_command(cmd, parameters)
@@ -875,7 +874,7 @@ class Console(object):
 
         cmd_string[in]     Command
 
-        Returns tuple - command, parameters
+        Returns tuple - command, list of parameters
         """
         try:
             tokens = shlex.split(cmd_string)
@@ -885,9 +884,9 @@ class Console(object):
                   "".format(str(err)))
             return None, None
         else:
-            if len(tokens):
-                return (tokens[0], ' '.join(tokens[1:]))
-        return (cmd_string.strip(' '), '')
+            if len(tokens) > 1:
+                return tokens[0], tokens[1:]
+        return cmd_string.strip(' '), []
 
     def get_user_command(self):
         """Get a command from the user.

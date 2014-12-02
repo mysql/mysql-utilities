@@ -39,7 +39,9 @@ from mysql.utilities.common.messages import (PARSE_ERR_OBJ_NAME_FORMAT,
                                              PARSE_ERR_OPT_INVALID_DATE,
                                              PARSE_ERR_OPT_INVALID_DATE_TIME,
                                              PARSE_ERR_OPT_INVALID_NUM_DAYS,
-                                             PARSE_ERR_OPT_INVALID_VALUE)
+                                             PARSE_ERR_OPT_INVALID_VALUE,
+                                             EXTERNAL_SCRIPT_DOES_NOT_EXIST,
+                                             INSUFFICIENT_FILE_PERMISSIONS)
 from mysql.utilities.common.my_print_defaults import (MyDefaultsReader,
                                                       my_login_config_exists)
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
@@ -914,6 +916,36 @@ def check_dir_option(parser, opt_value, opt_name, check_access=False,
                              "folder specified by {0}.".format(opt_name))
         return full_path
     return None
+
+
+def check_script_option(parser, opt_value, check_executable=True):
+    """ Check if the specified script option is valid.
+
+    Check if the script specified for the option exists, and if
+    the user has appropriate access privileges to it. An appropriate parser
+    error is issued if the specified directory does not exist or is not
+    executable.
+
+    parser[in]            Instance of the option parser (optparse).
+    opt_value[in]         Value specified for the option.
+    check_executable[in]  Flag specifying if the executable privileges need to
+                          be checked. By default, True(needs to be executable).
+
+    Return the absolute path for the specified script or None if an empty
+    value is specified.
+    """
+    if opt_value:
+        abs_path = os.path.abspath(opt_value)
+        if not os.path.isfile(abs_path):
+            parser.error(EXTERNAL_SCRIPT_DOES_NOT_EXIST.format(
+                path=opt_value))
+
+        if check_executable and not os.access(abs_path, os.X_OK):
+            parser.error(INSUFFICIENT_FILE_PERMISSIONS.format(
+                path=opt_value, permissions='execute'))
+        return opt_value
+    else:
+        return None
 
 
 def get_absolute_path(path):

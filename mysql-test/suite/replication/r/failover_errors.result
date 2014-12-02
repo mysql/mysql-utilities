@@ -33,3 +33,19 @@ Test case 9 - Connection failure
 # Checking privileges.
 # Checking privileges on candidates.
 ERROR: Can't connect to MySQL server on XXXX
+Test case 10 - script passed to the '--exec-after' option does not exist
+Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover: error: 'std_data/does_not_exist.bat' script cannot be found. Please check the path and filename for accuracy and try again.
+Test case 11 - script passed to the '--exec-before' option does not exist
+Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover: error: 'std_data/does_not_exist.bat' script cannot be found. Please check the path and filename for accuracy and try again.
+Test case 12 - script passed to the '--exec-fail-check' option does not exist
+Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover: error: 'std_data/does_not_exist.bat' script cannot be found. Please check the path and filename for accuracy and try again.
+Test case 13 - script passed to the '--exec-post-failover' option does not exist
+Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover: error: 'std_data/does_not_exist.bat' script cannot be found. Please check the path and filename for accuracy and try again.

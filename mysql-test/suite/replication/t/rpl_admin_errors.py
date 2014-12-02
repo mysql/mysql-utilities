@@ -271,6 +271,24 @@ class test(rpl_admin.test):
             self.results.append("Error NOT found in the log.\n")
         # log file removed by the cleanup method
 
+        # Test path to script file not being valid
+        option_scripts = ['--exec-after', '--exec-before']
+
+        non_valid_path = os.path.normpath("./std_data/does_not_exist.bat")
+        for opt in option_scripts:
+            test_num += 1
+            comment = ("Test case {0} - script passed to the '{1}' option "
+                       "does not exist".format(test_num, opt))
+            cmd_str = "mysqlrpladmin.py failover "
+            cmd_opts = (" --master={0} --slaves={1} {2}={3}".format(
+                master_conn, slave1_conn, opt, non_valid_path))
+            res = mutlib.System_test.run_test_case(self, 2, cmd_str + cmd_opts,
+                                                   comment)
+            if not res:
+                raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+
         # Mask out non-deterministic data
         rpl_admin.test.do_masks(self)
 
@@ -278,6 +296,8 @@ class test(rpl_admin.test):
                             "ERROR: Can't connect to XXXXXXX\n")
 
         self.replace_substring(str(self.server5.port), "PORT5")
+        self.replace_substring('std_data\\does_not_exist.bat',
+                               'std_data/does_not_exist.bat')
 
         self.replace_substring(socket.gethostname().split('.', 1)[0],
                                "<hostname>")

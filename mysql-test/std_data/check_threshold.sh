@@ -1,3 +1,5 @@
+#!/bin/sh
+
 echo "# ARGUMENTS PASSED:"
 echo "# old master host: " $1
 echo "# old master port: " $2

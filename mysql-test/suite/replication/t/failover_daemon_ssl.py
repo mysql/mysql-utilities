@@ -75,9 +75,13 @@ class test(failover_daemon.test):
         self.temp_files = []
         # Post failover script executed to detect failover events (by creating
         # a specific directory).
-        # Note: .bat extension is used for the script to be executed on all
-        # operating systems (including Windows).
-        self.fail_event_script = os.path.normpath("./std_data/fail_event.bat")
+        if os.name == 'posix':
+            self.fail_event_script = os.path.normpath("./std_data/"
+                                                      "fail_event.sh")
+        else:
+            self.fail_event_script = os.path.normpath("./std_data/"
+                                                      "fail_event.bat")
+
         # Directory created by the post failover script.
         self.failover_dir = os.path.normpath("./fail_event")
 

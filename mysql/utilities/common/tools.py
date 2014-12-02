@@ -24,6 +24,7 @@ import inspect
 import os
 import re
 import sys
+import shlex
 import shutil
 import socket
 import subprocess
@@ -195,15 +196,21 @@ def execute_script(run_cmd, filename=None, options=None, verbosity=False):
             filename = os.devnull
         f_out = open(filename, 'w')
 
-    str_opts = [str(opt) for opt in options]
-    cmd_opts = " ".join(str_opts)
-    command = " ".join([run_cmd, cmd_opts])
+    is_posix = True if os.name == "posix" else False
+    command = shlex.split(run_cmd, posix=is_posix)
+
+    if options:
+        command.extend([str(opt) for opt in options])
 
     if verbosity:
         print("# SCRIPT EXECUTED: {0}".format(command))
 
-    proc = subprocess.Popen(command, shell=True,
-                            stdout=f_out, stderr=f_out)
+    try:
+        proc = subprocess.Popen(command, shell=False,
+                                stdout=f_out, stderr=f_out)
+    except OSError as err:
+        raise UtilError(str(err))
+
     ret_val = proc.wait()
     if not verbosity:
         f_out.close()

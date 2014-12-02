@@ -27,7 +27,7 @@ from mysql.utilities.common.tools import check_python_version
 check_python_version()
 
 import logging
-import os.path
+import os
 import signal
 import sys
 
@@ -45,7 +45,8 @@ from mysql.utilities.common.options import (add_failover_options,
                                             check_server_lists,
                                             license_callback,
                                             UtilitiesParser,
-                                            check_password_security)
+                                            check_password_security,
+                                            check_script_option)
 
 
 # Constants
@@ -266,7 +267,7 @@ if __name__ == '__main__':
         'verbosity': 0 if opt.verbosity is None else opt.verbosity,
         'before': opt.exec_before,
         'after': opt.exec_after,
-        'fail_check': opt.exec_fail,
+        'exec_fail': opt.exec_fail,
         'max_position': opt.max_position,
         'max_delay': opt.max_delay,
         'discover': opt.discover,
@@ -298,6 +299,13 @@ if __name__ == '__main__':
     # Warn user about script threshold checking.
     if opt.script_threshold:
         print(SCRIPT_THRESHOLD_WARNING)
+
+    # Check if script files exist and are executable and warn users if they
+    # are not.
+    script_opts = ['after', 'before', 'exec_fail', 'post_fail']
+    for key in script_opts:
+        parameter_val = options[key]
+        check_script_option(parser, parameter_val)
 
     # Check if the values specified for the --report-values option are valid.
     for report in opt.report_values.split(','):

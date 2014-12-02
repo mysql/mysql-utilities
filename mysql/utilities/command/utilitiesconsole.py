@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -272,7 +272,7 @@ class UtilitiesConsole(Console):
             if util_info["name"] == command:
                 # Get the command used to obtain the help from the utility
                 cmd = list(util_info["cmd"])
-                cmd.extend([parameters])
+                cmd.extend(parameters)
 
                 # Add quotes for Windows
                 if (os.name == "nt"):
@@ -288,7 +288,7 @@ class UtilitiesConsole(Console):
                                             stdout=self.f_out,
                                             stderr=self.f_out)
                 else:
-                    proc = subprocess.Popen(" ".join(cmd), shell=True,
+                    proc = subprocess.Popen(cmd, shell=False,
                                             stderr=subprocess.PIPE)
                     print
 
@@ -304,10 +304,9 @@ class UtilitiesConsole(Console):
                     if parameters:
                         msg = ("\nExecution of utility: '{0} {1}' ended with "
                                "return code '{2}' and with the following "
-                               "error message:\n{3}").format(command,
-                                                             parameters,
-                                                             return_code,
-                                                             stderr_temp)
+                               "error message:\n"
+                               "{3}").format(command, ' '.join(parameters),
+                                             return_code, stderr_temp)
                     else:
                         msg = ("\nExecution of utility: '{0}' ended with "
                                "return code '{1}' and with the following "
@@ -321,7 +320,8 @@ class UtilitiesConsole(Console):
                                "return code '{2}' but no error message was "
                                "streamed to the standard error, please review "
                                "the output from its execution."
-                               "").format(command, parameters, return_code)
+                               "").format(command, ' '.join(parameters),
+                                          return_code)
                     else:
                         msg = ("\nExecution of utility: '{0}' ended with "
                                "return code '{1}' but no error message was "
