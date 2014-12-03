@@ -65,7 +65,7 @@ class test(mutlib.System_test):
         self.res_fname = "result.txt"
         cmd_str = "mysqlbinlogrotate.py "
         serv_conn = self.build_custom_connection_string(self.server2,
-                                                          'a_user', 'a_pwd')
+                                                        'a_user', 'a_pwd')
 
         test_num = 1
         test_cases = (
@@ -73,22 +73,22 @@ class test(mutlib.System_test):
              "grant_list": None,
              "revoke_list": None,
              "exp_cmd_res": 1,
-             "rotation_expected": False,},
+             "rotation_expected": False},
             {"comment": "with RELOAD privilege only",
              "grant_list": ['RELOAD'],
              "revoke_list": None,
              "exp_cmd_res": 1,
-             "rotation_expected": False,},
+             "rotation_expected": False},
             {"comment": "with REPLICATION CLIENT privilege only",
              "grant_list": ['REPLICATION CLIENT'],
              "revoke_list": ['RELOAD'],
              "exp_cmd_res": 1,
-             "rotation_expected": False,},
+             "rotation_expected": False},
             {"comment": "with RELOAD and REPLICATION CLIENT privileges",
              "grant_list": ['RELOAD'],
              "revoke_list": None,
              "exp_cmd_res": 0,
-             "rotation_expected": True,}
+             "rotation_expected": True}
         )
 
         create_user = True
@@ -114,7 +114,7 @@ class test(mutlib.System_test):
             res = self.run_test_case(test_case["exp_cmd_res"], cmd, comment)
             if not res or \
                (rot_exp ^ binlog_file_exists(self.server2_datadir,
-                                            "mysql-bin.000002", self.debug)):
+                                             "mysql-bin.000002", self.debug)):
                 raise MUTLibError("{0}: failed".format(comment))
             test_num += 1
 

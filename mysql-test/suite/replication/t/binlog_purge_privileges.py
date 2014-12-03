@@ -19,8 +19,6 @@
 binlog_purge_privileges test.
 """
 
-import mutlib
-
 import binlog_purge_rpl
 from binlog_rotate import binlog_file_exists
 
@@ -102,7 +100,7 @@ class test(binlog_purge_rpl.test):
         test_num += 1
         comment = ("Test case {0} - Purge binlog using a user without "
                    "privileges, {1} option (fail).".format(test_num,
-                                                               option_name))
+                                                           option_name))
         cmd = cmd_str.format("--{0}={1} {2}".format(option_name, server_con,
                                                     ad_opt))
         res = self.run_test_case(1, cmd, comment)

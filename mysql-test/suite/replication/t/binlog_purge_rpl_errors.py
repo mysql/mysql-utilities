@@ -22,7 +22,6 @@ binlog_purge_rpl_errors test.
 import rpl_admin
 from binlog_rotate import binlog_file_exists
 
-from mysql.utilities.common.user import change_user_privileges
 from mysql.utilities.exception import MUTLibError
 
 

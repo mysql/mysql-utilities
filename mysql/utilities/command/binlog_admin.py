@@ -822,7 +822,7 @@ class BinaryLogRotate(object):
 
         # Check required privileges
         check_privileges(self.server, BINLOG_OP_ROTATE,
-                         ["RELOAD","REPLICATION CLIENT"],
+                         ["RELOAD", "REPLICATION CLIENT"],
                          BINLOG_OP_ROTATE_DESC, self.verbosity, self._report)
 
         active_binlog, binlog_size = get_active_binlog_and_size(self.server)

@@ -22,7 +22,6 @@ binlog_rotate errors test.
 import mutlib
 from binlog_rotate import binlog_file_exists
 
-from mysql.utilities.common.user import change_user_privileges
 from mysql.utilities.exception import MUTLibError
 
 
