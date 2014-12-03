@@ -1,0 +1,91 @@
+Test case 1 - do the help
+  --version             show program's version number and exit
+  --help                display a help message and exit
+  --license             display program's license and exit
+  --server=SERVER       connection information for the server in the form:
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
+  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+                        CAs.
+  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+                        establishing a secure connection.
+  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+                        secure connection.
+  -d, --dry-run         run the utility without purge any binary log, instead
+                        it will print the unused binary log files.
+  --binlog=BINLOG       Binlog file name to keep (not to purge). All the
+                        binary log files prior to the specified file will be
+                        removed.
+  --discover-slaves-login=DISCOVER
+                        at startup, query master for all registered slaves and
+                        use the user name and password specified to connect.
+                        Supply the user and password in the form
+                        <user>[:<password>] or <login-path>. For example,
+                        --discover-slaves-login=joe:secret will use 'joe' as
+                        the user and 'secret' as the password for each
+                        discovered slave.
+  --master=MASTER       connection information for master server in the form:
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>].
+  --slaves=SLAVES       connection information for slave servers in the form:
+                        <user>[:<password>]@<host>[:<port>][:<socket>] or
+                        <login-path>[:<port>][:<socket>] or <config-
+                        path>[<[group]>]. List multiple slaves in comma-
+                        separated list.
+  -v, --verbose         control how much information is displayed. e.g., -v =
+                        verbose, -vv = more verbose, -vvv = debug
+
+Introduction
+------------
+The mysqlbinlogpurge utility was designed to purge binary log files in a
+replication scenario operating in a safe manner by prohibiting deletion of
+binary log files that are open or which are required by a slave (have not
+been read by the slave). The utility verifies the latest binary log file that
+has been read by all the slave servers to determine the binary log files that
+can be deleted.
+
+Note: In order to determine the latest binary log file that has been
+replicated by all the slaves, they must be connected to the master at the time
+the utility is executed.
+
+The following are examples of use:
+  # Purge all the binary log files prior to a specified file for a standalone
+  # server.
+  $ mysqlbinlogpurge --server=root:pass@host1:3306 \
+                     --binlog=bin-log.001302
+
+  # Display the latest binary log that has been replicated by all specified
+  # slaves in a replication scenario.
+  $ mysqlbinlogpurge --master=root:pass@host2:3306 \
+                     --slaves=root:pass@host3:3308,root:pass@host3:3309 \
+                     --dry-run
+Test case 2 -mysqlbinlogpurge with verbose (-vv)
+# Checking user permission to purge binary logs...
+#
+# Server active binlog file: mysql-bin.000003
+# Range of binlog files available: from mysql-bin.000001 to mysql-bin.000003
+# Latest not active binlog file: mysql-bin.000002
+# Executing query PURGE BINARY LOGS TO 'mysql-bin.000003'
+# Binlog file available: mysql-bin.000003
+# Range of binlog files purged: from mysql-bin.000001 to mysql-bin.000002
+Test case 3 -mysqlbinlogpurge No binlog files to purge
+# No binlog files can be purged.
+Test case 4 -mysqlbinlogpurge dry-run (-d)
+# To manually purge purge the binary logs Execute the following query:
+PURGE BINARY LOGS TO 'mysql-bin.000004'
+Test case 5 -mysqlbinlogpurge --binlog option
+# Checking user permission to purge binary logs...
+#
+# Server active binlog file: mysql-bin.000007
+# Range of binlog files available: from mysql-bin.000003 to mysql-bin.000007
+# Executing query PURGE BINARY LOGS TO 'mysql-bin.000004'
+# Range of binlog files available: from mysql-bin.000004 to mysql-bin.000007
+# Binlog file purged: mysql-bin.000003
+Test case 6 -mysqlbinlogpurge --binlog option warning not found
+# Checking user permission to purge binary logs...
+#
+# Server active binlog file: mysql-bin.000007
+# Range of binlog files available: from mysql-bin.000004 to mysql-bin.000007
+WARNING: Could not find the given binlog name: 'mysql-bin.000003' in the binlog files listed in the server: XXXX-XXXX:XXXX

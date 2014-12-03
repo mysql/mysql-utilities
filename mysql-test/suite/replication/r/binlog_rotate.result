@@ -1,0 +1,8 @@
+Test case 1 - simple rotate
+# The binlog file has been rotated.
+Test case 2 - simple rotate (-vv)
+# Checking user permission to rotate binary logs...
+#
+# Active binlog file: 'XXXXX-XXX:XXXXXX' (size: XXX bytes)
+# The binlog file has been rotated.
+# New active binlog file: 'mysql-bin.000003'

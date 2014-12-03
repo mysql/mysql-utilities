@@ -1,0 +1,18 @@
+Test case 1 - rotate on server with no privileges and -vv
+# Checking user permission to rotate binary logs...
+#
+ERROR: User 'a_user' on 'XXXX-XXXX@PORT1' does not have sufficient privileges to perform binary log rotation (required: RELOAD and REPLICATION CLIENT).
+Test case 2 - rotate on server with RELOAD privilege only and -vv
+# Checking user permission to rotate binary logs...
+#
+ERROR: User 'a_user' on 'XXXX-XXXX@PORT1' does not have sufficient privileges to perform binary log rotation (required: REPLICATION CLIENT).
+Test case 3 - rotate on server with REPLICATION CLIENT privilege only and -vv
+# Checking user permission to rotate binary logs...
+#
+ERROR: User 'a_user' on 'XXXX-XXXX@PORT1' does not have sufficient privileges to perform binary log rotation (required: RELOAD).
+Test case 4 - rotate on server with RELOAD and REPLICATION CLIENT privileges and -vv
+# Checking user permission to rotate binary logs...
+#
+# Active binlog file: 'XXXXX-XXX:XXXXXX' (size: XXX bytes)
+# The binlog file has been rotated.
+# New active binlog file: 'mysql-bin.000002'

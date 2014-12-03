@@ -1,0 +1,67 @@
+mysqlrplshow.py
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT2
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT3
+
+# Replication Topology Graph
+localhost:PORT1 (MASTER)
+   |
+   +--- localhost:PORT2 - (SLAVE + MASTER)
+       |
+       +--- localhost:PORT3 - (SLAVE)
+
+Test case 1 - mysqlbinlogpurge: with discover invalid login
+# Discovering slaves for master at localhost:PORT1
+
+WARNING: Cannot connect to some slaves (--verbose for more details).
+ERROR: Can not verify the slaves status for the given master localhost:PORT1. Make sure the slaves are active and accessible.
+Test case 2 - mysqlbinlogpurge: with discover invalid login and verbose
+# Discovering slaves for master at localhost:PORT1
+
+WARNING: Cannot connect to some slaves:
+ - localhost:PORT2: Access denied for user 'in'@'localhost' (using password: YES)
+# Checking user permission to purge binary logs...
+#
+# Binary log basename: mysql-bin
+# Master active binlog file: mysql-bin.000003
+ERROR: Can not verify the slaves status for the given master localhost:PORT1. Make sure the slaves are active and accessible.
+Test case 3 - mysqlbinlogpurge: single server given as master and --discover option
+# Discovering slaves for master at localhost:PORT4
+ERROR: Can not verify the slaves status for the given master localhost:PORT4. Make sure the slaves are active and accessible.
+Test case 4 - mysqlbinlogpurge: standalone server given as master and --slaves from other master
+ERROR: Slave 'localhost:PORT2' is configured for master 'localhost:PORT1' and not 'localhost:PORT4'.
+Test case 5 - mysqlbinlogpurge: server without binlog as master and --slaves from other master
+ERROR: Unable to get binlog information from master at localhost:PORT5
+Test case 6 - mysqlbinlogpurge: one slave from other master
+ERROR: Slave 'localhost:PORT3' is configured for master 'localhost:PORT2' and not 'localhost:PORT1'.
+Test case 7 - mysqlbinlogpurge: with slaves including an standalone server
+ERROR: Server 'localhost:PORT4' is not acting as a slave (slave status is empty).
+Test case 8 - mysqlbinlogpurge: with slave without binlog
+ERROR: Server 'localhost:PORT5' is not acting as a slave (slave status is empty).
+Test case 9 - mysqlbinlogpurge: Master without binlog and --slaves from other master
+ERROR: Unable to get binlog information from master at localhost:PORT5
+Test case 10 - mysqlbinlogpurge: Master given as server on --server option
+ERROR: The given server is acting as a master and has slaves connected to it. To proceed please use the --master option. For more info use verbose option.
+Test case 11 - mysqlbinlogpurge: Master given as server on --server option and -v
+# Checking user permission to purge binary logs...
+#
+# Server active binlog file: mysql-bin.000003
+# WARNING: Slave with id:XXX at localhost:PORT2 is connected to this server.
+ERROR: The given server is acting as a master and has slaves connected to it. To proceed please use the --master option.
+Test case 12 - mysqlbinlogpurge: Slave disconnected from master using --discover-slave option
+# Discovering slaves for master at localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Slave skipped (IO not running): localhost:PORT3
+# Checking user permission to purge binary logs...
+#
+# Master active binlog file: mysql-bin.000002
+ERROR: Can not verify the slaves status for the given master localhost:PORT2. Make sure the slaves are active and accessible.
+Test case 13 - mysqlbinlogpurge: Slave disconnected from master --slaves option
+# Checking user permission to purge binary logs...
+#
+# Master active binlog file: mysql-bin.000002
+# Slave 'localhost:PORT3' IO not running
+ERROR: Can not verify the status for slave localhost:PORT3. Make sure the slave are active and accessible.

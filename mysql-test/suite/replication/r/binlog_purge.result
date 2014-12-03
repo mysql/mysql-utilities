@@ -1,0 +1,11 @@
+Test case 1 - simple purge
+# Purging binary logs prior to 'mysql-bin.000002'
+Test case 2 - purge using verbose (-v)
+# Checking user permission to purge binary logs...
+#
+# Server active binlog file: mysql-bin.000003
+# Range of binlog files available: from mysql-bin.000002 to mysql-bin.000003
+# Latest not active binlog file: mysql-bin.000002
+# Purging binary logs prior to 'mysql-bin.000003'
+# Binlog file available: mysql-bin.000003
+# Binlog file purged: mysql-bin.000002

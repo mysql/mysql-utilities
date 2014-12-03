@@ -1,0 +1,38 @@
+Test case 1 - No options
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: Option '--server' or '--master' is required.
+Test case 2 - Master no Slave options
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: Option --master requires the following option(s): --slaves or --discover-slaves-login.
+Test case 3 - Server with Slave option
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: Option --slaves requires the following option(s): --master.
+Test case 4 - Server without binlog
+ERROR: Unable to get binlog information from server at XXXX-XXXX:PORT2
+Test case 5 - Master with wrong Slave
+ERROR: Unable to get binlog information from master at XXXX-XXXX:PORT2
+Test case 6 - Server with Discover option
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: Option --discover-slaves-login requires the following option(s): --master.
+Test case 7 - Only discover option
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: Option --discover-slaves-login requires the following option(s): --master.
+Test case 8 - Only slaves option
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: Option --slaves requires the following option(s): --master.
+Test case 9 - Only dry-run and verbose options
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: Option '--server' or '--master' is required.
+Test case 10 - wrong binlog base name
+ERROR: The given binlog file name: 'wrong_binlog_name' differs from the used by the server: 'mysql-bin'
+Test case 11 - server and master options mixed
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: Options --server and --master cannot be used together.

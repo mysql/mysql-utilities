@@ -1,0 +1,43 @@
+Test case 1 - do the help
+  --version            show program's version number and exit
+  --help               display a help message and exit
+  --license            display program's license and exit
+  --server=SERVER      connection information for the server in the form:
+                       <user>[:<password>]@<host>[:<port>][:<socket>] or
+                       <login-path>[:<port>][:<socket>] or <config-
+                       path>[<[group]>].
+  --ssl-ca=SSL_CA      The path to a file that contains a list of trusted SSL
+                       CAs.
+  --ssl-cert=SSL_CERT  The name of the SSL certificate file to use for
+                       establishing a secure connection.
+  --ssl-key=SSL_KEY    The name of the SSL key file to use for establishing a
+                       secure connection.
+  --min-size=MIN_SIZE  rotate the active binlog file only if the file size
+                       exceeds the specified value in bytes.
+  -v, --verbose        control how much information is displayed. e.g., -v =
+                       verbose, -vv = more verbose, -vvv = debug
+
+Introduction
+------------
+The mysqlbinlogrotate utility was designed to rotate the active binary log.
+
+The following are examples of use:
+  # Rotate the active binary log from a server.
+  $ mysqlbinlogrotate --server=root:pass@host1:3306
+
+  # Rotate the active binary log from a server if the active binlog is bigger
+  # than 1MB or 1048576 bytes.
+  $ mysqlbinlogrotate --server=root:pass@host1:3306 \
+                      --min-size=1048576
+Test case 2 - rotate and verbose option (-vv)
+# Checking user permission to rotate binary logs...
+#
+# Active binlog file: 'XXXXX-XXX:XXXXXX' (size: XXX bytes)
+# The binlog file has been rotated.
+# New active binlog file: 'mysql-bin.000002'
+Test case 3 - rotate and min_size option (-vv)
+# Checking user permission to rotate binary logs...
+#
+# Active binlog file: 'XXXXX-XXX:XXXXXX' (size: XXX bytes)
+# The binlog file has been rotated.
+# New active binlog file: 'mysql-bin.000003'

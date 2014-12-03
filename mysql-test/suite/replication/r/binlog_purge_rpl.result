@@ -1,0 +1,113 @@
+mysqlrplshow.py
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT1
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT2
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT3
+# master on localhost: ... connected.
+# Finding slaves for master: localhost:PORT4
+
+# Replication Topology Graph
+localhost:PORT1 (MASTER)
+   |
+   +--- localhost:PORT2 - (SLAVE)
+   |
+   +--- localhost:PORT3 - (SLAVE)
+   |
+   +--- localhost:PORT4 - (SLAVE)
+
+Test case 1 - mysqlbinlogpurge: with discover option
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
+# Latest binlog file replicated by all slaves: mysql-bin.000005
+# Purging binary logs prior to 'mysql-bin.000006'
+Test case 2 - mysqlbinlogpurge: with discover and verbose options
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
+# Checking user permission to purge binary logs...
+#
+# Master active binlog file: mysql-bin.000011
+# Checking slave: localhost@PORT2
+# I/O thread is currently reading: mysql-bin.XXXXXX
+# File position of the I/O thread: XXX
+# Master binlog file with last event executed by the SQL thread: mysql-bin.XXXXXX
+# I/O thread running: Yes
+# SQL thread running: Yes
+# Checking slave: localhost@PORT3
+# I/O thread is currently reading: mysql-bin.XXXXXX
+# File position of the I/O thread: XXX
+# Master binlog file with last event executed by the SQL thread: mysql-bin.XXXXXX
+# I/O thread running: Yes
+# SQL thread running: Yes
+# Checking slave: localhost@PORT4
+# I/O thread is currently reading: mysql-bin.XXXXXX
+# File position of the I/O thread: XXX
+# Master binlog file with last event executed by the SQL thread: mysql-bin.XXXXXX
+# I/O thread running: Yes
+# SQL thread running: Yes
+# Range of binlog files available: from mysql-bin.000006 to mysql-bin.000011
+# Latest binlog file replicated by all slaves: mysql-bin.000010
+# Latest not active binlog file: mysql-bin.000010
+# Executing query PURGE BINARY LOGS TO 'mysql-bin.000011'
+# Binlog file available: mysql-bin.000011
+# Range of binlog files purged: from mysql-bin.000006 to mysql-bin.000010
+Test case 3 - mysqlbinlogpurge: slaves option
+# Latest binlog file replicated by all slaves: mysql-bin.000015
+# Purging binary logs prior to 'mysql-bin.000016'
+Test case 4 - mysqlbinlogpurge: slaves and verbose options
+# Checking user permission to purge binary logs...
+#
+# Master active binlog file: mysql-bin.000021
+# Checking slave: localhost@PORT2
+# I/O thread is currently reading: mysql-bin.XXXXXX
+# File position of the I/O thread: XXX
+# Master binlog file with last event executed by the SQL thread: mysql-bin.XXXXXX
+# I/O thread running: Yes
+# SQL thread running: Yes
+# Checking slave: localhost@PORT3
+# I/O thread is currently reading: mysql-bin.XXXXXX
+# File position of the I/O thread: XXX
+# Master binlog file with last event executed by the SQL thread: mysql-bin.XXXXXX
+# I/O thread running: Yes
+# SQL thread running: Yes
+# Checking slave: localhost@PORT4
+# I/O thread is currently reading: mysql-bin.XXXXXX
+# File position of the I/O thread: XXX
+# Master binlog file with last event executed by the SQL thread: mysql-bin.XXXXXX
+# I/O thread running: Yes
+# SQL thread running: Yes
+# Range of binlog files available: from mysql-bin.000016 to mysql-bin.000021
+# Latest binlog file replicated by all slaves: mysql-bin.000020
+# Latest not active binlog file: mysql-bin.000020
+# Executing query PURGE BINARY LOGS TO 'mysql-bin.000021'
+# Binlog file available: mysql-bin.000021
+# Range of binlog files purged: from mysql-bin.000016 to mysql-bin.000020
+Test case 5 - mysqlbinlogpurge: --binlog option
+# Latest binlog file replicated by all slaves: mysql-bin.000025
+# Purging binary logs prior to 'mysql-bin.000023'
+Test case 6 - mysqlbinlogpurge: --binlog option and verbose
+# Checking user permission to purge binary logs...
+#
+# Master active binlog file: mysql-bin.000031
+# Checking slave: localhost@PORT2
+# I/O thread is currently reading: mysql-bin.XXXXXX
+# Checking slave: localhost@PORT3
+# I/O thread is currently reading: mysql-bin.XXXXXX
+# Checking slave: localhost@PORT4
+# I/O thread is currently reading: mysql-bin.XXXXXX
+# Range of binlog files available: from mysql-bin.000023 to mysql-bin.000031
+# Latest binlog file replicated by all slaves: mysql-bin.000030
+# Purging binary logs prior to 'mysql-bin.000027'
+# Range of binlog files available: from mysql-bin.000027 to mysql-bin.000031
+# Range of binlog files purged: from mysql-bin.000023 to mysql-bin.000026

@@ -1,0 +1,17 @@
+Test case 1 - Purge binlog using a user without privileges, server option (fail).
+ERROR: User 'a_user' on 'XXXX-XXXX@PORT2' does not have sufficient privileges to perform binary log purge (required: SUPER and REPLICATION SLAVE).
+Test case 2 - Purge binlog using a user without REPLICATION SLAVE, server option (fail).
+ERROR: User 'a_user' on 'XXXX-XXXX@PORT2' does not have sufficient privileges to perform binary log purge (required: REPLICATION SLAVE).
+Test case 3 - Purge binlog using a user without SUPER, server option (fail).
+ERROR: User 'a_user' on 'XXXX-XXXX@PORT2' does not have sufficient privileges to perform binary log purge (required: SUPER).
+Test case 4 - Purge binlog using a user with required privileges (REPLICATION SLAVE and SUPER), server option.
+# Purging binary logs prior to 'mysql-bin.000002'
+Test case 5 - Purge binlog using a user without privileges, master option (fail).
+ERROR: User 'a_user' on 'XXXX-XXXX@PORT1' does not have sufficient privileges to perform binary log purge (required: SUPER and REPLICATION SLAVE).
+Test case 6 - Purge binlog using a user without REPLICATION SLAVE, master option (fail).
+ERROR: User 'a_user' on 'XXXX-XXXX@PORT1' does not have sufficient privileges to perform binary log purge (required: REPLICATION SLAVE).
+Test case 7 - Purge binlog using a user without SUPER, master option (fail).
+ERROR: User 'a_user' on 'XXXX-XXXX@PORT1' does not have sufficient privileges to perform binary log purge (required: SUPER).
+Test case 8 - Purge binlog using a user with required privileges (REPLICATION SLAVE and SUPER), master option.
+# Latest binlog file replicated by all slaves: mysql-bin.000005
+# Purging binary logs prior to 'mysql-bin.000006'
