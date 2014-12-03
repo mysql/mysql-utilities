@@ -12,7 +12,7 @@ Test case 3 - discover-slaves requires --master.
 Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]
 
-mysqlrplsync: error: Option --discover-slaves-login requires use of --master.
+mysqlrplsync: error: Option --discover-slaves-login requires the following option(s): --master.
 Test case 4 - master cannot be included in slaves.
 Usage: mysqlrplsync --master=user:pass@host:port --slaves=user:pass@host:port \
                     [<db_name>[.<tbl_name>]]

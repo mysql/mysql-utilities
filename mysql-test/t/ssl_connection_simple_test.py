@@ -44,8 +44,9 @@ class test(mutlib.System_test):
 
     def setup(self):
         try:
+            mysqld = "--log-bin=mysql-bin {0}".format(ssl_server_opts())
             self.servers.spawn_server('ssl_server',
-                                      ssl_server_opts(), kill=False)
+                                      mysqld, kill=False)
         except MUTLibError as err:
             raise MUTLibError("Cannot spawn needed servers: {0}"
                               "".format(err.errmsg))
@@ -191,6 +192,22 @@ class test(mutlib.System_test):
             "cmd_str": "mysqldiff.py --server1={0} --server2={0}",
             "comment": "Test case {0} - basic mysqldiff with ssl",
             "cmd_opts": " util_test_a.t1:util_test_z.t1 --skip-table-options"
+        })
+
+        # mysqlbinlogrotate
+        tests.append({
+            "utility": "mysqlbinlogrotate",
+            "cmd_str": "mysqlbinlogrotate.py --server={0}",
+            "comment": "Test case {0} - basic mysqlbinlogrotate with ssl",
+            "cmd_opts": ""
+        })
+
+        # mysqlbinlogpurge
+        tests.append({
+            "utility": "mysqlbinlogpurge",
+            "cmd_str": "mysqlbinlogpurge.py --server={0}",
+            "comment": "Test case {0} - basic mysqlbinlogpurge with ssl",
+            "cmd_opts": ""
         })
 
         test_num = 0

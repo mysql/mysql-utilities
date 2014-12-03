@@ -46,106 +46,124 @@ Test case 11 - basic mysqldiff with ssl
 # server1 on XXXX-XXXX: ... 
 ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
 
+Test case 12 - basic mysqlbinlogrotate with ssl
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 13 - basic mysqlbinlogpurge with ssl
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
 ##############################################################################
 --> --ssl-ca and --ssl-key options only
 ##############################################################################
-Test case 12 - indexcheck with ssl connection all tables for a single database
+Test case 14 - indexcheck with ssl connection all tables for a single database
 # Source on XXXX-XXXX: ... 
 ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
-Test case 13 - basic serverinfo with ssl
+Test case 15 - basic serverinfo with ssl
 ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
-Test case 14 - userclone dump grants with ssl
+Test case 16 - userclone dump grants with ssl
 # Source on XXXX-XXXX: ... 
 ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
-Test case 15 - basic dbexport with ssl
+Test case 17 - basic dbexport with ssl
 # Source on XXXX-XXXX: ... 
 ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
-Test case 16 - basic dbimport with ssl
+Test case 18 - basic dbimport with ssl
 # Source on XXXX-XXXX: ... 
 ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
-Test case 17 - basic metagrep with ssl
+Test case 19 - basic metagrep with ssl
 ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
-Test case 18 - basic procgrep with ssl
+Test case 20 - basic procgrep with ssl
 ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
-Test case 19 - basic diskusage with ssl
+Test case 21 - basic diskusage with ssl
 # Source on XXXX-XXXX: ... 
 Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
 
 mysqldiskusage: error: ssl_key and ssl_cert need to be both specified, or neither.
 
-Test case 20 - basic mysqlfrm with ssl
+Test case 22 - basic mysqlfrm with ssl
 # Source on XXXX-XXXX: ... 
 Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
 mysqlfrm: error: ssl_key and ssl_cert need to be both specified, or neither.
 
-Test case 21 - basic mysqldbcopy with ssl
+Test case 23 - basic mysqldbcopy with ssl
 # Source on XXXX-XXXX: ... 
 ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
-Test case 22 - basic mysqldiff with ssl
+Test case 24 - basic mysqldiff with ssl
 # server1 on XXXX-XXXX: ... 
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
+
+Test case 25 - basic mysqlbinlogrotate with ssl
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
+
+Test case 26 - basic mysqlbinlogpurge with ssl
 ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 ##############################################################################
 --> --ssl-key option only
 ##############################################################################
-Test case 23 - indexcheck with ssl connection all tables for a single database
+Test case 27 - indexcheck with ssl connection all tables for a single database
 # Source on XXXX-XXXX: ... 
 ERROR: Missing ssl_ca argument.
 
-Test case 24 - basic serverinfo with ssl
+Test case 28 - basic serverinfo with ssl
 ERROR: Missing ssl_ca argument.
 
-Test case 25 - userclone dump grants with ssl
+Test case 29 - userclone dump grants with ssl
 # Source on XXXX-XXXX: ... 
 ERROR: Missing ssl_ca argument.
 
-Test case 26 - basic dbexport with ssl
+Test case 30 - basic dbexport with ssl
 # Source on XXXX-XXXX: ... 
 ERROR: Missing ssl_ca argument.
 
-Test case 27 - basic dbimport with ssl
+Test case 31 - basic dbimport with ssl
 # Source on XXXX-XXXX: ... 
 ERROR: Missing ssl_ca argument.
 
-Test case 28 - basic metagrep with ssl
+Test case 32 - basic metagrep with ssl
 ERROR: Missing ssl_ca argument.
 
-Test case 29 - basic procgrep with ssl
+Test case 33 - basic procgrep with ssl
 ERROR: Missing ssl_ca argument.
 
-Test case 30 - basic diskusage with ssl
+Test case 34 - basic diskusage with ssl
 # Source on XXXX-XXXX: ... 
 Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
 
 mysqldiskusage: error: Missing ssl_ca argument.
 
-Test case 31 - basic mysqlfrm with ssl
+Test case 35 - basic mysqlfrm with ssl
 # Source on XXXX-XXXX: ... 
 Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
 mysqlfrm: error: Missing ssl_ca argument.
 
-Test case 32 - basic mysqldbcopy with ssl
+Test case 36 - basic mysqldbcopy with ssl
 # Source on XXXX-XXXX: ... 
 ERROR: Missing ssl_ca argument.
 
-Test case 33 - basic mysqldiff with ssl
+Test case 37 - basic mysqldiff with ssl
 # server1 on XXXX-XXXX: ... 
+ERROR: Missing ssl_ca argument.
+
+Test case 38 - basic mysqlbinlogrotate with ssl
+ERROR: Missing ssl_ca argument.
+
+Test case 39 - basic mysqlbinlogpurge with ssl
 ERROR: Missing ssl_ca argument.
 
 ##############################################################################
 --> --ssl-key and --ssl-cert options only
 ##############################################################################
-Test case 34 - indexcheck with ssl connection all tables for a single database
+Test case 40 - indexcheck with ssl connection all tables for a single database
 # Source on XXXX-XXXX: ... connected.
 # The following indexes are duplicates or redundant for table util_test_a.t1:
 #
@@ -157,20 +175,20 @@ CREATE INDEX `s2` ON `util_test_a`.`t1` (`d`(32))
 #     may be redundant or duplicate of:
 CREATE INDEX `s4` ON `util_test_a`.`t1` (`d`(32)) 
 
-Test case 35 - basic serverinfo with ssl
+Test case 41 - basic serverinfo with ssl
 # Source on XXXX-XXXX: ... connected.
 *************************       1. row *************************
                    server: XXXX-XXXX:XXXX
 1 row.
 #...done.
 
-Test case 36 - userclone dump grants with ssl
+Test case 42 - userclone dump grants with ssl
 # Source on XXXX-XXXX: ... connected.
 # Dumping grants for user joe_pass@user
 GRANT USAGE ON *.* TO 'joe_pass'@'user' IDENTIFIED BY PASSWORD '*6DA88CFC20231681AB7287BB201D08136A9A7369'
 GRANT SELECT ON `util_test`.* TO 'joe_pass'@'user'
 
-Test case 37 - basic dbexport with ssl
+Test case 43 - basic dbexport with ssl
 # Source on XXXX-XXXX: ... connected.
 # Exporting metadata from util_test_a
 DROP DATABASE IF EXISTS `util_test_a`;
@@ -195,19 +213,19 @@ CREATE TABLE `t2` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 #...done.
 
-Test case 38 - basic dbimport with ssl
+Test case 44 - basic dbimport with ssl
 # Source on XXXX-XXXX: ... connected.
 # Importing definitions from ./std_data/import_data.sql.
 #...done.
 
-Test case 39 - basic metagrep with ssl
+Test case 45 - basic metagrep with ssl
 +---+
 | Connection                 | Object Type  | Object Name  | Database  | Field Type  | Matches  |
 +---+
 | root[...]
 +---+
 
-Test case 40 - basic procgrep with ssl
+Test case 46 - basic procgrep with ssl
 +---+
 | Connection                 | Id  | User      | Host             | Db    | Command  | Time  | State      | Info                                                                                                                          |
 +---+
@@ -220,18 +238,18 @@ WHERE
 | root[...]
 +---+
 
-Test case 41 - basic diskusage with ssl
+Test case 47 - basic diskusage with ssl
 # Source on XXXX-XXXX: ... connected.
 +---+
 
-Test case 42 - basic mysqlfrm with ssl
+Test case 48 - basic mysqlfrm with ssl
 # Source on XXXX-XXXX: ... connected.
 # NOTE: No .frm files found in folder ./.
 # Starting the spawned server on port...
 # Reading .frm files
 #...done.
 
-Test case 43 - basic mysqldbcopy with ssl
+Test case 49 - basic mysqldbcopy with ssl
 # Source on XXXX-XXXX: ... connected.
 # Destination on XXXX-XXXX: ... connected.
 # Copying database util_test_a renamed as util_test_z
@@ -241,299 +259,355 @@ Test case 43 - basic mysqldbcopy with ssl
 # Copying data for TABLE util_test_a.t2
 #...done.
 
-Test case 44 - basic mysqldiff with ssl
+Test case 50 - basic mysqldiff with ssl
 # server1 on XXXX-XXXX: ... connected.
 # server2 on XXXX-XXXX: ... connected.
 # Comparing util_test_a.t1 to util_test_z.t1                       [PASS]
 Success. All objects are the same.
 
+Test case 51 - basic mysqlbinlogrotate with ssl
+# The binlog file has been rotated.
+
+Test case 52 - basic mysqlbinlogpurge with ssl
+# Purging binary logs prior to 'mysql-bin.000002'
+
 ##############################################################################
 --> invalid --ssl-ca option
 ##############################################################################
-Test case 45 - indexcheck with ssl connection all tables for a single database
+Test case 53 - indexcheck with ssl connection all tables for a single database
 Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck: error: the given path './' in option --ssl-ca does not correspond to a file
 
-Test case 46 - basic serverinfo with ssl
+Test case 54 - basic serverinfo with ssl
 Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
 
 mysqlserverinfo: error: the given path './' in option --ssl-ca does not correspond to a file
 
-Test case 47 - userclone dump grants with ssl
+Test case 55 - userclone dump grants with ssl
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@XXXX-XXXX sam:secret1@XXXX-XXXX
 
 mysqluserclone: error: the given path './' in option --ssl-ca does not correspond to a file
 
-Test case 48 - basic dbexport with ssl
+Test case 56 - basic dbexport with ssl
 Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
 mysqldbexport: error: the given path './' in option --ssl-ca does not correspond to a file
 
-Test case 49 - basic dbimport with ssl
+Test case 57 - basic dbimport with ssl
 Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
 
 mysqldbimport: error: the given path './' in option --ssl-ca does not correspond to a file
 
-Test case 50 - basic metagrep with ssl
+Test case 58 - basic metagrep with ssl
 Usage: mysqlmetagrep --server=user:pass@host:port:socket [options] pattern
 
 mysqlmetagrep: error: the given path './' in option --ssl-ca does not correspond to a file
 
-Test case 51 - basic procgrep with ssl
+Test case 59 - basic procgrep with ssl
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 mysqlprocgrep: error: the given path './' in option --ssl-ca does not correspond to a file
 
-Test case 52 - basic diskusage with ssl
+Test case 60 - basic diskusage with ssl
 Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
 
 mysqldiskusage: error: the given path './' in option --ssl-ca does not correspond to a file
 
-Test case 53 - basic mysqlfrm with ssl
+Test case 61 - basic mysqlfrm with ssl
 Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
 mysqlfrm: error: the given path './' in option --ssl-ca does not correspond to a file
 
-Test case 54 - basic mysqldbcopy with ssl
+Test case 62 - basic mysqldbcopy with ssl
 Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy: error: the given path './' in option --ssl-ca does not correspond to a file
 
-Test case 55 - basic mysqldiff with ssl
+Test case 63 - basic mysqldiff with ssl
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
 mysqldiff: error: the given path './' in option --ssl-ca does not correspond to a file
 
+Test case 64 - basic mysqlbinlogrotate with ssl
+Usage: mysqlbinlogrotate --server=user:pass@host:port
+
+mysqlbinlogrotate: error: the given path './' in option --ssl-ca does not correspond to a file
+
+Test case 65 - basic mysqlbinlogpurge with ssl
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: the given path './' in option --ssl-ca does not correspond to a file
+
 ##############################################################################
 --> invalid --ssl-ca option
 ##############################################################################
-Test case 56 - indexcheck with ssl connection all tables for a single database
+Test case 66 - indexcheck with ssl connection all tables for a single database
 Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck: error: the given path './std_data' in option --ssl-ca does not correspond to a file
 
-Test case 57 - basic serverinfo with ssl
+Test case 67 - basic serverinfo with ssl
 Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
 
 mysqlserverinfo: error: the given path './std_data' in option --ssl-ca does not correspond to a file
 
-Test case 58 - userclone dump grants with ssl
+Test case 68 - userclone dump grants with ssl
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@XXXX-XXXX sam:secret1@XXXX-XXXX
 
 mysqluserclone: error: the given path './std_data' in option --ssl-ca does not correspond to a file
 
-Test case 59 - basic dbexport with ssl
+Test case 69 - basic dbexport with ssl
 Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
 mysqldbexport: error: the given path './std_data' in option --ssl-ca does not correspond to a file
 
-Test case 60 - basic dbimport with ssl
+Test case 70 - basic dbimport with ssl
 Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
 
 mysqldbimport: error: the given path './std_data' in option --ssl-ca does not correspond to a file
 
-Test case 61 - basic metagrep with ssl
+Test case 71 - basic metagrep with ssl
 Usage: mysqlmetagrep --server=user:pass@host:port:socket [options] pattern
 
 mysqlmetagrep: error: the given path './std_data' in option --ssl-ca does not correspond to a file
 
-Test case 62 - basic procgrep with ssl
+Test case 72 - basic procgrep with ssl
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 mysqlprocgrep: error: the given path './std_data' in option --ssl-ca does not correspond to a file
 
-Test case 63 - basic diskusage with ssl
+Test case 73 - basic diskusage with ssl
 Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
 
 mysqldiskusage: error: the given path './std_data' in option --ssl-ca does not correspond to a file
 
-Test case 64 - basic mysqlfrm with ssl
+Test case 74 - basic mysqlfrm with ssl
 Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
 mysqlfrm: error: the given path './std_data' in option --ssl-ca does not correspond to a file
 
-Test case 65 - basic mysqldbcopy with ssl
+Test case 75 - basic mysqldbcopy with ssl
 Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy: error: the given path './std_data' in option --ssl-ca does not correspond to a file
 
-Test case 66 - basic mysqldiff with ssl
+Test case 76 - basic mysqldiff with ssl
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
 mysqldiff: error: the given path './std_data' in option --ssl-ca does not correspond to a file
 
+Test case 77 - basic mysqlbinlogrotate with ssl
+Usage: mysqlbinlogrotate --server=user:pass@host:port
+
+mysqlbinlogrotate: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
+Test case 78 - basic mysqlbinlogpurge with ssl
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: the given path './std_data' in option --ssl-ca does not correspond to a file
+
 ##############################################################################
 --> unexisting certificatefile in --ssl-ca option
 ##############################################################################
-Test case 67 - indexcheck with ssl connection all tables for a single database
+Test case 79 - indexcheck with ssl connection all tables for a single database
 Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
 
-Test case 68 - basic serverinfo with ssl
+Test case 80 - basic serverinfo with ssl
 Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
 
 mysqlserverinfo: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
 
-Test case 69 - userclone dump grants with ssl
+Test case 81 - userclone dump grants with ssl
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@XXXX-XXXX sam:secret1@XXXX-XXXX
 
 mysqluserclone: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
 
-Test case 70 - basic dbexport with ssl
+Test case 82 - basic dbexport with ssl
 Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
 mysqldbexport: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
 
-Test case 71 - basic dbimport with ssl
+Test case 83 - basic dbimport with ssl
 Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
 
 mysqldbimport: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
 
-Test case 72 - basic metagrep with ssl
+Test case 84 - basic metagrep with ssl
 Usage: mysqlmetagrep --server=user:pass@host:port:socket [options] pattern
 
 mysqlmetagrep: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
 
-Test case 73 - basic procgrep with ssl
+Test case 85 - basic procgrep with ssl
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 mysqlprocgrep: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
 
-Test case 74 - basic diskusage with ssl
+Test case 86 - basic diskusage with ssl
 Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
 
 mysqldiskusage: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
 
-Test case 75 - basic mysqlfrm with ssl
+Test case 87 - basic mysqlfrm with ssl
 Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
 mysqlfrm: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
 
-Test case 76 - basic mysqldbcopy with ssl
+Test case 88 - basic mysqldbcopy with ssl
 Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
 
-Test case 77 - basic mysqldiff with ssl
+Test case 89 - basic mysqldiff with ssl
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
 mysqldiff: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
 
+Test case 90 - basic mysqlbinlogrotate with ssl
+Usage: mysqlbinlogrotate --server=user:pass@host:port
+
+mysqlbinlogrotate: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
+
+Test case 91 - basic mysqlbinlogpurge with ssl
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: the given path './std_data/unexisting.pem' in option --ssl-ca does not exist or can not be accessed
+
 ##############################################################################
 --> unexisting certificatefile in --ssl-cert option
 ##############################################################################
-Test case 78 - indexcheck with ssl connection all tables for a single database
+Test case 92 - indexcheck with ssl connection all tables for a single database
 Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
 
-Test case 79 - basic serverinfo with ssl
+Test case 93 - basic serverinfo with ssl
 Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
 
 mysqlserverinfo: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
 
-Test case 80 - userclone dump grants with ssl
+Test case 94 - userclone dump grants with ssl
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@XXXX-XXXX sam:secret1@XXXX-XXXX
 
 mysqluserclone: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
 
-Test case 81 - basic dbexport with ssl
+Test case 95 - basic dbexport with ssl
 Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
 mysqldbexport: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
 
-Test case 82 - basic dbimport with ssl
+Test case 96 - basic dbimport with ssl
 Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
 
 mysqldbimport: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
 
-Test case 83 - basic metagrep with ssl
+Test case 97 - basic metagrep with ssl
 Usage: mysqlmetagrep --server=user:pass@host:port:socket [options] pattern
 
 mysqlmetagrep: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
 
-Test case 84 - basic procgrep with ssl
+Test case 98 - basic procgrep with ssl
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 mysqlprocgrep: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
 
-Test case 85 - basic diskusage with ssl
+Test case 99 - basic diskusage with ssl
 Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
 
 mysqldiskusage: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
 
-Test case 86 - basic mysqlfrm with ssl
+Test case 100 - basic mysqlfrm with ssl
 Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
 mysqlfrm: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
 
-Test case 87 - basic mysqldbcopy with ssl
+Test case 101 - basic mysqldbcopy with ssl
 Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
 
-Test case 88 - basic mysqldiff with ssl
+Test case 102 - basic mysqldiff with ssl
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
 mysqldiff: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
 
+Test case 103 - basic mysqlbinlogrotate with ssl
+Usage: mysqlbinlogrotate --server=user:pass@host:port
+
+mysqlbinlogrotate: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
+
+Test case 104 - basic mysqlbinlogpurge with ssl
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: the given path './std_data/unexisting.pem' in option --ssl-cert does not exist or can not be accessed
+
 ##############################################################################
 --> unexisting certificatefile in --ssl-key option
 ##############################################################################
-Test case 89 - indexcheck with ssl connection all tables for a single database
+Test case 105 - indexcheck with ssl connection all tables for a single database
 Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
 
-Test case 90 - basic serverinfo with ssl
+Test case 106 - basic serverinfo with ssl
 Usage: mysqlserverinfo --server=user:pass@host:port:socket --format=grid
 
 mysqlserverinfo: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
 
-Test case 91 - userclone dump grants with ssl
+Test case 107 - userclone dump grants with ssl
 Usage: mysqluserclone --source=user:pass@host:port:socket --destination=user:pass@host:port:socket joe@XXXX-XXXX sam:secret1@XXXX-XXXX
 
 mysqluserclone: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
 
-Test case 92 - basic dbexport with ssl
+Test case 108 - basic dbexport with ssl
 Usage: mysqldbexport --server=user:pass@host:port:socket db1, db2, db3
 
 mysqldbexport: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
 
-Test case 93 - basic dbimport with ssl
+Test case 109 - basic dbimport with ssl
 Usage: mysqldbimport --server=user:pass@host:port:socket db1.csv db2.sql db3.grid
 
 mysqldbimport: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
 
-Test case 94 - basic metagrep with ssl
+Test case 110 - basic metagrep with ssl
 Usage: mysqlmetagrep --server=user:pass@host:port:socket [options] pattern
 
 mysqlmetagrep: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
 
-Test case 95 - basic procgrep with ssl
+Test case 111 - basic procgrep with ssl
 Usage: mysqlprocgrep --server=user:pass@host:port:socket [options]
 
 mysqlprocgrep: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
 
-Test case 96 - basic diskusage with ssl
+Test case 112 - basic diskusage with ssl
 Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
 
 mysqldiskusage: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
 
-Test case 97 - basic mysqlfrm with ssl
+Test case 113 - basic mysqlfrm with ssl
 Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
 mysqlfrm: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
 
-Test case 98 - basic mysqldbcopy with ssl
+Test case 114 - basic mysqldbcopy with ssl
 Usage: mysqldbcopy --source=user:pass@host:port:socket --destination=user:pass@host:port:socket orig_db:new_db
 
 mysqldbcopy: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
 
-Test case 99 - basic mysqldiff with ssl
+Test case 115 - basic mysqldiff with ssl
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
 mysqldiff: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
+
+Test case 116 - basic mysqlbinlogrotate with ssl
+Usage: mysqlbinlogrotate --server=user:pass@host:port
+
+mysqlbinlogrotate: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
+
+Test case 117 - basic mysqlbinlogpurge with ssl
+Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
+
+mysqlbinlogpurge: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
 

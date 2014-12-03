@@ -1362,7 +1362,8 @@ class Slave(Server):
     def is_connected(self):
         """Check to see if slave is connected to master
 
-        This method will check the slave to see if it is connected to a master.
+        This method will check the slave to see if it is connected to a master
+        by checking if his I/O Thread is running.
 
         Returns bool - True = slave is connected
         """
@@ -1947,7 +1948,7 @@ class Slave(Server):
         res = self.get_status()
         if res == [] or not res[0]:
             if raise_error:
-                raise UtilRplError("Server '{0}:{1}' is not acting as a Slave "
+                raise UtilRplError("Server '{0}:{1}' is not acting as a slave "
                                    "(slave status is empty)"
                                    ".".format(self.host, self.port))
             return False

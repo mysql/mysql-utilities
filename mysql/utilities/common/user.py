@@ -26,6 +26,7 @@ from collections import namedtuple, defaultdict
 from mysql.utilities.common.grants_info import filter_grants
 from mysql.utilities.exception import UtilError, UtilDBError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection, clean_IPv6
+from mysql.utilities.common.messages import ERROR_USER_WITHOUT_PRIVILEGES
 from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   quote_with_backticks)
@@ -134,6 +135,53 @@ def grant_proxy_ssl_privileges(server, user, passw, at='localhost',
             raise UtilError("Cannot grant proxy to user {0} at {1}:{2} "
                             "reason:{3}".format(user, server.host,
                                                 server.port, err.errmsg))
+
+
+def check_privileges(server, operation, privileges, description,
+                     verbosity=0, reporter=None):
+    """Check required privileges.
+
+    This method check if the used user possess the required privileges to
+    execute a statement or operation.
+    An exception is thrown if the user doesn't have enough privileges.
+
+    server[in]        Server instance to check.
+    operation[in]     The name of tha task that requires the privileges,
+                      used in the error message if an exception is thrown.
+    privileges[in]    List of the required privileges.
+    description[in]   Description of the operation requiring the User's
+                      privileges, used in the message if verbosity if given.
+    verbosity[in]     Verbosity.
+    reporter[in]      A method to invoke with messages and warnings
+                      (by default print).
+    """
+    # print message with the given reporter.
+    if reporter is None and verbosity > 0:
+        print("# Checking user permission to {0}...\n"
+              "#".format(description))
+    elif reporter is not None and verbosity > 0:
+        reporter("# Checking user permission to {0}...\n"
+                 "#".format(description))
+
+    # Check privileges
+    user_obj = User(server, "{0}@{1}".format(server.user, server.host))
+    need_privileges = []
+    for privilege in privileges:
+        if not user_obj.has_privilege('*', '*', privilege):
+            need_privileges.append(privilege)
+
+    if len(need_privileges) > 0:
+        if len(need_privileges) > 1:
+            privileges_needed = "{0} and {1}".format(
+                ", ".join(need_privileges[:-1]),
+                need_privileges[-1]
+            )
+        else:
+            privileges_needed = need_privileges[0]
+        raise UtilError(ERROR_USER_WITHOUT_PRIVILEGES.format(
+            user=server.user, host=server.host, port=server.port,
+            operation=operation, req_privileges=privileges_needed
+        ))
 
 
 class User(object):

@@ -13,8 +13,12 @@ Test case 3 - Test --add-util=mysqlfakeutility option without --hide-utils
 Launching console ...
 WARNING: Unable to locate utility mysqldbcopy.
 WARNING: mysqldbcopy failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlbinlogrotate.
+WARNING: mysqlbinlogrotate failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlrpladmin.
 WARNING: mysqlrpladmin failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
+WARNING: Unable to locate utility mysqlbinlogpurge.
+WARNING: mysqlbinlogpurge failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlrplshow.
 WARNING: mysqlrplshow failed to read options. This utility will not be shown in 'help utilities' and cannot be accessed from the console.
 WARNING: Unable to locate utility mysqlrplcheck.

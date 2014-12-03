@@ -78,34 +78,36 @@ show variables          Display list of variables.
 
 Test Case 4: Show Utilities
 
-Utility           Description                                                
-----------------  -----------------------------------------------------------
-mysqlauditadmin   audit log maintenance utility                              
-mysqlauditgrep    audit log search utility                                   
-mysqlbinlogmove   binary log relocate utility                                
-mysqldbcompare    compare databases for consistency                          
-mysqldbcopy       copy databases from one server to another                  
-mysqldbexport     export metadata and data from databases                    
-mysqldbimport     import metadata and data from files                        
-mysqldiff         compare object definitions among objects where the         
-                  difference is how db1.obj1 differs from db2.obj2           
-mysqldiskusage    show disk usage for databases                              
-mysqlfailover     automatic replication health monitoring and failover       
-mysqlfrm          show CREATE TABLE from .frm files                          
-mysqlgrants       display grants per object                                  
-mysqlindexcheck   check for duplicate or redundant indexes                   
-mysqlmetagrep     search metadata                                            
-mysqlprocgrep     search process information                                 
-mysqlreplicate    establish replication with a master                        
-mysqlrpladmin     administration utility for MySQL replication               
-mysqlrplcheck     check replication                                          
-mysqlrplms        establish multi-source replication                         
-mysqlrplshow      show slaves attached to a master                           
-mysqlrplsync      replication synchronization checker utility                
-mysqlserverclone  start another instance of a running server                 
-mysqlserverinfo   show server information                                    
-mysqlslavetrx     skip transactions on slaves                                
-mysqluserclone    clone a MySQL user account to one or more new users        
+Utility            Description                                               
+-----------------  ----------------------------------------------------------
+mysqlauditadmin    audit log maintenance utility                             
+mysqlauditgrep     audit log search utility                                  
+mysqlbinlogmove    binary log relocate utility                               
+mysqlbinlogpurge   purges unnecessary binary log files                       
+mysqlbinlogrotate  rotates the active binary log file                        
+mysqldbcompare     compare databases for consistency                         
+mysqldbcopy        copy databases from one server to another                 
+mysqldbexport      export metadata and data from databases                   
+mysqldbimport      import metadata and data from files                       
+mysqldiff          compare object definitions among objects where the        
+                   difference is how db1.obj1 differs from db2.obj2          
+mysqldiskusage     show disk usage for databases                             
+mysqlfailover      automatic replication health monitoring and failover      
+mysqlfrm           show CREATE TABLE from .frm files                         
+mysqlgrants        display grants per object                                 
+mysqlindexcheck    check for duplicate or redundant indexes                  
+mysqlmetagrep      search metadata                                           
+mysqlprocgrep      search process information                                
+mysqlreplicate     establish replication with a master                       
+mysqlrpladmin      administration utility for MySQL replication              
+mysqlrplcheck      check replication                                         
+mysqlrplms         establish multi-source replication                        
+mysqlrplshow       show slaves attached to a master                          
+mysqlrplsync       replication synchronization checker utility               
+mysqlserverclone   start another instance of a running server                
+mysqlserverinfo    show server information                                   
+mysqlslavetrx      skip transactions on slaves                               
+mysqluserclone     clone a MySQL user account to one or more new users       
 
 Test Case 5: Show Options
 
@@ -176,65 +178,69 @@ show variables          Display list of variables.
                         (context sensitive).                                 
 
 
-Utility           Description                                                
-----------------  -----------------------------------------------------------
-mysqlauditadmin   audit log maintenance utility                              
-mysqlauditgrep    audit log search utility                                   
-mysqlbinlogmove   binary log relocate utility                                
-mysqldbcompare    compare databases for consistency                          
-mysqldbcopy       copy databases from one server to another                  
-mysqldbexport     export metadata and data from databases                    
-mysqldbimport     import metadata and data from files                        
-mysqldiff         compare object definitions among objects where the         
-                  difference is how db1.obj1 differs from db2.obj2           
-mysqldiskusage    show disk usage for databases                              
-mysqlfailover     automatic replication health monitoring and failover       
-mysqlfrm          show CREATE TABLE from .frm files                          
-mysqlgrants       display grants per object                                  
-mysqlindexcheck   check for duplicate or redundant indexes                   
-mysqlmetagrep     search metadata                                            
-mysqlprocgrep     search process information                                 
-mysqlreplicate    establish replication with a master                        
-mysqlrpladmin     administration utility for MySQL replication               
-mysqlrplcheck     check replication                                          
-mysqlrplms        establish multi-source replication                         
-mysqlrplshow      show slaves attached to a master                           
-mysqlrplsync      replication synchronization checker utility                
-mysqlserverclone  start another instance of a running server                 
-mysqlserverinfo   show server information                                    
-mysqlslavetrx     skip transactions on slaves                                
-mysqluserclone    clone a MySQL user account to one or more new users        
+Utility            Description                                               
+-----------------  ----------------------------------------------------------
+mysqlauditadmin    audit log maintenance utility                             
+mysqlauditgrep     audit log search utility                                  
+mysqlbinlogmove    binary log relocate utility                               
+mysqlbinlogpurge   purges unnecessary binary log files                       
+mysqlbinlogrotate  rotates the active binary log file                        
+mysqldbcompare     compare databases for consistency                         
+mysqldbcopy        copy databases from one server to another                 
+mysqldbexport      export metadata and data from databases                   
+mysqldbimport      import metadata and data from files                       
+mysqldiff          compare object definitions among objects where the        
+                   difference is how db1.obj1 differs from db2.obj2          
+mysqldiskusage     show disk usage for databases                             
+mysqlfailover      automatic replication health monitoring and failover      
+mysqlfrm           show CREATE TABLE from .frm files                         
+mysqlgrants        display grants per object                                 
+mysqlindexcheck    check for duplicate or redundant indexes                  
+mysqlmetagrep      search metadata                                           
+mysqlprocgrep      search process information                                
+mysqlreplicate     establish replication with a master                       
+mysqlrpladmin      administration utility for MySQL replication              
+mysqlrplcheck      check replication                                         
+mysqlrplms         establish multi-source replication                        
+mysqlrplshow       show slaves attached to a master                          
+mysqlrplsync       replication synchronization checker utility               
+mysqlserverclone   start another instance of a running server                
+mysqlserverinfo    show server information                                   
+mysqlslavetrx      skip transactions on slaves                               
+mysqluserclone     clone a MySQL user account to one or more new users       
 
 Test Case 11: Show Utilities + Options
 
-Utility           Description                                                
-----------------  -----------------------------------------------------------
-mysqlauditadmin   audit log maintenance utility                              
-mysqlauditgrep    audit log search utility                                   
-mysqlbinlogmove   binary log relocate utility                                
-mysqldbcompare    compare databases for consistency                          
-mysqldbcopy       copy databases from one server to another                  
-mysqldbexport     export metadata and data from databases                    
-mysqldbimport     import metadata and data from files                        
-mysqldiff         compare object definitions among objects where the         
-                  difference is how db1.obj1 differs from db2.obj2           
-mysqldiskusage    show disk usage for databases                              
-mysqlfailover     automatic replication health monitoring and failover       
-mysqlfrm          show CREATE TABLE from .frm files                          
-mysqlgrants       display grants per object                                  
-mysqlindexcheck   check for duplicate or redundant indexes                   
-mysqlmetagrep     search metadata                                            
-mysqlprocgrep     search process information                                 
-mysqlreplicate    establish replication with a master                        
-mysqlrpladmin     administration utility for MySQL replication               
-mysqlrplcheck     check replication                                          
-mysqlrplms        establish multi-source replication                         
-mysqlrplshow      show slaves attached to a master                           
-mysqlrplsync      replication synchronization checker utility                
-mysqlserverclone  start another instance of a running server                 
-mysqlserverinfo   show server information                                    
-mysqlslavetrx     skip transactions on slaves                                
-mysqluserclone    clone a MySQL user account to one or more new users        
+Utility            Description                                               
+-----------------  ----------------------------------------------------------
+mysqlauditadmin    audit log maintenance utility                             
+mysqlauditgrep     audit log search utility                                  
+mysqlbinlogmove    binary log relocate utility                               
+mysqlbinlogpurge   purges unnecessary binary log files                       
+mysqlbinlogrotate  rotates the active binary log file                        
+mysqldbcompare     compare databases for consistency                         
+mysqldbcopy        copy databases from one server to another                 
+mysqldbexport      export metadata and data from databases                   
+mysqldbimport      import metadata and data from files                       
+mysqldiff          compare object definitions among objects where the        
+                   difference is how db1.obj1 differs from db2.obj2          
+mysqldiskusage     show disk usage for databases                             
+mysqlfailover      automatic replication health monitoring and failover      
+mysqlfrm           show CREATE TABLE from .frm files                         
+mysqlgrants        display grants per object                                 
+mysqlindexcheck    check for duplicate or redundant indexes                  
+mysqlmetagrep      search metadata                                           
+mysqlprocgrep      search process information                                
+mysqlreplicate     establish replication with a master                       
+mysqlrpladmin      administration utility for MySQL replication              
+mysqlrplcheck      check replication                                         
+mysqlrplms         establish multi-source replication                        
+mysqlrplshow       show slaves attached to a master                          
+mysqlrplsync       replication synchronization checker utility               
+mysqlserverclone   start another instance of a running server                
+mysqlserverinfo    show server information                                   
+mysqlslavetrx      skip transactions on slaves                               
+mysqluserclone     clone a MySQL user account to one or more new users       
 
 
 
@@ -252,34 +258,36 @@ width      77
 
 Test Case 12: Show Utilities + Options + NULL
 
-Utility           Description                                                
-----------------  -----------------------------------------------------------
-mysqlauditadmin   audit log maintenance utility                              
-mysqlauditgrep    audit log search utility                                   
-mysqlbinlogmove   binary log relocate utility                                
-mysqldbcompare    compare databases for consistency                          
-mysqldbcopy       copy databases from one server to another                  
-mysqldbexport     export metadata and data from databases                    
-mysqldbimport     import metadata and data from files                        
-mysqldiff         compare object definitions among objects where the         
-                  difference is how db1.obj1 differs from db2.obj2           
-mysqldiskusage    show disk usage for databases                              
-mysqlfailover     automatic replication health monitoring and failover       
-mysqlfrm          show CREATE TABLE from .frm files                          
-mysqlgrants       display grants per object                                  
-mysqlindexcheck   check for duplicate or redundant indexes                   
-mysqlmetagrep     search metadata                                            
-mysqlprocgrep     search process information                                 
-mysqlreplicate    establish replication with a master                        
-mysqlrpladmin     administration utility for MySQL replication               
-mysqlrplcheck     check replication                                          
-mysqlrplms        establish multi-source replication                         
-mysqlrplshow      show slaves attached to a master                           
-mysqlrplsync      replication synchronization checker utility                
-mysqlserverclone  start another instance of a running server                 
-mysqlserverinfo   show server information                                    
-mysqlslavetrx     skip transactions on slaves                                
-mysqluserclone    clone a MySQL user account to one or more new users        
+Utility            Description                                               
+-----------------  ----------------------------------------------------------
+mysqlauditadmin    audit log maintenance utility                             
+mysqlauditgrep     audit log search utility                                  
+mysqlbinlogmove    binary log relocate utility                               
+mysqlbinlogpurge   purges unnecessary binary log files                       
+mysqlbinlogrotate  rotates the active binary log file                        
+mysqldbcompare     compare databases for consistency                         
+mysqldbcopy        copy databases from one server to another                 
+mysqldbexport      export metadata and data from databases                   
+mysqldbimport      import metadata and data from files                       
+mysqldiff          compare object definitions among objects where the        
+                   difference is how db1.obj1 differs from db2.obj2          
+mysqldiskusage     show disk usage for databases                             
+mysqlfailover      automatic replication health monitoring and failover      
+mysqlfrm           show CREATE TABLE from .frm files                         
+mysqlgrants        display grants per object                                 
+mysqlindexcheck    check for duplicate or redundant indexes                  
+mysqlmetagrep      search metadata                                           
+mysqlprocgrep      search process information                                
+mysqlreplicate     establish replication with a master                       
+mysqlrpladmin      administration utility for MySQL replication              
+mysqlrplcheck      check replication                                         
+mysqlrplms         establish multi-source replication                        
+mysqlrplshow       show slaves attached to a master                          
+mysqlrplsync       replication synchronization checker utility               
+mysqlserverclone   start another instance of a running server                
+mysqlserverinfo    show server information                                   
+mysqlslavetrx      skip transactions on slaves                               
+mysqluserclone     clone a MySQL user account to one or more new users       
 
 
 

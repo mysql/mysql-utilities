@@ -2097,6 +2097,28 @@ class Server(object):
                     self.grants_enabled = True
         return self.grants_enabled
 
+    def get_server_binlogs_list(self, include_size=False):
+        """Find the binlog file names listed on a server.
+
+        Obtains the binlog file names available on the server by using the
+        'SHOW BINARY LOGS' query at the given server instance and returns these
+        file names as a list.
+
+        include_size[in]  Boolean value to indicate if the returning list shall
+                          include the size of the file.
+
+        Returns a list with the binary logs names available on master.
+        """
+        res = self.exec_query("SHOW BINARY LOGS")
+
+        server_binlogs = []
+        for row in res:
+            if include_size:
+                server_binlogs.append(row)
+            else:
+                server_binlogs.append(row[0])
+        return server_binlogs
+
 
 class QueryKillerThread(threading.Thread):
     """Class to run a thread to kill an executing query.

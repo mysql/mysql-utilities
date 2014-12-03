@@ -110,6 +110,9 @@ PARSE_ERR_OPT_REQ_GREATER_VALUE = ("Option '{opt}' requires a value greater "
 
 PARSE_ERR_OPT_REQ_VALUE = "Option '{opt}' requires a non-empty value."
 
+PARSE_ERR_OPT_REQ_OPT = ("Option {opt} requires the following option(s): "
+                         "{opts}.")
+
 PARSE_ERR_OPTS_EXCLD = ("Options {opt1} and {opt2} cannot be used "
                         "together.")
 
@@ -117,9 +120,6 @@ PARSE_ERR_OPTS_REQ = "Option '{opt}' is required."
 
 PARSE_ERR_OPTS_REQ_BY_CMD = ("'{cmd}' requires the following option(s): "
                              "{opts}.")
-
-PARSE_ERR_DISCO_REQ_MASTER = ("Option --discover-slaves-login requires use of "
-                              "--master.")
 
 PARSE_ERR_SLAVE_DISCO_REQ = ("Option --discover-slaves-login or --slaves is "
                              "required.")

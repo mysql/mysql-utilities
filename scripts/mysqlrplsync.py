@@ -32,7 +32,7 @@ import sys
 
 from mysql.utilities.command.rpl_sync_check import check_data_consistency
 from mysql.utilities.common.messages import (
-    ERROR_MASTER_IN_SLAVES, PARSE_ERR_DISCO_REQ_MASTER,
+    ERROR_MASTER_IN_SLAVES, PARSE_ERR_OPT_REQ_OPT,
     PARSE_ERR_OPT_REQ_NON_NEGATIVE_VALUE, PARSE_ERR_OPT_REQ_GREATER_VALUE,
     PARSE_ERR_OPT_REQ_VALUE, PARSE_ERR_OPTS_EXCLD,
     PARSE_ERR_SLAVE_DISCO_REQ
@@ -192,7 +192,10 @@ if __name__ == '__main__':
         ))
 
     if opt.discover and not opt.master:
-        parser.error(PARSE_ERR_DISCO_REQ_MASTER)
+        parser.error(PARSE_ERR_OPT_REQ_OPT.format(
+            opt="--discover-slaves-login",
+            opts="--master"
+        ))
 
     # Check timeout values, must be greater than zero.
     if opt.rpl_timeout < 0:

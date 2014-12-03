@@ -14,12 +14,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-
 """
 This file contains commands methods methods for working with binary log files.
 For example: to relocate binary log files to a new location.
 """
 
+import logging
 import os.path
 import shutil
 
@@ -28,16 +28,41 @@ from mysql.utilities.common.binary_log_file import (
     filter_binary_logs_by_date, get_index_file, LOG_TYPE_ALL, LOG_TYPE_BIN,
     LOG_TYPE_RELAY, move_binary_log
 )
-from mysql.utilities.common.messages import ERROR_USER_WITHOUT_PRIVILEGES
+from mysql.utilities.common.binlog import (
+    determine_purgeable_binlogs,
+    get_active_binlog_and_size,
+    get_binlog_info,
+    purge,
+    rotate,
+)
 from mysql.utilities.common.server import Server
-from mysql.utilities.common.user import User
+from mysql.utilities.common.topology import Topology
+from mysql.utilities.common.user import check_privileges
 from mysql.utilities.exception import UtilError
 
 
+BINLOG_OP_MOVE = "perform binary log move"
+BINLOG_OP_MOVE_DESC = "move binary logs"
+BINLOG_OP_PURGE = "perform binary log purge"
+BINLOG_OP_PURGE_DESC = "purge binary logs"
+BINLOG_OP_ROTATE = "perform binary log rotation"
+BINLOG_OP_ROTATE_DESC = "rotate binary logs"
 _ACTION_DATADIR_USED = ("The 'datadir' will be used as base directory for "
                         "{file_type} files.")
 _ACTION_SEARCH_INDEX = ("The utility will try to find the index file in the"
                         "base directory for {file_type} files.")
+_CAN_NOT_VERIFY_SLAVES_STATUS = (
+    "Can not verify the slaves status for the given master {host}:{port}. "
+    "Make sure the slaves are active and accessible."
+)
+_CAN_NOT_VERIFY_SLAVE_STATUS = (
+    "Can not verify the status for slave {host}:{port}. "
+    "Make sure the slave are active and accessible."
+)
+_COULD_NOT_FIND_BINLOG = (
+    "WARNING: Could not find the given binlog name: '{bin_name}' "
+    "in the binlog files listed in the {server_name}: {host}:{port}"
+)
 _ERR_MSG_MOVE_FILE = "Unable to move binary file: {filename}\n{error}"
 _INFO_MSG_APPLY_FILTERS = ("# Applying {filter_type} filter to {file_type} "
                            "files...")
@@ -188,7 +213,7 @@ def move_binlogs(binlog_dir, destination, options, bin_basename=None,
     print("#...done.\n#")
 
 
-def _check_privileges(server, options):
+def _check_privileges_to_move_binlogs(server, options):
     """Check required privileges to move binary logs from server.
 
     This method check if the used user possess the required privileges to
@@ -200,21 +225,10 @@ def _check_privileges(server, options):
     options[in]     Dictionary of options (skip_flush_binlogs, verbosity).
     """
     skip_flush = options['skip_flush_binlogs']
-
+    verbosity = options['verbosity']
     if not skip_flush:
-        # Only need to check privileges if flush is not skipped.
-        verbosity = options['verbosity']
-        if verbosity > 0:
-            print("# Checking user permission to move binary logs...\n"
-                  "#")
-
-        # Check privileges
-        user_obj = User(server, "{0}@{1}".format(server.user, server.host))
-        if not user_obj.has_privilege('*', '*', 'RELOAD'):
-            raise UtilError(ERROR_USER_WITHOUT_PRIVILEGES.format(
-                user=server.user, host=server.host, port=server.port,
-                operation='perform binary log move', req_privileges='RELOAD'
-            ))
+        check_privileges(server, BINLOG_OP_MOVE, ['RELOAD'],
+                         BINLOG_OP_MOVE_DESC, verbosity)
 
 
 def move_binlogs_from_server(server_cnx_val, destination, options,
@@ -261,7 +275,7 @@ def move_binlogs_from_server(server_cnx_val, destination, options,
                         "access to the binary log files.")
 
     # Check privileges.
-    _check_privileges(srv, options)
+    _check_privileges_to_move_binlogs(srv, options)
 
     # Process binlog files.
     if log_type in (LOG_TYPE_BIN, LOG_TYPE_ALL):
@@ -375,3 +389,459 @@ def move_binlogs_from_server(server_cnx_val, destination, options,
             print("#")
 
     print("#...done.\n#")
+
+
+def _report_binlogs(binlog_list, reporter, removed=False):
+    """Reports the binary files available and removed.
+
+    binlog_list[in]    A list of binlog file names.
+    reporter[in]       A reporter that receives the messages as parameter
+    removed[in]        The given list of binlog file names are removed files.
+                       Default is False, meaning files are available.
+
+    Uses the reporter to reports the binary files available and removed.
+    """
+    if removed:
+        msg = ("binlog file", "purged")
+    else:
+        msg = ("binlog file", "available")
+
+    if len(binlog_list) == 1:
+        reporter("# {0} {1}: {2}"
+                 "".format(msg[0].capitalize(), msg[1], binlog_list[0]))
+
+    if len(binlog_list) > 1:
+        end_range = "from {0} to {1}".format(binlog_list[0], binlog_list[-1])
+        reporter("# Range of {0}s {1}: {2}"
+                 "".format(msg[0], msg[1], end_range))
+
+
+def binlog_purge(server_cnx_val, master_cnx_val, slaves_cnx_val, options):
+    """Purge binary log.
+
+    Purges the binary logs from a server, it will purge all of the binlogs
+    older than the active binlog file or the given target binlog index.
+    For a master server determines the latest log file to purge among all the
+    slaves, which becomes the target file to purge binary logs to, in case no
+    other file is specified.
+
+    server_cnx_val[in]    Server connection dictionary.
+    master_cnx_val[in]    Master server connection dictionary.
+    slaves_cnx_val[in]    Slave server connection dictionary.
+    options[in]           Options dictionary.
+        to_binlog_name    The target binlog index, in case doesn't want
+                          to use the active binlog file or the index last in
+                          use in a replication scenario.
+        verbosity         print extra data during operations default level
+                          value = 0
+        discover          discover the list of slaves associated to the
+                          specified login (user and password).
+        dry_run           Don't actually rotate the active binlog, instead
+                          it will print information about file name and size.
+
+    """
+    assert not (server_cnx_val is None and master_cnx_val is None), \
+        "At least one of server_cnx_val or master_cnx_val must be a valid"\
+        " dictionary with server connection values"
+
+    if master_cnx_val is not None:
+        purger = RPLBinaryLogPurge(master_cnx_val, slaves_cnx_val, options)
+    else:
+        purger = BinaryLogPurge(server_cnx_val, options)
+    purger.purge()
+
+
+class BinaryLogPurge(object):
+    """BinaryLogPurge
+    """
+
+    def __init__(self, server_cnx_val, options):
+        """Initiator.
+
+        server_cnx_val[in]    Server connection dictionary.
+        options[in]        Options dictionary.
+        """
+
+        self.server_cnx_val = server_cnx_val
+        self.server = None
+        self.options = options
+        self.verbosity = self.options.get("verbosity", 0)
+        self.quiet = self.options.get("quiet", False)
+        self.logging = self.options.get("logging", False)
+        self.dry_run = self.options.get("dry_run", 0)
+        self.to_binlog_name = self.options.get("to_binlog_name", False)
+
+    def _report(self, message, level=logging.INFO, print_msg=True):
+        """Log message if logging is on.
+
+        This method will log the message presented if the log is turned on.
+        Specifically, if options['log_file'] is not None. It will also
+        print the message to stdout.
+
+        message[in]      Message to be printed.
+        level[in]        Level of message to log. Default = INFO.
+        print_msg[in]    If True, print the message to stdout. Default = True.
+        """
+        # First, print the message.
+        if print_msg and not self.quiet:
+            print(message)
+        # Now log message if logging turned on
+        if self.logging:
+            logging.log(int(level), message.strip("#").strip(" "))
+
+    def get_target_binlog_index(self, binlog_file_name):
+        """Retrieves the target binlog file index.
+
+        Retrieves the target binlog file index that will used in the purge
+        query, by the fault the latest log not in use unless the user
+        specifies a different target which is validated against the server's
+        binlog base name.
+
+        binlog_file_name[in]    the binlog base file name used by the server.
+
+        Returns the target index binlog file
+        """
+        if self.to_binlog_name:
+            to_binlog_name = self.to_binlog_name.split('.')[0]
+            if to_binlog_name != binlog_file_name:
+                raise UtilError(
+                    "The given binlog file name: '{0}' differs "
+                    "from the used by the server: '{1}'"
+                    "".
+                    format(to_binlog_name, binlog_file_name))
+            else:
+                to_binlog_index = int(self.to_binlog_name.split('.')[1])
+            return to_binlog_index
+        return None
+
+    def _purge(self, index_last_in_use, active_binlog_file, binlog_file_name,
+               target_binlog_index=None, server=None, server_is_master=False):
+        """The inner purge method.
+
+        Purges the binary logs from the given server, it will purge all of the
+        binlogs older than the active_binlog_file ot to target_binlog_index.
+
+        index_last_in_use[in]    The index of the latest binary log not in
+                                 use. in case of a Master, must be the latest
+                                 binlog caought by all the slaves.
+        active_binlog_file[in]   Current active binlog file.
+        binlog_file_name[in]     Binlog base file name.
+        target_binlog_index[in]  The target binlog index, in case doesn't want
+                                 to use the index_last_in_use by default None.
+        server[in]               Server object where to purge the binlogs from,
+                                 by default self.server is used.
+        server_is_master[in]     Indicates if the given server is a Master,
+                                 used for report purposes by default False.
+        """
+        if server is None:
+            server = self.server
+        if server_is_master:
+            server_name = "master"
+        else:
+            server_name = "server"
+
+        # The purge_to_binlog file used to purge query based on earliest log
+        # not in use
+        z_len = len(active_binlog_file.split('.')[1])
+        purge_to_binlog = (
+            "{0}.{1}".format(binlog_file_name,
+                             repr(index_last_in_use).zfill(z_len))
+        )
+
+        server_binlogs_list = server.get_server_binlogs_list()
+        if self.verbosity >= 1:
+            _report_binlogs(server_binlogs_list, self._report)
+
+        # The last_binlog_not_in_use used for information purposes
+        index_last_not_in_use = index_last_in_use - 1
+        last_binlog_not_in_use = (
+            "{0}.{1}".format(binlog_file_name,
+                             repr(index_last_not_in_use).zfill(z_len))
+        )
+
+        if server_is_master:
+            self._report("# Latest binlog file replicated by all slaves: "
+                         "{0}".format(last_binlog_not_in_use))
+
+        if target_binlog_index is None:
+            # Purge to latest binlog not in use
+            if self.verbosity > 0:
+                self._report("# Latest not active binlog"
+                             " file: {0}".format(last_binlog_not_in_use))
+
+            # last_binlog_not_in_use
+            purge(server, purge_to_binlog, server_binlogs_list,
+                  reporter=self._report, dryrun=self.dry_run,
+                  verbosity=self.verbosity)
+        else:
+            purge_to_binlog = (
+                "{0}.{1}".format(binlog_file_name,
+                                 repr(target_binlog_index).zfill(z_len))
+            )
+            if purge_to_binlog not in server_binlogs_list:
+                self._report(
+                    _COULD_NOT_FIND_BINLOG.format(bin_name=self.to_binlog_name,
+                                                  server_name=server_name,
+                                                  host=server.host,
+                                                  port=server.port))
+                return
+
+            if target_binlog_index > index_last_in_use:
+                self._report("WARNING: The given binlog name: '{0}' is "
+                             "required for one or more slaves, the Utilitiy "
+                             "will purge to binlog '{1}' instead."
+                             "".format(self.to_binlog_name,
+                                       last_binlog_not_in_use))
+                target_binlog_index = last_binlog_not_in_use
+
+            # last_binlog_not_in_use
+            purge(server, purge_to_binlog, server_binlogs_list,
+                  reporter=self._report, dryrun=self.dry_run,
+                  verbosity=self.verbosity)
+
+        server_binlogs_list_after = server.get_server_binlogs_list()
+        if self.verbosity >= 1:
+            _report_binlogs(server_binlogs_list_after, self._report)
+        for binlog in server_binlogs_list_after:
+            if binlog in server_binlogs_list:
+                server_binlogs_list.remove(binlog)
+        if self.verbosity >= 1 and server_binlogs_list:
+            _report_binlogs(server_binlogs_list, self._report, removed=True)
+
+    def purge(self):
+        """The purge method for a standalone server.
+
+        Determines the latest log file to purge, which becomes the target
+        file to purge binary logs to in case no other file is specified.
+        """
+        # Connect to server
+        self.server = Server({'conn_info': self.server_cnx_val})
+        self.server.connect()
+
+        # Check required privileges
+        check_privileges(self.server, BINLOG_OP_PURGE,
+                         ["SUPER", "REPLICATION SLAVE"],
+                         BINLOG_OP_PURGE_DESC, self.verbosity, self._report)
+
+        # retrieve active binlog info
+        binlog_file_name, active_binlog_file, index_last_in_use = (
+            get_binlog_info(self.server, reporter=self._report,
+                            server_name="server", verbosity=self.verbosity)
+        )
+
+        # Verify this server is not a Master.
+        processes = self.server.exec_query("SHOW PROCESSLIST")
+        binlog_dump = False
+        for process in processes:
+            if process[4] == "Binlog Dump":
+                binlog_dump = True
+                break
+        hosts = self.server.exec_query("SHOW SLAVE HOSTS")
+        if binlog_dump or hosts:
+            if hosts and not self.verbosity:
+                msg_v = " For more info use verbose option."
+            else:
+                msg_v = ""
+            if self.verbosity >= 1:
+                for host in hosts:
+                    self._report("# WARNING: Slave with id:{0} at {1}:{2} "
+                                 "is connected to this server."
+                                 "".format(host[0], host[1], host[2]))
+            raise UtilError("The given server is acting as a master and has "
+                            "slaves connected to it. To proceed please use the"
+                            " --master option.{0}".format(msg_v))
+
+        target_binlog_index = self.get_target_binlog_index(binlog_file_name)
+
+        self._purge(index_last_in_use, active_binlog_file, binlog_file_name,
+                    target_binlog_index)
+
+
+class RPLBinaryLogPurge(BinaryLogPurge):
+    """RPLBinaryLogPurge class
+    """
+
+    def __init__(self, master_cnx_val, slaves_cnx_val, options):
+        """Initiator.
+
+        master_cnx_val[in]    Master server connection dictionary.
+        slaves_cnx_val[in]    Slave server connection dictionary.
+        options[in]           Options dictionary.
+        """
+        super(RPLBinaryLogPurge, self).__init__(None, options)
+
+        self.master_cnx_val = master_cnx_val
+        self.slaves_cnx_val = slaves_cnx_val
+
+        self.topology = None
+        self.master = None
+        self.slaves = None
+
+    def purge(self):
+        """The Purge Method
+
+        Determines the latest log file to purge among all the slaves, which
+        becomes the target file to purge binary logs to, in case no other
+        file is specified.
+        """
+        # Create a topology object to verify the connection between master and
+        # slaves servers.
+        self.topology = Topology(self.master_cnx_val, self.slaves_cnx_val,
+                                 self.options, skip_conn_err=False)
+
+        self.master = self.topology.master
+        self.slaves = self.topology.slaves
+
+        # Check required privileges
+        check_privileges(self.master, BINLOG_OP_PURGE,
+                         ["SUPER", "REPLICATION SLAVE"],
+                         BINLOG_OP_PURGE_DESC, self.verbosity, self._report)
+
+        # Get binlog info
+        binlog_file_name, active_binlog_file, active_binlog_index = (
+            get_binlog_info(self.master, reporter=self._report,
+                            server_name="master", verbosity=self.verbosity)
+        )
+
+        # Verify this Master has at least one slave.
+        if not self.slaves:
+            errormsg = (
+                _CAN_NOT_VERIFY_SLAVES_STATUS.format(host=self.master.host,
+                                                     port=self.master.port))
+            raise UtilError(errormsg)
+
+        # verify the given slaves are connected to this Master.
+        if self.slaves_cnx_val and self.slaves:
+            for slave in self.slaves:
+                slave['instance'].is_configured_for_master(self.master,
+                                                           verify_state=False,
+                                                           raise_error=True)
+
+                # IO running verification for --slaves option
+                if not slave['instance'].is_connected():
+                    if self.verbosity:
+                        self._report("# Slave '{0}:{1}' IO not running"
+                                     "".format(slave['host'], slave['port']))
+                    raise UtilError(
+                        _CAN_NOT_VERIFY_SLAVE_STATUS.format(host=slave['host'],
+                                                            port=slave['port'])
+                    )
+
+        target_binlog_index = self.get_target_binlog_index(binlog_file_name)
+
+        index_last_in_use = determine_purgeable_binlogs(
+            active_binlog_index,
+            self.slaves,
+            reporter=self._report,
+            verbosity=self.verbosity
+        )
+
+        self._purge(index_last_in_use, active_binlog_file, binlog_file_name,
+                    target_binlog_index, server=self.master,
+                    server_is_master=True)
+
+
+def binlog_rotate(server_val, options):
+    """Rotate binary log.
+
+    This function creates a BinaryLogRotate task.
+
+    server_cnx_val[in] Dictionary with the connection values for the server.
+    options[in]        options for controlling behavior:
+        logging        If logging is active or not.
+        verbose        print extra data during operations (optional)
+                       default value = False
+        min_size       minimum size that the active binlog must have prior
+                       to rotate it.
+        dry_run        Don't actually rotate the active binlog, instead
+                       it will print information about file name and size.
+    """
+    binlog_rotate = BinaryLogRotate(server_val, options)
+    binlog_rotate.rotate()
+
+
+class BinaryLogRotate(object):
+    """The BinaryLogRotate Class, it represents a binary log rotation task.
+    The rotate method performs the following tasks:
+        - Retrieves the active binary log and file size.
+        - If the minimum size is given, evaluate active binlog file size, and
+          if this is greater than the minimum size rotation will occur.
+          rotation occurs.
+    """
+
+    def __init__(self, server_cnx_val, options):
+        """Initiator.
+
+        server_cnx_val[in] Dictionary with the connection values for the
+                           server.
+        options[in]        options for controlling behavior:
+            logging        If logging is active or not.
+            verbose        print extra data during operations (optional)
+                           default value = False
+            min_size       minimum size that the active binlog must have prior
+                           to rotate it.
+            dry_run        Don't actually rotate the active binlog, instead
+                           it will print information about file name and size.
+        """
+
+        # Connect to server
+        self.server = Server({'conn_info': server_cnx_val})
+        self.server.connect()
+        self.options = options
+        self.verbosity = self.options.get("verbosity", 0)
+        self.quiet = self.options.get("quiet", False)
+        self.logging = self.options.get("logging", False)
+        self.dry_run = self.options.get("dry_run", 0)
+        self.binlog_min_size = self.options.get("min_size", False)
+
+    def _report(self, message, level=logging.INFO, print_msg=True):
+        """Log message if logging is on.
+
+        This method will log the message presented if the log is turned on.
+        Specifically, if options['log_file'] is not None. It will also
+        print the message to stdout.
+
+        message[in]      Message to be printed.
+        level[in]        Level of message to log. Default = INFO.
+        print_msg[in]    If True, print the message to stdout. Default = True.
+        """
+        # First, print the message.
+        if print_msg and not self.quiet:
+            print(message)
+        # Now log message if logging turned on
+        if self.logging:
+            msg = message.strip("#").strip(" ")
+            logging.log(int(level), msg)
+
+    def rotate(self):
+        """This Method runs the rotation.
+
+        This method will use the methods from the common library to rotate the
+        binary log.
+        """
+
+        # Check required privileges
+        check_privileges(self.server, BINLOG_OP_ROTATE,
+                         ["RELOAD","REPLICATION CLIENT"],
+                         BINLOG_OP_ROTATE_DESC, self.verbosity, self._report)
+
+        active_binlog, binlog_size = get_active_binlog_and_size(self.server)
+        if self.verbosity:
+            self._report("# Active binlog file: '{0}' (size: {1} bytes)'"
+                         "".format(active_binlog, binlog_size))
+
+        if self.binlog_min_size:
+            rotated = rotate(self.server, self.binlog_min_size,
+                             reporter=self._report)
+        else:
+            rotated = rotate(self.server, reporter=self._report)
+
+        if rotated:
+            new_active_binlog, _ = get_active_binlog_and_size(self.server)
+            if active_binlog == new_active_binlog:
+                raise UtilError("Unable to rotate binlog file.")
+            else:
+                self._report("# The binlog file has been rotated.")
+                if self.verbosity:
+                    self._report("# New active binlog file: '{0}'"
+                                 "".format(new_active_binlog))

@@ -9,3 +9,5 @@ Test case 8 - basic diskusage with ssl: passed
 Test case 9 - basic mysqlfrm with ssl: passed
 Test case 10 - basic mysqldbcopy with ssl: passed
 Test case 11 - basic mysqldiff with ssl: passed
+Test case 12 - basic mysqlbinlogrotate with ssl: passed
+Test case 13 - basic mysqlbinlogpurge with ssl: passed

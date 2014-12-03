@@ -51,6 +51,8 @@ AVAILABLE_UTILITIES = {
     'mysqlauditadmin': (),
     'mysqlauditgrep': (),
     'mysqlbinlogmove': (),
+    'mysqlbinlogpurge': (),
+    'mysqlbinlogrotate': (),
     'mysqldbcompare': (),
     'mysqldbcopy': (),
     'mysqldbexport': (),
