@@ -1,3 +1,30 @@
+Release-1.6.1 (Released December 08, 2014)
+------------------------------------------
+- BUG#20078072 : Improve MySQL Utilities support for MySQL 5.7.5
+- BUG#20035380 : utilities need to support new mysql fk behavior
+- BUG#19943104 : utilities do not parse grant statements correctly
+- BUG#19942512 : utilities do not work with spaces on the mysql server path
+- BUG#19804151 : mysqlserverclone does not work with mysql5.7
+- BUG#19792492 : Commercial mysql utilities rpm depends on community c/py.
+- BUG#19781888 : MUT test binlogmove_privileges failing
+- BUG#19781304 : possible to execute system commands with mysqluc
+- BUG#19720715 : mysqlindexcheck has wrong results for hash and fulltext indexes
+- BUG#19614037 : utilities version not shown in logged output
+- BUG#19348330 : mut fails to kill servers on windows
+- BUG#19340701 : mysqldbcompare generates invalid sql
+- BUG#19313139 : mysqldbcompare not escaping values in sql output
+- BUG#19238195 : Missing support of config-path in rpl_user option.
+- BUG#19031182 : comply with ssl changes in wl#6791
+- BUG#19030588 : ssl-ca option is required to establish an encrypted connection
+- BUG#18955235 : mysqldbcopy fails when copying text columns with single quotes
+- BUG#18792076 : CSV format using incorrect line terminator for unix
+- BUG#18763262 : error using large span key values for mysqldbcompare
+- BUG#18718660 : indexes that just have same prefix are not redundant
+- BUG#18717843 : duplicated execution for mysqldbcompare with --show-reverse
+- BUG#18042411 : mysqldbimport should report non existing file error
+- WL#8039 : MySQL binary log purge and rotate utilities
+- WL#7350 : mysqlslavetrx
+
 Release-1.5.3 (Released October 20, 2014)
 -------------------------------------------
 - BUG#19430737: missing mysqldbcompare feature to compare all databases
