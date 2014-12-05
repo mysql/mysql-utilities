@@ -128,6 +128,22 @@ def path_callback(option, opt, value, parser):
     setattr(parser.values, option.dest, value)
 
 
+def ssl_callback(option, opt, value, parser):
+    """Verify that the given path is an existing file. If it is then add it
+    to the parser values.
+
+    option[in]        option instance
+    opt[in]           option name
+    value[in]         given user value
+    parser[in]        parser instance
+    """
+    if not (value == 0 or value == 1 or value == ''):
+        parser.error("the given value '{0}' in option {1} is not"
+                     " valid, valid values are 0 or 1.".format(value, opt))
+
+    setattr(parser.values, option.dest, value)
+
+
 def add_config_path_option(parser):
     """Add the config_path option.
 
@@ -160,6 +176,13 @@ def add_ssl_options(parser):
                       callback=path_callback,
                       type="string", help="The name of the SSL key file to "
                       "use for establishing a secure connection.")
+
+    parser.add_option("--ssl", action="callback", callback=ssl_callback,
+                      # default=0,
+                      type="int", help="Specifies if the server "
+                      "connection requires use of SSL. If an encrypted "
+                      "connection cannot be established, the connection "
+                      "attempt fails. By default 0 (SSL not required).")
 
 
 class CaseInsensitiveChoicesOption(CustomOption):
@@ -1048,6 +1071,8 @@ def get_ssl_dict(parser_options=None):
             certs_paths['ssl_cert'] = parser_options.ssl_cert
         if 'ssl_key' in dir(parser_options):
             certs_paths['ssl_key'] = parser_options.ssl_key
+        if 'ssl' in dir(parser_options):
+            certs_paths['ssl'] = parser_options.ssl
         conn_options.update(certs_paths)
     return conn_options
 

@@ -19,6 +19,10 @@
 check ssl connection support test.
 """
 
+from mysql.utilities.exception import MUTLibError
+
+from mutlib.ssl_certs import ssl_c_ca_b
+
 import ssl_connection_simple_test
 
 
@@ -26,18 +30,24 @@ class test(ssl_connection_simple_test.test):
     """checks ssl connection support for utilities that uses add server option
     from option module.
 
-    Shares the the same pre_requisites, setup and drop_all methods as the
+    Shares the the same pre_requisites and drop_all methods as the
     parent class.
     """
-    # pylint: disable=W0221
-    def run_test(self, test, test_case, conn_str, exp_result):
-        """Runs each individual test.
-        """
-        test_cmd = "{0} {1}".format(test['cmd_str'].format(conn_str),
-                                    test['cmd_opts'])
-        test_comment = test['comment'].format(test_case)
-        res = self.run_test_case(exp_result, test_cmd, test_comment)
-        return res
+
+    server2 = None
+
+    def setup(self):
+        super(test, self).setup()
+        try:
+            self.servers.spawn_server('no_ssl_server', mysqld="--ssl=1")
+        except MUTLibError as err:
+            raise MUTLibError("Cannot spawn needed servers: {0}"
+                              "".format(err.errmsg))
+
+        index = self.servers.find_server_by_name('no_ssl_server')
+        self.server2 = self.servers.get_server(index)
+
+        return True
 
     def run_round_of_tests(self, tests, test_num, conn_opts, comment):
         """Runs a round of tests.
@@ -60,6 +70,8 @@ class test(ssl_connection_simple_test.test):
         ssl_ca = "--ssl-ca={0}".format(conn_val[6])
         ssl_cert = "--ssl-cert={0}".format(conn_val[7])
         ssl_key = "--ssl-key={0}".format(conn_val[8])
+        ssl = "--ssl={0}"
+        conn_no_ssl = self.build_connection_string(self.server2)
         tests = []
 
         # ======== mysqlindexcheck ========= #
@@ -124,7 +136,7 @@ class test(ssl_connection_simple_test.test):
             "utility": "mysqldiskusage",
             "cmd_str": "mysqldiskusage.py --server={0}",
             "comment": "Test case {0} - basic diskusage with ssl",
-            "cmd_opts": " -q"
+            "cmd_opts": ""
         })
 
         # ========  mysqlfrm  ========= #
@@ -173,10 +185,6 @@ class test(ssl_connection_simple_test.test):
         conn_opts = "{0}".format(conn_str)
         test_num = self.run_round_of_tests(tests, test_num, conn_opts,
                                            "No ssl options")
-
-        # Servers prior to 5.7 will allow connection if ssl_ca is present
-        # for that reason this case is not run on this test.
-        # MySQl 5.7 may require a variant of this test.
 
         # conn_str with --ssl-ca and --ssl-key options only
         conn_opts = "{0} {1} {2}".format(conn_str, ssl_ca, ssl_key)
@@ -230,6 +238,29 @@ class test(ssl_connection_simple_test.test):
                                            "unexisting certificate"
                                            "file in --ssl-key option")
 
+        # conn_str with --ssl=0 with user that requires SSL
+        ssl_required = ssl.format("0")
+        conn_opts = "{0} {1}".format(conn_str, ssl_required)
+        test_num = self.run_round_of_tests(tests, test_num, conn_opts,
+                                           "only --ssl=0 option for ssl "
+                                           "required user")
+
+        # conn_str with --ssl=1 with server without ssl certs and user that no
+        # requires SSL
+        ssl_required = ssl.format("1")
+        conn_opts = "{0} {1}".format(conn_no_ssl, ssl_required)
+        test_num = self.run_round_of_tests(tests, test_num, conn_opts,
+                                           "only --ssl=1 option and server "
+                                           "without ssl certs")
+
+        # conn_str with --ssl=1 with different ca-cert
+        ssl_required = ssl.format("1")
+        conn_opts = "{0} --ssl-ca={1} {2}".format(conn_str, ssl_c_ca_b,
+                                                  ssl_required)
+        test_num = self.run_round_of_tests(tests, test_num, conn_opts,
+                                           "--ssl=1 option and different ssl "
+                                           "ca-cert")
+
         self.do_replacements()
 
         return True
@@ -249,6 +280,20 @@ class test(ssl_connection_simple_test.test):
                             "| root[...]\n")
         self.remove_result_and_lines_after("              config_file:", 16)
         self.remove_result_and_lines_after("| db_name             |", 12)
+        self.remove_result("# Database totals:")
+        self.remove_result_and_lines_after("Total database disk u", 2)
+        self.replace_substring("mysqldiskusage: error: Lost connection",
+                               "ERROR: Lost connection")
+        self.replace_substring("ERROR: 2055: Lost connection",
+                               "ERROR: Lost connection")
+        self.replace_substring("mysqlfrm: error: Lost connection",
+                               "ERROR: Lost connection")
+        self.replace_substring_portion("ERROR: Lost connection",
+                                       "certificate verify failed",
+                                       "certificate verify failed")
+        self.replace_result("ERROR: Lost connection to MySQL server at",
+                            "ERROR: Lost connection to MySQL server at"
+                            " 'XXXX-XXXX:XXXX'\n")
 
     def get_result(self):
         return self.compare(__name__, self.results)
@@ -257,4 +302,5 @@ class test(ssl_connection_simple_test.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
+        self.kill_server_list(['no_ssl_server'])
         return ssl_connection_simple_test.test.cleanup(self)

@@ -40,6 +40,10 @@ Test case 2 - show the help
                         establishing a secure connection.
   --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
                         secure connection.
+  --ssl=SSL             Specifies if the server connection requires use of
+                        SSL. If an encrypted connection cannot be established,
+                        the connection attempt fails. By default 0 (SSL not
+                        required).
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   -q, --quiet           turn off all messages for quiet execution.

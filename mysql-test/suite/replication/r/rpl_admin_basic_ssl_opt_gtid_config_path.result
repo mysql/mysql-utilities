@@ -1,0 +1,234 @@
+Test case 1 - SSL switchover demote-master 
+# Checking privileges.
+# Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
+# Checking candidate slave prerequisites.
+# Checking slaves configuration to master.
+# Waiting for slaves to catch up to old master.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Starting all slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Switchover complete.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT2  | MASTER  | UP     | ON         | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+
+Test case 2 - SSL mysqlrplcheck NEW Master after demote
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Checking server_uuid values                                          [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+
+#
+# Slave status: 
+#
+                Slave_IO_State : Waiting for master to send event
+                   Master_Host : localhost
+                   Master_User : rpluser
+                   Master_Port : PORT2
+                    Last_Errno : 0
+                    Last_Error : 
+            Master_SSL_Allowed : Yes
+            Master_SSL_CA_File : XXXXX
+            Master_SSL_CA_Path : 
+               Master_SSL_Cert : XXXX
+             Master_SSL_Cipher : 
+                Master_SSL_Key : XXXX
+                Master_SSL_Crl : XXXX
+            Master_SSL_Crlpath : 
+# ...done.
+
+Test case 3 - SSL mysqlrplcheck NEW Master after demote
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Checking server_uuid values                                          [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+
+#
+# Slave status: 
+#
+                Slave_IO_State : Waiting for master to send event
+                   Master_Host : localhost
+                   Master_User : rpluser
+                   Master_Port : PORT2
+                    Last_Errno : 0
+                    Last_Error : 
+            Master_SSL_Allowed : Yes
+            Master_SSL_CA_File : XXXXX
+            Master_SSL_CA_Path : 
+               Master_SSL_Cert : XXXX
+             Master_SSL_Cipher : 
+                Master_SSL_Key : XXXX
+                Master_SSL_Crl : XXXX
+            Master_SSL_Crlpath : 
+# ...done.
+
+Test case 4 - SSL mysqlrplcheck NEW Master after demote
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Checking server_uuid values                                          [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+
+#
+# Slave status: 
+#
+                Slave_IO_State : Waiting for master to send event
+                   Master_Host : localhost
+                   Master_User : rpluser
+                   Master_Port : PORT2
+                    Last_Errno : 0
+                    Last_Error : 
+            Master_SSL_Allowed : Yes
+            Master_SSL_CA_File : XXXXX
+            Master_SSL_CA_Path : 
+               Master_SSL_Cert : XXXX
+             Master_SSL_Cipher : 
+                Master_SSL_Key : XXXX
+                Master_SSL_Crl : XXXX
+            Master_SSL_Crlpath : 
+# ...done.
+
+Test case 5 - SSL failover 
+WARNING: The --master option is not required for 'failover' (option ignored).
+# Checking privileges.
+# Checking privileges on candidates.
+# Performing failover.
+# Candidate slave localhost:PORT3 will become the new master.
+# Checking slaves status (before failover).
+# Preparing candidate for failover.
+# Creating replication user if it does not exist.
+# Stopping slaves.
+# Performing STOP on all slaves.
+# Switching slaves to new master.
+# Disconnecting new master as slave.
+# Starting slaves.
+# Performing START on all slaves.
+# Checking slaves for errors.
+# Failover complete.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT3  | MASTER  | UP     | ON         | OK      |
+| localhost  | PORT1  | SLAVE   | UP     | ON         | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+
+Test case 6 - SSL mysqlrplcheck NEW Master after demote
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Checking server_uuid values                                          [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+
+#
+# Slave status: 
+#
+                Slave_IO_State : Waiting for master to send event
+                   Master_Host : localhost
+                   Master_User : rpluser
+                   Master_Port : PORT3
+                    Last_Errno : 0
+                    Last_Error : 
+            Master_SSL_Allowed : Yes
+            Master_SSL_CA_File : XXXXX
+            Master_SSL_CA_Path : 
+               Master_SSL_Cert : XXXX
+             Master_SSL_Cipher : 
+                Master_SSL_Key : XXXX
+                Master_SSL_Crl : XXXX
+            Master_SSL_Crlpath : 
+# ...done.
+
+Test case 7 - SSL mysqlrplcheck NEW Master after demote
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+Test Description                                                     Status
+---------------------------------------------------------------------------
+Checking for binary logging on master                                [pass]
+Are there binlog exceptions?                                         [pass]
+Replication user exists?                                             [pass]
+Checking server_id values                                            [pass]
+Checking server_uuid values                                          [pass]
+Is slave connected to master?                                        [pass]
+Check master information file                                        [pass]
+Checking InnoDB compatibility                                        [pass]
+Checking storage engines compatibility                               [pass]
+Checking lower_case_table_names settings                             [pass]
+Checking slave delay (seconds behind master)                         [pass]
+
+#
+# Slave status: 
+#
+                Slave_IO_State : Waiting for master to send event
+                   Master_Host : localhost
+                   Master_User : rpluser
+                   Master_Port : PORT3
+                    Last_Errno : 0
+                    Last_Error : 
+            Master_SSL_Allowed : Yes
+            Master_SSL_CA_File : XXXXX
+            Master_SSL_CA_Path : 
+               Master_SSL_Cert : XXXX
+             Master_SSL_Cipher : 
+                Master_SSL_Key : XXXX
+                Master_SSL_Crl : XXXX
+            Master_SSL_Crlpath : 
+# ...done.
+

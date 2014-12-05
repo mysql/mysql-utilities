@@ -62,7 +62,7 @@ class test(rpl_admin.test):
 
     def check_prerequisites(self):
         if not self.servers.get_server(0).check_version_compat(5, 6, 9):
-            raise MUTLibError("Test requires server version 5.6.9")
+            raise MUTLibError("Test requires server version >= 5.6.9")
         return self.check_num_servers(1)
 
     def reset_topology(self, slaves_list=None, rpl_user='rpl',
@@ -310,7 +310,12 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
         self.results.append("\n")
 
-        # Mask out non-deterministic data
+        self.mask_results()
+        return True
+
+    def mask_results(self):
+        """Mask out non-deterministic data
+        """
         rpl_admin.test.do_masks(self)
 
         self.replace_result("# QUERY = SELECT "
@@ -453,8 +458,6 @@ class test(rpl_admin.test):
                                            3)
 
         self.remove_result("          Replicate_Rewrite_DB :")
-
-        return True
 
     def get_result(self):
         return self.compare(__name__, self.results)

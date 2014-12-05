@@ -111,54 +111,54 @@ ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 ##############################################################################
 Test case 27 - indexcheck with ssl connection all tables for a single database
 # Source on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 28 - basic serverinfo with ssl
-ERROR: Missing ssl_ca argument.
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 29 - userclone dump grants with ssl
 # Source on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 30 - basic dbexport with ssl
 # Source on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 31 - basic dbimport with ssl
 # Source on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 32 - basic metagrep with ssl
-ERROR: Missing ssl_ca argument.
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 33 - basic procgrep with ssl
-ERROR: Missing ssl_ca argument.
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 34 - basic diskusage with ssl
 # Source on XXXX-XXXX: ... 
 Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
 
-mysqldiskusage: error: Missing ssl_ca argument.
+mysqldiskusage: error: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 35 - basic mysqlfrm with ssl
 # Source on XXXX-XXXX: ... 
 Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
 
-mysqlfrm: error: Missing ssl_ca argument.
+mysqlfrm: error: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 36 - basic mysqldbcopy with ssl
 # Source on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 37 - basic mysqldiff with ssl
 # server1 on XXXX-XXXX: ... 
-ERROR: Missing ssl_ca argument.
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 38 - basic mysqlbinlogrotate with ssl
-ERROR: Missing ssl_ca argument.
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 Test case 39 - basic mysqlbinlogpurge with ssl
-ERROR: Missing ssl_ca argument.
+ERROR: ssl_key and ssl_cert need to be both specified, or neither.
 
 ##############################################################################
 --> --ssl-key and --ssl-cert options only
@@ -241,6 +241,7 @@ WHERE
 Test case 47 - basic diskusage with ssl
 # Source on XXXX-XXXX: ... connected.
 +---+
+
 
 Test case 48 - basic mysqlfrm with ssl
 # Source on XXXX-XXXX: ... connected.
@@ -610,4 +611,166 @@ Test case 117 - basic mysqlbinlogpurge with ssl
 Usage: mysqlbinlogpurge --master=user:pass@host:port --slaves=user:pass@host:port,user:pass@host:port
 
 mysqlbinlogpurge: error: the given path './std_data/unexisting.pem' in option --ssl-key does not exist or can not be accessed
+
+##############################################################################
+--> only --ssl=0 option for ssl required user
+##############################################################################
+Test case 118 - indexcheck with ssl connection all tables for a single database
+# Source on XXXX-XXXX: ... 
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 119 - basic serverinfo with ssl
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' using password: YES
+
+Test case 120 - userclone dump grants with ssl
+# Source on XXXX-XXXX: ... 
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 121 - basic dbexport with ssl
+# Source on XXXX-XXXX: ... 
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 122 - basic dbimport with ssl
+# Source on XXXX-XXXX: ... 
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 123 - basic metagrep with ssl
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 124 - basic procgrep with ssl
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 125 - basic diskusage with ssl
+# Source on XXXX-XXXX: ... 
+Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+mysqldiskusage: error: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 126 - basic mysqlfrm with ssl
+# Source on XXXX-XXXX: ... 
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+mysqlfrm: error: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 127 - basic mysqldbcopy with ssl
+# Source on XXXX-XXXX: ... 
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 128 - basic mysqldiff with ssl
+# server1 on XXXX-XXXX: ... 
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 129 - basic mysqlbinlogrotate with ssl
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+Test case 130 - basic mysqlbinlogpurge with ssl
+ERROR: Access denied for user 'root_ssl'@'XXXX-XXXX' (using password: YES)
+
+##############################################################################
+--> only --ssl=1 option and server without ssl certs
+##############################################################################
+Test case 131 - indexcheck with ssl connection all tables for a single database
+# Source on XXXX-XXXX: ... 
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 132 - basic serverinfo with ssl
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 133 - userclone dump grants with ssl
+# Source on XXXX-XXXX: ... 
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 134 - basic dbexport with ssl
+# Source on XXXX-XXXX: ... 
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 135 - basic dbimport with ssl
+# Source on XXXX-XXXX: ... 
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 136 - basic metagrep with ssl
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 137 - basic procgrep with ssl
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 138 - basic diskusage with ssl
+# Source on XXXX-XXXX: ... 
+Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 139 - basic mysqlfrm with ssl
+# Source on XXXX-XXXX: ... 
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 140 - basic mysqldbcopy with ssl
+# Source on XXXX-XXXX: ... 
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 141 - basic mysqldiff with ssl
+# server1 on XXXX-XXXX: ... 
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 142 - basic mysqlbinlogrotate with ssl
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+Test case 143 - basic mysqlbinlogpurge with ssl
+ERROR: Lost connection to MySQL server at 'XXXX-XXXX:XXXX'
+
+##############################################################################
+--> --ssl=1 option and different ssl ca-cert
+##############################################################################
+Test case 144 - indexcheck with ssl connection all tables for a single database
+# Source on XXXX-XXXX: ... 
+certificate verify failed
+
+Test case 145 - basic serverinfo with ssl
+certificate verify failed
+
+Test case 146 - userclone dump grants with ssl
+# Source on XXXX-XXXX: ... 
+certificate verify failed
+
+Test case 147 - basic dbexport with ssl
+# Source on XXXX-XXXX: ... 
+certificate verify failed
+
+Test case 148 - basic dbimport with ssl
+# Source on XXXX-XXXX: ... 
+certificate verify failed
+
+Test case 149 - basic metagrep with ssl
+certificate verify failed
+
+Test case 150 - basic procgrep with ssl
+certificate verify failed
+
+Test case 151 - basic diskusage with ssl
+# Source on XXXX-XXXX: ... 
+Usage: mysqldiskusage --server=user:pass@host:port:socket db1 --all
+
+certificate verify failed
+
+Test case 152 - basic mysqlfrm with ssl
+# Source on XXXX-XXXX: ... 
+Usage: mysqlfrm --server=[user[:<pass>]@host[:<port>][:<socket>]|<login-path>[:<port>][:<socket>]] [path\tbl1.frm|db:tbl.frm]
+
+certificate verify failed
+
+Test case 153 - basic mysqldbcopy with ssl
+# Source on XXXX-XXXX: ... 
+certificate verify failed
+
+Test case 154 - basic mysqldiff with ssl
+# server1 on XXXX-XXXX: ... 
+certificate verify failed
+
+Test case 155 - basic mysqlbinlogrotate with ssl
+certificate verify failed
+
+Test case 156 - basic mysqlbinlogpurge with ssl
+certificate verify failed
 

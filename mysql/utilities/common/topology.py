@@ -398,7 +398,8 @@ class Topology(Replication):
                                       'socket': None,
                                       'ssl_ca': self.master.ssl_ca,
                                       'ssl_cert': self.master.ssl_cert,
-                                      'ssl_key': self.master.ssl_key},
+                                      'ssl_key': self.master.ssl_key,
+                                      'ssl': self.master.ssl},
                         'role': slave,
                         'verbose': self.options.get("verbosity", 0) > 0,
                     }
