@@ -525,6 +525,7 @@ def show_server_info(servers, options):
     ssl_dict['ssl_cert'] = options.get("ssl_cert", None)
     ssl_dict['ssl_ca'] = options.get("ssl_ca", None)
     ssl_dict['ssl_key'] = options.get("ssl_key", None)
+    ssl_dict['ssl'] = options.get("ssl", None)
 
     row_dict_lst = []
     warnings = []

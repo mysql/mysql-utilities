@@ -317,6 +317,7 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
     ssl_ca = None
     ssl_cert = None
     ssl_key = None
+    ssl = None
 
     # Split on the '@' to determine the connection string format.
     # The user/password may have the '@' character, split by last occurrence.
@@ -479,6 +480,7 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                 ssl_ca = config_path_data.get('ssl-ca', None)
                 ssl_cert = config_path_data.get('ssl-cert', None)
                 ssl_key = config_path_data.get('ssl-key', None)
+                ssl = config_path_data.get('ssl', None)
 
         else:
             if login_path and not config_path:
@@ -534,10 +536,11 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
     if isinstance(options, dict):
         charset = options.get("charset", None)
         # If one SSL option was found before, not mix with those in options.
-        if not ssl_cert and not ssl_ca and not ssl_key:
+        if not ssl_cert and not ssl_ca and not ssl_key and not ssl:
             ssl_cert = options.get("ssl_cert", None)
             ssl_ca = options.get("ssl_ca", None)
             ssl_key = options.get("ssl_key", None)
+            ssl = options.get("ssl", None)
 
     else:
         # options is an instance of optparse.Values
@@ -546,7 +549,7 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
         except AttributeError:
             charset = None
         # If one SSL option was found before, not mix with those in options.
-        if not ssl_cert and not ssl_ca and not ssl_key:
+        if not ssl_cert and not ssl_ca and not ssl_key and not ssl:
             try:
                 ssl_cert = options.ssl_cert  # pylint: disable=E1103
             except AttributeError:
@@ -559,6 +562,10 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                 ssl_key = options.ssl_key  # pylint: disable=E1103
             except AttributeError:
                 ssl_key = None
+            try:
+                ssl = options.ssl  # pylint: disable=E1103
+            except AttributeError:
+                ssl = None
 
     # Set parsed connection values
     connection = {
@@ -576,6 +583,8 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
         connection["ssl_ca"] = ssl_ca
     if ssl_key:
         connection["ssl_key"] = ssl_key
+    if ssl:
+        connection["ssl"] = ssl
     # Handle optional parameters. They are only stored in the dict if
     # they were provided in the specifier.
     if socket is not None and os.name == "posix":

@@ -1,13 +1,52 @@
-Test case 1 - indexcheck with ssl connection all tables for a single database: passed
-Test case 2 - basic serverinfo with ssl: passed
-Test case 3 - userclone dump grants with ssl: passed
-Test case 4 - basic dbexport with ssl: passed
-Test case 5 - basic dbimport with ssl: passed
-Test case 6 - basic metagrep with ssl: passed
-Test case 7 - basic procgrep with ssl: passed
-Test case 8 - basic diskusage with ssl: passed
-Test case 9 - basic mysqlfrm with ssl: passed
-Test case 10 - basic mysqldbcopy with ssl: passed
-Test case 11 - basic mysqldiff with ssl: passed
-Test case 12 - basic mysqlbinlogrotate with ssl: passed
-Test case 13 - basic mysqlbinlogpurge with ssl: passed
+Test case 1 Using ssl certificates - indexcheck with ssl connection all tables for a single database: passed
+Test case 2 Using ssl certificates - basic serverinfo with ssl: passed
+Test case 3 Using ssl certificates - userclone dump grants with ssl: passed
+Test case 4 Using ssl certificates - basic dbexport with ssl: passed
+Test case 5 Using ssl certificates - basic dbimport with ssl: passed
+Test case 6 Using ssl certificates - basic metagrep with ssl: passed
+Test case 7 Using ssl certificates - basic procgrep with ssl: passed
+Test case 8 Using ssl certificates - basic diskusage with ssl: passed
+Test case 9 Using ssl certificates - basic mysqlfrm with ssl: passed
+Test case 10 Using ssl certificates - basic mysqldbcopy with ssl: passed
+Test case 11 Using ssl certificates - basic mysqldiff with ssl: passed
+Test case 12 Using ssl certificates - basic mysqlbinlogrotate with ssl: passed
+Test case 13 Using ssl certificates - basic mysqlbinlogpurge with ssl: passed
+Test case 14 ssl=1 user require ssl - indexcheck with ssl connection all tables for a single database: passed
+Test case 15 ssl=1 user require ssl - basic serverinfo with ssl: passed
+Test case 16 ssl=1 user require ssl - userclone dump grants with ssl: passed
+Test case 17 ssl=1 user require ssl - basic dbexport with ssl: passed
+Test case 18 ssl=1 user require ssl - basic dbimport with ssl: passed
+Test case 19 ssl=1 user require ssl - basic metagrep with ssl: passed
+Test case 20 ssl=1 user require ssl - basic procgrep with ssl: passed
+Test case 21 ssl=1 user require ssl - basic diskusage with ssl: passed
+Test case 22 ssl=1 user require ssl - basic mysqlfrm with ssl: passed
+Test case 23 ssl=1 user require ssl - basic mysqldbcopy with ssl: passed
+Test case 24 ssl=1 user require ssl - basic mysqldiff with ssl: passed
+Test case 25 ssl=1 user require ssl - basic mysqlbinlogrotate with ssl: passed
+Test case 26 ssl=1 user require ssl - basic mysqlbinlogpurge with ssl: passed
+Test case 27 ssl=0 user no require ssl - indexcheck with ssl connection all tables for a single database: passed
+Test case 28 ssl=0 user no require ssl - basic serverinfo with ssl: passed
+Test case 29 ssl=0 user no require ssl - userclone dump grants with ssl: passed
+Test case 30 ssl=0 user no require ssl - basic dbexport with ssl: passed
+Test case 31 ssl=0 user no require ssl - basic dbimport with ssl: passed
+Test case 32 ssl=0 user no require ssl - basic metagrep with ssl: passed
+Test case 33 ssl=0 user no require ssl - basic procgrep with ssl: passed
+Test case 34 ssl=0 user no require ssl - basic diskusage with ssl: passed
+Test case 35 ssl=0 user no require ssl - basic mysqlfrm with ssl: passed
+Test case 36 ssl=0 user no require ssl - basic mysqldbcopy with ssl: passed
+Test case 37 ssl=0 user no require ssl - basic mysqldiff with ssl: passed
+Test case 38 ssl=0 user no require ssl - basic mysqlbinlogrotate with ssl: passed
+Test case 39 ssl=0 user no require ssl - basic mysqlbinlogpurge with ssl: passed
+Test case 40 ssl=1 user no require ssl - indexcheck with ssl connection all tables for a single database: passed
+Test case 41 ssl=1 user no require ssl - basic serverinfo with ssl: passed
+Test case 42 ssl=1 user no require ssl - userclone dump grants with ssl: passed
+Test case 43 ssl=1 user no require ssl - basic dbexport with ssl: passed
+Test case 44 ssl=1 user no require ssl - basic dbimport with ssl: passed
+Test case 45 ssl=1 user no require ssl - basic metagrep with ssl: passed
+Test case 46 ssl=1 user no require ssl - basic procgrep with ssl: passed
+Test case 47 ssl=1 user no require ssl - basic diskusage with ssl: passed
+Test case 48 ssl=1 user no require ssl - basic mysqlfrm with ssl: passed
+Test case 49 ssl=1 user no require ssl - basic mysqldbcopy with ssl: passed
+Test case 50 ssl=1 user no require ssl - basic mysqldiff with ssl: passed
+Test case 51 ssl=1 user no require ssl - basic mysqlbinlogrotate with ssl: passed
+Test case 52 ssl=1 user no require ssl - basic mysqlbinlogpurge with ssl: passed

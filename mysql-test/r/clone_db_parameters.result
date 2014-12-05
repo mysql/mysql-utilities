@@ -97,6 +97,10 @@ Options:
                         establishing a secure connection.
   --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
                         secure connection.
+  --ssl=SSL             Specifies if the server connection requires use of
+                        SSL. If an encrypted connection cannot be established,
+                        the connection attempt fails. By default 0 (SSL not
+                        required).
   --skip-gtid           skip creation and execution of GTID statements during
                         copy.
   --multiprocess=MULTIPROCESS

@@ -57,6 +57,8 @@ class test(mutlib.System_test):
         for server in [self.server1]:
             try:
                 grant_proxy_ssl_privileges(server, ssl_user, ssl_pass)
+                grant_proxy_ssl_privileges(server, "ssl_opt", "ssl_opt_pass",
+                                           ssl=False)
             except UtilError as err:
                 raise MUTLibError("{0} on:{1}".format(err.errmsg,
                                                       server.role))
@@ -69,6 +71,7 @@ class test(mutlib.System_test):
             'ssl_ca': ssl_c_ca,
             'ssl_cert': ssl_c_cert,
             'ssl_key': ssl_c_key,
+            'ssl': 1
         }
 
         self.server1 = Server.fromServer(self.server1, conn_info)
@@ -77,9 +80,16 @@ class test(mutlib.System_test):
         res = self.server1.exec_query("SHOW STATUS LIKE 'Ssl_cipher'")
         if not res[0][1]:
             raise MUTLibError("Cannot spawn a SSL server.")
-        data_files = ["std_data/index_test.sql", "./std_data/basic_users.sql"]
 
         self.drop_all()
+        self.load_test_data()
+
+        return True
+
+    def load_test_data(self):
+        """Loads required test data.
+        """
+        data_files = ["std_data/index_test.sql", "./std_data/basic_users.sql"]
         for data_file in data_files:
             try:
                 self.server1.read_and_exec_SQL(data_file, self.debug)
@@ -87,14 +97,12 @@ class test(mutlib.System_test):
                 raise MUTLibError("Failed to read commands from file {0}: "
                                   "{1}".format(data_file, err.errmsg))
 
-        return True
-
-    def run_test(self, test, test_case, conn_str):
+    def run_test(self, test, test_case, conn_str, grp_comment):
         """Runs each individual test.
         """
         test_cmd = "{0} {1}".format(test['cmd_str'].format(conn_str),
                                     test['cmd_opts'])
-        test_comment = test['comment'].format(test_case)
+        test_comment = test['comment'].format(test_case, grp_comment)
         res = self.run_test_case(0, test_cmd, test_comment)
         return res
 
@@ -102,6 +110,10 @@ class test(mutlib.System_test):
         self.res_fname = "result.txt"
 
         conn_str = self.build_connection_string(self.server1, ssl=True)
+        conn_str_nossl = self.build_connection_string(self.server1, ssl=False)
+        conn_ssl_opt = self.build_custom_connection_string(self.server1,
+                                                           'ssl_opt',
+                                                           'ssl_opt_pass')
 
         tests = []
 
@@ -109,8 +121,8 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqlindexcheck",
             "cmd_str": "mysqlindexcheck.py --server={0}",
-            "comment": ("Test case {0} - indexcheck with ssl connection all "
-                        "tables for a single database"),
+            "comment": ("Test case {0} {1} - indexcheck with ssl connection "
+                        "all tables for a single database"),
             "cmd_opts": "util_test_a"
         })
 
@@ -118,7 +130,7 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqlserverinfo",
             "cmd_str": "mysqlserverinfo.py --server={0}",
-            "comment": "Test case {0} - basic serverinfo with ssl",
+            "comment": "Test case {0} {1} - basic serverinfo with ssl",
             "cmd_opts": " --format=vertical "
         })
 
@@ -126,7 +138,7 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqluserclone",
             "cmd_str": "mysqluserclone.py --source={0}",
-            "comment": "Test case {0} - userclone dump grants with ssl",
+            "comment": "Test case {0} {1} - userclone dump grants with ssl",
             "cmd_opts": " -d -v {0}".format(" joe_pass@user")
         })
 
@@ -134,7 +146,7 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqldbexport",
             "cmd_str": "mysqldbexport.py --server={0}",
-            "comment": "Test case {0} - basic dbexport with ssl",
+            "comment": "Test case {0} {1} - basic dbexport with ssl",
             "cmd_opts": " -edefinitions {0}".format("util_test_a")
         })
 
@@ -142,7 +154,7 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqldbimport",
             "cmd_str": "mysqldbimport.py --server={0}",
-            "comment": "Test case {0} - basic dbimport with ssl",
+            "comment": "Test case {0} {1} - basic dbimport with ssl",
             "cmd_opts": " -d {0}".format("./std_data/import_data.sql")
         })
 
@@ -150,7 +162,7 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqlmetagrep",
             "cmd_str": "mysqlmetagrep.py --server={0}",
-            "comment": "Test case {0} - basic metagrep with ssl",
+            "comment": "Test case {0} {1} - basic metagrep with ssl",
             "cmd_opts": " -e%{0}".format("mysql")
         })
 
@@ -158,7 +170,7 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqlprocgrep",
             "cmd_str": "mysqlprocgrep.py --server={0}",
-            "comment": "Test case {0} - basic procgrep with ssl",
+            "comment": "Test case {0} {1} - basic procgrep with ssl",
             "cmd_opts": " --match-user={0}".format(self.server1.user)
         })
 
@@ -166,15 +178,15 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqldiskusage",
             "cmd_str": "mysqldiskusage.py --server={0}",
-            "comment": "Test case {0} - basic diskusage with ssl",
-            "cmd_opts": " -q"
+            "comment": "Test case {0} {1} - basic diskusage with ssl",
+            "cmd_opts": ""
         })
 
         # ========  mysqlfrm  ========= #
         tests.append({
             "utility": "mysqlfrm",
             "cmd_str": "mysqlfrm.py --server={0}",
-            "comment": "Test case {0} - basic mysqlfrm with ssl",
+            "comment": "Test case {0} {1} - basic mysqlfrm with ssl",
             "cmd_opts": " ./ --port={0}".format(self.servers.get_free_port())
         })
 
@@ -182,7 +194,7 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqldbcopy",
             "cmd_str": "mysqldbcopy.py --source={0} --destination={0}",
-            "comment": "Test case {0} - basic mysqldbcopy with ssl",
+            "comment": "Test case {0} {1} - basic mysqldbcopy with ssl",
             "cmd_opts": " util_test_a:util_test_z"
         })
 
@@ -190,7 +202,7 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqldiff",
             "cmd_str": "mysqldiff.py --server1={0} --server2={0}",
-            "comment": "Test case {0} - basic mysqldiff with ssl",
+            "comment": "Test case {0} {1} - basic mysqldiff with ssl",
             "cmd_opts": " util_test_a.t1:util_test_z.t1 --skip-table-options"
         })
 
@@ -198,7 +210,7 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqlbinlogrotate",
             "cmd_str": "mysqlbinlogrotate.py --server={0}",
-            "comment": "Test case {0} - basic mysqlbinlogrotate with ssl",
+            "comment": "Test case {0} {1} - basic mysqlbinlogrotate with ssl",
             "cmd_opts": ""
         })
 
@@ -206,23 +218,57 @@ class test(mutlib.System_test):
         tests.append({
             "utility": "mysqlbinlogpurge",
             "cmd_str": "mysqlbinlogpurge.py --server={0}",
-            "comment": "Test case {0} - basic mysqlbinlogpurge with ssl",
+            "comment": "Test case {0} {1} - basic mysqlbinlogpurge with ssl",
             "cmd_opts": ""
+        })
+
+        test_options_group = []
+        test_options_group.append({
+            "conn_opts": conn_str,
+            "grp_comment": "Using ssl certificates"
+        })
+        # Run tests cases using user that requires ssl without ssl
+        # certificates and only --ssl=1
+        test_options_group.append({
+            "conn_opts": "{0} --ssl=1".format(conn_str_nossl),
+            "grp_comment": "ssl=1 user require ssl"
+        })
+        # Run tests cases using user that no requires ssl without ssl
+        # certificates and only --ssl=0
+        test_options_group.append({
+            "conn_opts": "{0} --ssl=0".format(conn_ssl_opt),
+            "grp_comment": "ssl=0 user no require ssl"
+        })
+        # Run tests cases using user that no requires ssl without ssl
+        # certificates and only --ssl=1 Note: server is ssl capable
+        test_options_group.append({
+            "conn_opts": "{0} --ssl=1".format(conn_ssl_opt),
+            "grp_comment": "ssl=1 user no require ssl"
         })
 
         test_num = 0
         results_list = []
-        for test in tests:
-            test_num += 1
-            res = self.run_test(test, test_num, conn_str)
-            if not res:
-                raise MUTLibError(
-                    "{0}: failed".format(test['comment'].format(test_num)))
-            else:
-                results_list.append(
-                    "{0}: {1}\n"
-                    "".format(test["comment"].format(test_num), "passed")
-                )
+
+        for test_options in test_options_group:
+            for test in tests:
+                grp_cnt = test_options["grp_comment"]
+                test_num += 1
+                res = self.run_test(test, test_num, test_options["conn_opts"],
+                                    grp_cnt)
+                if not res:
+                    raise MUTLibError(
+                        "{0}: failed".format(test['comment'].format(test_num,
+                                                                    grp_cnt))
+                    )
+                else:
+                    results_list.append(
+                        "{0}: {1}\n"
+                        "".format(test["comment"].format(test_num, grp_cnt),
+                                  "passed")
+                    )
+
+            self.drop_all()
+            self.load_test_data()
 
         self.results = results_list
 
@@ -238,7 +284,7 @@ class test(mutlib.System_test):
         # Drop databases
         databases = ["util_test_a", "util_test_b", "util_test_c",
                      "util_test_d", "util_test_e", "util_test_f",
-                     "util_test_g", "util_test"]
+                     "util_test_g", "util_test", "util_test_z"]
         for db in databases:
             try:
                 self.server1.exec_query("DROP DATABASE IF EXISTS "

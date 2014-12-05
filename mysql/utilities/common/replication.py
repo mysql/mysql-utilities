@@ -265,8 +265,9 @@ class Replication(object):
         self.ssl_ca = options.get("ssl_ca", None)
         self.ssl_cert = options.get("ssl_cert", None)
         self.ssl_key = options.get("ssl_key", None)
+        self.ssl_opt = options.get("ssl", None)
         self.ssl = False
-        if self.ssl_ca or self.ssl_cert or self.ssl_key:
+        if self.ssl_ca or self.ssl_cert or self.ssl_key or self.ssl_opt:
             self.ssl = True
         self.master = master
         self.slave = slave
@@ -972,7 +973,8 @@ class Master(Server):
                                   'host': row[1], 'port': row[2],
                                   'socket': None, 'ssl_ca': self.ssl_ca,
                                   'ssl_cert': self.ssl_cert,
-                                  'ssl_key': self.ssl_key},
+                                  'ssl_key': self.ssl_key,
+                                  'ssl': self.ssl},
                     'role': 'slave',
                     'verbose': verbose,
                 }
@@ -1872,6 +1874,8 @@ class Slave(Server):
             master_ssl_ca = master_values.get('Master_SSL_CA_File', None)
             master_ssl_cert = master_values.get('Master_SSL_Cert', None)
             master_ssl_key = master_values.get('Master_SSL_Key', None)
+            if master_ssl and master_ssl_ca is None:
+                master_ssl_ca = ''
         else:
             master_host = master_values.get('Master_Host',
                                             master_info['Master_Host'])
@@ -1914,7 +1918,7 @@ class Slave(Server):
         change_master += "MASTER_PORT = %s" % master_port
         if master_ssl:
             change_master = "{0}, MASTER_SSL = {1}".format(change_master, 1)
-        if master_ssl_ca:
+        if master_ssl_ca is not None:
             change_master = ("{0}, MASTER_SSL_CA = '{1}'"
                              ).format(change_master, master_ssl_ca)
         if master_ssl_cert:
