@@ -1,7 +1,7 @@
 Source: mysql-utilities-commercial
 Section: python
 Priority: extra
-Maintainer: Oracle and/or its affiliates Product Engineering Team <mysql-build@oss.oracle.com> 
+Maintainer: MySQL Release Engineering <mysql-build@oss.oracle.com>
 Build-Depends: debhelper (>= 8), python-all-dev (>= 2.6)
 X-Python-Version: >= 2.6
 Standards-Version: 3.9.3
@@ -20,4 +20,3 @@ Description: Collection of scripts for managing MySQL servers
  and administration of MySQL servers. These utilities encapsulate a set 
  of primitive commands, and bundles them so they can be used to perform 
  macro operations with a single command.
-

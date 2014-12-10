@@ -22,6 +22,7 @@ import os
 import platform
 import subprocess
 import time
+import commands
 
 from distutils import log
 from distutils.core import Command
@@ -95,6 +96,7 @@ class BuildDistDebian(Command):
         self.debian_support_dir = 'debian' # omit the /gpl for now.
         self.debug = True
         self.tag = ''
+        self.codename = platform.linux_distribution()[2].lower()
 
     def finalize_options(self):
         """Finalize the options"""
@@ -159,7 +161,9 @@ class BuildDistDebian(Command):
         f_compat.write('8\n')
         f_compat.flush()
         f_compat.close()
-
+        
+        if self.codename == '':
+        	self.codename = commands.getoutput('lsb_release -c').split()[-1]
         # debian/changelog
         log.info("creating debian/changelog file")
         f_changelog = open( os.path.join(deb_dir,'changelog'), mode='w')
@@ -167,6 +171,9 @@ class BuildDistDebian(Command):
                           "  * Debian package automatically created.\n\n"
                           " -- {maintainer} <{maintainer_email}>  {date_R}\n"
                           "".format(project_name=self.name, ver=self.version,
+                          			platform=self.platform,
+                                    version=self.platform_version,
+                                    codename=self.codename,
                                     maintainer=self.maintainer,
                                     maintainer_email=self.maintainer_email,
                                     date_R=_get_date_time()))
@@ -189,7 +196,7 @@ class BuildDistDebian(Command):
         # debian/copyright
         log.info("creating debian/copyright file")
         with open('README.txt') as f_readme:
-            GPL_CR['README'] = ''.join(f_readme)
+            GPL_CR['README'] = ''.join(f_readme.readlines()[0:16])
         cr_tmp_path = os.path.join("support", "debian", "copyright_template")
         with open(cr_tmp_path) as f_cr_template:
             lines = (line.replace('\n', '') for line in f_cr_template)
@@ -223,15 +230,9 @@ class BuildDistDebian(Command):
         for base, dirs, files in os.walk(self.started_dir):
             for filename in files:
                 if filename.endswith('.deb'):
-                    newname = filename.replace(
-                        '{0}_all'.format(self.version),
-                        '{0}-1{1}{2}{3}_all'.format(self.version, self.tag, 
-                                                  self.platform,
-                                                  self.platform_version)
-                    )
                     filepath = os.path.join(base, filename)
                     filedest = os.path.join(self.started_dir,
-                                            self.dist_dir, newname)
+                                            self.dist_dir)
                     copy_file(filepath, filedest)
 
     def run(self):
@@ -341,7 +342,7 @@ class BuildCommercialDistDebian(BuildDistDebian):
         log.info("current directory: {0}".format(os.getcwd()))
         readme_p = os.path.join('support', 'commercial_docs', 'README_com.txt')
         with open(readme_p) as f_readme:
-            COM_CR['README'] = ''.join(f_readme)
+            COM_CR['README'] = ''.join(f_readme.readlines()[0:17])
         cr_tmp_path = os.path.join("support", "debian", "copyright_template")
         with open(cr_tmp_path) as f_cr_template:
             lines = (line.replace('\n', '') for line in f_cr_template)
