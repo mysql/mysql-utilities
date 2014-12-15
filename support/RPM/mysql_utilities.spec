@@ -2,6 +2,10 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 %endif
 
+%if 0%{?sles} && 0%{?sles} <= 10
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+%endif
+
 %global        doctrine mysql-fabric-doctrine-1.4.0
 
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
