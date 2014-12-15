@@ -62,6 +62,9 @@ rm -rf %{buildroot}
 %doc CHANGES_*.txt LICENSE.txt README_*.txt
 %config(noreplace) %{_sysconfdir}/mysql/fabric.cfg
 %dir %{_sysconfdir}/mysql
+%{_bindir}/mysqlbinlogpurge
+%{_bindir}/mysqlbinlogrotate
+%{_bindir}/mysqlslavetrx
 %{_bindir}/mysqlauditadmin
 %{_bindir}/mysqlauditgrep
 %{_bindir}/mysqldbcompare
@@ -99,6 +102,9 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}
 
 %changelog
+* Mon Dec 15 2014 Murthy Narkedimilli <murthy.narkedimilli@oracle.com> - 1.6.1
+- Added new utilities binaries mysqlbinlogpurge, mysqlbinlogrotate and mysqlslavetrx
+
 * Tue Sep 09 2014 Balasubramanian Kandasamy <balasubramanian.kandasamy@oracle.com> - 1.6.0-1
 - Added new utilities mysqlgrants and mysqlbinlogmove
 
