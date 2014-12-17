@@ -136,6 +136,9 @@ rm -rf %{buildroot}
 %if 0%{?rhel} > 5 || 0%{?fedora} > 12
 %{python_sitelib}/mysql_utilities-*.egg-info
 %endif
+%if 0%{?suse_version} && 0%{?suse_version} <= 1200
+%{python_sitelib}/mysql_utilities-*.egg-info
+%endif
 %{_mandir}/*
 
 %files extra
