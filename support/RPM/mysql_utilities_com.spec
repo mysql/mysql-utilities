@@ -1,3 +1,5 @@
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+
 %define mysql_license   Commercial
 %define python_version  %(python -c "import distutils.sysconfig as ds; print ds.get_python_version()")
 %define name            mysql-utilities-commercial
