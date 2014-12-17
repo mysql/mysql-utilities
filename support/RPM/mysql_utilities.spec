@@ -2,6 +2,11 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 %endif
 
+%if 0%{?suse_version} && 0%{?suse_version} <= 1200
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+%endif
+
+
 %global        doctrine mysql-fabric-doctrine-1.4.0
 
 Summary:       Collection of utilities used for maintaining and administering MySQL servers
@@ -43,7 +48,7 @@ unzip data/%{doctrine}*
 %install
 rm -rf %{buildroot}
 
-%{__python} setup.py install --skip-build --root %{buildroot}
+%{__python} setup.py install --prefix=%{_prefix} --skip-build --root %{buildroot}
 install -d %{buildroot}%{_mandir}/man1
 %{__python} setup.py install_man --root %{buildroot}
 
@@ -95,6 +100,9 @@ rm -rf %{buildroot}
 %if 0%{?rhel} > 5 || 0%{?fedora} > 12
 %{python_sitelib}/mysql_utilities-*.egg-info
 %endif
+%if 0%{?suse_version} && 0%{?suse_version} <= 1200
+%{python_sitelib}/mysql_utilities-*.egg-info
+%endif
 %{_mandir}/man1/mysql*.1*
 
 %files extra
@@ -102,8 +110,10 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}
 
 %changelog
-* Mon Dec 15 2014 Murthy Narkedimilli <murthy.narkedimilli@oracle.com> - 1.6.1
+* Mon Dec 17 2014 Murthy Narkedimilli <murthy.narkedimilli@oracle.com> - 1.6.1
 - Added new utilities binaries mysqlbinlogpurge, mysqlbinlogrotate and mysqlslavetrx
+- Changed the build prefix for SLES platform.
+- Added condition to include the mysql_utilities-*.egg-info file
 
 * Tue Sep 09 2014 Balasubramanian Kandasamy <balasubramanian.kandasamy@oracle.com> - 1.6.0-1
 - Added new utilities mysqlgrants and mysqlbinlogmove
