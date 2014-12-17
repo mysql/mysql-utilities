@@ -110,7 +110,7 @@ rm -rf %{buildroot}
 %{_datadir}/%{name}
 
 %changelog
-* Mon Dec 17 2014 Murthy Narkedimilli <murthy.narkedimilli@oracle.com> - 1.6.1
+* Wed Dec 17 2014 Murthy Narkedimilli <murthy.narkedimilli@oracle.com> - 1.6.1
 - Added new utilities binaries mysqlbinlogpurge, mysqlbinlogrotate and mysqlslavetrx
 - Changed the build prefix for SLES platform.
 - Added condition to include the mysql_utilities-*.egg-info file
