@@ -1,4 +1,4 @@
-# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -224,11 +224,8 @@ if __name__ == '__main__':
                 # Pretty print the MySQL version
                 pprint_mysql_version(version_msg)
 
-                # set the executable part the run command according to the OS
-                if os.name == 'nt':
-                    cmd_exec = r'.\mysql-test-run.pl'
-                else:
-                    cmd_exec = './mysql-test-run.pl'
+                # set the executable part the run command
+                cmd_exec = 'perl mysql-test-run.pl'
 
                 # Fill the dynamic fields in the arguments of the command to
                 # start the server
@@ -238,7 +235,7 @@ if __name__ == '__main__':
                 run_cmd = "{0} {1}".format(cmd_exec, cmd_args)
 
                 # Load audit-log plugin for commercial servers
-                if(get_major_version(server.version) in ['5.5', '5.6']
+                if(get_major_version(server.version) in ['5.5', '5.6', '5.7']
                         and server.is_commercial):
                     if os.name == 'nt':
                         run_cmd = ("{0} --mysqld=--plugin_load="
