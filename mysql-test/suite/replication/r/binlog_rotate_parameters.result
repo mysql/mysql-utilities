@@ -12,6 +12,10 @@ Test case 1 - do the help
                        establishing a secure connection.
   --ssl-key=SSL_KEY    The name of the SSL key file to use for establishing a
                        secure connection.
+  --ssl=SSL            Specifies if the server connection requires use of SSL.
+                       If an encrypted connection cannot be established, the
+                       connection attempt fails. By default 0 (SSL not
+                       required).
   --min-size=MIN_SIZE  rotate the active binlog file only if the file size
                        exceeds the specified value in bytes.
   -v, --verbose        control how much information is displayed. e.g., -v =

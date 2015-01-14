@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class test(ssl_connection_simple_test.test):
     def setup(self):
         super(test, self).setup()
         try:
-            self.servers.spawn_server('no_ssl_server', mysqld="--ssl=1")
+            self.servers.spawn_server('no_ssl_server', mysqld="--ssl=0")
         except MUTLibError as err:
             raise MUTLibError("Cannot spawn needed servers: {0}"
                               "".format(err.errmsg))
@@ -294,6 +294,8 @@ class test(ssl_connection_simple_test.test):
         self.replace_result("ERROR: Lost connection to MySQL server at",
                             "ERROR: Lost connection to MySQL server at"
                             " 'XXXX-XXXX:XXXX'\n")
+        self.replace_result("certificate verify failed",
+                            "certificate verify failed\n")
 
     def get_result(self):
         return self.compare(__name__, self.results)

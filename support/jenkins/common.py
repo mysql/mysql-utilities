@@ -1,4 +1,4 @@
-# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -465,10 +465,6 @@ def copy_connector(connector_path):
     it must be called on the root of the utilities folder"""
     cwd = os.getcwd()
     # check if we are on the root of the utilities folder
-    is_root = '.bzr' in os.listdir(cwd)
-    if not is_root:
-        print("# Error: please chdir to the root utilities folder")
-        sys.exit(1)
     dest_folder = cwd
     install_cmd = ("python setup.py install --root={0} --install-lib=. "
                    "".format(dest_folder))

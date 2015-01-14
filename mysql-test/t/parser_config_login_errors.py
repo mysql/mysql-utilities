@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2015,  Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import os
 
 from mysql.utilities.exception import MUTLibError, UtilError
 from mysql.utilities.common.ip_parser import parse_connection
+from mysql.utilities.common.my_print_defaults import my_login_config_exists
 
 
 class test(mutlib.System_test):
@@ -40,6 +41,12 @@ class test(mutlib.System_test):
     environment_path_backup = ""
 
     def check_prerequisites(self):
+        # Check if the required files are accessible
+        if not my_login_config_exists():
+            raise MUTLibError('The MySQL default config file (.mylogin.cnf) '
+                              'must exist in the default location and the user'
+                              ' must have read access. Test cannot be run.')
+
         return True
 
     def setup(self):

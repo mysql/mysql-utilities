@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -262,7 +262,8 @@ class test(mutlib.System_test):
             self.server2.exec_query("GRANT SELECT, CREATE, ALTER, INSERT, "
                                     "UPDATE, EXECUTE, DROP, LOCK TABLES, "
                                     "EVENT, TRIGGER, CREATE ROUTINE, "
-                                    "CREATE VIEW ON `util_db_privileges`.* TO "
+                                    "REFERENCES, CREATE VIEW ON "
+                                    "`util_db_privileges`.* TO "
                                     "'joe'@'localhost'")
 
             # Change DEFINER in procedures and functions on the source server
@@ -300,6 +301,7 @@ class test(mutlib.System_test):
                    "").format(test_num)
         cmd = ("mysqldbcopy.py --skip-gtid --skip=grants --drop-first {0} "
                "{1} util_test:util_db_privileges".format(from_conn, to_conn))
+
         res = self.exec_util(cmd, self.res_fname)
         self.results.append(res)
         if res != 0:

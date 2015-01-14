@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -337,8 +337,9 @@ class test(copy_db.test):
                                     "'joe'@'localhost'")
             # Add all privileges needed for joe@localhost in destination db
             self.server2.exec_query("GRANT SELECT, CREATE, ALTER, INSERT, "
-                                    "UPDATE, EXECUTE, DROP, LOCK TABLES ON "
-                                    "`util_db_clone`.* TO 'joe'@'localhost'")
+                                    "UPDATE, EXECUTE, DROP, REFERENCES, "
+                                    "LOCK TABLES ON `util_db_clone`.* TO "
+                                    "'joe'@'localhost'")
         except UtilError as err:
             raise MUTLibError("Failed to execute query: "
                               "{0}".format(err.errmsg))
