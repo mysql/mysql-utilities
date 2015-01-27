@@ -1,4 +1,4 @@
-Release-1.6.1 (Released December 10, 2014)
+Release-1.6.1 (Released January 27, 2015)
 ------------------------------------------
 - BUG#20078072 : Improve MySQL Utilities support for MySQL 5.7.5
 - BUG#20035380 : utilities need to support new mysql fk behavior
