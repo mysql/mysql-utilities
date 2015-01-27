@@ -21,6 +21,7 @@ packages
 import os
 import platform
 import subprocess
+import sys
 import time
 import commands
 
@@ -93,15 +94,14 @@ class BuildDistDebian(Command):
         self.platform = platform.linux_distribution()[0].lower()
         self.platform_version = '.'.join(
             platform.linux_distribution()[1].split('.', 2)[0:2])
-        self.debian_support_dir = 'debian' # omit the /gpl for now.
+        self.debian_support_dir = 'debian'
         self.debug = True
         self.tag = ''
         self.codename = platform.linux_distribution()[2].lower()
 
     def finalize_options(self):
         """Finalize the options"""
-        self.set_undefined_options('bdist', 
-                                   ('dist_dir', 'dist_dir'))
+        self.set_undefined_options('bdist', ('dist_dir', 'dist_dir'))
         if self.tag:
             self.tag = "-{0}".format(self.tag)
 
@@ -112,14 +112,14 @@ class BuildDistDebian(Command):
             """return time with format, Day, day# MM YYYY HH:MM:SS utc"""
             return time.strftime("%a, %d %b %Y %H:%M:%S %z", time.gmtime())
 
-        #copy necessary files and debian metainfo files
+        # copy necessary files and debian metainfo files
         self.mkpath(self.deb_base)
         deb_dir = os.path.join(self.deb_base, "debian")
         copy_tree_src_dst = [
-           (os.path.join("support", "debian","gpl"), deb_dir),
-           ("docs", os.path.join(self.deb_base, "docs")),
-           ("mysql", os.path.join(self.deb_base, "mysql")),
-           ("scripts", os.path.join(self.deb_base, "scripts"))
+            (os.path.join("support", "debian", "gpl"), deb_dir),
+            ("docs", os.path.join(self.deb_base, "docs")),
+            ("mysql", os.path.join(self.deb_base, "mysql")),
+            ("scripts", os.path.join(self.deb_base, "scripts"))
         ]
         # Hack for Fabric, copy data dir if exist
         if os.path.exists('data'):
@@ -129,7 +129,7 @@ class BuildDistDebian(Command):
         for src, dst in copy_tree_src_dst:
             copy_tree(src, dst)
 
-        #copy txt files
+        # copy txt files
         file_list = [
             ("README.txt", "README_Utilities.txt"),
             ("LICENSE.txt", "LICENSE.txt"),
@@ -161,17 +161,17 @@ class BuildDistDebian(Command):
         f_compat.write('8\n')
         f_compat.flush()
         f_compat.close()
-        
+
         if self.codename == '':
-        	self.codename = commands.getoutput('lsb_release -c').split()[-1]
+            self.codename = commands.getoutput('lsb_release -c').split()[-1]
         # debian/changelog
         log.info("creating debian/changelog file")
-        f_changelog = open( os.path.join(deb_dir,'changelog'), mode='w')
+        f_changelog = open(os.path.join(deb_dir, 'changelog'), mode='w')
         f_changelog.write("{project_name} ({ver}) UNRELEASED; urgency=low\n\n"
                           "  * Debian package automatically created.\n\n"
                           " -- {maintainer} <{maintainer_email}>  {date_R}\n"
                           "".format(project_name=self.name, ver=self.version,
-                          			platform=self.platform,
+                                    platform=self.platform,
                                     version=self.platform_version,
                                     codename=self.codename,
                                     maintainer=self.maintainer,
@@ -183,13 +183,13 @@ class BuildDistDebian(Command):
         # package.manpages
         log.info("creating debian/package.manpages file")
         f_manpages = open(os.path.join(deb_dir, 'manpages'), mode='w')
-        for base, dirs, files in os.walk(os.path.join(self.deb_base,
-                                                      "docs", "man")):
-                for filename in files:
-                    if not self.verbose:
-                        log.info("  Adding MAN page: {0}".format(filename))
-                    filepath = os.path.join("docs", "man", filename)
-                    f_manpages.write('{0}\n'.format(filepath))
+        for _, _, files in os.walk(os.path.join(self.deb_base, "docs",
+                                                "man")):
+            for filename in files:
+                if not self.verbose:
+                    log.info("  Adding MAN page: {0}".format(filename))
+                filepath = os.path.join("docs", "man", filename)
+                f_manpages.write('{0}\n'.format(filepath))
         f_manpages.flush()
         f_manpages.close()
 
@@ -204,7 +204,8 @@ class BuildDistDebian(Command):
             with open(os.path.join(deb_dir, 'copyright'), 'w') as f_copyright:
                 f_copyright.write('{0}\n'.format(content))
 
-    def _create_deb(self, source_only=False, sign_pkg=False, binary=True):
+    def _create_deb(self, source_only=False, sign_pkg=False, binary=True,
+                    gpl=True):
         """Create the deb files using the deb_build_cmd command"""
         log.info("creating deb package using {0}".format(self.deb_build_cmd))
 
@@ -218,21 +219,40 @@ class BuildDistDebian(Command):
         # create only the debian src tar (a tar with the debian directory)
         if source_only:
             cmd.append("-S")
-        
+
         if binary:
             cmd.append("-b")
             cmd.append("-nc")
             cmd.append("-rfakeroot")
-        
+
         os.chdir(self.deb_base)
         self.spawn(cmd)
 
-        for base, dirs, files in os.walk(self.started_dir):
+        for base, _, files in os.walk(self.started_dir):
             for filename in files:
                 if filename.endswith('.deb'):
+                    if gpl:
+                        newname = filename.replace(
+                            '{0}_all'.format(self.version),
+                            '{0}-1{1}{2}{3}_all'.format(self.version,
+                                                        self.tag,
+                                                        self.platform,
+                                                        self.platform_version)
+                        )
+                    else:
+                        newname = filename.replace(
+                            '{0}_all'.format(self.version),
+                            '{0}-1{1}{2}{3}_py{4}'.format(
+                                self.version,
+                                self.tag,
+                                self.platform,
+                                self.platform_version,
+                                sys.version[0:3]
+                            )
+                        )
                     filepath = os.path.join(base, filename)
-                    filedest = os.path.join(self.started_dir,
-                                            self.dist_dir)
+                    filedest = os.path.join(self.started_dir, self.dist_dir,
+                                            newname)
                     copy_file(filepath, filedest)
 
     def run(self):
@@ -243,7 +263,8 @@ class BuildDistDebian(Command):
             try:
                 devnull = open(os.devnull, 'w')
                 subprocess.Popen([self.deb_build_cmd, '--version'],
-                    stdin=devnull, stdout=devnull, stderr=devnull)
+                                 stdin=devnull, stdout=devnull,
+                                 stderr=devnull)
             except OSError:
                 raise DistutilsError("Cound not execute debuild. Make sure "
                                      "it is installed and in your PATH"
@@ -280,11 +301,11 @@ class BuildCommercialDistDebian(BuildDistDebian):
             return time.strftime("%a, %d %b %Y %H:%M:%S %z", time.gmtime())
 
         log.info("Copying commercial Debian metainfo files")
-        #copy necessary files and debian metainfo files
-        #self.mkpath(self.deb_base)
+        # copy necessary files and debian metainfo files
+
         self.dist_name = get_dist_name(
             self.distribution,
-            source_only_dist=False,#self.include_sources,
+            source_only_dist=False,
             commercial=True)
         deb_dir = os.path.join(self.dist_name, "debian")
         deb_lic_dir = self.debian_support_dir
@@ -311,8 +332,9 @@ class BuildCommercialDistDebian(BuildDistDebian):
 
         # debian/changelog
         log.info("creating debian/changelog file")
-        f_changelog = open( os.path.join(deb_dir,'changelog'), mode='w')
-        f_changelog.write("{project_name}-commercial ({ver}) UNRELEASED; urgency=low\n\n"
+        f_changelog = open(os.path.join(deb_dir, 'changelog'), mode='w')
+        f_changelog.write("{project_name}-commercial ({ver}) UNRELEASED;"
+                          " urgency=low\n\n"
                           "  * Debian package automatically created.\n\n"
                           " -- {maintainer} <{maintainer_email}>  {date_R}\n"
                           "".format(project_name=self.name, ver=self.version,
@@ -325,17 +347,15 @@ class BuildCommercialDistDebian(BuildDistDebian):
         # package.manpages
         log.info("creating debian/package.manpages file")
         f_manpages = open(os.path.join(deb_dir, 'manpages'), mode='w')
-        for base, dirs, files in os.walk(os.path.join(self.deb_base,
-                                                      "docs", "man")):
-                for filename in files:
-                    if not self.verbose:
-                        log.info("  Adding MAN page: {0}".format(filename))
-                    filepath = os.path.join("docs", "man", filename)
-                    f_manpages.write('{0}\n'.format(filepath))
+        for _, _, files in os.walk(os.path.join(self.deb_base, "docs",
+                                                "man")):
+            for filename in files:
+                if not self.verbose:
+                    log.info("  Adding MAN page: {0}".format(filename))
+                filepath = os.path.join("docs", "man", filename)
+                f_manpages.write('{0}\n'.format(filepath))
         f_manpages.flush()
         f_manpages.close()
-
-        
 
         # debian/copyright
         log.info("creating debian/copyright file")
@@ -354,7 +374,7 @@ class BuildCommercialDistDebian(BuildDistDebian):
         dist_dirname = self.distribution.get_fullname()
         log.info("dist_dirname {0}".format(dist_dirname))
         log.info("os.getcwd() {0}".format(os.getcwd()))
-        
+
         # Rename tarball to conform Debian's Policy
         if tarball:
             self.orig_tarball = os.path.join(
@@ -385,7 +405,7 @@ class BuildCommercialDistDebian(BuildDistDebian):
             try:
                 devnull = open(os.devnull, 'w')
                 subprocess.Popen([self.deb_build_cmd, '--version'],
-                    stdin=devnull, stdout=devnull, stderr=devnull)
+                                 stdin=devnull, stdout=devnull, stderr=devnull)
             except OSError:
                 raise DistutilsError("Cound not execute debuild. Make sure "
                                      "it is installed and in your PATH"
@@ -406,8 +426,7 @@ class BuildCommercialDistDebian(BuildDistDebian):
             self._prepare(sdist.archive_files[0])
         self._prepare(base=sdist.dist_name)
 
-
-        self._create_deb(binary=True)
+        self._create_deb(binary=True, gpl=False)
 
         if not self.keep_temp:
             os.chdir(cur_dir)
@@ -415,4 +434,3 @@ class BuildCommercialDistDebian(BuildDistDebian):
                                      source_only_dist=False,
                                      commercial=True)
             remove_tree(temp_dir, dry_run=self.dry_run)
-

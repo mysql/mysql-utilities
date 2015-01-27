@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -78,6 +78,22 @@ if platform.uname()[0] == 'Darwin':
             'bdist_osx': BuildDistOSX,
             'bdist_com_osx': BuildDistOSXcom
         })
+
+if platform.uname()[0] == 'SunOS':
+    try:
+        from support.distribution.commands.dist_solaris import (
+            BuildDistSunOS,
+            BuildDistSunOScom
+        )
+
+    except ImportError:
+        pass
+    else:
+        COMMANDS['cmdclass'].update({
+            'bdist_sunos': BuildDistSunOS,
+            'bdist_com_sunos': BuildDistSunOScom
+        })
+
 
 ARGS = {
 }
