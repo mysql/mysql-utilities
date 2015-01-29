@@ -57,7 +57,6 @@ class BuildDistSunOS(bdist):
     dstroot = "dstroot"
     name = None
     keep_temp = None
-    platform = None
     platform_version = None
     sun_pkg_name = None
     sun_path = None
@@ -88,7 +87,6 @@ class BuildDistSunOS(bdist):
         self.keep_temp = None
         self.dist_dir = None
         self.started_dir = os.getcwd()
-        self.platform = self.platf_n
         self.platform_version = self.platf_v
         self.debug = False
         self.sun_pkg_name = "{0}-{1}.pkg".format(self.name, self.version)
@@ -233,24 +231,14 @@ class BuildDistSunOS(bdist):
                 'Utilities'
             ])
 
-        for base, dirs, files in os.walk(os.getcwd()):
+        for base, _, files in os.walk(os.getcwd()):
             for filename in files:
                 if filename.endswith('.gz') or filename.endswith('.pkg'):
-                    if gpl:
-                        new_name = filename.replace(
-                            '{0}'.format(self.version),
-                            '{0}{1}{2}'.format(self.version, self.platform,
-                                               self.platform_version)
-                        )
-                    else:
-                        new_name = filename.replace(
-                            '{0}'.format(self.version),
-                            '{0}{1}{2}.{3}.{4}'.format(self.version,
-                                                       self.platform,
-                                                       self.platform_version,
-                                                       self.processor,
-                                                       self.machine)
-                        )
+                    new_name = filename.replace(
+                        '{0}'.format(self.version),
+                        '{0}{1}{2}'.format(self.version, self.platf_n,
+                                           self.platform_version)
+                    )
                     file_path = os.path.join(base, filename)
                     file_dest = os.path.join(self.started_dir,
                                              self.dist_dir, new_name)
@@ -332,8 +320,6 @@ class BuildDistSunOScom(BuildDistSunOS):
        package
     """
     description = 'create a solaris distribution commercial package'
-    processor = platform.uname()[4]
-    machine = platform.uname()[5]
     user_options = [
         ('keep-temp', 'k',
          "keep the pseudo-installation tree around after "
@@ -347,9 +333,6 @@ class BuildDistSunOScom(BuildDistSunOS):
          "(default '{0}')".format(BuildDistSunOS.platf_n)),
         ('platform-version=', 'v', "version of the platform in resulting file"
          " (default '{0}')".format(BuildDistSunOS.platf_v)),
-        ('processor=', 'x',
-         "processor name (default '{0}')".format(processor)),
-        ('machine=', 'm', "machine name (default '{0}')".format(machine))
     ]
 
     boolean_options = ['keep-temp', 'sign']
@@ -361,7 +344,6 @@ class BuildDistSunOScom(BuildDistSunOS):
         self.keep_temp = None
         self.dist_dir = None
         self.started_dir = os.getcwd()
-        self.platform = self.platf_n
         self.platform_version = self.platf_v
         self.debug = False
         self.sun_pkg_name = "{0}-commercial-{1}.pkg".format(self.name,
@@ -369,8 +351,6 @@ class BuildDistSunOScom(BuildDistSunOS):
         self.dstroot = "dstroot"
         self.trans = False
         self.sun_path = ''
-        self.processor = platform.uname()[4]
-        self.machine = platform.uname()[5]
 
     def finalize_options(self):
         """Finalize the options"""

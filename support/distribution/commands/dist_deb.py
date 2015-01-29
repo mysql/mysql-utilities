@@ -21,7 +21,6 @@ packages
 import os
 import platform
 import subprocess
-import sys
 import time
 import commands
 
@@ -204,8 +203,7 @@ class BuildDistDebian(Command):
             with open(os.path.join(deb_dir, 'copyright'), 'w') as f_copyright:
                 f_copyright.write('{0}\n'.format(content))
 
-    def _create_deb(self, source_only=False, sign_pkg=False, binary=True,
-                    gpl=True):
+    def _create_deb(self, source_only=False, sign_pkg=False, binary=True):
         """Create the deb files using the deb_build_cmd command"""
         log.info("creating deb package using {0}".format(self.deb_build_cmd))
 
@@ -231,25 +229,13 @@ class BuildDistDebian(Command):
         for base, _, files in os.walk(self.started_dir):
             for filename in files:
                 if filename.endswith('.deb'):
-                    if gpl:
-                        newname = filename.replace(
-                            '{0}_all'.format(self.version),
-                            '{0}-1{1}{2}{3}_all'.format(self.version,
-                                                        self.tag,
-                                                        self.platform,
-                                                        self.platform_version)
-                        )
-                    else:
-                        newname = filename.replace(
-                            '{0}_all'.format(self.version),
-                            '{0}-1{1}{2}{3}_py{4}'.format(
-                                self.version,
-                                self.tag,
-                                self.platform,
-                                self.platform_version,
-                                sys.version[0:3]
-                            )
-                        )
+                    newname = filename.replace(
+                        '{0}_all'.format(self.version),
+                        '{0}-1{1}{2}{3}_all'.format(self.version,
+                                                    self.tag,
+                                                    self.platform,
+                                                    self.platform_version)
+                    )
                     filepath = os.path.join(base, filename)
                     filedest = os.path.join(self.started_dir, self.dist_dir,
                                             newname)
@@ -426,7 +412,7 @@ class BuildCommercialDistDebian(BuildDistDebian):
             self._prepare(sdist.archive_files[0])
         self._prepare(base=sdist.dist_name)
 
-        self._create_deb(binary=True, gpl=False)
+        self._create_deb(binary=True)
 
         if not self.keep_temp:
             os.chdir(cur_dir)
