@@ -27,6 +27,7 @@ import time
 from distutils import log
 from distutils.archive_util import make_tarball
 from distutils.command.bdist import bdist
+from distutils.errors import DistutilsExecError
 from distutils.file_util import copy_file
 from distutils.dir_util import copy_tree, remove_tree
 
@@ -184,9 +185,23 @@ class BuildDistSunOS(bdist):
 
         with open(proto_tmp, "w") as f_out:
             cmd = ['pkgproto', '.']
-            subprocess.Popen(cmd, shell=False, stdout=f_out, stderr=f_out)
+            pkgp_p = subprocess.Popen(cmd, shell=False, stdout=f_out,
+                                      stderr=f_out)
+            res = pkgp_p.wait()
+            if res != 0:
+                log.error("pkgproto command failed with: {0}".format(res))
+                raise DistutilsExecError("pkgproto command failed with: {0}"
+                                         "".format(res))
+            f_out.flush()
+
+        # log Prototype contents
+        log.info("/n>> Prototype_temp contents >>/n")
+        with open(proto_tmp, 'r') as f_in:
+            log.info(f_in.readlines())
+        log.info("/n<< Prototype_temp contents end <</n")
 
         # Fix Prototype file, incert pkginfo and remove Prototype
+        log.info("Fixing folder permissions on Prototype contents")
         with open(prototype_path, 'w') as f_out:
             with open(proto_tmp, 'r') as f_in:
                 # add pkginfo entry at begining of the Prototype file
@@ -204,6 +219,12 @@ class BuildDistSunOS(bdist):
                     else:
                         f_out.write(line)
                 f_out.flush()
+
+        # log Prototype contents
+        log.info("/n>> Prototype contents >>/n")
+        with open(prototype_path, 'r') as f_in:
+            log.info(f_in.readlines())
+        log.info("/n<< Prototype contents end <</n")
 
         # Create Solaris package running the package creation command pkgmk
         log.info("Creating package with pkgmk")
