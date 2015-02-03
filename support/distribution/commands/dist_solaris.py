@@ -32,17 +32,16 @@ from distutils.file_util import copy_file
 from distutils.dir_util import copy_tree, remove_tree
 
 PKGINFO = (
-    'PKG="Utilities"\n'
-    'NAME="MySQL Utilities {ver}"\n'
+    'PKG="{pkg}"\n'
+    'NAME="MySQL Utilities {ver} {lic}, Collection of utilities used for '
+    'maintaining and administering MySQL servers"\n'
     'VERSION="{ver}"\n'
-    'ARCH="sparc"\n'
+    'ARCH="all"\n'
     'CLASSES="none"\n'
-    'CATEGORY="utility"\n'
-    'VENDOR="ORACLE"\n'
+    'CATEGORY="application"\n'
+    'VENDOR="ORACLE Corporation"\n'
     'PSTAMP="{tstamp}"\n'
     'EMAIL="MySQL Release Engineering <mysql-build@oss.oracle.com>"\n'
-    'ISTATES="S s 1 2 3"\n'
-    'RSTATES="S s 1 2 3"\n'
     'BASEDIR="/"\n'
 )
 
@@ -64,6 +63,7 @@ class BuildDistSunOS(bdist):
     started_dir = None
     trans = False
     version = None
+    pkg = 'mysql-utilities'
     user_options = [
         ('keep-temp', 'k',
          "keep the pseudo-installation tree around after "
@@ -118,15 +118,19 @@ class BuildDistSunOS(bdist):
         # No special folder for GPL or commercial. Files inside the directory
         # will determine what it is.
         data_path = os.path.join(
-            self.sun_path, 'usr', 'local',
-            '{0}-{1}'.format(self.name, self.version)
+            self.sun_path, 'usr', '{0}-{1}'.format(self.name, self.version)
         )
         self.mkpath(data_path)
 
+        if gpl:
+            lic = '(GPL)'
+        else:
+            lic = '(Commercial)'
         sun_pkg_info = os.path.join(cwd, self.sun_path, 'pkginfo')
         print("sun_pkg_info path: {0}".format(sun_pkg_info))
         with open(sun_pkg_info, 'w') as f_pkg_info:
-            f_pkg_info.write(PKGINFO.format(ver=self.version,
+            f_pkg_info.write(PKGINFO.format(ver=self.version, lic=lic,
+                                            pkg=self.pkg,
                                             tstamp=time.ctime()))
             f_pkg_info.close()
 
@@ -239,7 +243,7 @@ class BuildDistSunOS(bdist):
         # gzip the package folder
         log.info("creating tarball")
 
-        make_tarball(self.sun_pkg_name, 'Utilities', compress='gzip')
+        make_tarball(self.sun_pkg_name, self.pkg, compress='gzip')
 
         if self.trans:
             log.info("Transforming package into data stream with pkgtrans")
@@ -249,7 +253,7 @@ class BuildDistSunOS(bdist):
                 '-s',
                 os.getcwd(),
                 os.path.join(os.getcwd(), self.sun_pkg_name),
-                'Utilities'
+                self.pkg
             ])
 
         for base, _, files in os.walk(os.getcwd()):
@@ -305,7 +309,7 @@ class BuildDistSunOS(bdist):
 
         remove_tree(os.path.join(self.sun_path, 'build'))
 
-        man_prefix = '/usr/local/share/man'
+        man_prefix = '/usr/share/man'
         install_man_cmd = self.reinitialize_command('install_man',
                                                     reinit_subcommands=1)
 
@@ -408,7 +412,7 @@ class BuildDistSunOScom(BuildDistSunOS):
         bdist.bdist_dir = purelib_path
         bdist.man_root = self.sun_path
         bdist.data_root = self.sun_path
-        bdist.man_prefix = os.path.join('usr', 'local', 'share', 'man')
+        bdist.man_prefix = os.path.join('usr', 'share', 'man')
         bdist.bin_install_dir = os.path.join(self.sun_path, 'usr', 'bin')
         self.run_command('bdist_com')
         if self.debug:
