@@ -118,7 +118,10 @@ class BuildDistSunOS(bdist):
         # No special folder for GPL or commercial. Files inside the directory
         # will determine what it is.
         data_path = os.path.join(
-            self.sun_path, 'usr', '{0}-{1}'.format(self.name, self.version)
+            self.sun_path,
+            'usr',
+            'share',
+            '{0}-{1}'.format(self.name, self.version),
         )
         self.mkpath(data_path)
 

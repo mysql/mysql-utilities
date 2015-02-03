@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -161,17 +161,21 @@ class BuildDistDebian(Command):
         f_compat.flush()
         f_compat.close()
 
+        platform_ver = self.platform_version
         if self.codename == '':
             self.codename = commands.getoutput('lsb_release -c').split()[-1]
+            platform_ver = self.platform_version.split('.')[0]
+
         # debian/changelog
         log.info("creating debian/changelog file")
         f_changelog = open(os.path.join(deb_dir, 'changelog'), mode='w')
-        f_changelog.write("{project_name} ({ver}) UNRELEASED; urgency=low\n\n"
+        f_changelog.write("{project_name} ({ver}-1{platform}{version}) "
+                          "{codename}; urgency=low\n\n"
                           "  * Debian package automatically created.\n\n"
                           " -- {maintainer} <{maintainer_email}>  {date_R}\n"
                           "".format(project_name=self.name, ver=self.version,
                                     platform=self.platform,
-                                    version=self.platform_version,
+                                    version=platform_ver,
                                     codename=self.codename,
                                     maintainer=self.maintainer,
                                     maintainer_email=self.maintainer_email,
@@ -229,16 +233,9 @@ class BuildDistDebian(Command):
         for base, _, files in os.walk(self.started_dir):
             for filename in files:
                 if filename.endswith('.deb'):
-                    newname = filename.replace(
-                        '{0}_all'.format(self.version),
-                        '{0}-1{1}{2}{3}_all'.format(self.version,
-                                                    self.tag,
-                                                    self.platform,
-                                                    self.platform_version)
-                    )
                     filepath = os.path.join(base, filename)
                     filedest = os.path.join(self.started_dir, self.dist_dir,
-                                            newname)
+                                            filename)
                     copy_file(filepath, filedest)
 
     def run(self):
@@ -316,14 +313,23 @@ class BuildCommercialDistDebian(BuildDistDebian):
         f_compat.flush()
         f_compat.close()
 
+        platform_ver = self.platform_version
+        if self.codename == '':
+            self.codename = commands.getoutput('lsb_release -c').split()[-1]
+            platform_ver = self.platform_version.split('.')[0]
+
         # debian/changelog
         log.info("creating debian/changelog file")
         f_changelog = open(os.path.join(deb_dir, 'changelog'), mode='w')
-        f_changelog.write("{project_name}-commercial ({ver}) UNRELEASED;"
-                          " urgency=low\n\n"
+        f_changelog.write("{project_name}-commercial "
+                          "({ver}-1{platform}{version}) "
+                          "{codename}; urgency=low\n\n"
                           "  * Debian package automatically created.\n\n"
                           " -- {maintainer} <{maintainer_email}>  {date_R}\n"
                           "".format(project_name=self.name, ver=self.version,
+                                    platform=self.platform,
+                                    version=platform_ver,
+                                    codename=self.codename,
                                     maintainer=self.maintainer,
                                     maintainer_email=self.maintainer_email,
                                     date_R=_get_date_time()))
