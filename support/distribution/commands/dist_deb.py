@@ -162,8 +162,10 @@ class BuildDistDebian(Command):
         f_compat.close()
 
         platform_ver = self.platform_version
+        log.info("platform codename: {0}".format(self.codename))
         if self.codename == '':
             self.codename = commands.getoutput('lsb_release -c').split()[-1]
+            log.info("new platform codename: {0}".format(self.codename))
             platform_ver = self.platform_version.split('.')[0]
 
         # debian/changelog
@@ -314,8 +316,11 @@ class BuildCommercialDistDebian(BuildDistDebian):
         f_compat.close()
 
         platform_ver = self.platform_version
+        self.codename = platform.linux_distribution()[2].lower()
+        log.info("platform codename: {0}".format(self.codename))
         if self.codename == '':
             self.codename = commands.getoutput('lsb_release -c').split()[-1]
+            log.info("new platform codename: {0}".format(self.codename))
             platform_ver = self.platform_version.split('.')[0]
 
         # debian/changelog
