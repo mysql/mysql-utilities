@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ VERSION = (1, 6, 1, 'Alpha', 0)
 
 VERSION_STRING = "%s.%s.%s" % VERSION[0:3]
 
-COPYRIGHT = "2010, 2014 Oracle and/or its affiliates. All rights reserved."
+COPYRIGHT = "2010, 2015 Oracle and/or its affiliates. All rights reserved."
 
 COPYRIGHT_FULL = "Copyright (c) " + COPYRIGHT + """
 This is a release of dual licensed MySQL Utilities. For the avoidance of

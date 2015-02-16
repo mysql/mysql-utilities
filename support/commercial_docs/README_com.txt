@@ -7,7 +7,7 @@ particular copy of the software is released under a commercial
 license and the GNU General Public License does not apply. 
 MySQL Utilities is brought to you by Oracle.
 
-Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
 
 For more information on MySQL Utilities, visit
   http://www.mysql.com/products/enterprise/utilities.html
