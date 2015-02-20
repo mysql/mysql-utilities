@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
-from _bsddb import version
 
 """Implements custom DistUtils commands for the MS Windows platform
 
@@ -36,16 +35,27 @@ from distutils.util import get_platform
 
 from mysql.utilities import COPYRIGHT
 from support import wix
-from support.distribution.msi_descriptor_parser import (add_exe_utils,
+from support.distribution.msi_descriptor_parser import (add_arch_dep_elems,
+                                                        add_exe_utils,
                                                         add_features,
                                                         add_online_help_utils)
 
 
-#WIX_INSTALL = r"C:\Program Files (x86)\Windows Installer XML v3.5"
+# WIX_INSTALL = r"C:\Program Files (x86)\Windows Installer XML v3.5"
 WIX_INSTALL = r"C:\Program Files (x86)\WiX Toolset v3.8"
+
 
 class _MSIDist(bdist):
     """Create a Windows Installer with Windows Executables"""
+    bdist_base = None
+    dist_dir = None
+    dist_type = None
+    dist_target = None
+    keep_temp = False
+    plat_name = None
+    product_name = ''
+    sub_version = ''
+    tag = ''
     user_options = [
         ('bdist-base=', 'b',
          "temporary directory for creating built distributions"),
@@ -69,17 +79,13 @@ class _MSIDist(bdist):
 
     def initialize_options(self):
         """Initialize options"""
-        self.bdist_base = None
-        self.plat_name = None
-        self.dist_dir = None
-        self.keep_temp = False
-        self.dist_type = None
-        self.dist_target = None
-        self.tag = ''
         self.product_name = 'MySQL Utilities {0}'
-        self.sub_version = ''
 
     def are_fabric_doctrine_present(self):
+        """Verifies if fabric project and Doctrine are present.
+
+        Returns a tuople of booleans.
+        """
         pck_fabric = False
         add_doczip = False
         for pck_name in self.distribution.packages:
@@ -156,8 +162,9 @@ class _MSIDist(bdist):
                 "No upgrade code found for version v{appver}, "
                 "Python v{pyver}".format(appver=appver, pyver=pyver))
         log.info("upgrade code for v{appver},"
-                 " Python v{pyver}: {upgrade}".format(
-                    appver=appver, pyver=pyver, upgrade=upgrade_code))
+                 " Python v{pyver}: {upgrade}".format(appver=appver,
+                                                      pyver=pyver,
+                                                      upgrade=upgrade_code))
 
         # wixobj's basename is the name of the installer
         wixobj = self._get_wixobj_name()
@@ -191,7 +198,7 @@ class _MSIDist(bdist):
             'Patch_Version': patch,
             'PythonInstallDir': 'Python%s' % pyver.replace('.', ''),
             'BuildDir': os.path.abspath(self.bdist_base),
-            #'BDist': os.path.abspath(self.dist_target),
+            # 'BDist': os.path.abspath(self.dist_target),
             'PyExt': 'pyc' if not self.include_sources else 'py',
             'BitmapDir': os.path.join(os.getcwd(), 'support', 'MSWindows'),
             'UpgradeCode': upgrade_code,
@@ -242,6 +249,7 @@ class _MSIDist(bdist):
 class MSIBuiltDist(_MSIDist):
     """Create a Built MSI distribution with executables"""
     description = 'create a Built MSI distribution with executables'
+    include_sources = False
     user_options = _MSIDist.user_options + [
         ('wix-install', None,
          "location of the Windows Installer XML installation\n"
@@ -249,6 +257,7 @@ class MSIBuiltDist(_MSIDist):
         ]
 
     python_version = get_python_version()
+    wix_install = None
     wxs = 'support/MSWindows/mysql_utilities.xml'
     fix_txtfiles = [
         ('README.txt', 'README_Utilities.txt'),
@@ -276,15 +285,20 @@ class MSIBuiltDist(_MSIDist):
                       self.distribution.scripts, log=log)
         add_online_help_utils(result_xml_path, result_xml_path,
                               self.distribution.scripts, log=log)
+        if get_platform() == 'win32':
+            add_arch_dep_elems(result_xml_path, result_xml_path, for32=True,
+                               log=log)
+        else:
+            add_arch_dep_elems(result_xml_path, result_xml_path, log=log)
 
         pck_fabric, add_doczip = self.are_fabric_doctrine_present()
         if pck_fabric or add_doczip:
-            #set the resulting_xml_path from above.
+            # set the resulting_xml_path from above.
             add_features(result_xml_path, result_xml_path,
                          add_fabric=pck_fabric,
                          add_doczip=add_doczip,
                          log=log)
-            for root, _dirs, files in os.walk('support/MSWindows/'):
+            for root, _, files in os.walk('support/MSWindows/'):
                 log.info('Checking for new msi descriptor at: {0}'
                          ''.format(root))
                 for afile in files:
@@ -326,7 +340,7 @@ class MSIBuiltDist(_MSIDist):
         """Prepare the distribution"""
         log.info('===== installing data =====')
         install_data = self.reinitialize_command('install_data',
-                                                     reinit_subcommands=1)
+                                                 reinit_subcommands=1)
         install_data.install_dir = self.bdist_base
         log.info("installing to %s" % self.bdist_base)
         self.run_command('install_data')
@@ -351,6 +365,11 @@ class MSIBuiltDist(_MSIDist):
 class BuiltCommercialMSI(_MSIDist):
     """Create a Built Commercial MSI distribution"""
     description = 'create a commercial built MSI distribution'
+    fix_txtfiles = None
+    include_sources = False
+    python_version = get_python_version()
+    wix_install = wix.WIX_INSTALL_PATH
+    wxs = None
     user_options = [
         ('bdist-base=', 'd',
          "temporary directory for creating the distribution"),
@@ -386,9 +405,6 @@ class BuiltCommercialMSI(_MSIDist):
         self.keep_temp = 0
         self.dist_dir = None
         self.plat_name = None
-        self.include_sources = False
-        self.wix_install = wix.WIX_INSTALL_PATH
-        self.python_version = get_python_version()
         self.dist_type = ''
         self.sub_version = ''
 
@@ -405,14 +421,20 @@ class BuiltCommercialMSI(_MSIDist):
         add_online_help_utils(result_xml_path, result_xml_path,
                               self.distribution.scripts, log=log)
 
+        if get_platform() == 'win32':
+            add_arch_dep_elems(result_xml_path, result_xml_path, for32=True,
+                               log=log)
+        else:
+            add_arch_dep_elems(result_xml_path, result_xml_path, log=log)
+
         pck_fabric, add_doczip = self.are_fabric_doctrine_present()
         if pck_fabric or add_doczip:
-            #set the resulting_xml_path from above.
+            # set the resulting_xml_path from above.
             add_features(result_xml_path, result_xml_path,
                          add_fabric=pck_fabric,
                          add_doczip=add_doczip,
                          log=log)
-            for root, _dirs, files in os.walk('support/MSWindows/'):
+            for root, _, files in os.walk('support/MSWindows/'):
                 log.info('Checking for new msi descriptor at: {0}'
                          ''.format(root))
                 for afile in files:

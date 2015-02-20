@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2015 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,18 +15,23 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
 
+"""Windows MSI descriptor parser.
+- Miscellaneous utility functions for modify MSI descriptor"""
+
 from xml.dom.minidom import parse, parseString
 import os
 
 # MySQL Utilities\scripts\etc\mysql\fabric.cfg
-dir_fab_conf = ('<Directory>'
+dir_fab_conf = (
+    '<Directory>'
     '<Directory Id="ETC" Name="etc">'
     '<Directory Id="FABCONF" Name="mysql"/>'
     '</Directory>'
     '</Directory>'
 )
 
-file_exe_gen = ('<Component>'
+file_exe_gen = (
+    '<Component>'
     '<File Id="exe_{mysql_util}" Name="{mysql_util}.exe"'
     ' Source="$(var.BuildDir)\\{mysql_util}.exe" DiskId="1"/>'
     '</Component>'
@@ -35,14 +40,15 @@ file_exe_gen = ('<Component>'
 util_help_gen = (
     '<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"'
     ' xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">'
-     '<util:InternetShortcut Id="url_{mysql_util}"'
-     ' Name="{mysql_util} (online)" '
-     ' Target="http://dev.mysql.com/doc/mysql-utilities/$(var.DocVersion)/en/'
-     '{util_url}.html"/>'
-     '</Wix>'
+    '<util:InternetShortcut Id="url_{mysql_util}"'
+    ' Name="{mysql_util} (online)" '
+    ' Target="http://dev.mysql.com/doc/mysql-utilities/$(var.DocVersion)/en/'
+    '{util_url}.html"/>'
+    '</Wix>'
 )
 
-dirref_fab = ('<Product>'
+dirref_fab = (
+    '<Product>'
     '<DirectoryRef Id="FABCONF">'
     '<Component Id="Fabric_config"'
     ' Guid="CA95B0AF-5500-48CD-9707-56608AE78491">'
@@ -66,79 +72,157 @@ dirref_fab = ('<Product>'
     '</Product>'
 )
 
-compref_fab = ('<Feature>'
+compref_fab = (
+    '<Feature>'
     '<ComponentRef Id="Fabric_config"/>'
     '</Feature>'
 )
 
-comp_fabric_cfg_menu = ('<Component>'
+comp_fabric_cfg_menu = (
+    '<Component>'
     '<Shortcut Description="MySQL Fabric configuration file" Id="fabric_cfg" '
     'Name="MySQL Fabric configuration file" '
     'Target="[INSTALLDIR]etc\\mysql\\fabric.cfg"/>'
     '</Component>'
 )
 
-dir_php_zip = ('<Directory>'
+dir_php_zip = (
+    '<Directory>'
     '<Directory Id="DOCTRINEZIP" Name="Doctrine extensions for PHP"/>'
     '</Directory>'
 )
 
-comp_doczip_menu = ('<Component>'
+comp_doczip_menu = (
+    '<Component>'
     '<Shortcut Description="[DOCTRINEZIP]" Id="zip_doczip" '
     'Name="Doctrine extensions for PHP" '
     'Target="[INSTALLDIR]Doctrine extensions for PHP"/>'
     '</Component>'
 )
 
-dirref_doczip = ('<Product><DirectoryRef Id="DOCTRINEZIP">'
-    '<Component Guid="cadd4711-6c3d-426f-a646-ad4f3a62f885" Id="SetupRegistryDocZip">'
-    '<RegistryKey Action="createAndRemoveOnUninstall" Key="Software\MySQL\MySQL Utilities\[DOCTRINEZIP]" Root="HKCU">'
-    '<RegistryValue KeyPath="yes" Name="Version" Type="string" Value="$(var.Version)"/>'
+dirref_doczip = (
+    '<Product><DirectoryRef Id="DOCTRINEZIP">'
+    '<Component Guid="cadd4711-6c3d-426f-a646-ad4f3a62f885" '
+    'Id="SetupRegistryDocZip">'
+    '<RegistryKey Action="createAndRemoveOnUninstall" '
+    'Key="Software\\MySQL\\MySQL Utilities\\[DOCTRINEZIP]" Root="HKCU">'
+    '<RegistryValue KeyPath="yes" Name="Version" Type="string" '
+    'Value="$(var.Version)"/>'
     '<RegistryValue Name="Location" Type="string" Value="[DOCTRINEZIP]"/>'
     '</RegistryKey>'
-    '<RegistryKey Action="createAndRemoveOnUninstall" Key="Software\MySQL AB\MySQL Utilities\[DOCTRINEZIP]" Root="HKCU">'
+    '<RegistryKey Action="createAndRemoveOnUninstall" '
+    'Key="Software\\MySQL AB\\MySQL Utilities\\[DOCTRINEZIP]" Root="HKCU">'
     '<RegistryValue Name="Version" Type="string" Value="$(var.Version)"/>'
     '<RegistryValue Name="Location" Type="string" Value="[DOCTRINEZIP]"/>'
     '</RegistryKey>'
     '</Component>'
-    '<Component Guid="78e37230-fc92-43f3-aad2-5920d228cee0" Id="SetupEnvDocZip">'
+    '<Component Guid="78e37230-fc92-43f3-aad2-5920d228cee0" '
+    'Id="SetupEnvDocZip">'
     '<CreateFolder/>'
-    '<Environment Action="set" Id="SystemPathDocZip" Name="PATH" Part="last" Permanent="no" System="yes" Value="[DOCTRINEZIP]"/>'
+    '<Environment Action="set" Id="SystemPathDocZip" Name="PATH" '
+    'Part="last" Permanent="no" System="yes" Value="[DOCTRINEZIP]"/>'
     '</Component>'
     '<Component Guid="d8069f9b-5d6b-4643-9273-78e2ab016edd" Id="DocZip">'
-    '<File Checksum="yes" Id="{docphp_id}" Source="$(var.BuildDir)\\scripts\\etc\\mysql\\{docphp}"/>'
+    '<File Checksum="yes" Id="{docphp_id}" '
+    'Source="$(var.BuildDir)\\scripts\\etc\\mysql\\{docphp}"/>'
     '</Component>'
     '</DirectoryRef></Product>'
 )
 
 dir_docphp = '<Directory Id="DocMenu" Name="Documentation"/>'
 
-compref_doczip = ('<Feature>'
+compref_doczip = (
+    '<Feature>'
     '<ComponentRef Id="SetupRegistryDocZip"/>'
     '<ComponentRef Id="SetupEnvDocZip"/>'
     '<ComponentRef Id="DocZip"/>'
     '</Feature>'
 )
 
+# Property VCPPREDIST2013 used to check Visual c++ Redistributable Package 
+# 2013 32bit and 64bit in 32bit on 64bit OS
+vcpp2013_redist = (
+    '<Product>'
+    '<Property Id="VCPPREDIST2013" Secure="yes">'
+    '<RegistrySearch Root="HKLM" Type="raw" Id="VCPP2013_Installed"'
+    ' Key="SOFTWARE\\Microsoft\\DevDiv\\vc\\Servicing\\12.0\\RuntimeMinimum"'
+    ' {w64} Name="Install" />'
+    '</Property>'
+    '</Product>'
+)
+
+# Property VCPPREDIST2013_32 used  check Visual c++ Redistributable Package 32bit on 64bit
+# notice the Wow6432Node, the normal check is shared by the two MSI packages
+# and is called VCPPREDIST2013
+msi32_on_64bit = (
+    '<Product>'
+    '<Property Id="VCPPREDIST2013_32" Secure="yes">'
+    '<RegistrySearch Root="HKLM" Type="raw" Id="VCPP2013_32_Installed"'
+    ' Key="SOFTWARE\\Wow6432Node\\Microsoft\\DevDiv\\vc\\Servicing\\12.0'
+    '\\RuntimeMinimum" Win64="yes" Name="Install" />'
+    '</Property>'
+    '</Product>'
+)
+
+# 32bit Conditional check, includes VCPPREDIST2013 and previows property.
+vc_red_32 = (
+    '<Product>'
+    '<!-- Check Visual c++ Redistributable Package for required dll -->'
+    '<Condition Message="This application requires the Visual C++ '
+    'Redistributable Package for Visual Studio 2013. Please install '
+    'the redistributable package and then run this installer again. See '
+    'the online documentation for more details.">'
+    '<![CDATA[Installed OR VCPPREDIST2013 OR VCPPREDIST2013_32]]>'
+    '</Condition>'
+    '</Product>'
+)
+
+# 64bit Conditional check, only includes VCPPREDIST2013 property.
+vc_red_64 = (
+    '<Product>'
+    '<!-- Check Visual c++ Redistributable Package for required dll -->'
+    '<Condition Message="This application requires the Visual C++ '
+    'Redistributable Package for Visual Studio 2013. Please install '
+    'the redistributable package and then run this installer again. See '
+    'the online documentation for more details.">'
+    '<![CDATA[Installed OR VCPPREDIST2013]]>'
+    '</Condition>'
+    '</Product>'
+)
+
+# 64bit Conditional check, only intall if OS is 64bit. Used in MSI-64
+only_64bit = (
+    '<Product>'
+    '<Condition Message="This version of the installer is only suitable to'
+    ' run on 64 bit operating systems.">'
+    '<![CDATA[Installed OR (VersionNT64 >=600)]]>'
+    '</Condition>'
+    '</Product>'
+)
+
 
 def append_childs_from_unparsed_xml(fatherNode, unparsed_xml):
+    """Append childs xml nodes to a node.
+    """
     dom3 = parseString(unparsed_xml)
     childNodes = dom3.firstChild.childNodes
-    for child_index in range(len(childNodes)):
+    for _ in range(len(childNodes)):
         childNode = childNodes.item(0)
         fatherNode.appendChild(childNode)
 
 
-def get_element(dom_msi, tagName, name=None, id=None):
+def get_element(dom_msi, tagName, name=None, id_=None):
+    """Get a xml element defined on Product.
+    """
     product = dom_msi.getElementsByTagName("Product")[0]
     elements = product.getElementsByTagName(tagName)
     for element in elements:
-        if name and id:
-            if (element.getAttribute('Name') == name and
-                element.getAttribute('Id') == id):
+        if name and id_:
+            if element.getAttribute('Name') == name and \
+               element.getAttribute('Id') == id_:
                 return element
-        elif id:
-            if element.getAttribute('Id') == id:
+        elif id_:
+            if element.getAttribute('Id') == id_:
                 return element
 
 
@@ -168,7 +252,7 @@ def add_online_help_utils(xml_path, result_path, util_names=None, log=None):
     print("set util_names {0}".format(set(util_names)))
 
     # Add the Fabric scripts.
-    diref = get_element(dom_msi, "DirectoryRef", id='DocMenu')
+    diref = get_element(dom_msi, "DirectoryRef", id_='DocMenu')
     comps = diref.getElementsByTagName('Component')
     for com in comps:
         if com.getAttribute('Id') == 'UtilsManuals':
@@ -197,7 +281,7 @@ def add_exe_utils(xml_path, result_path, util_names=None, log=None):
     """Adds the executable utilities to the msi package descriptor
 
     This method adds the executable utilities XML attributes to the msi
-    package descriptor so the installer can registered them in to Windows 
+    package descriptor so the installer can registered them in to Windows
     Registry for later uninstall.
 
     xml_path[in]       The original xml msi descriptor path
@@ -218,7 +302,7 @@ def add_exe_utils(xml_path, result_path, util_names=None, log=None):
     print("set util_names {0}".format(set(util_names)))
 
     # Add the Fabric scripts.
-    diref = get_element(dom_msi, "DirectoryRef", id='INSTALLDIR')
+    diref = get_element(dom_msi, "DirectoryRef", id_='INSTALLDIR')
     comps = diref.getElementsByTagName('Component')
     for com in comps:
         if com.getAttribute('Id') == 'UtilsExe':
@@ -239,10 +323,12 @@ def add_exe_utils(xml_path, result_path, util_names=None, log=None):
 
 
 def add_fabric_elements(dom_msi):
-    # Define the Directories structure that will be used on the installation 
+    """Helper method to add the Fabric's project files.
+    """
+    # Define the Directories structure that will be used on the installation
     # to Directory.
     dir_in = get_element(dom_msi, "Directory", name='MySQL Utilities',
-                         id="INSTALLDIR")
+                         id_="INSTALLDIR")
     append_childs_from_unparsed_xml(dir_in, dir_fab_conf)
 
     # Define the files to be installed on DirectoryRef.
@@ -250,23 +336,25 @@ def add_fabric_elements(dom_msi):
     append_childs_from_unparsed_xml(product, dirref_fab)
 
     # Add comp_fabric_cfg_menu shortcut.
-    diref = get_element(dom_msi, "DirectoryRef", id="UtilsMenu")
+    diref = get_element(dom_msi, "DirectoryRef", id_="UtilsMenu")
     comps = diref.getElementsByTagName('Component')
     for com in comps:
         if com.getAttribute('Id') == 'UtilsShortcuts':
             append_childs_from_unparsed_xml(com, comp_fabric_cfg_menu)
 
-    # Set ComponentRef to Feature, that list elements to be installed 
-    # We need to include the references to all elements added before. 
-    feature = get_element(dom_msi, "Feature", id="Install")
+    # Set ComponentRef to Feature, that list elements to be installed
+    # We need to include the references to all elements added before.
+    feature = get_element(dom_msi, "Feature", id_="Install")
     append_childs_from_unparsed_xml(feature, compref_fab)
 
 
 def add_doczip_elements(dom_msi, doc_zip_ver):
-    # Get the Directory elements, that is where the installation 
-    # directory structure is defined.
-    dir = get_element(dom_msi, "Directory", name='MySQL Utilities', id="INSTALLDIR")
-    append_childs_from_unparsed_xml(dir, dir_php_zip)
+    """Helper method to add the PHP Doctrine's zip file.
+    """
+    # Get the Directory element
+    inst_dir = get_element(dom_msi, "Directory", name='MySQL Utilities',
+                           id_="INSTALLDIR")
+    append_childs_from_unparsed_xml(inst_dir, dir_php_zip)
 
     # Add Doctrine folder and files
     product = dom_msi.getElementsByTagName("Product")[0]
@@ -275,26 +363,29 @@ def add_doczip_elements(dom_msi, doc_zip_ver):
     append_childs_from_unparsed_xml(product, dirref)
 
     # Add Doctrine shortcut.
-    diref = get_element(dom_msi, "DirectoryRef", id="UtilsMenu")
+    diref = get_element(dom_msi, "DirectoryRef", id_="UtilsMenu")
     comps = diref.getElementsByTagName('Component')
     for com in comps:
         if com.getAttribute('Id') == 'UtilsShortcuts':
             append_childs_from_unparsed_xml(com, comp_doczip_menu)
 
-    # Set ComponentRef to Feature, that list elements to be installed 
-    # We need to include the references to all elements added before. 
-    feature = get_element(dom_msi, "Feature", id="Install")
+    # Set ComponentRef to Feature, that list elements to be installed
+    # We need to include the references to all elements added before.
+    feature = get_element(dom_msi, "Feature", id_="Install")
     append_childs_from_unparsed_xml(feature, compref_doczip)
 
 
 def _print(log, msg):
+    """Log and print messages
+    """
     if log:
         log.info(msg)
     print(msg)
 
+
 def add_features(xml_path, result_path, add_fabric=False, add_doczip=False,
                  log=None):
-    """Adds the nessesary entries to the msi build descriptor to include 
+    """Adds the nessesary entries to the msi build descriptor to include
        Fabric and Doctrine.
 
        xml_path[in]       The original xml msi descriptor path
@@ -315,3 +406,55 @@ def add_features(xml_path, result_path, add_fabric=False, add_doczip=False,
     f.flush()
     f.close()
 
+
+def add_32bit_elements(dom_msi):
+    """Helper method for add the properties and conditions elements to the xml
+    msi descriptor.
+    """
+    # Add Doctrine folder and files
+    product = dom_msi.getElementsByTagName("Product")[0]
+
+    vcpp2013r = vcpp2013_redist.format(w64="")
+    append_childs_from_unparsed_xml(product, vcpp2013r)
+    append_childs_from_unparsed_xml(product, msi32_on_64bit)
+    append_childs_from_unparsed_xml(product, vc_red_32)
+    
+
+
+def add_64bit_elements(dom_msi):
+    """Helper method for add the properties and conditions elements to the xml
+    msi descriptor.
+    """
+    # Add Doctrine folder and files
+    product = dom_msi.getElementsByTagName("Product")[0]
+
+    vcpp2013r = vcpp2013_redist.format(w64='Win64="yes"')
+    print("vcpp2013r {0}".format(vcpp2013r))
+    append_childs_from_unparsed_xml(product, vcpp2013r)
+    append_childs_from_unparsed_xml(product, vc_red_64)
+    append_childs_from_unparsed_xml(product, only_64bit)
+
+
+def add_arch_dep_elems(xml_path, result_path, for32=False, log=None):
+    """Adds the architecture dependient properties and conditions.
+
+       xml_path[in]       The original xml msi descriptor path
+       result_path[in]    Path to save the resulting xml
+       add_fabric[in]     If True, fabric information will be added
+       add_doczip[in]     If True, Doctrine information will be added
+       log[in]            build command log instance
+    """
+    dom_msi = parse(xml_path)
+    if for32:
+        _print(log, "Adding 32bit elements")
+        add_32bit_elements(dom_msi)
+    else:
+        _print(log, "Adding 32bit elements")
+        add_64bit_elements(dom_msi)
+
+    _print(log, "Saving xml to:{0} working directory:{1}"
+           "".format(result_path, os.getcwd()))
+    f = open(result_path, "w+")
+    f.write(dom_msi.toprettyxml())
+    f.flush()
+    f.close()
