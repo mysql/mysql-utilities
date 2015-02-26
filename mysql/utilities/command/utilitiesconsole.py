@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -279,8 +279,15 @@ class UtilitiesConsole(Console):
                     # If there is a space in the command, quote it!
                     if (" " in cmd[0]):
                         cmd[0] = '"{0}"'.format(cmd[0])
+                    # if cmd is freeze code utility, subprocess just need the
+                    # executable part not absolute path using shell=False or
+                    # Windows will complain about the path. The base path of
+                    # mysqluc is used as location dir base of the subprocess.
+                    if '.exe' in cmd[0]:
+                        _, ut_cmd = os.path.split(cmd[0])
+                        cmd[0] = ut_cmd.replace('"', '')
                     # If the second part has .py in it and spaces, quote it!
-                    if (" " in cmd[1]) and ('.py' in cmd[0]):
+                    if len(cmd) > 1 and (" " in cmd[1]) and ('.py' in cmd[0]):
                         cmd[1] = '"{0}"'.format(cmd[1])
 
                 if self.quiet:

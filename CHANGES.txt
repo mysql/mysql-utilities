@@ -1,5 +1,6 @@
 Release-1.6.1 (Released January 27, 2015)
 ------------------------------------------
+- BUG#20583756 : mysqluc fails to launch utilities when using Windows MSI
 - BUG#20078072 : Improve MySQL Utilities support for MySQL 5.7.5
 - BUG#20035380 : utilities need to support new mysql fk behavior
 - BUG#19943104 : utilities do not parse grant statements correctly
