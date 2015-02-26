@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -135,7 +135,6 @@ def clone_server(conn_val, options):
             print "# Cloning the MySQL server running on %s." % \
                 conn_val["host"]
 
-        basedir = ""
         # Get basedir
         rows = server1.exec_query("SHOW VARIABLES LIKE 'basedir'")
         if not rows:
@@ -194,31 +193,40 @@ def clone_server(conn_val, options):
         print "# Locating mysql tools..."
 
     mysqladmin_path = get_tool_path(basedir, "mysqladmin")
-    mysql_basedir = get_tool_path(basedir, "share/english/errgmsg.sys",
-                                  False, False)
+
     mysql_basedir = basedir
     if os.path.exists(os.path.join(basedir, "local/mysql/share/")):
         mysql_basedir = os.path.join(mysql_basedir, "local/mysql/")
     # for source trees
     elif os.path.exists(os.path.join(basedir, "/sql/share/english/")):
         mysql_basedir = os.path.join(mysql_basedir, "/sql/")
-    system_tables = get_tool_path(basedir, "mysql_system_tables.sql", False)
-    system_tables_data = get_tool_path(basedir, "mysql_system_tables_data.sql",
-                                       False)
-    test_data_timezone = get_tool_path(basedir, "mysql_test_data_timezone.sql",
-                                       False)
-    help_data = get_tool_path(basedir, "fill_help_tables.sql", False)
+
+
+    locations = [
+        ("mysqld", mysqld_path),
+        ("mysqladmin", mysqladmin_path),
+        ]
+    # From 5.7.6 version onwards, bootstrap is done via mysqld with the
+    # --initialize-insecure option, so no need to get information about the
+    # sql system tables that need to be loaded.
+    if version < (5, 7, 6):
+        system_tables = get_tool_path(basedir, "mysql_system_tables.sql",
+                                      False)
+        system_tables_data = get_tool_path(basedir,
+                                           "mysql_system_tables_data.sql",
+                                           False)
+        test_data_timezone = get_tool_path(basedir,
+                                           "mysql_test_data_timezone.sql",
+                                           False)
+        help_data = get_tool_path(basedir, "fill_help_tables.sql", False)
+        locations.extend([("mysql_system_tables.sql", system_tables),
+                          ("mysql_system_tables_data.sql", system_tables_data),
+                          ("mysql_test_data_timezone.sql", test_data_timezone),
+                          ("fill_help_tables.sql", help_data),
+                          ])
 
     if verbosity >= 3 and not quiet:
         print "# Location of files:"
-        locations = [
-            ("mysqld", mysqld_path),
-            ("mysqladmin", mysqladmin_path),
-            ("mysql_system_tables.sql", system_tables),
-            ("mysql_system_tables_data.sql", system_tables_data),
-            ("mysql_test_data_timezone.sql", test_data_timezone),
-            ("fill_help_tables.sql", help_data),
-        ]
         if cmd_file is not None:
             locations.append(("write startup command to", cmd_file))
 
@@ -229,50 +237,68 @@ def clone_server(conn_val, options):
     if not quiet:
         print "# Setting up empty database and mysql tables..."
 
-    # Get bootstrap SQL statements
-    sql = list()
-    sql.append("CREATE DATABASE mysql;")
-    sql.append("USE mysql;")
-    innodb_disabled = False
-    if mysqld_options:
-        innodb_disabled = '--innodb=OFF' in mysqld_options
-    for sqlfile in [system_tables, system_tables_data, test_data_timezone,
-                    help_data]:
-        lines = open(sqlfile, 'r').readlines()
-        # Starting with MySQL 5.7.5, the root@localhost account creation was
-        # moved from the system_tables_data sql file into the mysql_install_db
-        # binary. Since we don't use mysql_install_db directly we need to
-        # create the root user account ourselves.
-        if (version is not None and version >= (5, 7, 5) and
-                sqlfile == system_tables_data):
-            lines.extend(_CREATE_ROOT_USER)
-        for line in lines:
-            line = line.strip()
-            # Don't fail when InnoDB is turned off (Bug#16369955) (Ugly hack)
-            if (sqlfile == system_tables and
-               "SET @sql_mode_orig==@@SES" in line and innodb_disabled):
-                for line in lines:
-                    if 'SET SESSION sql_mode=@@sql' in line:
-                        break
-            sql.append(line)
-
-    # Bootstap to setup mysql tables
     fnull = open(os.devnull, 'w')
-    cmd = [
-        mysqld_path,
-        "--no-defaults",
-        "--bootstrap",
-        "--datadir={0}".format(new_data),
-        "--basedir={0}".format(os.path.abspath(mysql_basedir)),
-    ]
 
-    if verbosity >= 1 and not quiet:
-        proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE)
+    # For MySQL versions before 5.7.6, use regular bootstrap procedure.
+    if version < (5, 7, 6):
+        # Get bootstrap SQL statements
+        sql = list()
+        sql.append("CREATE DATABASE mysql;")
+        sql.append("USE mysql;")
+        innodb_disabled = False
+        if mysqld_options:
+            innodb_disabled = '--innodb=OFF' in mysqld_options
+        for sqlfile in [system_tables, system_tables_data, test_data_timezone,
+                        help_data]:
+            lines = open(sqlfile, 'r').readlines()
+            # On MySQL 5.7.5, the root@localhost account creation was
+            # moved from the system_tables_data sql file into the
+            # mysql_install_db binary. Since we don't use mysql_install_db
+            # directly we need to create the root user account ourselves.
+            if (version is not None and version == (5, 7, 5) and
+                    sqlfile == system_tables_data):
+                lines.extend(_CREATE_ROOT_USER)
+            for line in lines:
+                line = line.strip()
+                # Don't fail when InnoDB is turned off (Bug#16369955)
+                # (Ugly hack)
+                if (sqlfile == system_tables and
+                   "SET @sql_mode_orig==@@SES" in line and innodb_disabled):
+                    for line in lines:
+                        if 'SET SESSION sql_mode=@@sql' in line:
+                            break
+                sql.append(line)
+
+        # Bootstap to setup mysql tables
+        cmd = [
+            mysqld_path,
+            "--no-defaults",
+            "--bootstrap",
+            "--datadir={0}".format(new_data),
+            "--basedir={0}".format(os.path.abspath(mysql_basedir)),
+        ]
+
+        if verbosity >= 1 and not quiet:
+            proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE)
+        else:
+            proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE,
+                                    stdout=fnull, stderr=fnull)
+        proc.communicate('\n'.join(sql))
+
+    # From 5.7.6 onwards, mysql_install_db has been replaced by mysqld and
+    # the --initialize option
     else:
-        proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE,
-                                stdout=fnull, stderr=fnull)
-    proc.communicate('\n'.join(sql))
-
+        cmd = [
+            mysqld_path,
+            "--initialize-insecure=on",
+            "--datadir={0}".format(new_data),
+            "--basedir={0}".format(os.path.abspath(mysql_basedir))
+        ]
+        if verbosity >= 1 and not quiet:
+            proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE)
+        else:
+            proc = subprocess.Popen(cmd, shell=False, stdin=subprocess.PIPE,
+                                    stdout=fnull, stderr=fnull)
     # Wait for subprocess to finish
     res = proc.wait()
     # Kill subprocess just in case it didn't finish - Ok if proc doesn't exist

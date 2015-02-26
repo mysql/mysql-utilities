@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,17 +35,18 @@ CANNOT_START_SERVER_ERR = ("Cannot connect to server restarted with the "
 
 class test(mutlib.System_test):
     """clone server parameters
-    This test exercises the parameters for mysqlserverclone
+    This test exercises the parameters for mysqlserverclone for server versions
+    after and including MySQL 5.7.6.
     """
 
     start_cmd_fl = None
 
     def check_prerequisites(self):
-        ret = self.check_num_servers(1)
-        if ret and \
-           not self.servers.get_server(0).check_version_compat(5, 6, 0):
-            raise MUTLibError("Test requires server version 5.6 and later.")
-        return ret
+        has_server = self.check_num_servers(1)
+        srv = self.servers.get_server(0)
+        if not srv.check_version_compat(5, 7, 6):
+            raise MUTLibError("Test requires server version 5.7.6 and later.")
+        return has_server
 
     def setup(self):
         # No setup needed
@@ -196,15 +197,6 @@ class test(mutlib.System_test):
                             "#                       mysqld: XXXXXXXXXXXX\n")
         self.replace_result("#                   mysqladmin:",
                             "#                   mysqladmin: XXXXXXXXXXXX\n")
-        self.replace_result("#      mysql_system_tables.sql:",
-                            "#      mysql_system_tables.sql: XXXXXXXXXXXX\n")
-        self.replace_result("# mysql_system_tables_data.sql:",
-                            "# mysql_system_tables_data.sql: XXXXXXXXXXXX\n")
-        self.replace_result("# mysql_test_data_timezone.sql:",
-                            "# mysql_test_data_timezone.sql: XXXXXXXXXXXX\n")
-        self.replace_result("#         fill_help_tables.sql:",
-                            "#         fill_help_tables.sql: XXXXXXXXXXXX\n")
-
         self.replace_result("# Cloning the MySQL server running on ",
                             "# Cloning the MySQL server running on "
                             "XXXXX-XXXXX.\n")
