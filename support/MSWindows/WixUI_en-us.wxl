@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
-    <String Id="WelcomeDlgDescription" Overridable="yes">The Setup Wizard will install [ProductName] on your computer. Click Next to continue or Cancel to exit the Setup Wizard.</String>
-    <String Id="ExitDialogOptionalText" Overridable="yes">The utilities are now installed and available from any new opened sessions of Command Prompt (cmd.exe) or PowerShell.&#13;&#10;&#13;&#10;Additionally, a shortcut named 'MySQL Utilities Console' has been added to the Start Menu.&#13;&#10;&#13;&#10;Documentation can be found here: http://dev.mysql.com/doc/index-utils-fabric.html</String>
-</WixLocalization>

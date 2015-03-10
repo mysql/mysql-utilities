@@ -1,0 +1,3 @@
+[submodule "internal"]
+	path = internal
+	url = git@myrepo.no.oracle.com:mysql-utilities-internal

@@ -1,8 +1,0 @@
-Format: {FORMAT}
-Upstream-Name: {PRODUCT_NAME}
-Source: {SOURCE}
-
-Files: *
-Copyright: 2009, {CURRENT_YEAR}, Oracle and/or its affiliates. All rights reserved.
-License: {LICENSE_TYPE}
-{README}
