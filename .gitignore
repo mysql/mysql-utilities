@@ -1,0 +1,38 @@
+# Tmp files
+~*
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Connector python files
+mysql/connector/*
+
+# Distribution / packaging
+*.egg-info
+dist/
+build/
+MANIFEST
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+
+# OSX and Pycharm
+.DS_Store
+.idea/
+
+# Patch files
+*.patch
+*.diff
+
+# Reject files from MUT
+*.reject
