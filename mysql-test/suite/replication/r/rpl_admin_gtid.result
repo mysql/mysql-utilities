@@ -603,12 +603,12 @@ WARNING: Using a password on the command line interface can be insecure.
             role: SLAVE
            state: UP
        gtid_mode: ON
-          health: Slave has 4 transactions behind master.
+          health: IO thread is not running., SQL thread is not running., Slave has 4 transactions behind master.
          version: XX.XX.XX
  master_log_file: XXXXX.XXXX
   master_log_pos: XXXX
-       IO_Thread: Yes
-      SQL_Thread: Yes
+       IO_Thread: No
+      SQL_Thread: No
      Secs_Behind: X
  Remaining_Delay: XXX
     IO_Error_Num: 0

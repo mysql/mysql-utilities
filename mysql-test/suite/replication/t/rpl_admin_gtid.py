@@ -19,8 +19,6 @@
 rpl_admin_gtid test.
 """
 
-import time
-
 import mutlib
 import rpl_admin
 
@@ -275,49 +273,23 @@ class test(rpl_admin.test):
         self.reset_master([self.server1, self.server2])
         self.reset_slaves()
 
-        # Start the slave again
-        self.server2.exec_query("START SLAVE")
-
-        # Purge some gtids to create holes
-        self.server1.exec_query('SET GLOBAL gtid_purged= "{0}:3:5:7:12'
-                                '"'.format(master_uuid))
-        self.server1.exec_query("CREATE DATABASE `trx_behind`")
-        self.server1.exec_query("CREATE TABLE `trx_behind`.`t1` (x char(30))")
-        # Insert data on the master server:
-        last_val = 15
-        for i in range(last_val):
-            self.server1.exec_query('INSERT INTO `trx_behind`.`t1` '
-                                    'VALUES("{0}")'.format(i))
-
-        # Wait for the slave to catch up with the master.
-        round_ = 0
-        # Give a little time to the slave before verifying if it is in sync
-        time.sleep(3)
-        while round_ < TIMEOUT:
-            try:
-                res = self.server2.exec_query(
-                    "SELECT COUNT(*) FROM `trx_behind`.`t1`")
-                # Use rollback to close transaction and read fresh data
-                # data in next select.
-                self.server2.rollback()
-                if isinstance(res, list) and int(res[0][0]) == last_val:
-                    break
-            except UtilDBError:  # database may not exist yet
-                pass
-            finally:
-                round_ += 1
-                time.sleep(3)
-        else:
-            raise MUTLibError("{0}: failed - waiting for slave to sync "
-                              "with master".format(comment))
+        # set of transactions to skip on slave
+        slave_skip_trx = set([3, 5, 7, 12])
+        LAST_GTID = 21
+        for i in range(1, LAST_GTID + 1):
+            automatic = True if i == LAST_GTID else False
+            # inject transaction on master
+            gtid = "{0}:{1}".format(master_uuid, i)
+            self.server1.inject_empty_trx(gtid, automatic)
+            # check it transaction should be skipped
+            if i not in slave_skip_trx:
+                self.server2.inject_empty_trx(gtid, automatic)
 
         # Run the test
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        # DROP DATABASE
-        self.server1.exec_query("DROP DATABASE IF EXISTS `trx_behind`")
-        self.server2.exec_query("DROP DATABASE IF EXISTS `trx_behind`")
+
         # Now we return the topology to its original state for other tests
         self.reset_topology()
 
