@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2015 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -100,15 +100,12 @@ import distutils.core
 from distutils.command.bdist_dumb import bdist_dumb
 from distutils.command.install_data import install_data as _install_data
 from distutils import log
-from distutils.dir_util import remove_tree, ensure_relative
+from distutils.dir_util import remove_tree
 from distutils.util import change_root
 from itertools import groupby
 
-from info import find_packages
-
-_REQUIRED_CX_FREEZE = (4, 3, 1) # Or later
-_REQUIRED_MYCONNPY = (1, 0, 8) # Or later
-_REQUIRED_SPHINX = (1, 1, 3) # Or later
+_REQUIRED_CX_FREEZE = (4, 3, 1)  # Or later
+_REQUIRED_MYCONNPY = (1, 0, 8)  # Or later
 
 # Make absolutely sure current working directory is looked in first
 sys.path.insert(0, '.')
@@ -120,12 +117,12 @@ check_python_version()
 # Require cx_Freeze
 try:
     import cx_Freeze
-    vercxfreeze = tuple([ int(val) for val in cx_Freeze.version.split('.') ])
+    vercxfreeze = tuple([int(val) for val in cx_Freeze.version.split('.')])
     if not vercxfreeze >= _REQUIRED_CX_FREEZE:
         raise ImportError
 except ImportError:
     log.error("Package cx_Freeze v{0} or later is required.".format(
-        '.'.join([ str(val) for val in _REQUIRED_CX_FREEZE ])))
+        '.'.join([str(val) for val in _REQUIRED_CX_FREEZE])))
     sys.exit(1)
 
 # Require Connector/Python
@@ -135,13 +132,13 @@ try:
         raise ImportError
 except ImportError:
     log.error("MySQL Connector/Python v{0} or later is required.".format(
-        '.'.join([ str(val) for val in _REQUIRED_MYCONNPY ])))
+        '.'.join([str(val) for val in _REQUIRED_MYCONNPY])))
     sys.exit(1)
 
 from info import META_INFO, INSTALL
 
 # cx_Freeze executables and configuration
-APPS = [ cx_Freeze.Executable(script) for script in glob('scripts/mysql*.py') ]
+APPS = [cx_Freeze.Executable(script) for script in glob('scripts/mysql*.py')]
 # Acquire packages names to include in library from module info
 INSTALL_COPY = INSTALL.copy()
 print("Packages to include on library: {0}".format(INSTALL_COPY['packages']))
@@ -186,10 +183,13 @@ class NotSupportedCommand(distutils.core.Command):
 
 
 class Install(cx_Freeze.install):
+    """Install"""
+    install_exe = None
+
     def select_scheme(self, name):
         if self.install_exe is None and os.name != 'nt':
             arch = platform.architecture()[0]
-            libdir = 'lib64' if arch == '64bit' else 'lib' 
+            libdir = 'lib64' if arch == '64bit' else 'lib'
             self.install_exe = '$base/{libdir}/{name}'.format(
                 libdir=libdir,
                 name=self.distribution.metadata.name)
@@ -197,7 +197,9 @@ class Install(cx_Freeze.install):
 
 
 class BDistDumb(bdist_dumb):
+    """BDistDumb"""
     description = bdist_dumb.description + ' (customized)'
+
     def run(self):
         """Run the command"""
         if not self.skip_build:
@@ -220,10 +222,9 @@ class BDistDumb(bdist_dumb):
         installman.run()
 
         # Make the archive
-        filename = self.make_archive(pseudoinstall_root,
-                                     self.format, root_dir=self.dist_dir,
-                                     owner=self.owner, group=self.group,
-                                     base_dir=archive_basename)
+        self.make_archive(pseudoinstall_root, self.format,
+                          root_dir=self.dist_dir, owner=self.owner,
+                          group=self.group, base_dir=archive_basename)
 
         if not self.keep_temp:
             cwd = os.getcwd()
@@ -231,8 +232,12 @@ class BDistDumb(bdist_dumb):
             remove_tree(archive_basename, dry_run=self.dry_run)
             os.chdir(cwd)
 
+
 class InstallMan(distutils.core.Command):
+    """InstallMan"""
     description = "Install Unix manual pages"
+    root = None
+    prefix = None
 
     user_options = [
         ('prefix=', None, 'installation prefix (default /usr/share/man)'),
@@ -264,12 +269,17 @@ class InstallMan(distutils.core.Command):
             src_man = os.path.join(srcdir, man)
             section = os.path.splitext(man)[1][1:]
             dest_dir = os.path.join(self.prefix, 'man' + section)
-            self.mkpath(dest_dir) # Could be different section
+            self.mkpath(dest_dir)  # Could be different section
             dest_man = os.path.join(dest_dir, man)
             self.copy_file(src_man, dest_man)
 
-# We need to edit the configuration file before installing it
+
 class install_data(_install_data):
+    """Install data and edits the configuration file before installing it"""
+    user = None
+    home = None
+    data_files = None
+
     def initialize_options(self):
         _install_data.initialize_options(self)
         self.user = None
@@ -315,15 +325,14 @@ class install_data(_install_data):
                 # directories to the config file.
                 if fnmatch.fnmatch(filename, 'data/*.cfg.in'):
                     config = ConfigParser.RawConfigParser({
-                           'prefix': '', # install_dir,
-                            'logdir': install_logdir,
-                            'sysconfdir': install_sysconfdir,
-                            })
+                        'prefix': '',  # custom install_dir,
+                        'logdir': install_logdir,
+                        'sysconfdir': install_sysconfdir,
+                    })
                     config.readfp(open(filename))
-                    #filename = os.path.split(os.path.splitext(filename)[0])[1]
                     filename = os.path.splitext(filename)[0]
                     config.write(open(filename, "w"))
-                    # change directory 'fabric'to mysql 
+                    # change directory 'fabric'to mysql
                     directory = os.path.join(install_sysconfdir, 'mysql')
                 if os.name == 'nt':
                     directory = install_sysconfdir
@@ -336,8 +345,9 @@ class install_data(_install_data):
         #   --> [('bar', [2, 5]), ('foo', [1, 3, 4])]
         data_files.sort()
         data_files = [
-            (d, [ f[1] for f in fs ]) for d, fs in groupby(data_files, key=lambda x: x[0])
-            ]
+            (d, [f[1] for f in fs]) for d, fs in groupby(data_files,
+                                                         key=lambda x: x[0])
+        ]
         self.data_files = data_files
         log.info("package--> self.data_files {0}".format(self.data_files))
         log.info("package.py--> self.data_files {0}".format(self.data_files))
@@ -347,9 +357,9 @@ class install_data(_install_data):
 # Specific packaging for Unix platforms
 if os.name != 'nt':
     try:
-        from support.dist_rpm import BuiltExeRPM
+        from internal.packaging.commands.dist_rpm import BuiltExeRPM
     except ImportError:
-        pass # Building RPM packages not available
+        pass  # Building RPM packages not available
     else:
         SETUP_ARGS['cmdclass'].update({'bdist_rpm': BuiltExeRPM})
 
@@ -359,9 +369,11 @@ elif os.name == 'nt':
         'bdist_rpm': NotSupportedCommand,
         })
     try:
-        from support.distribution.commands.dist_msi import (BuiltCommercialMSI,
-                                                            MSIBuiltDist)
-        from support.distribution.commands import bdist, build
+        from internal.packaging.commands.dist_msi import (
+            BuiltCommercialMSI,
+            MSIBuiltDist,
+        )
+        from internal.packaging.commands import bdist
         import mysql.connector
     except ImportError as err:
         log.error("Can not make Windows packages. cx_Freeze and WiX 3.5 "
@@ -391,7 +403,9 @@ SETUP_ARGS['cmdclass'].update({
     'bdist_wininst': NotSupportedCommand,
     })
 
+
 def main():
+    """main"""
     cx_Freeze.setup(**SETUP_ARGS)
 
 if __name__ == '__main__':

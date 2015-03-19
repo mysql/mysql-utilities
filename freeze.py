@@ -15,11 +15,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+"""Helper Module used on build, generates excutable version of scripts"""
 
 import sys
 
-from info import META_INFO, INSTALL, COMMANDS
-
+from info import META_INFO, INSTALL
+import cx_Freeze
 from cx_Freeze import setup     # Setup function to use
 
 if sys.platform.startswith("win32"):
@@ -28,14 +29,12 @@ if sys.platform.startswith("win32"):
 ARGS = {
     'executable': [
         cx_Freeze.Executable(exe, base="Console") for exe in INSTALL['scripts']
-        ],
+    ],
     'options': {
-        'bdist_msi': { 'add_to_path': True, },
-        }
+        'bdist_msi': {'add_to_path': True, },
     }
+}
 
 ARGS.update(META_INFO)
 ARGS.update(INSTALL)
-ARGS.update(COMMANDS)
 setup(**ARGS)
-

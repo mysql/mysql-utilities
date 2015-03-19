@@ -58,6 +58,8 @@ _PACKAGES = (
 _CURRENT_PATH = os.path.abspath(os.path.dirname(__file__))
 (_BASE_PATH, _,) = os.path.split(_CURRENT_PATH)
 
+if os.path.exists(os.path.join(_BASE_PATH, "internal")):
+    _PACKAGES = _PACKAGES + (os.path.join("internal", "packaging"),)
 
 # Add base path and mysql-test to sys.path
 sys.path.append(_BASE_PATH)
