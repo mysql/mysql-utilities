@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1341,12 +1341,13 @@ class Database(object):
                 REFERENTIAL_CONSTRAINTS.UNIQUE_CONSTRAINT_SCHEMA,
                 REFERENTIAL_CONSTRAINTS.UPDATE_RULE,
                 REFERENTIAL_CONSTRAINTS.DELETE_RULE,
-                KEY_COLUMN_USAGE.CONSTRAINT_NAME,
+                KEY_COLUMN_USAGE.CONSTRAINT_NAME AS KEY_CONSTRAINT_NAME,
                 KEY_COLUMN_USAGE.COLUMN_NAME AS COL_NAME,
                 KEY_COLUMN_USAGE.REFERENCED_TABLE_SCHEMA,
                 KEY_COLUMN_USAGE.REFERENCED_COLUMN_NAME
             """
             full_pos_to_quote = (1, 2, 22, 27, 28, 29, 30, 33, 34, 35, 36)
+            full_pos_split_quote = (34, 36)
             _MINIMAL = """
             SELECT TABLES.TABLE_SCHEMA, TABLES.TABLE_NAME, TABLES.ENGINE,
                 COLUMNS.ORDINAL_POSITION, COLUMNS.COLUMN_NAME,
@@ -1359,12 +1360,13 @@ class Database(object):
                 REFERENTIAL_CONSTRAINTS.UNIQUE_CONSTRAINT_NAME,
                 REFERENTIAL_CONSTRAINTS.UPDATE_RULE,
                 REFERENTIAL_CONSTRAINTS.DELETE_RULE,
-                KEY_COLUMN_USAGE.CONSTRAINT_NAME,
+                KEY_COLUMN_USAGE.CONSTRAINT_NAME AS KEY_CONSTRAINT_NAME,
                 KEY_COLUMN_USAGE.COLUMN_NAME AS COL_NAME,
                 KEY_COLUMN_USAGE.REFERENCED_TABLE_SCHEMA,
                 KEY_COLUMN_USAGE.REFERENCED_COLUMN_NAME
             """
             minimal_pos_to_quote = (0, 1, 4, 11, 12, 13, 16, 17, 18, 19)
+            minimal_pos_split_quote = (17, 19)
             _OBJECT_QUERY = """
             FROM INFORMATION_SCHEMA.TABLES JOIN INFORMATION_SCHEMA.COLUMNS ON
                 TABLES.TABLE_SCHEMA = COLUMNS.TABLE_SCHEMA AND
@@ -1375,11 +1377,13 @@ class Database(object):
                 TABLES.TABLE_NAME = REFERENTIAL_CONSTRAINTS.TABLE_NAME
             LEFT JOIN (
                   SELECT CONSTRAINT_SCHEMA, TABLE_NAME, CONSTRAINT_NAME,
-                         GROUP_CONCAT(COLUMN_NAME) AS COLUMN_NAME,
-                         REFERENCED_TABLE_SCHEMA, REFERENCED_COLUMN_NAME
+                         GROUP_CONCAT(COLUMN_NAME ORDER BY ORDINAL_POSITION)
+                         AS COLUMN_NAME, REFERENCED_TABLE_SCHEMA,
+                         GROUP_CONCAT(REFERENCED_COLUMN_NAME ORDER BY
+                         ORDINAL_POSITION) AS REFERENCED_COLUMN_NAME
                   FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
                   GROUP BY CONSTRAINT_SCHEMA, TABLE_NAME, CONSTRAINT_NAME,
-                           REFERENCED_TABLE_SCHEMA, REFERENCED_COLUMN_NAME
+                           REFERENCED_TABLE_SCHEMA
             ) AS KEY_COLUMN_USAGE ON
                 TABLES.TABLE_SCHEMA = KEY_COLUMN_USAGE.CONSTRAINT_SCHEMA
                 AND
@@ -1406,12 +1410,14 @@ class Database(object):
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION
             """
             full_pos_to_quote = (1, 2)
+            full_pos_split_quote = ()
             _MINIMAL = """
             SELECT TABLE_SCHEMA, TABLE_NAME, DEFINER, SECURITY_TYPE,
                    VIEW_DEFINITION, CHECK_OPTION, IS_UPDATABLE,
                    CHARACTER_SET_CLIENT, COLLATION_CONNECTION
             """
             minimal_pos_to_quote = (0, 1)
+            minimal_pos_split_quote = ()
             _OBJECT_QUERY = """
             FROM INFORMATION_SCHEMA.VIEWS
             WHERE TABLE_SCHEMA = '%s' %s
@@ -1436,6 +1442,7 @@ class Database(object):
                    DATABASE_COLLATION
             """
             full_pos_to_quote = (1, 2, 5, 6)  # 9 ?
+            full_pos_split_quote = ()
             _MINIMAL = """
             SELECT TRIGGER_NAME, DEFINER, EVENT_MANIPULATION,
                    EVENT_OBJECT_SCHEMA, EVENT_OBJECT_TABLE,
@@ -1446,6 +1453,7 @@ class Database(object):
             """
             # Note: 7 (ACTION_STATEMENT) might require special handling
             minimal_pos_to_quote = (0, 3, 4)
+            minimal_pos_split_quote = ()
             _OBJECT_QUERY = """
             FROM INFORMATION_SCHEMA.TRIGGERS
             WHERE TRIGGER_SCHEMA = '%s' %s
@@ -1466,6 +1474,7 @@ class Database(object):
                    BODY_UTF8
             """
             full_pos_to_quote = (0, 1, 3)
+            full_pos_split_quote = ()
             _MINIMAL = """
             SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
                    SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
@@ -1474,6 +1483,7 @@ class Database(object):
                    DB_COLLATION
             """
             minimal_pos_to_quote = (0,)
+            minimal_pos_split_quote = ()
             _OBJECT_QUERY = """
             FROM mysql.proc
             WHERE DB = '%s' AND TYPE = 'PROCEDURE' %s
@@ -1494,6 +1504,7 @@ class Database(object):
                    BODY_UTF8
             """
             full_pos_to_quote = (0, 1, 3)
+            full_pos_split_quote = ()
             _MINIMAL = """
             SELECT NAME, LANGUAGE, SQL_DATA_ACCESS, IS_DETERMINISTIC,
                    SECURITY_TYPE, DEFINER, PARAM_LIST, RETURNS,
@@ -1502,6 +1513,7 @@ class Database(object):
                    DB_COLLATION
             """
             minimal_pos_to_quote = (0,)
+            minimal_pos_split_quote = ()
             _OBJECT_QUERY = """
             FROM mysql.proc
             WHERE DB = '%s' AND TYPE = 'FUNCTION' %s
@@ -1522,6 +1534,7 @@ class Database(object):
                    DB_COLLATION, BODY_UTF8
             """
             full_pos_to_quote = (0, 1)
+            full_pos_split_quote = ()
             _MINIMAL = """
             SELECT NAME, DEFINER, BODY, STATUS,
                    EXECUTE_AT, INTERVAL_VALUE, INTERVAL_FIELD, SQL_MODE,
@@ -1530,6 +1543,7 @@ class Database(object):
                    DB_COLLATION
             """
             minimal_pos_to_quote = (0,)
+            minimal_pos_split_quote = ()
             _OBJECT_QUERY = """
             FROM mysql.event
             WHERE DB = '%s' %s
@@ -1569,6 +1583,7 @@ class Database(object):
             'columns': get_columns
         }
         pos_to_quote = ()
+        pos_split_quote = ()
         if obj_type == _GRANT:
             query = _OBJECT_QUERY % (self.db_name, self.db_name,
                                      self.db_name, self.db_name)
@@ -1583,11 +1598,13 @@ class Database(object):
                 prefix = _FULL
                 if need_backtick:
                     pos_to_quote = full_pos_to_quote
+                    pos_split_quote = full_pos_split_quote
                 sufix = _ORDER_BY_DEFAULT
             else:
                 prefix = _MINIMAL
                 if need_backtick:
                     pos_to_quote = minimal_pos_to_quote
+                    pos_split_quote = minimal_pos_split_quote
                 sufix = _ORDER_BY_DEFAULT
             # Form exclusion string
             exclude_str = ""
@@ -1599,17 +1616,25 @@ class Database(object):
 
             # Quote required identifiers with backticks
             if need_backtick:
-                # function to quote row elements at a given positions
-                # quote = lambda pos, obj: quote_with_backticks(obj) \
-                #         if obj and pos in pos_to_quote else obj
                 new_rows = []
                 for row in res[1]:
-                    # recreate row tuple quoting needed elements with backticks
-                    #r = tuple([quote(i, data) for i, data in enumerate(row)])
-                    r = tuple([quote_with_backticks(data)
-                               if data and i in pos_to_quote else data
-                               for i, data in enumerate(row)])
-                    new_rows.append(r)
+                    # Recreate row tuple quoting needed elements with backticks
+                    # Note: handle elements that can hold multiple values
+                    # quoting them separately (e.g., multiple column names).
+                    r = []
+                    for i, data in enumerate(row):
+                        if data and i in pos_to_quote:
+                            if i in pos_split_quote:
+                                cols = data.split(',')
+                                data = ','.join(
+                                    [quote_with_backticks(col) for col in cols]
+                                )
+                                r.append(data)
+                            else:
+                                r.append(quote_with_backticks(data))
+                        else:
+                            r.append(data)
+                    new_rows.append(tuple(r))
 
                 # set new result with with required data quoted with backticks
                 res = (res[0], new_rows)

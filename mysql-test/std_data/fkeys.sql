@@ -22,5 +22,5 @@ INSERT INTO util_test_fk2.a2 VALUES(6,'bar',1,1);
 
 CREATE DATABASE util_test_fk3;
 USE util_test_fk3;
-CREATE TABLE util_test_fk2.m (a int NOT NULL DEFAULT 0, b char(20), PRIMARY KEY (a)) ENGINE=MYISAM;
-INSERT INTO util_test_fk2.m VALUES(1,'foo');
+CREATE TABLE util_test_fk3.m (a int NOT NULL DEFAULT 0, b char(20), PRIMARY KEY (a)) ENGINE=MYISAM;
+INSERT INTO util_test_fk3.m VALUES(1,'foo');

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1546,7 +1546,7 @@ class System_test(object):
         return all(kill_results)
 
     @staticmethod
-    def drop_db(server, db):
+    def drop_db(server, db, debug=False):
         """Drops a database.
 
         server[in]     Server instance.
@@ -1561,7 +1561,10 @@ class System_test(object):
         try:
             q_db = quote_with_backticks(db)
             server.exec_query("DROP DATABASE {0}".format(q_db))
-        except UtilError:
+        except UtilError as err:
+            if debug:
+                print("ERROR dropping {0} database: {1}".format(db,
+                                                                err.errmsg))
             return False
         return True
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import csv
 import re
 import sys
 
+from collections import defaultdict
 from itertools import imap
 
 from mysql.utilities.exception import UtilError, UtilDBError
@@ -462,83 +463,158 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
 
     create_str = "CREATE TABLE %s.%s (\n" % (db_name, tbl_name)
     stop = len(columns)
-    pri_keys = []
-    keys = []
-    key_str = ""
+    pri_keys = set()
+    keys = set()
+    key_constraints = defaultdict(set)
     col_name_index = col_ref.get("COLUMN_NAME", 0)
     col_type_index = col_ref.get("COLUMN_TYPE", 1)
     is_null_index = col_ref.get("IS_NULLABLE", 2)
     def_index = col_ref.get("COLUMN_DEFAULT", 3)
     col_key_index = col_ref.get("COLUMN_KEY", 4)
-    const_name_index = col_ref.get("CONSTRAINT_NAME", 7)
+    const_name_index = col_ref.get("KEY_CONSTRAINT_NAME", 12)
     ref_tbl_index = col_ref.get("REFERENCED_TABLE_NAME", 8)
-    ref_schema_index = col_ref.get("REFERENCED_TABLE_SCHEMA", 18)
+    ref_schema_index = col_ref.get("REFERENCED_TABLE_SCHEMA", 14)
     ref_col_index = col_ref.get("COL_NAME", 13)
     ref_col_ref = col_ref.get("REFERENCED_COLUMN_NAME", 15)
-    constraints = []
+    ref_const_name = col_ref.get("CONSTRAINT_NAME", 7)
+    update_rule = col_ref.get("UPDATE_RULE", 10)
+    delete_rule = col_ref.get("DELETE_RULE", 11)
+    used_columns = set()
     for column in range(0, stop):
         cur_col = columns[column]
         # Quote column name with backticks if needed
         col_name = cur_col[col_name_index]
         if not is_quoted_with_backticks(col_name):
             col_name = quote_with_backticks(col_name)
-        create_str = "%s  %s %s" % (create_str, col_name,
-                                    cur_col[col_type_index])
-        if cur_col[is_null_index].upper() != "YES":
-            create_str += " NOT NULL"
-        if len(cur_col[def_index]) > 0 and \
-                cur_col[def_index].upper() != "NONE":
-            create_str += " DEFAULT %s" % cur_col[def_index]
-        elif cur_col[is_null_index].upper == "YES":
-            create_str += " DEFAULT NULL"
+        if col_name not in used_columns:
+            # Only add the column definitions to the CREATE string once.
+            change_line = ",\n" if column > 0 else ""
+            create_str = "{0}{1}  {2} {3}".format(create_str, change_line,
+                                                  col_name,
+                                                  cur_col[col_type_index])
+            if cur_col[is_null_index].upper() != "YES":
+                create_str += " NOT NULL"
+            if len(cur_col[def_index]) > 0 and \
+                    cur_col[def_index].upper() != "NONE":
+                create_str += " DEFAULT %s" % cur_col[def_index]
+            elif cur_col[is_null_index].upper == "YES":
+                create_str += " DEFAULT NULL"
+            # Add column to set of columns already used for the CREATE string.
+            used_columns.add(col_name)
+
         if len(cur_col[col_key_index]) > 0:
             if cur_col[col_key_index] == "PRI":
-                pri_keys.append(cur_col[col_name_index])
+                if cur_col[const_name_index] in ('`PRIMARY`', 'PRIMARY'):
+                    pri_keys.add(cur_col[ref_col_index])
             else:
-                keys.append(cur_col[col_name_index])
-        if column + 1 < stop:
-            create_str += ",\n"
+                if cur_col[const_name_index] not in ('`PRIMARY`', 'PRIMARY'):
+                    keys.add(
+                        (col_name, cur_col[col_key_index])
+                    )
+                    if cur_col[ref_col_index].startswith(col_name) and \
+                        (not cur_col[ref_const_name] or
+                         cur_col[ref_const_name] == cur_col[const_name_index]):
+                        key_constraints[col_name].add(
+                            (cur_col[const_name_index],
+                             cur_col[ref_schema_index], cur_col[ref_tbl_index],
+                             cur_col[ref_col_index], cur_col[ref_col_ref],
+                             cur_col[update_rule], cur_col[delete_rule])
+                        )
+
+    key_strs = []
+    const_strs = []
+    # Create primary key definition string.
     if len(pri_keys) > 0:
-        key_list = pri_keys
-        key_str = ",\n  PRIMARY KEY("
-    elif len(keys) > 0:
-        key_list = keys
-        # Quote constraint name with backticks if needed
-        const_name = cur_col[const_name_index]
-        if const_name and not is_quoted_with_backticks(const_name):
-            const_name = quote_with_backticks(const_name)
-        key_str = ",\n  KEY %s (" % const_name
-        constraints.append([const_name, cur_col[ref_schema_index],
-                            cur_col[ref_tbl_index],
-                            cur_col[ref_col_index],
-                            cur_col[ref_col_ref]])
-    if len(key_str) > 0:
-        stop = len(key_list)
-        fixed_keys = []
-        for key in range(0, stop):
+        key_list = []
+        for key in pri_keys:
             # Quote keys with backticks if needed
-            if key_list[key] and not is_quoted_with_backticks(key_list[key]):
-                key_list[key] = quote_with_backticks(key_list[key])
-            fixed_keys.append(key_list[key])
-        key_str += ",".join(fixed_keys) + ")"
-        create_str += key_str
-    if len(constraints) > 0:
-        for constraint in constraints:
-            # Quote keys with backticks if needed
-            for key in constraint:
-                if key and not is_quoted_with_backticks(key):
-                    key = quote_with_backticks(key)
-            c_str = ("  CONSTRAINT {cstr} FOREIGN KEY ({fk}) REFERENCES "
-                     "{ref_schema}.{ref_table} ({ref_column})")
-            constraint_str = c_str.format(cstr=constraint[0], fk=constraint[3],
-                                          ref_schema=constraint[1],
-                                          ref_table=constraint[2],
-                                          ref_column=constraint[4])
-            create_str = "%s,\n%s" % (create_str, constraint_str)
-    create_str = "%s\n)" % create_str
+            if not is_quoted_with_backticks(key):
+                # Handle multiple columns separated by a comma (,)
+                cols = key.split(',')
+                key = ','.join([quote_with_backticks(col) for col in cols])
+            key_list.append(key)
+        key_str = "PRIMARY KEY({0})".format(",".join(key_list))
+        key_strs.append(key_str)
+
+    for key, column_type in keys:
+        key_type = 'UNIQUE ' if column_type == 'UNI' else ''
+        if not key_constraints[key]:
+            # Handle simple keys
+            # Quote column key with backticks if needed
+            if not is_quoted_with_backticks(key):
+                # Handle multiple columns separated by a comma (,)
+                cols = key.split(',')
+                key = ','.join([quote_with_backticks(col) for col in cols])
+            key_str = "{key_type}KEY ({column})".format(key_type=key_type,
+                                                        column=key)
+            key_strs.append(key_str)
+        else:
+            # Handle key with constraints
+            for const_def in key_constraints[key]:
+                # Keys for constraints or with specific name
+                key_name = ''
+                if const_def[0] and const_def[0] != const_def[3]:
+                    # Quote key name with backticks if needed
+                    if not is_quoted_with_backticks(const_def[0]):
+                        key_name = '{0} '.format(
+                            quote_with_backticks(const_def[0]))
+                    else:
+                        key_name = '{0} '.format(const_def[0])
+                # Use constraint columns as key if available.
+                if const_def[3]:
+                    key = const_def[3]
+                # Quote column key with backticks if needed
+                if not is_quoted_with_backticks(key):
+                    # Handle multiple columns separated by a comma (,)
+                    cols = key.split(',')
+                    key = ','.join([quote_with_backticks(col) for col in cols])
+                key_str = "{key_type}KEY {key_name}({column})".format(
+                    key_type=key_type, key_name=key_name, column=key
+                )
+                key_strs.append(key_str)
+                if const_def[2]:
+                    # Handle constraint (referenced_table_name found)
+                    const_name = const_def[0]
+                    # Quote constraint name with backticks if needed
+                    if const_name and not is_quoted_with_backticks(const_name):
+                        const_name = quote_with_backticks(const_name)
+                    fkey = const_def[3]
+                    # Quote fkey columns with backticks if needed
+                    if not is_quoted_with_backticks(fkey):
+                        # Handle multiple columns separated by a comma (,)
+                        cols = fkey.split(',')
+                        fkey = ','.join(
+                            [quote_with_backticks(col) for col in cols])
+                    ref_key = const_def[4]
+                    # Quote reference key columns with backticks if needed
+                    if not is_quoted_with_backticks(ref_key):
+                        # Handle multiple columns separated by a comma (,)
+                        cols = ref_key.split(',')
+                        ref_key = ','.join(
+                            [quote_with_backticks(col) for col in cols])
+                    ref_rules = ''
+                    if const_def[6] and const_def[6] == 'CASCADE':
+                        ref_rules = ' ON DELETE CASCADE'
+                    if const_def[5] and const_def[5] == 'CASCADE':
+                        ref_rules = '{0} ON UPDATE CASCADE'.format(ref_rules)
+                    key_str = (" CONSTRAINT {cstr} FOREIGN KEY ({fk}) "
+                               "REFERENCES {ref_schema}.{ref_table} "
+                               "({ref_column}){ref_rules}").format(
+                        cstr=const_name, fk=fkey, ref_schema=const_def[1],
+                        ref_table=const_def[2], ref_column=ref_key,
+                        ref_rules=ref_rules)
+                    const_strs.append(key_str)
+
+    # Build remaining CREATE TABLE string
+    key_strs.extend(const_strs)
+    keys_str = ',\n '.join(key_strs)
+    if keys_str:
+        create_str = "{0},\n  {1}\n)".format(create_str, keys_str)
+    else:
+        create_str = "{0}\n)".format(create_str)
     if engine and len(engine) > 0:
-        create_str = "%s ENGINE=%s" % (create_str, engine)
-    create_str = "%s;" % create_str
+        create_str = "{0} ENGINE={1}".format(create_str, engine)
+    create_str = "{0};".format(create_str)
 
     return create_str
 
@@ -816,8 +892,12 @@ def _build_insert_data(col_names, tbl_name, data):
 
     Returns (string) the INSERT statement.
     """
+    # Handle NULL (and None) values, i.e. do not quote them as a string.
+    quoted_data = [
+        'NULL' if val in ('NULL', None) else to_sql(val) for val in data
+    ]
     return "INSERT INTO %s (" % tbl_name + ",".join(col_names) + \
-           ") VALUES (" + ','.join(imap(to_sql, data)) + ");"
+           ") VALUES (" + ','.join(quoted_data) + ");"
 
 
 def _skip_sql(sql, options):
