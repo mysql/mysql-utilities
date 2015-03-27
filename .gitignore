@@ -36,3 +36,7 @@ coverage.xml
 
 # Reject files from MUT
 *.reject
+
+# Eclipse and PyDev project files
+.project
+.pydevproject
