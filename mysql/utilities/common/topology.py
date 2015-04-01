@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,13 +51,22 @@ _GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
 _GTID_SUBTRACT_TO_EXECUTED = ("SELECT GTID_SUBTRACT('{0}', "
                               "@@GLOBAL.GTID_EXECUTED)")
 
+# TODO: Remove the use of PASSWORD(), depercated from 5.7.6.
 _UPDATE_RPL_USER_QUERY = ('UPDATE mysql.user '
-                          'SET password = PASSWORD("%s")'
-                          'where user ="%s";')
+                          'SET password = PASSWORD("{passwd}")'
+                          'where user ="{user}"')
+# Query for server versions >= 5.7.6.
+_UPDATE_RPL_USER_QUERY_5_7_6 = (
+    "UPDATE mysql.user SET authentication_string = PASSWORD('{passwd}') "
+    "WHERE user = '{user}'")
 
 _SELECT_RPL_USER_PASS_QUERY = ('SELECT user, host, grant_priv, password, '
                                'Repl_slave_priv FROM mysql.user '
-                               'WHERE user ="%s" AND host ="%s";')
+                               'WHERE user ="{user}" AND host ="{host}"')
+# Query for server versions >= 5.7.6.
+_SELECT_RPL_USER_PASS_QUERY_5_7_6 = (
+    "SELECT user, host, grant_priv, authentication_string, "
+    "Repl_slave_priv FROM mysql.user WHERE user ='{user}' AND host ='{host}'")
 
 
 def parse_topology_connections(options, parse_candidates=True):
@@ -1780,14 +1789,20 @@ class Topology(Replication):
                 # Can't get rpl pass from remote master_repo=file
                 # but it can get the current used hashed to be compared.
                 slave_qry = slave_candidate.exec_query
-                passwd_hash = slave_qry(_SELECT_RPL_USER_PASS_QUERY %
-                                        (user, m_candidate.host))
+                # Use the correct query for server version (changed for 5.7.6)
+                if slave_candidate.check_version_compat(5, 7, 6):
+                    query = _SELECT_RPL_USER_PASS_QUERY_5_7_6
+                else:
+                    query = _SELECT_RPL_USER_PASS_QUERY
+                passwd_hash = slave_qry(query.format(user=user,
+                                                     host=m_candidate.host))
                 # if user does not exist passwd_hash will be an empty query.
                 if passwd_hash:
                     passwd_hash = passwd_hash[0][3]
                 else:
                     passwd_hash = ""
                 # now hash the given rpl password from --rpl-user.
+                # TODO: Remove the use of PASSWORD(), depercated from 5.7.6.
                 rpl_master_pass = slave_qry("SELECT PASSWORD('%s');" %
                                             passwd)
                 rpl_master_pass = rpl_master_pass[0][0]
@@ -1807,7 +1822,12 @@ class Topology(Replication):
                                "password.")
                     self._report("ERROR: %s" % msg, logging.ERROR)
                     return
-            self.master.exec_query(_UPDATE_RPL_USER_QUERY % (passwd, user))
+            # Use the correct query for server (changed for 5.7.6).
+            if self.master.check_version_compat(5, 7, 6):
+                query = _UPDATE_RPL_USER_QUERY_5_7_6
+            else:
+                query = _UPDATE_RPL_USER_QUERY
+            self.master.exec_query(query.format(user=user, passwd=passwd))
 
         if self.verbose:
             self._report("# Creating replication user if it does not exist.")

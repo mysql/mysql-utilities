@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -248,6 +248,27 @@ class test(mutlib.System_test):
         self.replace_substring(": NO", ": XXX")  # for columns.
         self.replace_substring("| NO ", "| XXX")
         self.replace_substring("OFF", "XXX")
+
+        # Must mask 'version' (for tests that use this one as base) before
+        # applying the next mask for 'health'.
+        self.replace_result("+------------+-------+---------+--------"
+                            "+------------+---------+-------------",
+                            "+------------+-------+---------+--------"
+                            "+------------+---------+-------------"
+                            "+-------------------+-----------------"
+                            "+------------+-------------+--------------"
+                            "+------------------+---------------+-----------"
+                            "+----------------+------------+---------------+"
+                            "\n")
+        self.replace_result("| host       | port  | role    | state  "
+                            "| gtid_mode  | health  | version  ",
+                            "| host       | port  | role    | state  "
+                            "| gtid_mode  | health  | version     "
+                            "| master_log_file   | master_log_pos  "
+                            "| IO_Thread  | SQL_Thread  | Secs_Behind  "
+                            "| Remaining_Delay  | IO_Error_Num  | IO_Error  "
+                            "| SQL_Error_Num  | SQL_Error  | Trans_Behind  |"
+                            "\n")
 
         # Mask slaves behind master.
         # It happens sometimes on windows in a non-deterministic way.

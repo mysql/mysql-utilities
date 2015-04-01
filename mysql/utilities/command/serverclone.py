@@ -290,6 +290,7 @@ def clone_server(conn_val, options):
     else:
         cmd = [
             mysqld_path,
+            "--no-defaults",
             "--initialize-insecure=on",
             "--datadir={0}".format(new_data),
             "--basedir={0}".format(os.path.abspath(mysql_basedir))
