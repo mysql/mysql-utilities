@@ -154,6 +154,14 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - show grants for all objects of a "
+                   "database using wildcard".format(test_num))
+        cmd = "{0} util_test.* ".format(cmd_base,)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # mask non deterministic output
         self.do_masks()
 

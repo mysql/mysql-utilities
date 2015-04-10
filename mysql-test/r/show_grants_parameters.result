@@ -26,7 +26,7 @@ Options:
                         required).
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
-  --show=SHOW_MODE      Controls the content of the report. If the value USERS
+  --show=SHOW_MODE      controls the content of the report. If the value USERS
                         is specified, the report shows only the list of users
                         with any kind of grant over the object. If USER_GRANTS
                         is specified the reports shows each user along with
@@ -36,12 +36,22 @@ Options:
                         influence over the specific object. Default is
                         USER_GRANTS.
   --privileges=PRIVILEGES
-                        Minimum set of privileges that a user must have for
+                        minimum set of privileges that a user must have for
                         any given object. Unless a user has all the privileges
                         listed for a specific object, she will not appear in
                         the list of users with privileges for that specific
                         object. To list multiple privileges, use a comma-
                         separated list.
+  --inherit-level=INHERIT_LEVEL
+                        specify the level of inheritance that should be taken
+                        into account. If OBJECT is specified, global level and
+                        database level grants are not inherited by objects. If
+                        DATABASE level is specified global level grants are
+                        not inherited by databases and objects inside those
+                        databases. Finally, if GLOBAL level is specified,
+                        normal inheritance rules are applied, global grants
+                        apply to both databases and objects and database level
+                        grants apply to the objects.
 
 Introduction
 ------------
@@ -77,6 +87,11 @@ examples:
   $ mysqlgrants --server=root:pass@host1:3306 \
                 --show=raw --privileges=TRIGGER,DROP db1 db1.table1
 
+  # Get the list of users with specific privileges at the object level, for
+  # all the objects of the database 'db1'.
+
+  $ mysqlgrants --server=root:pass@host1:3306 --inherit-level=object db1.*
+
 Helpful Hints
 -------------
   - To use the --show=users option you need to specify at least one privilege
@@ -91,6 +106,9 @@ Helpful Hints
     included in the list. For example, the SELECT privilege will be
     ignored for stored routines and the EXECUTE privilege will be ignored for
     tables but both will be taken into account for databases.
+
+  - The --inherit-level option can be used for filtering out global users, and
+    also users with the same database level privileges at the object level.
 
 Test case 2 - Privilege inheritance with --show=raw
 # Source on localhost: ... connected.
@@ -632,4 +650,277 @@ Test case 14 - show grantees, only stored routines (procedures and functions).
 # - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
 # - 'priv_test_user2'@'%' : EXECUTE
 # - 'priv_test_user3'@'%' : ALL PRIVILEGES, GRANT OPTION
+#...done.
+Test case 15 - show grants for all objects of a database using wildcard and --inherit-level=global option
+# Source on localhost: ... connected.
+
+# TABLE `util_test`.`t1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t2`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t3`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, SELECT, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t4`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t5`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# ROUTINE `util_test`.`f1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES
+
+# ROUTINE `util_test`.`f2`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : EXECUTE
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES
+
+# ROUTINE `util_test`.`p1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : EXECUTE
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES, GRANT OPTION
+#...done.
+Test case 16 - show grants of a database including all objects using wildcard and --inherit-level=global option
+# Source on localhost: ... connected.
+
+# DATABASE `util_test`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : EXECUTE, SELECT, UPDATE
+# - 'priv_test_user3'@'%' : ALTER ROUTINE, DELETE, DROP, EXECUTE, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t2`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t3`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, SELECT, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t4`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t5`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# ROUTINE `util_test`.`f1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES
+
+# ROUTINE `util_test`.`f2`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : EXECUTE
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES
+
+# ROUTINE `util_test`.`p1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : EXECUTE
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES, GRANT OPTION
+#...done.
+Test case 17 - show grants for all objects of a database using wildcard and --inherit-level=database option
+# Source on localhost: ... connected.
+
+# TABLE `util_test`.`t1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, TRIGGER
+# - 'priv_test_user2'@'%' : ALTER, CREATE, CREATE VIEW, DELETE, DROP, GRANT OPTION, INDEX, INSERT, REFERENCES, SHOW VIEW, TRIGGER
+# - 'priv_test_user3'@'%' : DELETE, UPDATE
+
+# TABLE `util_test`.`t2`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, TRIGGER
+# - 'priv_test_user3'@'%' : DELETE, UPDATE
+
+# TABLE `util_test`.`t3`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, TRIGGER
+# - 'priv_test_user3'@'%' : DELETE, SELECT, UPDATE
+
+# TABLE `util_test`.`t4`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, TRIGGER
+# - 'priv_test_user3'@'%' : DELETE, UPDATE
+
+# TABLE `util_test`.`t5`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, TRIGGER
+# - 'priv_test_user3'@'%' : DELETE, UPDATE
+
+# ROUTINE `util_test`.`f1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : ALTER ROUTINE, GRANT OPTION
+# - 'priv_test_user3'@'%' : ALTER ROUTINE
+
+# ROUTINE `util_test`.`f2`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user3'@'%' : ALTER ROUTINE
+
+# ROUTINE `util_test`.`p1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user3'@'%' : ALTER ROUTINE, GRANT OPTION
+#...done.
+Test case 18 - show grants of a database including all objects using wildcard and --inherit-level=database option
+# Source on localhost: ... connected.
+
+# DATABASE `util_test`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION, TRIGGER
+# - 'priv_test_user3'@'%' : ALTER ROUTINE, DELETE, UPDATE
+
+# TABLE `util_test`.`t1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, TRIGGER
+# - 'priv_test_user2'@'%' : ALTER, CREATE, CREATE VIEW, DELETE, DROP, GRANT OPTION, INDEX, INSERT, REFERENCES, SHOW VIEW, TRIGGER
+# - 'priv_test_user3'@'%' : DELETE, UPDATE
+
+# TABLE `util_test`.`t2`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, TRIGGER
+# - 'priv_test_user3'@'%' : DELETE, UPDATE
+
+# TABLE `util_test`.`t3`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, TRIGGER
+# - 'priv_test_user3'@'%' : DELETE, SELECT, UPDATE
+
+# TABLE `util_test`.`t4`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, TRIGGER
+# - 'priv_test_user3'@'%' : DELETE, UPDATE
+
+# TABLE `util_test`.`t5`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, TRIGGER
+# - 'priv_test_user3'@'%' : DELETE, UPDATE
+
+# ROUTINE `util_test`.`f1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : ALTER ROUTINE, GRANT OPTION
+# - 'priv_test_user3'@'%' : ALTER ROUTINE
+
+# ROUTINE `util_test`.`f2`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user3'@'%' : ALTER ROUTINE
+
+# ROUTINE `util_test`.`p1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user3'@'%' : ALTER ROUTINE, GRANT OPTION
+#...done.
+Test case 19 - show grants for all objects of a database using wildcard and --inherit-level=object option
+# Source on localhost: ... connected.
+
+# TABLE `util_test`.`t1`:
+# - 'priv_test_user2'@'%' : ALTER, CREATE, CREATE VIEW, DELETE, DROP, GRANT OPTION, INDEX, INSERT, REFERENCES, SHOW VIEW, TRIGGER
+
+# TABLE `util_test`.`t3`:
+# - 'priv_test_user3'@'%' : SELECT
+
+# ROUTINE `util_test`.`f1`:
+# - 'priv_test_user2'@'%' : ALTER ROUTINE, GRANT OPTION
+
+# ROUTINE `util_test`.`p1`:
+# - 'priv_test_user3'@'%' : ALTER ROUTINE, GRANT OPTION
+#...done.
+Test case 20 - show grants of a database including all objects using wildcard and --inherit-level=object option
+# Source on localhost: ... connected.
+
+# DATABASE `util_test`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION, TRIGGER
+# - 'priv_test_user3'@'%' : ALTER ROUTINE, DELETE, UPDATE
+
+# TABLE `util_test`.`t1`:
+# - 'priv_test_user2'@'%' : ALTER, CREATE, CREATE VIEW, DELETE, DROP, GRANT OPTION, INDEX, INSERT, REFERENCES, SHOW VIEW, TRIGGER
+
+# TABLE `util_test`.`t3`:
+# - 'priv_test_user3'@'%' : SELECT
+
+# ROUTINE `util_test`.`f1`:
+# - 'priv_test_user2'@'%' : ALTER ROUTINE, GRANT OPTION
+
+# ROUTINE `util_test`.`p1`:
+# - 'priv_test_user3'@'%' : ALTER ROUTINE, GRANT OPTION
 #...done.

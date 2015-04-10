@@ -94,3 +94,62 @@ Test case 2 - show grantees, using all types of objects: tables, databases and s
 # - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
 # - 'priv_test_user3'@'%' : EXECUTE
 #...done.
+Test case 3 - show grants for all objects of a database using wildcard
+# Source on localhost: ... connected.
+
+# TABLE `util_test`.`t1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t2`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t3`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, SELECT, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t4`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE `util_test`.`t5`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# ROUTINE `util_test`.`f1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES
+
+# ROUTINE `util_test`.`f2`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : EXECUTE
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES
+
+# ROUTINE `util_test`.`p1`:
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : EXECUTE
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES, GRANT OPTION
+#...done.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -93,6 +93,11 @@ examples:
   $ mysqlgrants --server=root:pass@host1:3306 \\
                 --show=raw --privileges=TRIGGER,DROP db1 db1.table1
 
+  # Get the list of users with specific privileges at the object level, for
+  # all the objects of the database 'db1'.
+
+  $ mysqlgrants --server=root:pass@host1:3306 --inherit-level=object db1.*
+
 Helpful Hints
 -------------
   - To use the --show=users option you need to specify at least one privilege
@@ -107,6 +112,9 @@ Helpful Hints
     included in the list. For example, the SELECT privilege will be
     ignored for stored routines and the EXECUTE privilege will be ignored for
     tables but both will be taken into account for databases.
+
+  - The --inherit-level option can be used for filtering out global users, and
+    also users with the same database level privileges at the object level.
 
 """
 
@@ -125,7 +133,7 @@ if __name__ == '__main__':
                       dest="show_mode", type="choice",
                       default="user_grants",
                       choices=["users", "user_grants", "raw"],
-                      help="Controls the content of the report. If the value "
+                      help="controls the content of the report. If the value "
                            "USERS is specified, the report shows only the "
                            "list of users with any kind of grant over the "
                            "object. If USER_GRANTS is specified the reports "
@@ -137,12 +145,26 @@ if __name__ == '__main__':
 
     parser.add_option("--privileges", action="store", dest="privileges",
                       type="string", default=None,
-                      help="Minimum set of privileges that a user must have "
+                      help="minimum set of privileges that a user must have "
                            "for any given object. Unless a user has all the "
                            "privileges listed for a specific object, "
                            "she will not appear in the list of users with "
                            "privileges for that specific object. To list "
                            "multiple privileges, use a comma-separated list.")
+
+    parser.add_option("--inherit-level", dest="inherit_level",
+                      type="choice", default='global',
+                      choices=["global", "database", "object"],
+                      help="specify the level of inheritance that should be "
+                           "taken into account. If OBJECT is specified, "
+                           "global level and database level grants are not "
+                           "inherited by objects. If DATABASE level is "
+                           "specified global level grants are not inherited "
+                           "by databases and objects inside those databases. "
+                           "Finally, if GLOBAL level is specified, normal "
+                           "inheritance rules are applied, global grants "
+                           "apply to both databases and objects and database "
+                           "level grants apply to the objects.")
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
@@ -202,6 +224,7 @@ if __name__ == '__main__':
         "verbosity": 0 if opt.verbosity is None else opt.verbosity,
         "privileges": priv_list,
         "show_mode": opt.show_mode,
+        "inherit_level": opt.inherit_level,
     }
     try:
         check_grants(server_val, options, objects_to_include)

@@ -24,7 +24,8 @@ from collections import defaultdict
 from mysql.utilities.common.database import Database
 from mysql.utilities.common.grants_info import (DATABASE_TYPE, ROUTINE_TYPE,
                                                 TABLE_TYPE, get_grantees,
-                                                filter_grants)
+                                                filter_grants, DATABASE_LEVEL,
+                                                OBJECT_LEVEL, GLOBAL_LEVEL)
 from mysql.utilities.common.messages import ERROR_USER_WITHOUT_PRIVILEGES
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
@@ -95,6 +96,15 @@ def validate_obj_type_dict(server, obj_type_dict):
         quoted_db_name = db_name
         if not is_quoted_with_backticks(db_name):
             quoted_db_name = quote_with_backticks(db_name)
+        # if wilcard (db.*) is used add all supported objects of the database
+        if '*' in obj_type_dict[db_name]:
+            obj_type_dict[db_name] = obj_type_dict[db_name] - set('*')
+            tables = (table[0] for table in db.get_db_objects('TABLE'))
+            obj_type_dict[db_name] = obj_type_dict[db_name] | set(tables)
+            procedures = (proc[0] for proc in db.get_db_objects('PROCEDURE'))
+            obj_type_dict[db_name] = obj_type_dict[db_name] | set(procedures)
+            functions = (proc[0] for proc in db.get_db_objects('FUNCTION'))
+            obj_type_dict[db_name] = obj_type_dict[db_name] | set(functions)
         for obj_name in obj_type_dict[db_name]:
             if obj_name is None:
                 # We must consider the database itself
@@ -139,7 +149,7 @@ def check_grants(server_cnx_val, options, dict_of_objects):
                             server.
     options[in]             Dictionary of options (verbosity, privileges,
                             show_mode).
-    list_of_objects[in]     Dictionary of objects (set of databases, tables
+    dict_of_objects[in]     Dictionary of objects (set of databases, tables
                             and procedures) by database to check.
 
     """
@@ -155,6 +165,12 @@ def check_grants(server_cnx_val, options, dict_of_objects):
 
     # Get optional list of required privileges
     req_privs = set(options['privileges']) if options['privileges'] else None
+
+    # Get hide_inherit_grants option
+    inherit_level_str = options['inherit_level'].lower()
+    inherit_level = {"global": GLOBAL_LEVEL,
+                     "database": DATABASE_LEVEL,
+                     "object": OBJECT_LEVEL}[inherit_level_str]
 
     # If we specify some privileges that are not valid for all the objects
     # print warning message stating that some will be ignored.
@@ -181,7 +197,8 @@ def check_grants(server_cnx_val, options, dict_of_objects):
 
     # get the grantee information dictionary
     grantee_info_dict = get_grantees(server, valid_dict_of_objects,
-                                     req_privileges=req_privs)
+                                     req_privileges=req_privs,
+                                     inherit_level=inherit_level)
 
     # Print the information
     obj_type_lst = [DATABASE_TYPE, TABLE_TYPE, ROUTINE_TYPE]
