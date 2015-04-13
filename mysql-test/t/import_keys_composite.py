@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,12 +41,11 @@ class test(import_basic.test):
 
     def setup(self):
         self.export_import_file = "test_run.txt"
-        if self.need_servers:
-            try:
-                self.servers.spawn_new_servers(3)
-            except MUTLibError as err:
-                raise MUTLibError("Cannot spawn needed servers: {0}".format(
-                    err.errmsg))
+        try:
+            self.servers.spawn_new_servers(3)
+        except MUTLibError as err:
+            raise MUTLibError("Cannot spawn needed servers: {0}".format(
+                err.errmsg))
 
         self.server1 = self.servers.get_server(1)
         self.server2 = self.servers.get_server(2)
@@ -90,7 +89,7 @@ class test(import_basic.test):
                         print("\nEXECUTING {0}".format(comment))
                     # We test DEFINITIONS and DATA only in other tests
                     self.run_import_test(
-                        0, from_conn, to_conn, db,
+                        0, from_conn, to_conn, [db],
                         frmt, "BOTH", comment, " --display={0}".format(display)
                     )
                     old_stdout = sys.stdout

@@ -497,3 +497,153 @@ CAUTION: The following warning messages were included in the import file:
 #...done.
 AFTER:
 OBJECT COUNTS: tables = 5, views = 2, triggers = 1, procedures = 1, functions = 2, events = 1 
+Test Case 24 : Testing multiple import with SQL format and BRIEF display
+BEFORE:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 25 : Testing multiple import with SQL format and FULL display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 26 : Testing multiple import with CSV format and BRIEF display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 27 : Testing multiple import with CSV format and FULL display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 28 : Testing multiple import with TAB format and BRIEF display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 29 : Testing multiple import with TAB format and FULL display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 30 : Testing multiple import with GRID format and BRIEF display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 31 : Testing multiple import with GRID format and FULL display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 32 : Testing multiple import with VERTICAL format and BRIEF display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 33 : Testing multiple import with VERTICAL format and FULL display
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 

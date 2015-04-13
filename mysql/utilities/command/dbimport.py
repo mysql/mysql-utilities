@@ -25,7 +25,6 @@ import re
 import sys
 
 from collections import defaultdict
-from itertools import imap
 
 from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.database import Database
@@ -262,6 +261,9 @@ def read_next(file_h, fmt):
     cmd_type = ""
     multiline = False
     delimiter = ';'
+    skip_next_line = False
+    first_occurrence = True
+    previous_cmd_type = None
     if fmt == "sql":
         sql_cmd = ""
         for row in _read_row(file_h, "sql", True):
@@ -396,6 +398,19 @@ def read_next(file_h, fmt):
                 if found_obj != "":
                     break
             if found_obj != "":
+                # For files with multiple databases, metadata about the
+                # cmd_types appears more than once. Each time we are at a new
+                # cmd_type we keep the first occurrence of such metadata and
+                # ignore the rest of the occurrences.
+
+                # reset the first_occurrence flag each time we change cmd_type
+                if previous_cmd_type is None or previous_cmd_type != cmd_type:
+                    first_occurrence = True
+                    previous_cmd_type = cmd_type
+                if first_occurrence:
+                    first_occurrence = False
+                else:
+                    skip_next_line = True
                 continue
             else:
                 # We're reading rows here
@@ -403,7 +418,12 @@ def read_next(file_h, fmt):
                    and (row[0][0] == "#" or row[0][0:2] == "--")):
                     continue
                 else:
-                    yield (cmd_type, row)
+                    # skip column_names only if we're not dealing with DATA
+                    if skip_next_line and cmd_type != 'DATA':
+                        skip_next_line = False
+                        continue
+                    else:
+                        yield (cmd_type, row)
 
 
 def _get_db(row):
@@ -1417,6 +1437,7 @@ def import_file(dest_val, file_name, options):
             raise UtilDBError("The table does not exist: {0}".format(table))
 
     # Read the file one object/definition group at a time
+    databases = []
     for row in read_next(file_h, fmt):
         # Check if --format=raw_csv
         if fmt == "raw_csv":
@@ -1465,6 +1486,12 @@ def import_file(dest_val, file_name, options):
                 statements.append(row[1])
             continue
         # In the first pass, try to get the database name from the file
+        if row[0] == "TABLE":
+            db = _get_db(row)
+            if db not in ["TABLE_SCHEMA", "TABLE_CATALOG"] and \
+                    db not in databases:
+                databases.append(db)
+                get_db = True
         if get_db:
             if skip_header:
                 skip_header = False
