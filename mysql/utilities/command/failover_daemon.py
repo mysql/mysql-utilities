@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ _GEN_GTID_COLS = ["host", "port", "role", "gtid"]
 
 _DROP_FC_TABLE = "DROP TABLE IF EXISTS mysql.failover_console"
 _CREATE_FC_TABLE = ("CREATE TABLE IF NOT EXISTS mysql.failover_console "
-                    "(host char(30), port char(10))")
+                    "(host char(255), port char(10))")
 _SELECT_FC_TABLE = ("SELECT * FROM mysql.failover_console WHERE host = '{0}' "
                     "AND port = '{1}'")
 _INSERT_FC_TABLE = "INSERT INTO mysql.failover_console VALUES ('{0}', '{1}')"
