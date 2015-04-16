@@ -283,7 +283,7 @@ def get_local_servers(all_proc=False, start=3306, end=3333,
                 # Look for port on either local or foreign address
                 port = proginfo[1][proginfo[1].find(":") + 1:]
                 if proginfo[1][0] == '0' and port.isdigit():
-                    if int(port) >= start and int(port) <= end:
+                    if int(port) >= int(start) and int(port) <= int(end):
                         processes.append((proginfo[4], port))
                         break
                 if len(proginfo) > 2:

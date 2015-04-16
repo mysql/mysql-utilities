@@ -202,9 +202,13 @@ def _server_info(server_val, get_defaults=False, options=None):
             else:
                 # Now get the information about the size of the logs
                 try:
+                    # log_file might be a relative path, in which case we need
+                    # to prepend the datadir path to it
+                    if not os.path.isabs(log_file):
+                        log_file = os.path.join(params_dict['datadir'],
+                                                log_file)
                     params_dict[log_tpl.log_file_size] = "{0} bytes".format(
                         os.path.getsize(log_file))
-
                 except os.error:
                     # if we are unable to get the log_file_size
                     params_dict[log_tpl.log_file_size] = ''

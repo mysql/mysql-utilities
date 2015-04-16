@@ -1226,6 +1226,32 @@ class System_test(object):
         for linenum in range(len(linenums) - 1, - 1, - 1):
             self.results.pop(linenums[linenum])
 
+    # TODO Replace usages of remove_result_and_lines_after as well as usages
+    # of remove_result_and _lines_before with remove_result_and_lines_around
+    def remove_result_and_lines_around(self, prefix, lines_before=0,
+                                       lines_after=0):
+        """Remove prefix line from result as well as lines around it.
+        prefix[in]         starting prefix of string to mask
+        lines_before[in]   number of lines to remove before the prefix line.
+        lines_after[in]    number of lines to remove after the prefix line.
+        """
+        lines_to_remove = set()
+        for linenum, line in enumerate(self.results):
+            index = line.find(prefix)
+            if index == 0:
+                for line2rm in range(linenum - lines_before,
+                                     linenum + lines_after + 1):
+                    if line2rm > - 1:
+                        lines_to_remove.add(int(line2rm))
+
+        # Convert to list and sort in reverse order to remove those
+        # lines from the list
+        lines_to_remove = list(lines_to_remove)
+        lines_to_remove.sort(reverse=True)
+        # Must remove lines in reverse order
+        for linenum in lines_to_remove:
+            del(self.results[linenum])
+
     def remove_result_and_lines_after(self, prefix, lines=0):
         """Remove lines in the results and lines after prefix.
 

@@ -214,6 +214,11 @@ class test(mutlib.System_test):
                             "# Source on XXXX-XXXX: ... connected.\n")
         self.replace_result("# Destination on ",
                             "# Destination on XXXX-XXXX: ... connected.\n")
+        # Mask password field on grant statements since it stopped appearing on
+        # versions >= 5.7.6
+        self.replace_substring_portion(" IDENTIFIED BY PASSWORD '", "'", "")
+        self.replace_result("GRANT USAGE ON *.* TO 'joe_nopass'@'user'",
+                            "GRANT USAGE ON *.* TO 'joe_nopass'@'user'\n")
         # Mask root,localhost (should exist on all MySQL server versions).
         self.replace_result("root,localhost", "ROOT,LOCALHOST\n")
         # Remove all other root users with different hosts (not localhost).

@@ -178,6 +178,11 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         self.replace_substring("on [::1]", "on localhost")
+        # Mask password field on grant statements since it stopped appearing on
+        # versions >= 5.7.6
+        self.replace_substring_portion(" IDENTIFIED BY PASSWORD '", "'", "")
+        self.replace_result("GRANT USAGE ON *.* TO 'joe_nopass'@'user'",
+                            "GRANT USAGE ON *.* TO 'joe_nopass'@'user'\n")
 
         return True
 

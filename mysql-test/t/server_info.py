@@ -99,6 +99,11 @@ class test(mutlib.System_test):
                             "      slow_query_log_file: XXXX\n")
         self.replace_result(" slow_query_log_file_size:",
                             " slow_query_log_file_size: XXXX\n")
+        # Remove warning that appears only on 5.7 and which is not important
+        # for the sake of this test.
+        self.remove_result_and_lines_around(
+            "WARNING: Unable to get size information from 'stderr' "
+            "for 'error log'.", lines_before=3, lines_after=1)
 
     def start_stop_newserver(self, delete_log=True, stop_server=True):
         """Start and stop new server.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,21 +42,24 @@ class test(server_info.test):
 
     def check_prerequisites(self):
         # This test requires server version < 5.5.7, due to the lack of
-        # 'GRANT PROXY ON ...' on previews versions.
+        # 'GRANT PROXY ON ...' on previous versions.
         if not self.servers.get_server(0).check_version_compat(5, 5, 8):
             raise MUTLibError("Test requires server version >= 5.5.8")
         # Check the required number of servers
         return self.check_num_servers(1)
 
     def setup(self):
-        # Remove previews configiration files (leftover from previous test).
+        # Remove previews configuration files (leftover from previous test).
         try:
             os.unlink(self.config_file_path)
         except OSError:
             pass
+        # use --log-error option in order to normalize serverinfo
+        # output between 5.6 and 5.7 servers by setting log_err to stderr
+        startup_opts = "{0} --log-error=error_log".format(ssl_server_opts())
         try:
             self.servers.spawn_server('ssl_server',
-                                      ssl_server_opts(), kill=False)
+                                      startup_opts, kill=False)
         except MUTLibError as err:
             raise MUTLibError("Cannot spawn needed servers: {0}"
                               "".format(err.errmsg))
