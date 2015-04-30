@@ -1,9 +1,0 @@
-# Source on localhost: ... connected.
-
-# DATABASE `mysql`:
-# - 'grant_priv_test'@'localhost' : SELECT
-# - 'root'@'127.0.0.1' : ALL PRIVILEGES, GRANT OPTION
-# - 'root'@'::1' : ALL PRIVILEGES, GRANT OPTION
-# - 'root'@'isrgomez-lap' : ALL PRIVILEGES, GRANT OPTION
-# - 'root'@'localhost' : ALL PRIVILEGES, GRANT OPTION
-#...done.
