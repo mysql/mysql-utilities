@@ -329,7 +329,7 @@ Test case 5 - Privilege inheritance with --show=user_grants and --privilege=ALL
 #...done.
 Test case 6 - Privilege inheritance with --show=users and --privileges
 # Source on localhost: ... connected.
-# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t2`, `util_test`.`t3` and `util_test`.`t1`.
+# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t1`, `util_test`.`t2` and `util_test`.`t3`.
 # WARNING: INSERT and SELECT do not apply to routines and will be ignored for: `util_test`.`f1` and `util_test`.`p1`.
 
 # DATABASE `util_test`:
@@ -350,7 +350,7 @@ Test case 6 - Privilege inheritance with --show=users and --privileges
 Test case 7 - Privilege inheritance with --show=users, --privileges and verbose
 The list of supported privileges is ALL, ALL PRIVILEGES, ALTER, ALTER ROUTINE, CREATE, CREATE ROUTINE, CREATE TABLESPACE, CREATE TEMPORARY TABLES, CREATE USER, CREATE VIEW, DELETE, DROP, EVENT, EXECUTE, FILE, GRANT OPTION, INDEX, INSERT, LOCK TABLES, PROCESS, REFERENCES, RELOAD, REPLICATION CLIENT, REPLICATION SLAVE, SELECT, SHOW DATABASES, SHOW VIEW, SHUTDOWN, SUPER, TRIGGER, UPDATE and USAGE
 # Source on localhost: ... connected.
-# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t2`, `util_test`.`t3` and `util_test`.`t1`.
+# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t1`, `util_test`.`t2` and `util_test`.`t3`.
 # WARNING: INSERT and SELECT do not apply to routines and will be ignored for: `util_test`.`f1` and `util_test`.`p1`.
 
 # DATABASE `util_test`:
@@ -370,7 +370,7 @@ The list of supported privileges is ALL, ALL PRIVILEGES, ALTER, ALTER ROUTINE, C
 #...done.
 Test case 8 - Privilege inheritance with --show=user_grants and --privileges
 # Source on localhost: ... connected.
-# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t2`, `util_test`.`t3` and `util_test`.`t1`.
+# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t1`, `util_test`.`t2` and `util_test`.`t3`.
 # WARNING: INSERT and SELECT do not apply to routines and will be ignored for: `util_test`.`f1` and `util_test`.`p1`.
 
 # DATABASE `util_test`:
@@ -393,7 +393,7 @@ Test case 8 - Privilege inheritance with --show=user_grants and --privileges
 #...done.
 Test case 9 - Privilege inheritance with --show=raw and --privileges
 # Source on localhost: ... connected.
-# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t2`, `util_test`.`t3` and `util_test`.`t1`.
+# WARNING: EXECUTE does not apply to tables and will be ignored for: `util_test`.`t1`, `util_test`.`t2` and `util_test`.`t3`.
 # WARNING: INSERT and SELECT do not apply to routines and will be ignored for: `util_test`.`f1` and `util_test`.`p1`.
 
 # DATABASE `util_test`:

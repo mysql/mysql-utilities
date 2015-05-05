@@ -116,12 +116,6 @@ class test(rpl_admin.test):
         self.s2_port = self.server3.port
         self.s3_port = self.server4.port
 
-        # Create replication user
-        for slave in [self.server2, self.server3, self.server4, self.server5]:
-            slave.exec_query(_SET_SQL_LOG_BIN.format('0'))
-            slave.exec_query(_GRANT_QUERY)
-            slave.exec_query(_SET_SQL_LOG_BIN.format('1'))
-
         # Set the initial replication topology
         self.reset_topology([self.server2, self.server3, self.server4,
                              self.server5])

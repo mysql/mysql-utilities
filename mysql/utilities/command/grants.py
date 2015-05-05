@@ -187,7 +187,7 @@ def check_grants(server_cnx_val, options, dict_of_objects):
                 else:
                     obj_lst = [".".join(obj_tpl) for obj_tpl in
                                valid_dict_of_objects[obj_type]]
-                obj_lst_str = join_and_build_str(obj_lst)
+                obj_lst_str = join_and_build_str(sorted(obj_lst))
                 missing_privs = sorted(req_privs - filtered_req_privs)
                 priv_str = join_and_build_str(missing_privs)
                 verb = "do" if len(missing_privs) > 1 else "does"

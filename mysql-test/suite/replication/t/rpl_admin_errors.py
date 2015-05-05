@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ class test(rpl_admin.test):
 
         # create a user for priv check
         self.server1.exec_query("CREATE USER 'joe'@'localhost'")
+        self.server1.exec_query("CREATE USER 'jane'@'localhost'")
         self.server1.exec_query("GRANT SELECT, SUPER ON *.* TO "
                                 "'jane'@'localhost'")
         mock_master1 = "--master=joe@localhost:{0}".format(
@@ -231,19 +232,6 @@ class test(rpl_admin.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = ("Test case {0} - Switchover using with --force and user "
-                   "does not have grant priv".format(test_num))
-        slaves_str = ",".join([slave2_conn, slave3_conn])
-        cmd_str = ("{0} --master={1} --new-master={2} --force switchover -q "
-                   "--rpl-user=rpl:rpl --slaves={3} --log={4} --log-age=1 "
-                   "--rpl-user=notthere "
-                   "--no-health".format(base_cmd, slave1_conn, alone_srv_conn,
-                                        slaves_str, _LOGNAME))
-        res = self.run_test_case(0, cmd_str, comment)
-        if not res:
-            raise MUTLibError("{0}: failed".format(comment))
-
-        test_num += 1
         comment = ("Test case {0} - Connect failure".format(test_num))
         slaves_str = ",".join([slave2_conn, slave3_conn])
         cmd_str = ("{0} --master={1} --new-master=nope@notthere "
@@ -255,21 +243,6 @@ class test(rpl_admin.test):
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-
-        # Check log file for error.
-        # Now check the log and dump its entries for debugging
-        log_file = open(_LOGNAME, "r")
-        rows = log_file.readlines()
-        log_file.close()
-        for row in rows:
-            if self.debug:
-                print("> {0}".format(row))
-            if "Cannot grant replication slave" in row:
-                self.results.append("Error found in log file. \n")
-                break
-        else:
-            self.results.append("Error NOT found in the log.\n")
-        # log file removed by the cleanup method
 
         # Test path to script file not being valid
         option_scripts = ['--exec-after', '--exec-before']

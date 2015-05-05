@@ -279,7 +279,11 @@ class test(ssl_connection_simple_test.test):
         self.replace_result("| root[...]",
                             "| root[...]\n")
         self.remove_result_and_lines_after("              config_file:", 16)
-        self.remove_result_and_lines_after("| db_name             |", 12)
+        if self.server2.check_version_compat(5, 7, 7):
+            self.remove_result_and_lines_after("| db_name             |", 13)
+        else:
+            self.remove_result_and_lines_after("| db_name             |", 12)
+
         self.remove_result("# Database totals:")
         self.remove_result_and_lines_after("Total database disk u", 2)
         self.replace_substring("mysqldiskusage: error: Lost connection",

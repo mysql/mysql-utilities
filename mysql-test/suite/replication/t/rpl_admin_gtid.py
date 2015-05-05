@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -186,6 +186,7 @@ class test(rpl_admin.test):
         # Test for BUG#14080657
         # Note: disable binary logging to avoid creating errant transactions.
         self.server2.exec_query("SET SQL_LOG_BIN= 0")
+        self.server2.exec_query("CREATE USER 'rpl'@'rpl'")
         self.server2.exec_query("GRANT REPLICATION SLAVE ON *.* TO "
                                 "'rpl'@'rpl'")
         self.server2.exec_query("SET SQL_LOG_BIN= 1")

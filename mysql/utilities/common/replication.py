@@ -858,11 +858,17 @@ class Master(Server):
                                     (False, <error>) = error
         """
 
+        grants_enabled = self.grant_tables_enabled()
+        if not grants_enabled:
+            return (True, None)
+
         if "]" in host:
             host = clean_IPv6(host)
 
         # Create user class instance
         user = User(self, "%s@%s:%s" % (r_user, host, port), verbosity)
+        if not user.exists():
+            user.create()
 
         if not user.has_privilege("*", "*", "REPLICATION SLAVE"):
             if verbosity > 0:

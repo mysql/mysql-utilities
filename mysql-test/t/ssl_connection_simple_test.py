@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -293,7 +293,8 @@ class test(mutlib.System_test):
                 pass
 
         # Drop users
-        users = ["joe_nopass@'user'", "amy_nopass@'user'", "remote@'%'", ]
+        users = ["joe_nopass@'user'","joe_pass@'user'", "amy_nopass@'user'",
+                 "remote@'%'", ]
         for user in users:
             try:
                 self.server1.exec_query("DROP USER {0}".format(user))
