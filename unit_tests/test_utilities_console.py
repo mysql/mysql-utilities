@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2014 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,8 +47,8 @@ class TestUtilitiesConsole(unittest.TestCase):
         self.util_con = UtilitiesConsole(options)
 
     def test_strange_keyboard_input(self):
-        test_cases = {'R': "INSERT_KEY", 'G': 'HOME_KEY', 'O': 'END_KEY',
-                      'I': 'PAGE_UP_KEY', 'Q': 'PAGE_DOWN_KEY'}
+        test_cases = {'R': "INSERT_KEY", 'I': 'PAGE_UP_KEY',
+                      'Q': 'PAGE_DOWN_KEY'}
 
         for key in test_cases:
             self.assertEqual(_WIN_COMMAND_KEY.get(key), None)
@@ -91,6 +91,30 @@ class TestUtilitiesConsole(unittest.TestCase):
         self.assertEqual("1234", self.util_con.cmd_line.command)
         self.util_con._process_command_keys('BACKSPACE_WIN')
         self.assertEqual("123", self.util_con.cmd_line.command)
+
+    def test_home_key(self):
+        """Test console response to HOME KEY.
+        """
+        self.util_con.cmd_line.command = "12345"
+        self.util_con.cmd_line.length = 5
+        for position in [0, 2, 5]:
+            self.util_con.cmd_line.position = position
+            self.util_con._process_command_keys('HOME')
+            self.assertEqual("12345", self.util_con.cmd_line.command)
+            self.assertEqual(5, self.util_con.cmd_line.length)
+            self.assertEqual(0, self.util_con.cmd_line.position)
+
+    def test_end_key(self):
+        """Test console response to END KEY.
+        """
+        self.util_con.cmd_line.command = "12345"
+        self.util_con.cmd_line.length = 5
+        for position in [0, 2, 5]:
+            self.util_con.cmd_line.position = position
+            self.util_con._process_command_keys('END')
+            self.assertEqual("12345", self.util_con.cmd_line.command)
+            self.assertEqual(5, self.util_con.cmd_line.length)
+            self.assertEqual(5, self.util_con.cmd_line.position)
 
     def test_quit_tab(self):
         """Test console response to Q+tab (should be 'quit').
