@@ -1938,7 +1938,7 @@ class Slave(Server):
         if master_passwd is not None:
             change_master += "MASTER_PASSWORD = '%s', " % master_passwd
         change_master += "MASTER_PORT = %s" % master_port
-        if master_ssl:
+        if master_ssl and master_ssl not in ('0', 'OFF'):
             change_master = "{0}, MASTER_SSL = {1}".format(change_master, 1)
         if master_ssl_ca is not None:
             change_master = ("{0}, MASTER_SSL_CA = '{1}'"

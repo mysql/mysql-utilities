@@ -654,6 +654,10 @@ class Database(object):
             pass
         for stm in create_list:
             try:
+                if obj_type == _GRANT:
+                    user = User(self.destination, obj[0])
+                    if not user.exists():
+                        user.create()
                 self.destination.exec_query(stm, self.query_options)
             except Exception as e:
                 raise UtilDBError("Cannot operate on {0} object."
