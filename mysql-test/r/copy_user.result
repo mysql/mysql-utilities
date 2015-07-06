@@ -53,6 +53,6 @@ DROP USER 'joe_nopass'@'user'
 CREATE USER 'joe_nopass'@'user' 
 GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT SELECT ON `util_test`.* TO 'joe_nopass'@'user'
-GRANT USAGE ON *.* TO 'joe_pass'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_pass'@'%'
+GRANT USAGE ON *.* TO 'joe_nopass'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'
 # ...done.

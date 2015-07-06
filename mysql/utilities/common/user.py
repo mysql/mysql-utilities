@@ -632,7 +632,10 @@ class User(object):
             if not user.exists():
                 user.create()
 
-            base_user_ticks = "'" + self.user + "'@'" + self.host + "'"
+            if globals_privs and '%' in row[0]:
+                base_user_ticks = "'" + self.user + "'@'" + '%' + "'"
+            else:
+                base_user_ticks = "'" + self.user + "'@'" + self.host + "'"
             user, _, host = parse_user_host(new_user)
             new_user_ticks = "'" + user + "'@'" + host + "'"
             grant = row[0].replace(base_user_ticks, new_user_ticks, 1)

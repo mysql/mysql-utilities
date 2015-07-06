@@ -54,8 +54,8 @@ DROP USER 'joe_nopass'@'user'
 CREATE USER 'joe_nopass'@'user' 
 GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT SELECT ON `util_test`.* TO 'joe_nopass'@'user'
-GRANT USAGE ON *.* TO 'joe_pass'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_pass'@'%'
+GRANT USAGE ON *.* TO 'joe_nopass'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'
 # ...done.
 Test case 8 - clone a single user joe_pass@user to a single user: jill@user with only source specified
 # Source on XXXX-XXXX: ... connected.
