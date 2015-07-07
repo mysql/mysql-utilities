@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1666,7 +1666,9 @@ class Server(object):
     def get_all_databases(self, ignore_internal_dbs=True):
         """Return a result set containing all databases on the server
         except for internal databases (mysql, INFORMATION_SCHEMA,
-        PERFORMANCE_SCHEMA)
+        PERFORMANCE_SCHEMA).
+
+        Note: New internal database 'sys' added by default for MySQL 5.7.7+.
 
         Returns result set
         """
@@ -1679,6 +1681,10 @@ class Server(object):
             AND SCHEMA_NAME != 'PERFORMANCE_SCHEMA'
             AND SCHEMA_NAME != 'mysql'
             """
+            # Starting from MySQL 5.7.7, sys schema is installed by default.
+            if self.check_version_compat(5, 7, 7):
+                _GET_DATABASES = "{0} AND SCHEMA_NAME != 'sys'".format(
+                    _GET_DATABASES)
         else:
             _GET_DATABASES = """
             SELECT SCHEMA_NAME

@@ -866,7 +866,7 @@ class Master(Server):
             host = clean_IPv6(host)
 
         # Create user class instance
-        user = User(self, "%s@%s:%s" % (r_user, host, port), verbosity)
+        user = User(self, "%s:%s@%s:%s" % (r_user, r_pass, host, port))
         if not user.exists():
             user.create()
 
