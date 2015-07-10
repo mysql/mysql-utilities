@@ -269,6 +269,28 @@ class test(mutlib.System_test):
                             "| Remaining_Delay  | IO_Error_Num  | IO_Error  "
                             "| SQL_Error_Num  | SQL_Error  | Trans_Behind  |"
                             "\n")
+        self.replace_result("+------------+-------+---------+--------"
+                            "+------------+----------------------------------"
+                            "------------------------------------------------"
+                            "-----+---------------",
+                            "+------------+-------+---------+--------"
+                            "+------------+---------+-------------"
+                            "+-------------------+-----------------"
+                            "+------------+-------------+--------------"
+                            "+------------------+---------------+-----------"
+                            "+----------------+------------+---------------+"
+                            "\n")
+        self.replace_result("| host       | port  | role    | state  "
+                            "| gtid_mode  | health                           "
+                            "                                                "
+                            "     | version     ",
+                            "| host       | port  | role    | state  "
+                            "| gtid_mode  | health  | version     "
+                            "| master_log_file   | master_log_pos  "
+                            "| IO_Thread  | SQL_Thread  | Secs_Behind  "
+                            "| Remaining_Delay  | IO_Error_Num  | IO_Error  "
+                            "| SQL_Error_Num  | SQL_Error  | Trans_Behind  |"
+                            "\n")
 
         # Mask slaves behind master.
         # It happens sometimes on windows in a non-deterministic way.

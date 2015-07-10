@@ -24,10 +24,15 @@ import rpl_admin
 from mysql.utilities.exception import MUTLibError
 
 
+# Note: By default ROW based binary logging is used starting from MySQL 5.7.7,
+# STATEMENT based logging is used by default for prior versions. This option
+# influence the GTIDs generated and therefore change the output of the
+# mysqlrpladmin utility (e.g., when catching up with servers for switchover).
 _DEFAULT_MYSQL_OPTS_FILE = ('"--log-bin=mysql-bin --skip-slave-start '
                             '--log-slave-updates --gtid-mode=on '
                             '--enforce-gtid-consistency '
                             '--report-host=localhost --report-port={0} '
+                            '--binlog-format=STATEMENT '
                             '--master-info-repository=file"')
 
 
@@ -228,6 +233,58 @@ class test(rpl_admin.test):
                                             "slaves (--verbose for more "
                                             "details).")
 
+        self.replace_result("# Return Code = ",
+                            "# Return Code = NNN\n")
+
+        # Mask slaves behind master.
+        # It happens sometimes on windows in a non-deterministic way.
+        self.replace_substring("+---------------------------------------------"
+                               "------------------------------------------+",
+                               "+---------+")
+        self.replace_substring("+---------------------------------------------"
+                               "-------------------------------------------+",
+                               "+---------+")
+        self.replace_substring("| health                                      "
+                               "                                          |",
+                               "| health  |")
+        self.replace_substring("| health                                      "
+                               "                                           |",
+                               "| health  |")
+        self.replace_substring("| OK                                          "
+                               "                                          |",
+                               "| OK      |")
+        self.replace_substring("| OK                                          "
+                               "                                           |",
+                               "| OK      |")
+        self.replace_substring_portion("| Slave delay is ",
+                                       "seconds behind master., No, Slave has "
+                                       "1 transactions behind master.  |",
+                                       "| OK      |")
+        self.replace_substring_portion("| Slave delay is ",
+                                       "seconds behind master., No, Slave has "
+                                       "1 transactions behind master.  |",
+                                       "| OK      |")
+        self.replace_substring_portion("| Slave delay is ",
+                                       "seconds behind master., No, Slave has "
+                                       "2 transactions behind master.  |",
+                                       "| OK      |")
+
+        self.replace_substring("| Slave has 1 transactions behind master.     "
+                               "                                          |",
+                               "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.     "
+                               "                                           |",
+                               "| OK      |")
+
+        self.replace_substring("+------------------------------------------+",
+                               "+---------+")
+        self.replace_substring("| health                                   |",
+                               "| health  |")
+        self.replace_substring("| OK                                       |",
+                               "| OK      |")
+        self.replace_substring("| Slave has 1 transactions behind master.  |",
+                               "| OK      |")
+
         self.replace_result("| XXXXXXXXX  | PORT2  | SLAVE   | UP     "
                             "| ON         | OK      | ",
                             "| XXXXXXXXX  | PORT2  | SLAVE   | UP     "
@@ -287,49 +344,6 @@ class test(rpl_admin.test):
                             "|                  |               |           "
                             "|                |            "
                             "|               |\n")
-
-        self.replace_result("# Return Code = ",
-                            "# Return Code = NNN\n")
-
-        # Mask slaves behind master.
-        # It happens sometimes on windows in a non-deterministic way.
-        self.replace_substring("+---------------------------------------------"
-                               "------------------------------------------+",
-                               "+---------+")
-        self.replace_substring("+---------------------------------------------"
-                               "-------------------------------------------+",
-                               "+---------+")
-        self.replace_substring("| health                                      "
-                               "                                          |",
-                               "| health  |")
-        self.replace_substring("| health                                      "
-                               "                                           |",
-                               "| health  |")
-        self.replace_substring("| OK                                          "
-                               "                                          |",
-                               "| OK      |")
-        self.replace_substring("| OK                                          "
-                               "                                           |",
-                               "| OK      |")
-        self.replace_substring_portion("| Slave delay is ",
-                                       "seconds behind master., No, Slave has "
-                                       "1 transactions behind master.  |",
-                                       "| OK      |")
-        self.replace_substring("| Slave has 1 transactions behind master.     "
-                               "                                          |",
-                               "| OK      |")
-        self.replace_substring("| Slave has 1 transactions behind master.     "
-                               "                                           |",
-                               "| OK      |")
-
-        self.replace_substring("+------------------------------------------+",
-                               "+---------+")
-        self.replace_substring("| health                                   |",
-                               "| health  |")
-        self.replace_substring("| OK                                       |",
-                               "| OK      |")
-        self.replace_substring("| Slave has 1 transactions behind master.  |",
-                               "| OK      |")
 
         return True
 

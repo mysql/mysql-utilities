@@ -194,6 +194,10 @@ class test(replicate.test):
         # Remove slave_master_info data available for servers starting 5.7.6.
         self.remove_result("                  Channel_Name :")
 
+        # Mask values of master information file that changed for 5.7 servers.
+        self.replace_result("                     Heartbeat :",
+                            "                     Heartbeat : XXXXX\n")
+
     def get_result(self):
         return self.compare(__name__, self.results)
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -979,8 +979,9 @@ def export_databases(server_values, db_list, output_file, options):
         for db in all_dbs:
             if warning_printed:
                 continue
+            # Internal databases 'sys' added by default for MySQL 5.7.7+.
             if db[0].upper() in ["MYSQL", "INFORMATION_SCHEMA",
-                                 "PERFORMANCE_SCHEMA"]:
+                                 "PERFORMANCE_SCHEMA", "SYS"]:
                 continue
             if not db[0] in db_list:
                 output_file.write(_GTID_BACKUP_WARNING)
