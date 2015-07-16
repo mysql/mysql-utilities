@@ -48,7 +48,8 @@ _DATA_COMMANDS = ["INSERT", "UPDATE"]
 _RPL_COMMANDS = ["START", "STOP", "CHANGE"]
 _RPL_PREFIX = "-- "
 _RPL = len(_RPL_PREFIX)
-_GTID_COMMANDS = ["SET @MYSQLUTILS_TEMP_L", "SET @@SESSION.SQL_LOG_",
+_SQL_LOG_BIN_CMD = "SET @@SESSION.SQL_LOG_"
+_GTID_COMMANDS = ["SET @MYSQLUTILS_TEMP_L", _SQL_LOG_BIN_CMD,
                   "SET @@GLOBAL.GTID_PURG"]
 _GTID_PREFIX = 22
 _GTID_SKIP_WARNING = ("# WARNING: GTID commands are present in the import "
@@ -1042,7 +1043,7 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
         # and improve performance of _parse_insert_statement().
         re_value_split = re.compile("VALUES?", re.IGNORECASE)
 
-    dml_cmd = False
+    exec_commit = False
 
     # Process all statements.
     for statement in statements:
@@ -1129,22 +1130,24 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
 
         # Execute statements list.
         for st in st_list:
-            # Check query type to determine if a COMMIT is needed, in order to
-            # avoid Error 1694 (Cannot modify SQL_LOG_BIN inside transaction).
-            if not autocommit:
-                if dml_cmd:
-                    if st[0:_GTID_PREFIX].upper() in _GTID_COMMANDS:
-                        # DML previously executed and GTID command found.
-                        destination.commit()
-                        dml_cmd = False
-                elif st[0:6] in _DATA_COMMANDS:
-                    dml_cmd = True  # DML command found (COMMIT needed later).
             # Execute query.
             try:
                 if dryrun:
                     print(st)
                 elif fmt != "sql" or not _skip_sql(st, options):
+                    # Check query type to determine if a COMMIT is needed, in
+                    # order to avoid Error 1694 (Cannot modify SQL_LOG_BIN
+                    # inside transaction).
+                    if not autocommit:
+                        if st[0:_GTID_PREFIX].upper() == _SQL_LOG_BIN_CMD:
+                            # SET SQL_LOG_BIN command found.
+                            destination.commit()
+                            exec_commit = True
                     destination.exec_query(st, options=query_opts)
+                    if exec_commit:
+                        # For safety, COMMIT after SET SQL_LOG_BIN command.
+                        destination.commit()
+                        exec_commit = False
             # It is not a good practice to catch the base Exception class,
             # instead all errors should be caught in a Util/Connector error.
             # Exception is only caught for safety (unanticipated errors).
