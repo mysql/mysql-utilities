@@ -1693,9 +1693,12 @@ class Database(object):
         if not options.get('skip_views', False):
             priv_tuple = (self.db_name, "SHOW VIEW")
             source_privs.append(priv_tuple)
-        # if procs or funcs are included, we need read on mysql db
-        if not options.get('skip_proc', False) or \
-           not options.get('skip_func', False):
+        # if procs, funcs, events or grants are included, we need read on
+        # mysql db
+        if not options.get('skip_procs', False) or \
+           not options.get('skip_funcs', False) or \
+           not options.get('skip_events', False) or \
+           not options.get('skip_grants', False):
             priv_tuple = ("mysql", "SELECT")
             source_privs.append(priv_tuple)
         # if events, we need event
