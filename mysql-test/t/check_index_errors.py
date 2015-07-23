@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,9 +39,13 @@ class test(check_index.test):
     def run(self):
         self.res_fname = "result.txt"
 
+        server_conn = "--server={0}".format(
+            self.build_connection_string(self.server1))
+
         test_num = 1
         comment = "Test case {0} - error: no db specified".format(test_num)
-        res = self.run_test_case(2, "mysqlindexcheck.py ", comment)
+        res = self.run_test_case(2, "mysqlindexcheck.py {0}"
+                                    "".format(server_conn), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -49,7 +53,7 @@ class test(check_index.test):
         comment = ("Test case {0} - error: invalid source "
                    "specified".format(test_num))
         res = self.run_test_case(1, "mysqlindexcheck.py util_test "
-                                    "--server=nope:nada@nohost", comment)
+                                 "--server=nope:nada@nohost", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
@@ -57,8 +61,8 @@ class test(check_index.test):
         comment = ("Test case {0} - error: invalid login to "
                    "server".format(test_num))
         res = self.run_test_case(1, "mysqlindexcheck.py util_test_a "
-                                    "--server=nope:nada@localhost:"
-                                    "{0}".format(self.server1.port),
+                                 "--server=nope:nada@localhost:"
+                                 "{0}".format(self.server1.port),
                                  comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -66,59 +70,85 @@ class test(check_index.test):
         test_num += 1
         comment = ("Test case {0} - error: stats and "
                    "best=alpha".format(test_num))
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --best=A "
-                                    "util_test_a", comment)
+        res = self.run_test_case(2, "mysqlindexcheck.py {0} --stats --best=A "
+                                 "util_test_a".format(server_conn), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - error: stats and "
                    "worst=alpha".format(test_num))
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --worst=A "
-                                    "util_test_a", comment)
+        res = self.run_test_case(2, "mysqlindexcheck.py {0} --stats --worst=A "
+                                 "util_test_a".format(server_conn), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = "Test case {0} - error: not stats ".format(test_num)
-        res = self.run_test_case(2, "mysqlindexcheck.py --best=1 "
-                                    "util_test_a", comment)
+        res = self.run_test_case(2, "mysqlindexcheck.py {0} --best=1 "
+                                 "util_test_a".format(server_conn), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = ("Test case {0} - error: stats and both best and "
                    "worst ".format(test_num))
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --best=1 "
-                                    "--worst=1 util_test_a", comment)
+        res = self.run_test_case(2, "mysqlindexcheck.py {0} --stats --best=1 "
+                                 "--worst=1 util_test_a"
+                                 "".format(server_conn), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = "Test case {0} - error: stats and worst=-1".format(test_num)
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --worst=-1 "
-                                    "util_test_a", comment)
+        res = self.run_test_case(2, "mysqlindexcheck.py {0} --stats "
+                                 "--worst=-1 util_test_a"
+                                 "".format(server_conn), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = "Test case {0} - error: stats and best=-1".format(test_num)
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --best=-1 "
-                                    "util_test_a", comment)
+        res = self.run_test_case(2, "mysqlindexcheck.py {0} --stats --best=-1 "
+                                 "util_test_a".format(server_conn), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = "Test case {0} - error: stats and worst=0".format(test_num)
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --worst=0 "
-                                    "util_test_a", comment)
+        res = self.run_test_case(2, "mysqlindexcheck.py {0} --stats --worst=0 "
+                                 "util_test_a".format(server_conn), comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
         comment = "Test case {0} - error: stats and best=0".format(test_num)
-        res = self.run_test_case(2, "mysqlindexcheck.py --stats --best=0 "
-                                    "util_test_a", comment)
+        res = self.run_test_case(2, "mysqlindexcheck.py {0} --stats --best=0 "
+                                 "util_test_a".format(server_conn), comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - error: argument '--' is ignored "
+                   "".format(test_num))
+        res = self.run_test_case(2, "mysqlindexcheck.py {0} --"
+                                 "".format(server_conn), comment)
+
+        test_num += 1
+        comment = ("Test case {0} - error: cannot parse the specified "
+                   "qualified name".format(test_num))
+        res = self.run_test_case(1, "mysqlindexcheck.py {0} .util_test_e"
+                                 "".format(server_conn), comment)
+
+        test_num += 1
+        comment = "Test case {0} - error: no tables to check".format(test_num)
+        res = self.run_test_case(1, "mysqlindexcheck.py {0} '`util_test_e.`'"
+                                 "".format(server_conn), comment)
+
+        test_num += 1
+        comment = "Test case {0} - no server specified".format(test_num)
+        res = self.run_test_case(2, "mysqlindexcheck.py database", comment)
+
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command import indexcheck
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.tools import check_connector_python
+from mysql.utilities.common.messages import PARSE_ERR_OPTS_REQ
 from mysql.utilities.common.options import (add_verbosity, add_format_option,
                                             get_ssl_dict, setup_common_options,
                                             check_password_security)
@@ -51,7 +52,7 @@ if not check_connector_python():
 if __name__ == '__main__':
     # Setup the command parser and setup server, help
     parser = setup_common_options(os.path.basename(sys.argv[0]),
-                                  DESCRIPTION, USAGE)
+                                  DESCRIPTION, USAGE, False, True, None)
 
     # Display DROP statements
     parser.add_option("--show-drops", "-d", action="store_true",
@@ -99,6 +100,10 @@ if __name__ == '__main__':
 
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
+
+    # Check mandatory option: --server.
+    if not opt.server:
+        parser.error(PARSE_ERR_OPTS_REQ.format(opt="--server"))
 
     # Check security settings
     check_password_security(opt, args)

@@ -40,3 +40,17 @@ Test case 11 - error: stats and best=0
 Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
 
 mysqlindexcheck: error: The --best parameter must be an integer >= 1
+Test case 12 - error: argument '--' is ignored 
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+
+mysqlindexcheck: error: You must specify at least one table or database to check.
+Test case 13 - error: cannot parse the specified qualified name
+# Source on localhost: ... connected.
+ERROR: Cannot parse the specified qualified name '.util_test_e' for the database/table arguments. Please verify that a valid format is used (i.e., <db_name>[.<tbl_name>]) and that backtick quotes are properly used if required.
+Test case 14 - error: no tables to check
+# Source on localhost: ... connected.
+ERROR: No tables to check.
+Test case 15 - no server specified
+Usage: mysqlindexcheck --server=user:pass@host:port:socket db1.table1 db2 db3.table2
+
+mysqlindexcheck: error: Option '--server' is required.
