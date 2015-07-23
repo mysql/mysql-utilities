@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -531,6 +531,7 @@ def compare_all_databases(server1_val, server2_val, exclude_list, options):
         WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
         AND SCHEMA_NAME != 'PERFORMANCE_SCHEMA'
         AND SCHEMA_NAME != 'mysql'
+        AND SCHEMA_NAME != 'sys'
         {0}"""
     conditions = ""
     if exclude_list:
