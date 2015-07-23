@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,21 +20,22 @@
 This file contains the mysql utilities client.
 """
 
-from mysql.utilities.common.options import (license_callback,
-                                            UtilitiesParser,
-                                            check_password_security)
+import os
+import sys
+
 from mysql.utilities.common.tools import (check_connector_python,
                                           check_python_version)
 
 # Check Python version compatibility
 check_python_version()
 
-import os
-import sys
-
 # Check for connector/python
 if not check_connector_python():
     sys.exit(1)
+
+from mysql.utilities.common.options import (license_callback,
+                                            UtilitiesParser,
+                                            check_password_security)
 
 try:
     from mysql.utilities import VERSION_FRM, VERSION_STRING, COPYRIGHT_FULL
