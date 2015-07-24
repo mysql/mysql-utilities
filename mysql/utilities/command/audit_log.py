@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2015 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -321,7 +321,7 @@ class AuditLog(object):
         """
         # Check for valid command
         command = self.options.get("command", None)
-        if not command in VALID_COMMANDS:
+        if command not in VALID_COMMANDS:
             raise UtilError("Invalid command.")
 
         command_value = self.options.get("value", None)

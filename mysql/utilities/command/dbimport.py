@@ -211,8 +211,9 @@ def _read_row(file_h, fmt, skip_comments=False):
                     yield new_row
             else:
                 if (len(row[0]) == 0 or row[0][0] != '#' or
-                   row[0][0:2] != "--") or ((row[0][0] == '#' or
-                   row[0][0:2] == "--") and not skip_comments):
+                    row[0][0:2] != "--") or ((row[0][0] == '#' or
+                                              row[0][0:2] == "--") and
+                                             not skip_comments):
                     yield row
 
     if warnings_found:
@@ -365,6 +366,7 @@ def read_next(file_h, fmt):
             if row[0][0:_RPL] == _RPL_PREFIX and first_word in _RPL_COMMANDS:
                 # join the parts if CSV or TAB
                 if fmt in ['csv', 'tab']:
+                    # pylint: disable=E1310
                     yield("RPL_COMMAND", ", ".join(row).strip("--"))
                 else:
                     yield("RPL_COMMAND", row[0][_RPL:])

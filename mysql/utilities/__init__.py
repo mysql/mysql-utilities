@@ -34,10 +34,8 @@ MySQL Utilities is brought to you by Oracle.
 
 LICENSE = "GPLv2"
 
-VERSION_FRM = ("MySQL Utilities {program} version {VERSION_STRING} \n"
-               "License type: {LICENSE}".format(program="{program}",
-                                                VERSION_STRING=VERSION_STRING,
-                                                LICENSE=LICENSE))
+VERSION_FRM = ("MySQL Utilities {program} version %s \n"
+               "License type: %s" % (VERSION_STRING, LICENSE))
 
 LICENSE_FRM = (VERSION_FRM + "\n" + COPYRIGHT_FULL)
 PYTHON_MIN_VERSION = (2, 6, 0)

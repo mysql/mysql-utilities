@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ def object_diff(server1_val, server2_val, object1, object2, options,
     # Get the object type if unknown considering that objects of different
     # types can be found with the same name.
     if not object_type:
-        #Get object types of object1
+        # Get object types of object1
         regexp_obj = re.compile(REGEXP_QUALIFIED_OBJ_NAME)
         m_obj = regexp_obj.match(object1)
         db_name, obj_name = m_obj.groups()

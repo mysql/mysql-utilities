@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -203,7 +203,7 @@ class test(mutlib.System_test):
                                          quote_char))
         comment = ("Test case {0} - re-started server prints "
                    "results ".format(test_num))
-        #cmd_str_wrong = cmd_str.replace("root:root", "wrong:wrong")
+        # cmd_str_wrong = cmd_str.replace("root:root", "wrong:wrong")
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

@@ -293,7 +293,7 @@ class test(mutlib.System_test):
                 pass
 
         # Drop users
-        users = ["joe_nopass@'user'","joe_pass@'user'", "amy_nopass@'user'",
+        users = ["joe_nopass@'user'", "joe_pass@'user'", "amy_nopass@'user'",
                  "remote@'%'", ]
         for user in users:
             try:

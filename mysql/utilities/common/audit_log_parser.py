@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -96,7 +96,7 @@ class AuditLogParser(AuditLogReader):
             # Apply filters and search criteria
             if self.options['users']:
                 self._track_new_users_connection_id(record, name_case)
-                #Check if record matches users search criteria
+                # Check if record matches users search criteria
                 if not self.match_users(record):
                     matching_record = False
 

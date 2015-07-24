@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ class test(mutlib.System_test):
             # setting required=False to verify it founds mysqld-nt.exe
             res = tools.get_tool_path(basedir[0][1], "mysqld", required=False)
             # ensuring it founds mysqld-nt.exe
-            if "mysqld-nt.exe" in res and not "Cannot find location of" in res:
+            if "mysqld-nt.exe" in res and "Cannot find location of" not in res:
                 self.results.append("Pass\n")
         except UtilError:
             raise MUTLibError("{0}: failed".format(comment))

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ from mysql.utilities.exception import (ConnectionValuesError, FormatError,
 from mysql.utilities.common.server import (get_connection_dictionary,
                                            connect_servers)
 
- # List of tuples (comment, input, fail)
+# List of tuples (comment, input, fail)
 _TEST_CASES = [('Good connection string but cannot connect',
                 'root:pass@hostname.com:3306:/my.sock', True),
                ('Bad connection string', 'DAS*!@#MASD&UKKLKDA)!@#', True),

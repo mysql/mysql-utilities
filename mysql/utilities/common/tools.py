@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 This module contains methods for working with mysql server tools.
 """
 
-import ctypes
 import inspect
 import os
 import re
@@ -30,9 +29,13 @@ import socket
 import subprocess
 import time
 
+try:
+    import ctypes
+except ImportError:
+    pass
+
 from mysql.utilities import (PYTHON_MIN_VERSION, PYTHON_MAX_VERSION,
                              CONNECTOR_MIN_VERSION)
-from mysql.utilities.common.format import print_list
 from mysql.utilities.exception import UtilError
 
 
@@ -80,7 +83,10 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True,
         defaults_paths = []
     search_paths = []
     if quote:
-        quote_char = "'" if os.name == "posix" else '"'
+        if os.name == "posix":
+            quote_char = "'"
+        else:
+            quote_char = '"'
     else:
         quote_char = ''
     if basedir:
@@ -109,12 +115,12 @@ def get_tool_path(basedir, tool, fix_ext=True, required=True,
         if os.path.isdir(norm_path):
             toolpath = os.path.join(norm_path, tool)
             if os.path.isfile(toolpath):
-                return r"{0}{1}{0}".format(quote_char, toolpath)
+                return r"%s%s%s" % (quote_char, toolpath, quote_char)
             else:
                 if tool == "mysqld.exe":
                     toolpath = os.path.join(norm_path, "mysqld-nt.exe")
                     if os.path.isfile(toolpath):
-                        return r"{0}{1}{0}".format(quote_char, toolpath)
+                        return r"%s%s%s" % (quote_char, toolpath, quote_char)
     if required:
         raise UtilError("Cannot find location of %s." % tool)
 
@@ -196,7 +202,7 @@ def execute_script(run_cmd, filename=None, options=None, verbosity=False):
             filename = os.devnull
         f_out = open(filename, 'w')
 
-    is_posix = True if os.name == "posix" else False
+    is_posix = (os.name == "posix")
     command = shlex.split(run_cmd, posix=is_posix)
 
     if options:
@@ -208,7 +214,8 @@ def execute_script(run_cmd, filename=None, options=None, verbosity=False):
     try:
         proc = subprocess.Popen(command, shell=False,
                                 stdout=f_out, stderr=f_out)
-    except OSError as err:
+    except OSError:
+        _, err, _ = sys.exc_info()
         raise UtilError(str(err))
 
     ret_val = proc.wait()
@@ -305,6 +312,8 @@ def show_file_statistics(file_name, wild=False, out_format="GRID"):
     else:
         rows.append(_get_file_stats(path, filename))
 
+    # Local import is needed because of Python compability issues
+    from mysql.utilities.common.format import print_list
     print_list(sys.stdout, out_format, columns, rows)
 
 
@@ -382,7 +391,7 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
             mod = inspect.getmodule(frm[0])
             mod_name = os.path.splitext(
                 os.path.basename(mod.__file__))[0]
-            name = '{0} utility'.format(mod_name)
+            name = '%s utility' % mod_name
 
         # Build the error message
         if max_version:
@@ -408,7 +417,7 @@ def check_python_version(min_version=PYTHON_MIN_VERSION,
             raise UtilError(error_msg)
 
         if print_on_fail:
-            print('ERROR: {0}'.format(error_msg))
+            print('ERROR: %s' % error_msg)
 
         if exit_on_fail:
             sys.exit(1)

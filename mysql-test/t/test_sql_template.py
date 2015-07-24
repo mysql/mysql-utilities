@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -146,9 +146,9 @@ class test(mutlib.System_test):
     test_objects = None
 
     def check_prerequisites(self):
-    #        if self.servers.get_server(0).check_version_compat(5, 6, 5):
-    #            raise MUTLibError("Test requires server version prior to 5
-    # .6.5")
+        # if self.servers.get_server(0).check_version_compat(5, 6, 5):
+        #     raise MUTLibError("Test requires server version prior to 5
+        # .6.5")
         self.test_objects = []
 
         # Need at least one server.

@@ -361,7 +361,7 @@ def _check_option_defaults(options):
     """
 
     for opt_name in _DEFAULT_OPTIONS:
-        if not opt_name in options:
+        if opt_name not in options:
             options[opt_name] = _DEFAULT_OPTIONS[opt_name]
 
 

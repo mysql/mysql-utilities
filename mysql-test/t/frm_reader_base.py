@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -162,7 +162,7 @@ class test(mutlib.System_test):
 
         # Perform tests of specific .frm files
         for tablename in tables:
-        # Read the .frm File from the server
+            # Read the .frm File from the server
             datadir = self.server1.show_server_variable("datadir")[0][1]
             frm_file = os.path.normpath("{0}/frm_test/{1}.frm > {2}".format(
                 datadir, tablename, self.frm_output))

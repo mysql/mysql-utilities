@@ -1,4 +1,3 @@
-
 #
 # Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
 #
@@ -293,7 +292,7 @@ class _Command(object):
         """
         tmp = self.position
         self.position = 0
-        sys.stdout.write('\b'*tmp)
+        sys.stdout.write('\b' * tmp)
 
     def end_keypress(self):
         """Executes the 'END' key press.
@@ -644,7 +643,7 @@ class Console(object):
         defined variables and complete the name of variable. If the user
         types 'TAB' twice, it will display a list of all possible matches.
         """
-        #find the last $
+        # find the last $
         variable = ''
         start_var = 0
         new_var = ''
@@ -923,7 +922,7 @@ class Console(object):
         cmd_string = ''
         cmd_key = None
         self.tab_count = 0
-        while not cmd_key in ['ENTER_POSIX', 'ENTER_WIN']:
+        while cmd_key not in ['ENTER_POSIX', 'ENTER_WIN']:
             key = getch()
             # If a special key, act on it
             if key in _COMMAND_KEY:

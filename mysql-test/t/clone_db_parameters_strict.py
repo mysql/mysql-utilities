@@ -21,6 +21,7 @@ clone_db_parameters_strict test.
 
 import clone_db_parameters
 
+
 class test(clone_db_parameters.test):
     """check parameters for clone db using strict mode
     This test executes a series of clone database operations on a single

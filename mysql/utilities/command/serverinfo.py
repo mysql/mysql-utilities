@@ -418,8 +418,9 @@ def _start_server(server_val, basedir, datadir, options=None):
 
     # Raise last known exception (if unable to connect to the server)
     if error:
-        raise error  # pylint: disable=E0702
-                     # See: http://www.logilab.org/ticket/3207
+        # See: http://www.logilab.org/ticket/3207
+        # pylint: disable=E0702
+        raise error
 
     if verbosity > 0:
         print "# done (server started)."
