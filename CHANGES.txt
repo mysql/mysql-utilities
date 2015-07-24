@@ -1,3 +1,65 @@
+Release-1.6.2
+-------------
+- BUG#20960564 : mysqlindexcheck raises an AttributeError
+- BUG#20953870 : mysqldbexport requires select to mysql even with --skip=procedures,functions
+- BUG#20817994 : mysqluc considers 'home' button as 'h' and 'end' button as 'f'
+- BUG#20812836 : Pylint tests are failing
+- BUG#20756920 : Fix failing MUT tests on MySQL 5.7.6
+- BUG#20654690 : The package mechanism modules are not included on pylint test
+- BUG#20411304 : Test strict sql_mode
+- BUG#20409105 : Mut tests fail if SQL_MODE includes NO_AUTO_CREATE_USER
+- BUG#20380999 : mysqlfailover service do not start when master/slave host name is over 30
+- BUG#20302446 : mysqlgrants should allow you to narrow output down to specific permissions only
+- BUG#20227070 : mysqldiff fails to generate a correct ALTER to change DEFAULT NULL to DEFAULT ''
+- BUG#20191865 : Fail to export/import tables with compound keys in CSV format
+- BUG#20161135 : mysqlrpl_admin_gtid test fails with mysql 5.6.22 and 5.7.6
+- BUG#20088285 : Help text for ssl options should start with lower case
+- BUG#20070400 : mysqldbimport does not support importing multiple databases at once
+- BUG#19887928 : mysqlserverinfo tries to access error log on the client instead of on the server
+- BUG#19658970 : Naming issue noticed in mysql utilities 1.5.2 Windows installers
+- WL#8611 : Remove Fabric project from Package Mechanisms
+
+Release-1.5.5
+-------------
+- BUG#21415893 : mysqldbcompare fails when using --all option with server 5.7.7
+- BUG#21327864 : The mysqlimport utility failing with error with server 5.7.7
+- BUG#21317583 : Indexerror noticed in mysqlrpladmin and mysqlrplcheck with server 5.7.7
+- BUG#21311404 : Failure noticed in mysqlrplcheck with health option with MySQL 5.7
+- BUG#21304792 : Python version not getting checked while invoking mysqluc
+- BUG#21056947 : Mislead error installing utilities on Debian 8 and Ubuntu 15.04
+- BUG#21031993 : mysqluserclone fails with --include-global-privileges option
+- BUG#20988407 : Add 3rd-party notice for python to fabric, utilities Windows MSI package
+- BUG#20979041 : mysqlrplsync gives wrong information with server 5.7.7
+- BUG#20972389 : mysqldbcopy fails to copy database to a server with NO_AUTO_CREATE_USER sql mode
+- BUG#20344064 : Error retrieving slave_master_info data for 5.7.6 servers
+
+Release-1.5.4 (Released February 26, 2015)
+------------------------------------------
+- BUG#20042765 : mysqlserverclone does not use mysql_install_db
+- BUG#20583756 : mysqluc fails to launch utilities when using Windows MSI
+- BUG#20078072 : Improve MySQL Utilities support for MySQL 5.7.5
+- BUG#20035380 : utilities need to support new mysql fk behavior
+- BUG#19943104 : utilities do not parse grant statements correctly
+- BUG#19942512 : utilities do not work with spaces on the mysql server path
+- BUG#19804151 : mysqlserverclone does not work with mysql5.7
+- BUG#19792492 : Commercial mysql utilities rpm depends on community c/py.
+- BUG#19781888 : MUT test binlogmove_privileges failing
+- BUG#19781304 : possible to execute system commands with mysqluc
+- BUG#19720715 : mysqlindexcheck has wrong results for hash and fulltext indexes
+- BUG#19614037 : utilities version not shown in logged output
+- BUG#19348330 : mut fails to kill servers on windows
+- BUG#19340701 : mysqldbcompare generates invalid sql
+- BUG#19313139 : mysqldbcompare not escaping values in sql output
+- BUG#19238195 : Missing support of config-path in rpl_user option.
+- BUG#19031182 : comply with ssl changes in wl#6791
+- BUG#19030588 : ssl-ca option is required to establish an encrypted connection
+- BUG#18955235 : mysqldbcopy fails when copying text columns with single quotes
+- BUG#18792076 : CSV format using incorrect line terminator for unix
+- BUG#18763262 : error using large span key values for mysqldbcompare
+- BUG#18718660 : indexes that just have same prefix are not redundant
+- BUG#18717843 : duplicated execution for mysqldbcompare with --show-reverse
+- BUG#18042411 : mysqldbimport should report non existing file error
+
 Release-1.6.1 (Released February 26, 2015)
 ------------------------------------------
 - BUG#20042765 : mysqlserverclone does not use mysql_install_db
