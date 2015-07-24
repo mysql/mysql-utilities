@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -798,11 +798,11 @@ class FrmReader(object):
             (1 if (col_flags & _FIELDFLAG_DECIMAL) or (length == 0) else 0)
 
         # algorithm from bin2decimal()
-        #int intg=precision-scale,
+        # int intg=precision-scale,
         #    intg0=intg/DIG_PER_DEC1, frac0=scale/DIG_PER_DEC1,
         #    intg0x=intg-intg0*DIG_PER_DEC1, frac0x=scale-frac0*DIG_PER_DEC1;
         #
-        #return intg0*sizeof(dec1)+dig2bytes[intg0x]+
+        # return intg0*sizeof(dec1)+dig2bytes[intg0x]+
         #       frac0*sizeof(dec1)+dig2bytes[frac0x];
 
         intg = length - decimals

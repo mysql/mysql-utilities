@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -490,7 +490,7 @@ class RplCommands(object):
                      "%s:%s" % (self.master_vals['host'],
                                 self.master_vals['port']),
                                "to slave at %s:%s." %
-                     (candidate['host'], candidate['port'])]))
+                               (candidate['host'], candidate['port'])]))
         if not self.topology.switchover(candidate):
             self._report("# Errors found. Switchover aborted.", logging.ERROR)
             return False
@@ -626,7 +626,7 @@ class RplCommands(object):
         if options is None:
             options = {}
         # Raise error if command is not valid
-        if not command in _VALID_COMMANDS:
+        if command not in _VALID_COMMANDS:
             msg = "'%s' is not a valid command." % command
             self._report(msg, logging.CRITICAL)
             raise UtilRplError(msg)

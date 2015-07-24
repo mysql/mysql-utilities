@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -164,7 +164,7 @@ class test(compare_db.test):
         self.server1.exec_query("CREATE TABLE inventory.box (a int) "
                                 "ENGINE=INNODB")
         self.server1.exec_query("INSERT INTO inventory.box VALUES (1)")
-        #index with nullable collumn
+        # index with nullable collumn
         self.server1.exec_query("CREATE TABLE inventory.box_2 "
                                 "(a int, b int, INDEX `ix_nullable` (`a`)) "
                                 "ENGINE=INNODB")
@@ -173,7 +173,7 @@ class test(compare_db.test):
         self.server2.exec_query("CREATE TABLE inventory.box (a int) "
                                 "ENGINE=INNODB")
         self.server2.exec_query("INSERT INTO inventory.box VALUES (2)")
-        #index with nullable collumn
+        # index with nullable collumn
         self.server2.exec_query("CREATE TABLE inventory.box_2 "
                                 "(a int, b int, INDEX `ix_nullable` (`a`)) "
                                 "ENGINE=INNODB")
@@ -197,18 +197,18 @@ class test(compare_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        #invalid index
+        # invalid index
         self.server1.exec_query("CREATE TABLE inventory.box_3 "
                                 "(a int not null, b int, "
                                 "UNIQUE `uk_nonull` (`a`))ENGINE=INNODB")
         self.server1.exec_query("INSERT INTO inventory.box_3 VALUES (2, 1)")
-        #invalid index
+        # invalid index
         self.server2.exec_query("CREATE TABLE inventory.box_3 "
                                 "(a int not null, b int, UNIQUE "
                                 "`uk_nonull` (`a`)) ENGINE=INNODB")
         self.server2.exec_query("INSERT INTO inventory.box_3 VALUES (2, 1)")
 
-        #different index
+        # different index
         self.server1.exec_query(
             "CREATE TABLE inventory.box_4 "
             "(a int not null, b int, c int, d int not null, "
@@ -216,7 +216,7 @@ class test(compare_db.test):
         )
         self.server1.exec_query("INSERT INTO inventory.box_4 VALUES "
                                 "(1, 2, 3, 4)")
-        #different index
+        # different index
         self.server2.exec_query(
             "CREATE TABLE inventory.box_4 "
             "(a int not null, b int not null, c int, d int not null, UNIQUE "

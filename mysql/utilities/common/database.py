@@ -261,9 +261,10 @@ class Database(object):
             'fetch': False,
             'commit': False,  # No COMMIT needed for DDL operations (default).
         }
-        self.constraints = deque()  # Used to store constraints to execute
-                                    # after table creation, deque is
-                                    # thread-safe
+        # Used to store constraints to execute
+        # after table creation, deque is
+        # thread-safe
+        self.constraints = deque()
 
         self.objects = []
         self.new_objects = []
@@ -781,7 +782,7 @@ class Database(object):
             try:
                 query = self.constraints.pop()
             except IndexError:
-                #queue is empty, exit while statement
+                # queue is empty, exit while statement
                 break
             if self.verbose:
                 print(query)

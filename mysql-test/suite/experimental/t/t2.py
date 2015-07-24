@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ class test(mutlib.System_test):
         # Note: comment out the next line and uncomment out the following line
         #       to see an unsuccessful test run
         self.ret_val.append("Line 3\n")
-        #self.ret_val.append("Something wonky here\n")
+        # self.ret_val.append("Something wonky here\n")
         self.ret_val.append("Line 4\n")
         self.ret_val.append("Line 5\n")
         return True

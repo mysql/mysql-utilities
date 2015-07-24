@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -112,8 +112,8 @@ def get_util_path(default_path=''):
     # Try the pythonpath environment variable
     pythonpath = os.getenv("PYTHONPATH")
     if pythonpath:
-        #This is needed on windows without a python setup, cause needs to
-        #find the executable scripts.
+        # This is needed on windows without a python setup, cause needs to
+        # find the executable scripts.
         path = _search_paths(needles, [os.path.join(n, "../")
                                        for n in pythonpath.split(";", 1)])
         if path:
@@ -279,7 +279,7 @@ class Utilities(object):
             utils = self.available_utilities
             working_utils = [util['name'] for util in self.util_list]
             if not len(working_utils) < len(self.util_list):
-                utils = [name for name in utils if not name in working_utils]
+                utils = [name for name in utils if name not in working_utils]
             if len(utils) < 1:
                 return
         else:

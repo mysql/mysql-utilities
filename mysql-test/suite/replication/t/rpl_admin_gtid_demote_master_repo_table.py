@@ -91,7 +91,7 @@ class test(rpl_admin.test):
         test_num += 1
         # mysqlrpladmin --master=root:root@localhost:13091
         # --new-master=root:root@localhost:13094
-        #--discover-slaves-login=root:root --demote-master  switchover
+        # --discover-slaves-login=root:root --demote-master  switchover
         # --rpl-user=rpl:rplpass
         comment = ("Test case {0} - demote-master after switchover "
                    "-vvv".format(test_num))

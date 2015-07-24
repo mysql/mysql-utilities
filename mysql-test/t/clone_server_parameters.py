@@ -106,7 +106,7 @@ class test(mutlib.System_test):
             # server.
             if restart:
                 if os.name == 'posix':
-                    #Change file permissions
+                    # Change file permissions
                     fl_st = os.stat(self.start_cmd_fl)
                     os.chmod(self.start_cmd_fl, fl_st.st_mode | stat.S_IEXEC)
                 # This sleep gives a chance to the OS to unlock the server

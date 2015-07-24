@@ -1797,7 +1797,7 @@ class Server(object):
                 j = create_str.find(" ", i)
                 exist_engine = create_str[i + 7:j]
             else:
-                ## Check if it is a CREATE TABLE LIKE statement
+                # Check if it is a CREATE TABLE LIKE statement
                 is_create_like = (create_str.find("CREATE TABLE {0} LIKE"
                                                   "".format(tbl_name)) == 0)
 
@@ -2024,7 +2024,7 @@ class Server(object):
                            else if False turn autocommit off (set to 0).
         """
         if enable is None:
-             # Switch autocommit value.
+            # Switch autocommit value.
             if self.autocommit is None:
                 # Get autocommit value if unknown
                 self.autocommit_set()

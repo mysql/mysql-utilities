@@ -695,7 +695,7 @@ class Replication(object):
             elif not sql_running:
                 if self.verbosity > 0:
                     print "# Retry to start the slave SQL thread..."
-                #SQL thread is not running, retry to start it
+                # SQL thread is not running, retry to start it
                 res = self.slave.start_sql_thread(self.query_options)
             if self.verbosity > 0:
                 print "# Waiting for slave to synchronize with master"
@@ -1777,7 +1777,7 @@ class Slave(Server):
         """
         slave_gtids = self.exec_query(_GTID_EXECUTED)[0][0]
         gtids = self.exec_query("SELECT GTID_SUBTRACT('%s','%s')" %
-                               (master_gtids[0][0], slave_gtids))[0]
+                                (master_gtids[0][0], slave_gtids))[0]
         # Init gtid_behind count (if no GTIDs behind then 0 is returned)
         gtid_behind = 0
         # Check if there are GTIDs behind

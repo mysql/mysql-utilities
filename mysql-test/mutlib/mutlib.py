@@ -260,9 +260,9 @@ class ServerList(object):
         self.cleanup_list = []         # List of files to remove at shutdown
         self.ports_in_use = []         # List of port numbers in use
         self.ports_freed = []          # List of ports that were used, but are
-                                       # now free to use again
+        # now free to use again
         self._next_port = startport    # port number to start looking for new
-                                       # unused ports
+        # unused ports
 
         if servers is None:
             self.server_list = []
@@ -1006,7 +1006,7 @@ class System_test(object):
         conn_str = "{0}".format(conn_val[0])
         if conn_val[1]:
             conn_str = "{0}:{1}".format(conn_str, conn_val[1])
-        if ":" in conn_val[2] and not "]" in conn_val[2]:
+        if ":" in conn_val[2] and "]" not in conn_val[2]:
             conn_str = "{0}@[{1}]:".format(conn_str, conn_val[2])
         else:
             conn_str = "{0}@{1}:".format(conn_str, conn_val[2])
@@ -1042,7 +1042,7 @@ class System_test(object):
         if passwd:
             conn_str = "{0}:{1}".format(conn_str, passwd)
         # Use the server values to build the remaining connection string.
-        if ":" in conn_val[2] and not "]" in conn_val[2]:
+        if ":" in conn_val[2] and "]" not in conn_val[2]:
             conn_str = "{0}@[{1}]:".format(conn_str, conn_val[2])
         else:
             conn_str = "{0}@{1}:".format(conn_str, conn_val[2])

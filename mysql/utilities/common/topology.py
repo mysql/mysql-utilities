@@ -754,7 +754,7 @@ class Topology(Replication):
             res = s_candidate.get_rpl_users()
             l = len(res)
             user, host, _ = res[l - 1]
-            #raise
+            # raise
 
         msg = "#   Replication user exists ... %s"
         if user is None or slave.check_rpl_user(user, slave.host) != []:

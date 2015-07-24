@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ class test(mutlib.System_test):
             self.server1.exec_query("INSTALL PLUGIN audit_log SONAME "
                                     " 'audit_log{0}'".format(ext))
         else:
-            #Restart plugin to force generation of an Audit event
+            # Restart plugin to force generation of an Audit event
             self.server1.exec_query("UNINSTALL PLUGIN audit_log")
             self.server1.exec_query("INSTALL PLUGIN audit_log SONAME "
                                     " 'audit_log{0}'".format(ext))

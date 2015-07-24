@@ -22,7 +22,7 @@ rpl_admin_gtid test.
 import mutlib
 import rpl_admin
 
-from mysql.utilities.exception import MUTLibError, UtilDBError
+from mysql.utilities.exception import MUTLibError
 
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --skip-slave-start '

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class test(t2.test):
         # Note: comment out the next line and uncomment out the following line
         #       to see an unsuccessful test run
         self.ret_val.append("Wack-a-mole 2\n")
-        #self.ret_val.append("Something hinky happened here\n")
+        # self.ret_val.append("Something hinky happened here\n")
         self.ret_val.append("Wack-a-mole 3\n")
         return True
 
