@@ -1,5 +1,6 @@
 Release-1.6.2
 -------------
+- BUG#21327864 : mysqldbimport utility failing with error 1694 with mysql 5.7.7
 - BUG#20960564 : mysqlindexcheck raises an AttributeError
 - BUG#20953870 : mysqldbexport requires select to mysql even with --skip=procedures,functions
 - BUG#20817994 : mysqluc considers 'home' button as 'h' and 'end' button as 'f'
