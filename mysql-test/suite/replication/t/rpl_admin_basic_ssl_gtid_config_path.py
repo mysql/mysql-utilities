@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -458,6 +458,9 @@ class test(rpl_admin.test):
                                            3)
 
         self.remove_result("          Replicate_Rewrite_DB :")
+
+        # Remove slave_master_info data available for servers starting 5.7.6.
+        self.remove_result("                  Channel_Name :")
 
     def get_result(self):
         return self.compare(__name__, self.results)

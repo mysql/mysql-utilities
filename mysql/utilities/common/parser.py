@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -290,37 +290,37 @@ class GeneralQueryLog(LogParserBase):
         self._cached_logentry = None
 
         self._commands = {
-            #'Sleep': None,
+            # 'Sleep': None,
             'Quit': self._handle_quit,
             'Init DB': self._handle_init_db,
             'Query': self._handle_multi_line,
-            #'Field List': None,
-            #'Create DB': None,
-            #'Drop DB': None,
-            #'Refresh': None,
-            #'Shutdown': None,
-            #'Statistics': None,
-            #'Processlist': None,
+            # 'Field List': None,
+            # 'Create DB': None,
+            # 'Drop DB': None,
+            # 'Refresh': None,
+            # 'Shutdown': None,
+            # 'Statistics': None,
+            # 'Processlist': None,
             'Connect': self._handle_connect,
-            #'Kill': None,
-            #'Debug': None,
-            #'Ping': None,
-            #'Time': None,
-            #'Delayed insert': None,
-            #'Change user': None,
-            #'Binlog Dump': None,
-            #'Table Dump': None,
-            #'Connect Out': None,
-            #'Register Slave': None,
+            # 'Kill': None,
+            # 'Debug': None,
+            # 'Ping': None,
+            # 'Time': None,
+            # 'Delayed insert': None,
+            # 'Change user': None,
+            # 'Binlog Dump': None,
+            # 'Table Dump': None,
+            # 'Connect Out': None,
+            # 'Register Slave': None,
             'Prepare': self._handle_multi_line,
             'Execute': self._handle_multi_line,
-            #'Long Data': None,
-            #'Close stmt': None,
-            #'Reset stmt': None,
-            #'Set option': None,
+            # 'Long Data': None,
+            # 'Close stmt': None,
+            # 'Reset stmt': None,
+            # 'Set option': None,
             'Fetch': self._handle_multi_line,
-            #'Daemon': None,
-            #'Error': None,
+            # 'Daemon': None,
+            # 'Error': None,
         }
 
     def _new_session(self, session_id):

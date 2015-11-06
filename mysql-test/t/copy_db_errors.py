@@ -56,6 +56,8 @@ class test(copy_db.test):
                                 "'joe'@'localhost' WITH GRANT OPTION")
         self.server2.exec_query("GRANT SUPER, CREATE USER ON *.* TO "
                                 "'joe'@'localhost'")
+        self.server2.exec_query(
+            "GRANT SELECT ON mysql.* TO 'joe'@'localhost'")
         return True
 
     def run(self):
@@ -225,6 +227,7 @@ class test(copy_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         self.server2.exec_query("GRANT SUPER ON *.* TO 'sam'@'localhost'")
+        self.server2.exec_query("GRANT SELECT ON mysql.* TO 'sam'@'localhost'")
 
         test_num += 1
         comment = ("Test case {0} - dest user has privileges "

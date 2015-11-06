@@ -42,15 +42,15 @@ if sys.version_info[0:2] not in [(2, 6), (2, 7)]:
 
 COMMANDS = {
     'cmdclass': {
-        },
-    }
+    },
+}
 
 # Custom DistUtils command
 try:
-    from support.distribution.commands import (dist_deb, dist_rpm, bdist,
-                                               build, sdist)
+    from internal.packaging.commands import (dist_deb, dist_rpm, bdist,
+                                             build, sdist)
 except ImportError:
-    pass # Use default when not available
+    pass  # Use default when not available
 else:
     COMMANDS['cmdclass'].update({
         'sdist': sdist.GenericSourceGPL,
@@ -66,11 +66,11 @@ else:
 
 if platform.uname()[0] == 'Darwin':
     try:
-        from support.distribution.commands.dist_osx import (
+        from internal.packaging.commands.dist_osx import (
             BuildDistOSX,
             BuildDistOSXcom
         )
-                                      
+
     except ImportError:
         pass
     else:
@@ -81,7 +81,7 @@ if platform.uname()[0] == 'Darwin':
 
 if platform.uname()[0] == 'SunOS':
     try:
-        from support.distribution.commands.dist_solaris import (
+        from internal.packaging.commands.dist_solaris import (
             BuildDistSunOS,
             BuildDistSunOScom
         )
@@ -117,8 +117,8 @@ class install(_install):
     """Install MySQL Utilities"""
     user_options = _install.user_options + [
         ("skip-profile", None, "Skip installing a profile script"),
-        ]
-
+    ]
+    skip_profile = None
     boolean_options = _install.boolean_options + ['skip-profile']
 
     def initialize_options(self):
@@ -135,8 +135,12 @@ class install(_install):
 
 
 class install_man(distutils.core.Command):
+    """install_man"""
     description = "Install Unix manual pages"
-
+    root = None
+    prefix = None
+    record = None
+    _outfiles = []
     user_options = [
         ('prefix=', None, 'installation prefix (default /usr/share/man)'),
         ('root=', None,
@@ -147,16 +151,14 @@ class install_man(distutils.core.Command):
 
     def initialize_options(self):
         """Initialize options"""
-        self.root = None
-        self.prefix = None
-        self.record = None
+        pass
 
     def finalize_options(self):
         """Finalize options"""
         self.set_undefined_options('install',
                                    ('root', 'root'),
-                                   ('record', 'record')
-                                   )
+                                   ('record', 'record'))
+
         if not self.prefix:
             self.prefix = '/usr/share/man'
 
@@ -172,13 +174,13 @@ class install_man(distutils.core.Command):
             src_man = os.path.join(srcdir, man)
             section = os.path.splitext(man)[1][1:]
             dest_dir = os.path.join(self.prefix, 'man' + section)
-            self.mkpath(dest_dir) # Could be different section
+            self.mkpath(dest_dir)  # Could be different section
             dest_man = os.path.join(dest_dir, man)
             self.copy_file(src_man, dest_man)
             self._outfiles.append(dest_man)
 
         # Disabled, done in the RPM spec
-        #self._write_record()
+        # self._write_record()
 
     def _write_record(self):
         """Write list of installed files"""
@@ -196,13 +198,15 @@ class install_man(distutils.core.Command):
                 f.write(line + "\n")
 
     def get_outputs(self):
+        """Returns the list of installed files"""
         return self._outfiles
 
 
 class install_scripts(_install):
     """Install MySQL Utilities scripts"""
     description = "Install the Shell Profile (Linux/Unix)"
-
+    skip_profile = False
+    install_dir = None
     user_options = _install.user_options + [
         ('root=', None,
          "install everything relative to this alternate root directory"),
@@ -292,6 +296,8 @@ class build_scripts(_build_scripts):
     3. Call run method in `distutils.command.build_scripts`.
     4. Restore the scripts list to the old value, for other commands
        to use."""
+    outfiles = []
+    scripts = []
 
     def run(self):
         if not self.scripts:
@@ -316,7 +322,6 @@ class build_scripts(_build_scripts):
         _build_scripts.run(self)
         self.outfiles = self.scripts
         self.scripts = saved_scripts
-        
 
     def get_outputs(self):
         """Get installed files"""
@@ -324,16 +329,19 @@ class build_scripts(_build_scripts):
 
 
 COMMANDS['cmdclass'].update({
-        'install': install,
-        })
+    'install': install,
+})
 
 
 # We need to edit the configuration file before installing it
 class install_data(_install_data):
+    """Install data and edits the configuration file before installing it"""
+    user = None
+    home = None
+    data_files = None
+
     def initialize_options(self):
         _install_data.initialize_options(self)
-        self.user = None
-        self.home = None
 
     def finalize_options(self):
         self.set_undefined_options('install',
@@ -383,15 +391,14 @@ class install_data(_install_data):
                 # directories to the config file.
                 if fnmatch.fnmatch(filename, 'data/*.cfg.in'):
                     config = ConfigParser.RawConfigParser({
-                            'prefix': '', # install_dir,
-                            'logdir': install_logdir,
-                            'sysconfdir': install_sysconfdir,
-                            })
+                        'prefix': '',  # install_dir,
+                        'logdir': install_logdir,
+                        'sysconfdir': install_sysconfdir,
+                    })
                     config.readfp(open(filename))
-                    #filename = os.path.split(os.path.splitext(filename)[0])[1]
                     filename = os.path.splitext(filename)[0]
                     config.write(open(filename, "w"))
-                    # change directory 'fabric'to mysql 
+                    # change directory 'fabric' to mysql
                 directory = os.path.join(install_sysconfdir, 'mysql')
                 data_files.append((directory, filename))
             new_data_files.extend(data_files)
@@ -403,26 +410,25 @@ class install_data(_install_data):
         #   --> [('bar', [2, 5]), ('foo', [1, 3, 4])]
         data_files.sort()
         data_files = [
-            (d, [ f[1] for f in fs ]) for d, fs in 
-                groupby(new_data_files, key=lambda x: x[0])
+            (d, [f[1] for f in fs]) for d, fs in groupby(new_data_files,
+                                                         key=lambda x: x[0])
             ]
         self.data_files = data_files
         _install_data.run(self)
 
 
 COMMANDS['cmdclass'].update({
-        'install_data': install_data,
-        })
+    'install_data': install_data,
+})
 
 
 if os.name != "nt":
     COMMANDS['cmdclass'].update({
         'build_scripts': build_scripts,
         'install_man': install_man,
-        })
+    })
 
 ARGS.update(META_INFO)
 ARGS.update(INSTALL)
 ARGS.update(COMMANDS)
 setup(**ARGS)
-

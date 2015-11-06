@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -99,6 +99,11 @@ class test(mutlib.System_test):
                             "      slow_query_log_file: XXXX\n")
         self.replace_result(" slow_query_log_file_size:",
                             " slow_query_log_file_size: XXXX\n")
+        # Remove warning that appears only on 5.7 and which is not important
+        # for the sake of this test.
+        self.remove_result_and_lines_around(
+            "WARNING: Unable to get size information from 'stderr' "
+            "for 'error log'.", lines_before=3, lines_after=1)
 
     def start_stop_newserver(self, delete_log=True, stop_server=True):
         """Start and stop new server.
@@ -198,7 +203,7 @@ class test(mutlib.System_test):
                                          quote_char))
         comment = ("Test case {0} - re-started server prints "
                    "results ".format(test_num))
-        #cmd_str_wrong = cmd_str.replace("root:root", "wrong:wrong")
+        # cmd_str_wrong = cmd_str.replace("root:root", "wrong:wrong")
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

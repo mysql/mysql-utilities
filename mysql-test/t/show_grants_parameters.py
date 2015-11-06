@@ -188,6 +188,63 @@ class test(show_grants.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - show grants for all objects of a database"
+                   " using wildcard and --inherit-level=global option"
+                   "".format(test_num))
+        cmd = "{0} util_test.* --inherit-level=global".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - show grants of a database including all "
+                   "objects using wildcard and --inherit-level=global option"
+                   "".format(test_num))
+        cmd = ("{0} util_test util_test.* --inherit-level=global"
+               "".format(cmd_base))
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - show grants for all objects of a database"
+                   " using wildcard and --inherit-level=database option"
+                   "".format(test_num))
+        cmd = "{0} util_test.* --inherit-level=database".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - show grants of a database including all "
+                   "objects using wildcard and --inherit-level=database option"
+                   "".format(test_num))
+        cmd = ("{0} util_test util_test.* --inherit-level=database"
+               "".format(cmd_base))
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - show grants for all objects of a database"
+                   " using wildcard and --inherit-level=object option"
+                   "".format(test_num))
+        cmd = "{0} util_test.* --inherit-level=object".format(cmd_base)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - show grants of a database including all "
+                   "objects using wildcard and --inherit-level=object option"
+                   "".format(test_num))
+        cmd = ("{0} util_test util_test.* --inherit-level=object"
+               "".format(cmd_base))
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.do_masks()
         return True
 

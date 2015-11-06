@@ -72,6 +72,9 @@ PROCEDURE_TYPE = 'PROCEDURE'
 ROUTINE_TYPE = 'ROUTINE'
 FUNCTION_TYPE = 'FUNCTION'
 GLOBAL_TYPE = 'GLOBAL'
+GLOBAL_LEVEL = 3
+DATABASE_LEVEL = 2
+OBJECT_LEVEL = 1
 
 ALL_PRIVS_LOOKUP_DICT = {PROCEDURE_TYPE: _ROUTINE_ALL_PRIVS,
                          ROUTINE_TYPE: _ROUTINE_ALL_PRIVS,
@@ -248,20 +251,22 @@ def filter_grants(grant_set, obj_type_str):
     return grant_set.intersection(all_privs_set)
 
 
-def _build_privilege_dicts(server, obj_type_dict):
+def _build_privilege_dicts(server, obj_type_dict, inherit_level=GLOBAL_LEVEL):
     """Builds TABLE, ROUTINE and DB dictionaries with grantee privileges
 
     server[in]        Server class instance
     obj_type_dict[in] dictionary with the list of objects to obtain the
                       grantee and respective grant information, organized
-                      by object type.
+                      by object type
+    inherit_level[in] Level of inheritance that should be taken into account.
+                      It must be one of GLOBAL_LEVEL, DATABASE_LEVEL or
+                      OBJECT_LEVEL
 
     This method builds and returns the 3 dictionaries with grantee
     information taking into account the grant hierarchy from mysql, i.e.
     global grants apply to all objects and database grants apply to all
     the database objects (tables, procedures and functions).
     """
-
     # Get the global Grants:
     global_grantee_lst = get_global_privs(server)
     # Build the Database level grants dict.
@@ -271,10 +276,12 @@ def _build_privilege_dicts(server, obj_type_dict):
         db_privs_lst = get_db_privs(server, db_name)
         for grantee, priv_set in db_privs_lst:
             db_grantee_dict[db_name][grantee] = priv_set
-        # Global privileges also apply to the database level.
-        for grantee, priv_set in global_grantee_lst:
-            db_grantee_dict[db_name][grantee].update(
-                filter_grants(priv_set, DATABASE_TYPE))
+        if inherit_level >= GLOBAL_LEVEL:
+            # If global inheritance level is turned on, global privileges
+            # also apply to the database level.
+            for grantee, priv_set in global_grantee_lst:
+                db_grantee_dict[db_name][grantee].update(
+                    filter_grants(priv_set, DATABASE_TYPE))
 
     # Build the table Level grants dict.
     # {db_name: {tbl_name: {grantee: set(privileges)}}}
@@ -286,24 +293,26 @@ def _build_privilege_dicts(server, obj_type_dict):
         for grantee, priv_set in tbl_privs_lst:
             table_grantee_dict[db_name][tbl_name][grantee] = priv_set
         # Existing db and global_grantee level privileges also apply to
-        # the table level.
-        # If we already have the privileges for the database where the
-        # table is at, we can use that information.
-        if db_grantee_dict[db_name]:
-            for grantee, priv_set in db_grantee_dict[db_name].iteritems():
-                table_grantee_dict[db_name][tbl_name][grantee].update(
-                    filter_grants(priv_set, TABLE_TYPE))
-        else:
-            # Get the grant information for the db the table is at and
-            # merge it together with global grants.
-            db_privs_lst = get_db_privs(server, db_name)
-            for grantee, priv_set in db_privs_lst:
-                table_grantee_dict[db_name][tbl_name][grantee].update(
-                    filter_grants(priv_set, TABLE_TYPE))
-            # Now do the same with global grants
-            for grantee, priv_set in global_grantee_lst:
-                table_grantee_dict[db_name][tbl_name][grantee].update(
-                    filter_grants(priv_set, TABLE_TYPE))
+        # the table level if inherit level is database level or higher
+        if inherit_level >= DATABASE_LEVEL:
+            # If we already have the privileges for the database where the
+            # table is at, we can use that information.
+            if db_grantee_dict[db_name]:
+                for grantee, priv_set in db_grantee_dict[db_name].iteritems():
+                    table_grantee_dict[db_name][tbl_name][grantee].update(
+                        filter_grants(priv_set, TABLE_TYPE))
+            else:
+                # Get the grant information for the db the table is at and
+                # merge it together with database grants.
+                db_privs_lst = get_db_privs(server, db_name)
+                for grantee, priv_set in db_privs_lst:
+                    table_grantee_dict[db_name][tbl_name][grantee].update(
+                        filter_grants(priv_set, TABLE_TYPE))
+                # Now do the same with global grants
+                if inherit_level >= GLOBAL_LEVEL:
+                    for grantee, priv_set in global_grantee_lst:
+                        table_grantee_dict[db_name][tbl_name][grantee].update(
+                            filter_grants(priv_set, TABLE_TYPE))
 
     # Build the ROUTINE Level grants dict.
     # {db_name: {proc_name: {user: set(privileges)}}}
@@ -314,24 +323,26 @@ def _build_privilege_dicts(server, obj_type_dict):
         for grantee, priv_set in proc_privs_lst:
             proc_grantee_dict[db_name][proc_name][grantee] = priv_set
         # Existing db and global_grantee level privileges also apply to
-        # the routine level.
-        # If we already have the privileges for the database where the
-        # routine is at, we can use that information.
-        if db_grantee_dict[db_name]:
-            for grantee, priv_set in db_grantee_dict[db_name].iteritems():
-                proc_grantee_dict[db_name][proc_name][grantee].update(
-                    filter_grants(priv_set, ROUTINE_TYPE))
-        else:
-            # Get the grant information for the db the routine belongs to
-            #  and merge it together with global grants.
-            db_privs_lst = get_db_privs(server, db_name)
-            for grantee, priv_set in db_privs_lst:
-                proc_grantee_dict[db_name][proc_name][grantee].update(
-                    filter_grants(priv_set, ROUTINE_TYPE))
-            # Now do the same with global grants.
-            for grantee, priv_set in global_grantee_lst:
-                proc_grantee_dict[db_name][proc_name][grantee].update(
-                    filter_grants(priv_set, ROUTINE_TYPE))
+        # the routine level if inherit level is database level or higher
+        if inherit_level >= DATABASE_LEVEL:
+            # If we already have the privileges for the database where the
+            # routine is at, we can use that information.
+            if db_grantee_dict[db_name]:
+                for grantee, priv_set in db_grantee_dict[db_name].iteritems():
+                    proc_grantee_dict[db_name][proc_name][grantee].update(
+                        filter_grants(priv_set, ROUTINE_TYPE))
+            else:
+                # Get the grant information for the db the routine belongs to
+                #  and merge it together with global grants.
+                db_privs_lst = get_db_privs(server, db_name)
+                for grantee, priv_set in db_privs_lst:
+                    proc_grantee_dict[db_name][proc_name][grantee].update(
+                        filter_grants(priv_set, ROUTINE_TYPE))
+                # Now do the same with global grants.
+                if inherit_level >= GLOBAL_LEVEL:
+                    for grantee, priv_set in global_grantee_lst:
+                        proc_grantee_dict[db_name][proc_name][grantee].update(
+                            filter_grants(priv_set, ROUTINE_TYPE))
 
     # TODO Refactor the code below to remove code repetition.
 
@@ -397,7 +408,8 @@ def _has_all_privileges(query_priv_set, grantee_priv_set, obj_type):
     return query_priv_set.issubset(grantee_priv_set)
 
 
-def get_grantees(server, valid_obj_type_dict, req_privileges=None):
+def get_grantees(server, valid_obj_type_dict, req_privileges=None,
+                 inherit_level=GLOBAL_LEVEL):
     """Get grantees and respective grants for the specified objects.
 
     server[in]            Server class instance
@@ -405,11 +417,14 @@ def get_grantees(server, valid_obj_type_dict, req_privileges=None):
                           by object type. We assume that each object exists
                           on the server
     req_privileges[in]    Optional set of required privileges
+    inherit_level[in]     Level of inheritance that should be taken into
+                          account. It must be one of GLOBAL_LEVEL,
+                          DATABASE_LEVEL or OBJECT_LEVEL
     """
 
     # Build the privilege dicts
     db_dict, table_dict, proc_dict = _build_privilege_dicts(
-        server, valid_obj_type_dict)
+        server, valid_obj_type_dict, inherit_level)
 
     # Build final dict with grantee/grant information, taking into account
     # required privileges

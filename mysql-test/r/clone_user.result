@@ -4,7 +4,7 @@ Test case 1 - clone a single user joe_pass@user to a single user: jill@user
 # Cloning 1 users...
 # Cloning joe_pass@user to user jill:duh@user 
 # ...done.
-GRANT USAGE ON *.* TO 'jill'@'user' IDENTIFIED BY PASSWORD '*76293EBE39BB165EF83BE0C62A146506D85FDBD2'
+GRANT USAGE ON *.* TO 'jill'@'user'
 GRANT SELECT ON `util_test`.* TO 'jill'@'user'
 Test case 2 - clone a single user amy_nopass@user to multiple users: jack@user and john@user
 # Source on XXXX-XXXX: ... connected.
@@ -13,7 +13,7 @@ Test case 2 - clone a single user amy_nopass@user to multiple users: jack@user a
 # Cloning amy_nopass@user to user jack:duh@user 
 # Cloning amy_nopass@user to user john@user 
 # ...done.
-GRANT USAGE ON *.* TO 'jack'@'user' IDENTIFIED BY PASSWORD '*76293EBE39BB165EF83BE0C62A146506D85FDBD2'
+GRANT USAGE ON *.* TO 'jack'@'user'
 GRANT INSERT ON `util_test`.* TO 'jack'@'user'
 GRANT USAGE ON *.* TO 'john'@'user'
 GRANT INSERT ON `util_test`.* TO 'john'@'user'
@@ -42,7 +42,7 @@ Test case 6 - show clone without --include-global-privileges
 # Cloning joe_pass@user to user joe_nopass@user 
 DROP USER 'joe_nopass'@'user' 
 CREATE USER 'joe_nopass'@'user' 
-GRANT USAGE ON *.* TO 'joe_nopass'@'user' 
+GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT SELECT ON `util_test`.* TO 'joe_nopass'@'user'
 # ...done.
 Test case 7 - show clone with --include-global-privileges
@@ -52,10 +52,10 @@ Test case 7 - show clone with --include-global-privileges
 # Cloning joe_pass@user to user joe_nopass@user 
 DROP USER 'joe_nopass'@'user' 
 CREATE USER 'joe_nopass'@'user' 
-GRANT USAGE ON *.* TO 'joe_nopass'@'user' 
+GRANT USAGE ON *.* TO 'joe_nopass'@'user'
 GRANT SELECT ON `util_test`.* TO 'joe_nopass'@'user'
-GRANT USAGE ON *.* TO 'joe_pass'@'%'
-GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_pass'@'%'
+GRANT USAGE ON *.* TO 'joe_nopass'@'user'
+GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_nopass'@'user'
 # ...done.
 Test case 8 - clone a single user joe_pass@user to a single user: jill@user with only source specified
 # Source on XXXX-XXXX: ... connected.
@@ -80,12 +80,12 @@ Test case 10 - mysqluserclone --dump with --destination
 WARNING: The --destination option is not required for '--dump' (option ignored).
 # Source on XXXX-XXXX: ... connected.
 # Dumping grants for user joe_pass@user
-GRANT USAGE ON *.* TO 'joe_pass'@'user' IDENTIFIED BY PASSWORD '*6DA88CFC20231681AB7287BB201D08136A9A7369'
+GRANT USAGE ON *.* TO 'joe_pass'@'user'
 GRANT SELECT ON `util_test`.* TO 'joe_pass'@'user'
 GRANT USAGE ON *.* TO 'joe_pass'@'%'
 GRANT ALL PRIVILEGES ON `util_test`.* TO 'joe_pass'@'%'
 Test case 11 - mysqluserclone --dump user with global privileges
 # Source on XXXX-XXXX: ... connected.
 # Dumping grants for user remote@%
-GRANT USAGE ON *.* TO 'remote'@'%' IDENTIFIED BY PASSWORD '*F98F1930C34C35152FBCC939712A7A908664F013'
+GRANT USAGE ON *.* TO 'remote'@'%'
 GRANT SELECT ON `util_test`.* TO 'remote'@'%'

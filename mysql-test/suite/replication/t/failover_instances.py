@@ -143,7 +143,6 @@ class test(failover.test):
             print comment
             print "# First instance:", failover_cmd1
             print "# Second instance:", failover_cmd2
-
         proc1, f_out1 = failover.test.start_process(self, failover_cmd1)
         self._poll_console(True, "first", proc1, comment)
 

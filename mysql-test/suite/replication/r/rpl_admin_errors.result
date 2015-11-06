@@ -147,17 +147,14 @@ Test case 30 - Switchover using a wrong slave and with --force
 | localhost  | PORT5  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-Test case 31 - Switchover using with --force and user does not have grant priv
-# ERROR: ERROR: Cannot grant replication slave to replication user.
-Test case 32 - Connect failure
+Test case 31 - Connect failure
 ERROR: Can't connect to XXXXXXX
-Error found in log file. 
-Test case 33 - script passed to the '--exec-after' option does not exist
+Test case 32 - script passed to the '--exec-after' option does not exist
 WARNING: The --master option is not required for 'failover' (option ignored).
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: 'std_data/does_not_exist.bat' script cannot be found. Please check the path and filename for accuracy and try again.
-Test case 34 - script passed to the '--exec-before' option does not exist
+Test case 33 - script passed to the '--exec-before' option does not exist
 WARNING: The --master option is not required for 'failover' (option ignored).
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 

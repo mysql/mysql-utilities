@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -117,7 +117,7 @@ class test(export_parameters_def.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        ## Mask known source.
+        # Mask known source.
         self.replace_result("# Source on localhost: ... connected.",
                             "# Source on XXXX-XXXX: ... connected.\n")
         self.replace_result("# Source on [::1]: ... connected.",

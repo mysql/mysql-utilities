@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -148,6 +148,31 @@ class test(mutlib.System_test):
         comment = ("Test case {0} - test transform for renamed "
                    "table ".format(test_num))
         res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        cmd_str = ("mysqldiff.py {0} {1} util_test.t6:util_test.t6 --force "
+                   "--difftype=sql".format(s1_conn, s2_conn))
+
+        # Add DEFAULT '' for testing issue reported in BUG#20227070
+        self.server2.exec_query("ALTER TABLE util_test.t6 CHANGE COLUMN a "
+                                "a char(30) NOT NULL DEFAULT ''")
+
+        test_num += 1
+        comment = ("Test case {0} - test transform for column with default '' "
+                   "for --changes-for=server1".format(test_num))
+        res = self.run_test_case(1,
+                                 "{0} --changes-for=server1".format(cmd_str),
+                                 comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - test transform for column with default '' "
+                   "for --changes-for=server2".format(test_num))
+        res = self.run_test_case(1,
+                                 "{0} --changes-for=server2".format(cmd_str),
+                                 comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

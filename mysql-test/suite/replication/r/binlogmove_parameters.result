@@ -11,13 +11,13 @@ Options:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>] or <config-
                         path>[<[group]>].
-  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+  --ssl-ca=SSL_CA       path to a file that contains a list of trusted SSL
                         CAs.
-  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+  --ssl-cert=SSL_CERT   name of the SSL certificate file to use for
                         establishing a secure connection.
-  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+  --ssl-key=SSL_KEY     name of the SSL key file to use for establishing a
                         secure connection.
-  --ssl=SSL             Specifies if the server connection requires use of
+  --ssl=SSL             specifies if the server connection requires use of
                         SSL. If an encrypted connection cannot be established,
                         the connection attempt fails. By default 0 (SSL not
                         required).
@@ -172,13 +172,13 @@ File moved: 'slave1-bin.000004' (index updated: True)
 File moved: 'slave1-bin.000005' (index updated: True)
 
 Test case 7c - SHOW BINARY LOGS (flush performed):
-file: slave1-bin.000001, size: 1??;
-file: slave1-bin.000002, size: 1??;
-file: slave1-bin.000003, size: 1??;
-file: slave1-bin.000004, size: 1??;
-file: slave1-bin.000005, size: 1??;
-file: slave1-bin.000006, size: 1??;
-file: slave1-bin.000007, size: 1??;
+file: slave1-bin.000001, size: ???;
+file: slave1-bin.000002, size: ???;
+file: slave1-bin.000003, size: ???;
+file: slave1-bin.000004, size: ???;
+file: slave1-bin.000005, size: ???;
+file: slave1-bin.000006, size: ???;
+file: slave1-bin.000007, size: ???;
 Test case 7d - move files back.
 #
 # Moving bin-log files...
@@ -308,12 +308,12 @@ File moved: 'slave2-relay-bin.000015' (index updated: True)
 File moved: 'slave2-relay-bin.000016' (index updated: True)
 
 Test case 9c - SHOW BINARY LOGS (flush skipped):
-file: slave2-bin.000001, size: 0;
-file: slave2-bin.000002, size: 0;
-file: slave2-bin.000003, size: 0;
-file: slave2-bin.000004, size: 0;
-file: slave2-bin.000005, size: 0;
-file: slave2-bin.000006, size: 1??;
+file: slave2-bin.000001, size: ???;
+file: slave2-bin.000002, size: ???;
+file: slave2-bin.000003, size: ???;
+file: slave2-bin.000004, size: ???;
+file: slave2-bin.000005, size: ???;
+file: slave2-bin.000006, size: ???;
 Test case 9d - move files back.
 #
 # Moving bin-log files...

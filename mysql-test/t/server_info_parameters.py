@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,7 +95,8 @@ class test(server_info.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        cmd_opts = " --format=vertical --show-servers"
+        cmd_opts = (" --format=vertical --show-servers --port-range="
+                    "3306:{0}".format(self.servers.view_next_port()))
         comment = "Test case {0} - show servers".format(test_num)
         res = self.run_test_case(0, cmd_str + cmd_opts, comment)
         if not res:
@@ -134,6 +135,12 @@ class test(server_info.test):
         self.replace_result("|", "| XXXX ...|\n")
         self.replace_result("localhost:", "localhost:XXXX [...]\n")
         self.remove_result("#  Process id:")
+
+        # Remove warning that appears only on 5.7 and which is not important
+        # for the sake of this test.
+        self.remove_result_and_lines_around(
+            "WARNING: Unable to get size information from 'stderr' "
+            "for 'error log'.", lines_before=3, lines_after=1)
 
         return True
 

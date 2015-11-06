@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@ class test(rpl_sync.test):
         self.server1.exec_query('CREATE DATABASE `only_on_master_db`')
         self.server1.exec_query('SET SQL_LOG_BIN=1')
 
-         # Identify missing databases.
+        # Identify missing databases.
         test_num += 1
         comment = ("Test case {0} - identify missing database."
                    "").format(test_num)

@@ -23,7 +23,7 @@ import re
 
 
 # Regular expression to match a database object identifier (support backticks)
-REGEXP_OBJ_NAME = r'(`(?:[^`]|``)+`|\w+)'
+REGEXP_OBJ_NAME = r'(`(?:[^`]|``)+`|\w+|\*)'
 
 # Regular expression to match a qualified object identifier (with multiple
 # parts). Example: db.obj, db or obj

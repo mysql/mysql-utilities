@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -361,7 +361,7 @@ def _check_option_defaults(options):
     """
 
     for opt_name in _DEFAULT_OPTIONS:
-        if not opt_name in options:
+        if opt_name not in options:
             options[opt_name] = _DEFAULT_OPTIONS[opt_name]
 
 
@@ -531,6 +531,7 @@ def compare_all_databases(server1_val, server2_val, exclude_list, options):
         WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
         AND SCHEMA_NAME != 'PERFORMANCE_SCHEMA'
         AND SCHEMA_NAME != 'mysql'
+        AND SCHEMA_NAME != 'sys'
         {0}"""
     conditions = ""
     if exclude_list:

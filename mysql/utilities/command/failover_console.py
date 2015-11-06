@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ _DATE_LEN = 22
 
 _DROP_FC_TABLE = "DROP TABLE IF EXISTS mysql.failover_console"
 _CREATE_FC_TABLE = ("CREATE TABLE IF NOT EXISTS mysql.failover_console "
-                    "(host char(30), port char(10))")
+                    "(host char(255), port char(10))")
 _SELECT_FC_TABLE = ("SELECT * FROM mysql.failover_console WHERE host = '%s' "
                     "AND port = '%s'")
 _INSERT_FC_TABLE = "INSERT INTO mysql.failover_console VALUES ('%s', '%s')"

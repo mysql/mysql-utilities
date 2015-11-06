@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ _DEFAULT_MYSQL_OPTS = ' '.join(['"--log-bin=mysql-bin --skip-slave-start',
 
 _GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('{0}', {1})"
 
+_CREATE_USER = "CREATE USER 'rpl'@'rpl'"
 _GRANT_QUERY = "GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'rpl'"
 _SET_SQL_LOG_BIN = "SET SQL_LOG_BIN = {0}"
 
@@ -159,15 +160,19 @@ class test(rpl_admin.test):
         test_num = 1
 
         self.server2.exec_query(_SET_SQL_LOG_BIN.format('0'))
+        self.server2.exec_query(_CREATE_USER)
         self.server2.exec_query(_GRANT_QUERY)
         self.server2.exec_query(_SET_SQL_LOG_BIN.format('1'))
         self.server3.exec_query(_SET_SQL_LOG_BIN.format('0'))
+        self.server3.exec_query(_CREATE_USER)
         self.server3.exec_query(_GRANT_QUERY)
         self.server3.exec_query(_SET_SQL_LOG_BIN.format('1'))
         self.server4.exec_query(_SET_SQL_LOG_BIN.format('0'))
+        self.server4.exec_query(_CREATE_USER)
         self.server4.exec_query(_GRANT_QUERY)
         self.server4.exec_query(_SET_SQL_LOG_BIN.format('1'))
         self.server5.exec_query(_SET_SQL_LOG_BIN.format('0'))
+        self.server5.exec_query(_CREATE_USER)
         self.server5.exec_query(_GRANT_QUERY)
         self.server5.exec_query(_SET_SQL_LOG_BIN.format('1'))
 

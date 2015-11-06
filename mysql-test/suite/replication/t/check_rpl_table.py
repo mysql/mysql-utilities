@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -190,6 +190,13 @@ class test(replicate.test):
                             "Slave has read all relay log; waiting for",
                             "       Slave_SQL_Running_State : "
                             "Slave has read all relay log; waiting for ...\n")
+
+        # Remove slave_master_info data available for servers starting 5.7.6.
+        self.remove_result("                  Channel_Name :")
+
+        # Mask values of master information file that changed for 5.7 servers.
+        self.replace_result("                     Heartbeat :",
+                            "                     Heartbeat : XXXXX\n")
 
     def get_result(self):
         return self.compare(__name__, self.results)

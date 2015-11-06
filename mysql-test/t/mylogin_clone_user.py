@@ -137,6 +137,9 @@ class test(mutlib.System_test):
         # Mask known source and destination host name.
         self.replace_substring("on localhost", "on XXXX-XXXX")
         self.replace_substring("on [::1]", "on XXXX-XXXX")
+        # Mask password field on grant statements since it stopped appearing on
+        # versions >= 5.7.6
+        self.replace_substring_portion(" IDENTIFIED BY PASSWORD '", "'", "")
 
         return True
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ class test(import_basic.test):
             comment = ("Test Case {0} : Testing import with "
                        "{1} format and NAMES display").format(test_num, frmt)
             # We test DEFINITIONS and DATA only in other tests
-            self.run_import_test(1, from_conn, to_conn, 'util_test', frmt,
+            self.run_import_test(1, from_conn, to_conn, ['util_test'], frmt,
                                  "BOTH", comment, " --display=NAMES")
             self.drop_db(self.server2, "util_test")
             test_num += 1
@@ -202,7 +202,7 @@ class test(import_basic.test):
             comment = ("Test Case {0} : Testing import with {1} format and "
                        "NAMES display (using backticks)").format(test_num,
                                                                  frmt)
-            self.run_import_test(1, from_conn, to_conn, '`db``:db`',
+            self.run_import_test(1, from_conn, to_conn, ['`db``:db`'],
                                  frmt, "BOTH", comment, " --display=NAMES")
             self.drop_db(self.server2, '`db``:db`')
             test_num += 1

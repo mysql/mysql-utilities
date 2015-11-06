@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -260,9 +260,9 @@ class ServerList(object):
         self.cleanup_list = []         # List of files to remove at shutdown
         self.ports_in_use = []         # List of port numbers in use
         self.ports_freed = []          # List of ports that were used, but are
-                                       # now free to use again
+        # now free to use again
         self._next_port = startport    # port number to start looking for new
-                                       # unused ports
+        # unused ports
 
         if servers is None:
             self.server_list = []
@@ -1006,7 +1006,7 @@ class System_test(object):
         conn_str = "{0}".format(conn_val[0])
         if conn_val[1]:
             conn_str = "{0}:{1}".format(conn_str, conn_val[1])
-        if ":" in conn_val[2] and not "]" in conn_val[2]:
+        if ":" in conn_val[2] and "]" not in conn_val[2]:
             conn_str = "{0}@[{1}]:".format(conn_str, conn_val[2])
         else:
             conn_str = "{0}@{1}:".format(conn_str, conn_val[2])
@@ -1042,7 +1042,7 @@ class System_test(object):
         if passwd:
             conn_str = "{0}:{1}".format(conn_str, passwd)
         # Use the server values to build the remaining connection string.
-        if ":" in conn_val[2] and not "]" in conn_val[2]:
+        if ":" in conn_val[2] and "]" not in conn_val[2]:
             conn_str = "{0}@[{1}]:".format(conn_str, conn_val[2])
         else:
             conn_str = "{0}@{1}:".format(conn_str, conn_val[2])
@@ -1225,6 +1225,32 @@ class System_test(object):
         # Must remove lines in reverse order
         for linenum in range(len(linenums) - 1, - 1, - 1):
             self.results.pop(linenums[linenum])
+
+    # TODO Replace usages of remove_result_and_lines_after as well as usages
+    # of remove_result_and _lines_before with remove_result_and_lines_around
+    def remove_result_and_lines_around(self, prefix, lines_before=0,
+                                       lines_after=0):
+        """Remove prefix line from result as well as lines around it.
+        prefix[in]         starting prefix of string to mask
+        lines_before[in]   number of lines to remove before the prefix line.
+        lines_after[in]    number of lines to remove after the prefix line.
+        """
+        lines_to_remove = set()
+        for linenum, line in enumerate(self.results):
+            index = line.find(prefix)
+            if index == 0:
+                for line2rm in range(linenum - lines_before,
+                                     linenum + lines_after + 1):
+                    if line2rm > - 1:
+                        lines_to_remove.add(int(line2rm))
+
+        # Convert to list and sort in reverse order to remove those
+        # lines from the list
+        lines_to_remove = list(lines_to_remove)
+        lines_to_remove.sort(reverse=True)
+        # Must remove lines in reverse order
+        for linenum in lines_to_remove:
+            del(self.results[linenum])
 
     def remove_result_and_lines_after(self, prefix, lines=0):
         """Remove lines in the results and lines after prefix.
@@ -1546,7 +1572,7 @@ class System_test(object):
         return all(kill_results)
 
     @staticmethod
-    def drop_db(server, db):
+    def drop_db(server, db, debug=False):
         """Drops a database.
 
         server[in]     Server instance.
@@ -1561,7 +1587,10 @@ class System_test(object):
         try:
             q_db = quote_with_backticks(db)
             server.exec_query("DROP DATABASE {0}".format(q_db))
-        except UtilError:
+        except UtilError as err:
+            if debug:
+                print("ERROR dropping {0} database: {1}".format(db,
+                                                                err.errmsg))
             return False
         return True
 

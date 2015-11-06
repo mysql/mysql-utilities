@@ -419,7 +419,7 @@ class test(binlogmove.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         # Mask non-deterministic data.
-        self.replace_substring_portion(", size: 1", ";", ", size: 1??;")
+        self.replace_substring_portion(", size: ", ";", ", size: ???;")
         # Remove version information.
         self.remove_result_and_lines_after("MySQL Utilities mysqlbinlogmove"
                                            " version", 1)

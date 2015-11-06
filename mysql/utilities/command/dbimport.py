@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import csv
 import re
 import sys
 
-from itertools import imap
+from collections import defaultdict
 
 from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.database import Database
@@ -48,7 +48,8 @@ _DATA_COMMANDS = ["INSERT", "UPDATE"]
 _RPL_COMMANDS = ["START", "STOP", "CHANGE"]
 _RPL_PREFIX = "-- "
 _RPL = len(_RPL_PREFIX)
-_GTID_COMMANDS = ["SET @MYSQLUTILS_TEMP_L", "SET @@SESSION.SQL_LOG_",
+_SQL_LOG_BIN_CMD = "SET @@SESSION.SQL_LOG_"
+_GTID_COMMANDS = ["SET @MYSQLUTILS_TEMP_L", _SQL_LOG_BIN_CMD,
                   "SET @@GLOBAL.GTID_PURG"]
 _GTID_PREFIX = 22
 _GTID_SKIP_WARNING = ("# WARNING: GTID commands are present in the import "
@@ -211,8 +212,9 @@ def _read_row(file_h, fmt, skip_comments=False):
                     yield new_row
             else:
                 if (len(row[0]) == 0 or row[0][0] != '#' or
-                   row[0][0:2] != "--") or ((row[0][0] == '#' or
-                   row[0][0:2] == "--") and not skip_comments):
+                    row[0][0:2] != "--") or ((row[0][0] == '#' or
+                                              row[0][0:2] == "--") and
+                                             not skip_comments):
                     yield row
 
     if warnings_found:
@@ -261,6 +263,9 @@ def read_next(file_h, fmt):
     cmd_type = ""
     multiline = False
     delimiter = ';'
+    skip_next_line = False
+    first_occurrence = True
+    previous_cmd_type = None
     if fmt == "sql":
         sql_cmd = ""
         for row in _read_row(file_h, "sql", True):
@@ -362,6 +367,7 @@ def read_next(file_h, fmt):
             if row[0][0:_RPL] == _RPL_PREFIX and first_word in _RPL_COMMANDS:
                 # join the parts if CSV or TAB
                 if fmt in ['csv', 'tab']:
+                    # pylint: disable=E1310
                     yield("RPL_COMMAND", ", ".join(row).strip("--"))
                 else:
                     yield("RPL_COMMAND", row[0][_RPL:])
@@ -395,6 +401,19 @@ def read_next(file_h, fmt):
                 if found_obj != "":
                     break
             if found_obj != "":
+                # For files with multiple databases, metadata about the
+                # cmd_types appears more than once. Each time we are at a new
+                # cmd_type we keep the first occurrence of such metadata and
+                # ignore the rest of the occurrences.
+
+                # reset the first_occurrence flag each time we change cmd_type
+                if previous_cmd_type is None or previous_cmd_type != cmd_type:
+                    first_occurrence = True
+                    previous_cmd_type = cmd_type
+                if first_occurrence:
+                    first_occurrence = False
+                else:
+                    skip_next_line = True
                 continue
             else:
                 # We're reading rows here
@@ -402,7 +421,12 @@ def read_next(file_h, fmt):
                    and (row[0][0] == "#" or row[0][0:2] == "--")):
                     continue
                 else:
-                    yield (cmd_type, row)
+                    # skip column_names only if we're not dealing with DATA
+                    if skip_next_line and cmd_type != 'DATA':
+                        skip_next_line = False
+                        continue
+                    else:
+                        yield (cmd_type, row)
 
 
 def _get_db(row):
@@ -462,83 +486,158 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
 
     create_str = "CREATE TABLE %s.%s (\n" % (db_name, tbl_name)
     stop = len(columns)
-    pri_keys = []
-    keys = []
-    key_str = ""
+    pri_keys = set()
+    keys = set()
+    key_constraints = defaultdict(set)
     col_name_index = col_ref.get("COLUMN_NAME", 0)
     col_type_index = col_ref.get("COLUMN_TYPE", 1)
     is_null_index = col_ref.get("IS_NULLABLE", 2)
     def_index = col_ref.get("COLUMN_DEFAULT", 3)
     col_key_index = col_ref.get("COLUMN_KEY", 4)
-    const_name_index = col_ref.get("CONSTRAINT_NAME", 7)
+    const_name_index = col_ref.get("KEY_CONSTRAINT_NAME", 12)
     ref_tbl_index = col_ref.get("REFERENCED_TABLE_NAME", 8)
-    ref_schema_index = col_ref.get("REFERENCED_TABLE_SCHEMA", 18)
+    ref_schema_index = col_ref.get("REFERENCED_TABLE_SCHEMA", 14)
     ref_col_index = col_ref.get("COL_NAME", 13)
     ref_col_ref = col_ref.get("REFERENCED_COLUMN_NAME", 15)
-    constraints = []
+    ref_const_name = col_ref.get("CONSTRAINT_NAME", 7)
+    update_rule = col_ref.get("UPDATE_RULE", 10)
+    delete_rule = col_ref.get("DELETE_RULE", 11)
+    used_columns = set()
     for column in range(0, stop):
         cur_col = columns[column]
         # Quote column name with backticks if needed
         col_name = cur_col[col_name_index]
         if not is_quoted_with_backticks(col_name):
             col_name = quote_with_backticks(col_name)
-        create_str = "%s  %s %s" % (create_str, col_name,
-                                    cur_col[col_type_index])
-        if cur_col[is_null_index].upper() != "YES":
-            create_str += " NOT NULL"
-        if len(cur_col[def_index]) > 0 and \
-                cur_col[def_index].upper() != "NONE":
-            create_str += " DEFAULT %s" % cur_col[def_index]
-        elif cur_col[is_null_index].upper == "YES":
-            create_str += " DEFAULT NULL"
+        if col_name not in used_columns:
+            # Only add the column definitions to the CREATE string once.
+            change_line = ",\n" if column > 0 else ""
+            create_str = "{0}{1}  {2} {3}".format(create_str, change_line,
+                                                  col_name,
+                                                  cur_col[col_type_index])
+            if cur_col[is_null_index].upper() != "YES":
+                create_str += " NOT NULL"
+            if len(cur_col[def_index]) > 0 and \
+                    cur_col[def_index].upper() != "NONE":
+                create_str += " DEFAULT %s" % cur_col[def_index]
+            elif cur_col[is_null_index].upper == "YES":
+                create_str += " DEFAULT NULL"
+            # Add column to set of columns already used for the CREATE string.
+            used_columns.add(col_name)
+
         if len(cur_col[col_key_index]) > 0:
             if cur_col[col_key_index] == "PRI":
-                pri_keys.append(cur_col[col_name_index])
+                if cur_col[const_name_index] in ('`PRIMARY`', 'PRIMARY'):
+                    pri_keys.add(cur_col[ref_col_index])
             else:
-                keys.append(cur_col[col_name_index])
-        if column + 1 < stop:
-            create_str += ",\n"
+                if cur_col[const_name_index] not in ('`PRIMARY`', 'PRIMARY'):
+                    keys.add(
+                        (col_name, cur_col[col_key_index])
+                    )
+                    if cur_col[ref_col_index].startswith(col_name) and \
+                        (not cur_col[ref_const_name] or
+                         cur_col[ref_const_name] == cur_col[const_name_index]):
+                        key_constraints[col_name].add(
+                            (cur_col[const_name_index],
+                             cur_col[ref_schema_index], cur_col[ref_tbl_index],
+                             cur_col[ref_col_index], cur_col[ref_col_ref],
+                             cur_col[update_rule], cur_col[delete_rule])
+                        )
+
+    key_strs = []
+    const_strs = []
+    # Create primary key definition string.
     if len(pri_keys) > 0:
-        key_list = pri_keys
-        key_str = ",\n  PRIMARY KEY("
-    elif len(keys) > 0:
-        key_list = keys
-        # Quote constraint name with backticks if needed
-        const_name = cur_col[const_name_index]
-        if const_name and not is_quoted_with_backticks(const_name):
-            const_name = quote_with_backticks(const_name)
-        key_str = ",\n  KEY %s (" % const_name
-        constraints.append([const_name, cur_col[ref_schema_index],
-                            cur_col[ref_tbl_index],
-                            cur_col[ref_col_index],
-                            cur_col[ref_col_ref]])
-    if len(key_str) > 0:
-        stop = len(key_list)
-        fixed_keys = []
-        for key in range(0, stop):
+        key_list = []
+        for key in pri_keys:
             # Quote keys with backticks if needed
-            if key_list[key] and not is_quoted_with_backticks(key_list[key]):
-                key_list[key] = quote_with_backticks(key_list[key])
-            fixed_keys.append(key_list[key])
-        key_str += ",".join(fixed_keys) + ")"
-        create_str += key_str
-    if len(constraints) > 0:
-        for constraint in constraints:
-            # Quote keys with backticks if needed
-            for key in constraint:
-                if key and not is_quoted_with_backticks(key):
-                    key = quote_with_backticks(key)
-            c_str = ("  CONSTRAINT {cstr} FOREIGN KEY ({fk}) REFERENCES "
-                     "{ref_schema}.{ref_table} ({ref_column})")
-            constraint_str = c_str.format(cstr=constraint[0], fk=constraint[3],
-                                          ref_schema=constraint[1],
-                                          ref_table=constraint[2],
-                                          ref_column=constraint[4])
-            create_str = "%s,\n%s" % (create_str, constraint_str)
-    create_str = "%s\n)" % create_str
+            if not is_quoted_with_backticks(key):
+                # Handle multiple columns separated by a comma (,)
+                cols = key.split(',')
+                key = ','.join([quote_with_backticks(col) for col in cols])
+            key_list.append(key)
+        key_str = "PRIMARY KEY({0})".format(",".join(key_list))
+        key_strs.append(key_str)
+
+    for key, column_type in keys:
+        key_type = 'UNIQUE ' if column_type == 'UNI' else ''
+        if not key_constraints[key]:
+            # Handle simple keys
+            # Quote column key with backticks if needed
+            if not is_quoted_with_backticks(key):
+                # Handle multiple columns separated by a comma (,)
+                cols = key.split(',')
+                key = ','.join([quote_with_backticks(col) for col in cols])
+            key_str = "{key_type}KEY ({column})".format(key_type=key_type,
+                                                        column=key)
+            key_strs.append(key_str)
+        else:
+            # Handle key with constraints
+            for const_def in key_constraints[key]:
+                # Keys for constraints or with specific name
+                key_name = ''
+                if const_def[0] and const_def[0] != const_def[3]:
+                    # Quote key name with backticks if needed
+                    if not is_quoted_with_backticks(const_def[0]):
+                        key_name = '{0} '.format(
+                            quote_with_backticks(const_def[0]))
+                    else:
+                        key_name = '{0} '.format(const_def[0])
+                # Use constraint columns as key if available.
+                if const_def[3]:
+                    key = const_def[3]
+                # Quote column key with backticks if needed
+                if not is_quoted_with_backticks(key):
+                    # Handle multiple columns separated by a comma (,)
+                    cols = key.split(',')
+                    key = ','.join([quote_with_backticks(col) for col in cols])
+                key_str = "{key_type}KEY {key_name}({column})".format(
+                    key_type=key_type, key_name=key_name, column=key
+                )
+                key_strs.append(key_str)
+                if const_def[2]:
+                    # Handle constraint (referenced_table_name found)
+                    const_name = const_def[0]
+                    # Quote constraint name with backticks if needed
+                    if const_name and not is_quoted_with_backticks(const_name):
+                        const_name = quote_with_backticks(const_name)
+                    fkey = const_def[3]
+                    # Quote fkey columns with backticks if needed
+                    if not is_quoted_with_backticks(fkey):
+                        # Handle multiple columns separated by a comma (,)
+                        cols = fkey.split(',')
+                        fkey = ','.join(
+                            [quote_with_backticks(col) for col in cols])
+                    ref_key = const_def[4]
+                    # Quote reference key columns with backticks if needed
+                    if not is_quoted_with_backticks(ref_key):
+                        # Handle multiple columns separated by a comma (,)
+                        cols = ref_key.split(',')
+                        ref_key = ','.join(
+                            [quote_with_backticks(col) for col in cols])
+                    ref_rules = ''
+                    if const_def[6] and const_def[6] == 'CASCADE':
+                        ref_rules = ' ON DELETE CASCADE'
+                    if const_def[5] and const_def[5] == 'CASCADE':
+                        ref_rules = '{0} ON UPDATE CASCADE'.format(ref_rules)
+                    key_str = (" CONSTRAINT {cstr} FOREIGN KEY ({fk}) "
+                               "REFERENCES {ref_schema}.{ref_table} "
+                               "({ref_column}){ref_rules}").format(
+                        cstr=const_name, fk=fkey, ref_schema=const_def[1],
+                        ref_table=const_def[2], ref_column=ref_key,
+                        ref_rules=ref_rules)
+                    const_strs.append(key_str)
+
+    # Build remaining CREATE TABLE string
+    key_strs.extend(const_strs)
+    keys_str = ',\n '.join(key_strs)
+    if keys_str:
+        create_str = "{0},\n  {1}\n)".format(create_str, keys_str)
+    else:
+        create_str = "{0}\n)".format(create_str)
     if engine and len(engine) > 0:
-        create_str = "%s ENGINE=%s" % (create_str, engine)
-    create_str = "%s;" % create_str
+        create_str = "{0} ENGINE={1}".format(create_str, engine)
+    create_str = "{0};".format(create_str)
 
     return create_str
 
@@ -816,8 +915,12 @@ def _build_insert_data(col_names, tbl_name, data):
 
     Returns (string) the INSERT statement.
     """
+    # Handle NULL (and None) values, i.e. do not quote them as a string.
+    quoted_data = [
+        'NULL' if val in ('NULL', None) else to_sql(val) for val in data
+    ]
     return "INSERT INTO %s (" % tbl_name + ",".join(col_names) + \
-           ") VALUES (" + ','.join(imap(to_sql, data)) + ");"
+           ") VALUES (" + ','.join(quoted_data) + ");"
 
 
 def _skip_sql(sql, options):
@@ -940,7 +1043,7 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
         # and improve performance of _parse_insert_statement().
         re_value_split = re.compile("VALUES?", re.IGNORECASE)
 
-    dml_cmd = False
+    exec_commit = False
 
     # Process all statements.
     for statement in statements:
@@ -1027,22 +1130,24 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
 
         # Execute statements list.
         for st in st_list:
-            # Check query type to determine if a COMMIT is needed, in order to
-            # avoid Error 1694 (Cannot modify SQL_LOG_BIN inside transaction).
-            if not autocommit:
-                if dml_cmd:
-                    if st[0:_GTID_PREFIX].upper() in _GTID_COMMANDS:
-                        # DML previously executed and GTID command found.
-                        destination.commit()
-                        dml_cmd = False
-                elif st[0:6] in _DATA_COMMANDS:
-                    dml_cmd = True  # DML command found (COMMIT needed later).
             # Execute query.
             try:
                 if dryrun:
                     print(st)
                 elif fmt != "sql" or not _skip_sql(st, options):
+                    # Check query type to determine if a COMMIT is needed, in
+                    # order to avoid Error 1694 (Cannot modify SQL_LOG_BIN
+                    # inside transaction).
+                    if not autocommit:
+                        if st[0:_GTID_PREFIX].upper() == _SQL_LOG_BIN_CMD:
+                            # SET SQL_LOG_BIN command found.
+                            destination.commit()
+                            exec_commit = True
                     destination.exec_query(st, options=query_opts)
+                    if exec_commit:
+                        # For safety, COMMIT after SET SQL_LOG_BIN command.
+                        destination.commit()
+                        exec_commit = False
             # It is not a good practice to catch the base Exception class,
             # instead all errors should be caught in a Util/Connector error.
             # Exception is only caught for safety (unanticipated errors).
@@ -1337,6 +1442,7 @@ def import_file(dest_val, file_name, options):
             raise UtilDBError("The table does not exist: {0}".format(table))
 
     # Read the file one object/definition group at a time
+    databases = []
     for row in read_next(file_h, fmt):
         # Check if --format=raw_csv
         if fmt == "raw_csv":
@@ -1385,6 +1491,12 @@ def import_file(dest_val, file_name, options):
                 statements.append(row[1])
             continue
         # In the first pass, try to get the database name from the file
+        if row[0] == "TABLE":
+            db = _get_db(row)
+            if db not in ["TABLE_SCHEMA", "TABLE_CATALOG"] and \
+                    db not in databases:
+                databases.append(db)
+                get_db = True
         if get_db:
             if skip_header:
                 skip_header = False

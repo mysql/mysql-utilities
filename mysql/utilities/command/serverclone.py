@@ -201,11 +201,11 @@ def clone_server(conn_val, options):
     elif os.path.exists(os.path.join(basedir, "/sql/share/english/")):
         mysql_basedir = os.path.join(mysql_basedir, "/sql/")
 
-
     locations = [
         ("mysqld", mysqld_path),
         ("mysqladmin", mysqladmin_path),
-        ]
+    ]
+
     # From 5.7.6 version onwards, bootstrap is done via mysqld with the
     # --initialize-insecure option, so no need to get information about the
     # sql system tables that need to be loaded.
@@ -290,6 +290,7 @@ def clone_server(conn_val, options):
     else:
         cmd = [
             mysqld_path,
+            "--no-defaults",
             "--initialize-insecure=on",
             "--datadir={0}".format(new_data),
             "--basedir={0}".format(os.path.abspath(mysql_basedir))

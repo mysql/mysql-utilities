@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ class test(mutlib.System_test):
     export_import_file = None
     s1_serverid = None
     s2_serverid = None
+    databases_to_drop = None
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -47,16 +48,15 @@ class test(mutlib.System_test):
         self.server1 = None
         self.server2 = None
         self.need_servers = False
-        if not self.check_num_servers(2):
-            self.need_servers = True
         return self.check_num_servers(1)
 
     def setup(self):
         self.export_import_file = "test_run.txt"
-        num_servers = self.servers.num_servers()
+        self.databases_to_drop = ["util_test", "db`:db", "import_test",
+                                  "views_test"]
         if self.need_servers:
             try:
-                self.servers.spawn_new_servers(num_servers + 1)
+                self.servers.spawn_new_servers(2)
             except MUTLibError as err:
                 raise MUTLibError("Cannot spawn needed servers: {0}".format(
                     err.errmsg))
@@ -138,7 +138,7 @@ class test(mutlib.System_test):
 
         return True
 
-    def run_import_test(self, expected_res, from_conn, to_conn, db, frmt,
+    def run_import_test(self, expected_res, from_conn, to_conn, db_list, frmt,
                         imp_type, comment, export_options=None,
                         import_options=None):
         """Runs import test.
@@ -146,7 +146,7 @@ class test(mutlib.System_test):
         expected_res[in]     Expected result.
         from_conn[in]        Connection string.
         to_conn[in]          Connection string.
-        db[in]               Database name.
+        db_list[in]          List of database names.
         frmt[in]             Format.
         imp_type[in]         Import type.
         comment[in]          Comment.
@@ -154,14 +154,13 @@ class test(mutlib.System_test):
         import_options[in]   Import options.
         """
         # Set command with appropriate quotes for the OS
-        if os.name == 'posix':
-            export_cmd = ("mysqldbexport.py --skip-gtid {0} '{1}' --export={2}"
-                          " --format={3} ".format(from_conn, db, imp_type,
-                                                  frmt))
-        else:
-            export_cmd = ('mysqldbexport.py --skip-gtid {0} "{1}" --export={2}'
-                          ' --format={3} '.format(from_conn, db, imp_type,
-                                                  frmt))
+        quote = "'" if os.name == "posix" else '"'
+        quoted_dbs = " ".join(["{0}{1}{0}".format(quote, db)
+                               for db in db_list])
+
+        export_cmd = ("mysqldbexport.py --skip-gtid {0} {1} --export={2}"
+                      " --format={3} ".format(from_conn, quoted_dbs, imp_type,
+                                              frmt))
         if export_options is not None:
             export_cmd += export_options
         export_cmd = "{0} > {1}".format(export_cmd, self.export_import_file)
@@ -176,7 +175,8 @@ class test(mutlib.System_test):
 
         # Precheck: check db and save the results.
         self.results.append("BEFORE:\n")
-        self.results.append(self.check_objects(self.server2, db))
+        for db in db_list:
+            self.results.append(self.check_objects(self.server2, db))
 
         # First run the export to a file.
         res = self.run_test_case(0, export_cmd, "Running export...")
@@ -190,7 +190,8 @@ class test(mutlib.System_test):
 
         # Now, check db and save the results.
         self.results.append("AFTER:\n")
-        self.results.append(self.check_objects(self.server2, db))
+        for db in db_list:
+            self.results.append(self.check_objects(self.server2, db))
 
     def run_import_raw_csv_test(self, expected_res, from_conn, to_conn, db,
                                 table, comment, import_options=None):
@@ -280,7 +281,7 @@ class test(mutlib.System_test):
                 comment = ("Test Case {0} : Testing import with {1} format "
                            "and {2} display".format(test_num, frmt, display))
                 # We test DEFINITIONS and DATA only in other tests
-                self.run_import_test(0, from_conn, to_conn, 'util_test',
+                self.run_import_test(0, from_conn, to_conn, ['util_test'],
                                      frmt, "BOTH", comment,
                                      " --display={0}".format(display))
                 self.drop_db(self.server2, "util_test")
@@ -292,8 +293,8 @@ class test(mutlib.System_test):
                 comment = ("Test Case {0} : Testing import with {1} format "
                            "and {2} display (using backticks)".format(
                                test_num, frmt, display))
-                self.run_import_test(0, from_conn, to_conn, '`db``:db`', frmt,
-                                     "BOTH", comment,
+                self.run_import_test(0, from_conn, to_conn, ['`db``:db`'],
+                                     frmt, "BOTH", comment,
                                      " --display={0}".format(display))
                 self.drop_db(self.server2, 'db`:db')
                 test_num += 1
@@ -303,8 +304,8 @@ class test(mutlib.System_test):
         comment = ("Test Case {0} : Testing import with {1} format and "
                    "{2} display (using backticks)".format(test_num, frmt,
                                                           display))
-        self.run_import_test(0, from_conn, to_conn, '`db``:db`', frmt, "BOTH",
-                             comment, " --display={0}".format(display))
+        self.run_import_test(0, from_conn, to_conn, ['`db``:db`'], frmt,
+                             "BOTH", comment, " --display={0}".format(display))
         self.drop_db(self.server2, 'db`:db')
         test_num += 1
 
@@ -358,7 +359,7 @@ class test(mutlib.System_test):
                            "and {2} display (using views with dependencies)"
                            "".format(test_num, frmt, display))
                 self.run_import_test(0, from_conn, to_conn,
-                                     'views_test',
+                                     ['views_test'],
                                      frmt,
                                      "BOTH", comment,
                                      " --display={0}".format(display))
@@ -380,15 +381,12 @@ class test(mutlib.System_test):
     def drop_all(self):
         """Drops all databases and users created.
         """
-        # OK if drop_db fails - they are spawned servers.
-        self.drop_db(self.server1, "util_test")
-        self.drop_db(self.server1, 'db`:db')
-        self.drop_db(self.server1, "import_test")
-        self.drop_db(self.server1, "views_test")
-        self.drop_db(self.server2, "util_test")
-        self.drop_db(self.server2, 'db`:db')
-        self.drop_db(self.server2, "import_test")
-        self.drop_db(self.server2, "views_test")
+
+        drop_results_s1 = []
+        drop_results_s2 = []
+        for db in self.databases_to_drop:
+            drop_results_s1.append(self.drop_db(self.server1, db))
+            drop_results_s2.append(self.drop_db(self.server2, db))
 
         drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'"]
         for drop in drop_user:
@@ -397,7 +395,8 @@ class test(mutlib.System_test):
                 self.server2.exec_query(drop)
             except UtilError:
                 pass
-        return True
+
+        return all(drop_results_s1) and all(drop_results_s2)
 
     def cleanup(self):
         if self.res_fname:

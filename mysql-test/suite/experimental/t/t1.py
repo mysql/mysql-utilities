@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ class test(mutlib.System_test):
         #       to see an unsuccessful test run
         #
         cmd = "mysqlserverclone.py --help"
-        #cmd = "NOTREALLYTHEREATALL!"
+        # cmd = "NOTREALLYTHEREATALL!"
         self.result = self.exec_util(cmd, "./result.txt")
         return True
 

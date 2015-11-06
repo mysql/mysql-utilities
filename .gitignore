@@ -9,7 +9,7 @@ __pycache__/
 *.so
 
 # Connector python files
-mysql/connector/*
+mysql/connector
 
 # Distribution / packaging
 *.egg-info
@@ -36,3 +36,10 @@ coverage.xml
 
 # Reject files from MUT
 *.reject
+
+# Eclipse and PyDev project files
+.project
+.pydevproject
+
+# Result file used by some MUT tests
+mysql-test/result.txt

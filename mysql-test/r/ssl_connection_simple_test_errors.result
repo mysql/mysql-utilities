@@ -185,7 +185,7 @@ Test case 41 - basic serverinfo with ssl
 Test case 42 - userclone dump grants with ssl
 # Source on XXXX-XXXX: ... connected.
 # Dumping grants for user joe_pass@user
-GRANT USAGE ON *.* TO 'joe_pass'@'user' IDENTIFIED BY PASSWORD '*6DA88CFC20231681AB7287BB201D08136A9A7369'
+GRANT USAGE ON *.* TO 'joe_pass'@'user'
 GRANT SELECT ON `util_test`.* TO 'joe_pass'@'user'
 
 Test case 43 - basic dbexport with ssl

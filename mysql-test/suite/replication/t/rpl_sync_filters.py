@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -121,6 +121,17 @@ class test(rpl_sync.test):
         )
         self.server7 = self.servers.spawn_server("rep_slave5_gtid", mysqld,
                                                  True)
+
+        # Create replication user to use on all servers, to avoid issues
+        # when mixing the topology (switching masters for the same slaves).
+        for server in [self.server1, self.server2, self.server3, self.server4,
+                       self.server5, self.server6, self.server7]:
+            server.exec_query("SET SQL_LOG_BIN= 0")
+            server.exec_query("CREATE USER 'rpl'@'{0}' IDENTIFIED BY 'rpl'"
+                              "".format(server.host))
+            server.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'{0}' "
+                              "IDENTIFIED BY 'rpl'".format(server.host))
+            server.exec_query("SET SQL_LOG_BIN= 1")
 
         # Reset spawned servers (clear binary log and GTID_EXECUTED set)
         # with supported filter options (first topology).

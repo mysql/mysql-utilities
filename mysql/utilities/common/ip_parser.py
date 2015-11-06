@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -657,7 +657,7 @@ def _verify_parsing(connection_str, host, port, socket, address_type,
     parsed_connection_list = []
     if host:
         log.debug("host {0}".format(host))
-        if address_type == ipv6 and not "[" in connection_str:
+        if address_type == ipv6 and "[" not in connection_str:
             host = host.replace("[", "")
             host = host.replace("]", "")
         parsed_connection_list.append(host)
@@ -716,7 +716,7 @@ def format_IPv6(host_address):
     """Format IPv6 host address
     """
     if host_address:
-        if not "]" in host_address:
+        if "]" not in host_address:
             host_address = "[{0}]".format(host_address)
     return host_address
 
@@ -753,7 +753,7 @@ def find_password(value):
     if not type(value) == str:
         return False
     # has to have an @ sign
-    if not '@' in value:
+    if '@' not in value:
         return False
     match = _CONN_USERPASS.match(value)
     if not match:

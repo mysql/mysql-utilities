@@ -46,6 +46,10 @@ CREATE VIEW util_test.v1 as SELECT * FROM util_test.t1;
 
 CREATE EVENT util_test.e1 ON SCHEDULE EVERY 1 YEAR DISABLE DO DELETE FROM util_test.t1 WHERE a = "not there";
 
+CREATE USER 'joe_wildcard'@'%';
+
+CREATE USER 'joe'@'user';
+
 GRANT ALL ON util_test.* TO 'joe'@'user';
 
 GRANT ALL ON util_test.* TO 'joe_wildcard'@'%';

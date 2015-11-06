@@ -13,13 +13,13 @@ Options:
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>] or <config-
                         path>[<[group]>].
-  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+  --ssl-ca=SSL_CA       path to a file that contains a list of trusted SSL
                         CAs.
-  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+  --ssl-cert=SSL_CERT   name of the SSL certificate file to use for
                         establishing a secure connection.
-  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+  --ssl-key=SSL_KEY     name of the SSL key file to use for establishing a
                         secure connection.
-  --ssl=SSL             Specifies if the server connection requires use of
+  --ssl=SSL             specifies if the server connection requires use of
                         SSL. If an encrypted connection cannot be established,
                         the connection attempt fails. By default 0 (SSL not
                         required).
@@ -874,7 +874,7 @@ Test case 14 - csv format
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
+TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,KEY_CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
@@ -947,7 +947,7 @@ Test case 15 - tab format
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
+TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	KEY_CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
 `util_test`	`t1`	MEMORY	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t2`	MyISAM	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t3`	InnoDB	1	`a`	int(11)	NO		PRI	latin1_swedish_ci							`PRIMARY`	`a`		
@@ -1020,20 +1020,20 @@ Test case 16 - GRID format
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
-| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UPDATE_RULE  | DELETE_RULE  | CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
-| util_test     | t1          | MEMORY  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None        | None                     | None                    |
-| util_test     | t2          | MyISAM  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None        | None                     | None                    |
-| util_test     | t3          | InnoDB  | 1                 | a               | int(11)                 | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a           | None                     | None                    |
-| util_test     | t3          | InnoDB  | 2                 | b               | varchar(30)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a           | None                     | None                    |
-| util_test     | t4          | InnoDB  | 1                 | c               | int(11)                 | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c           | util_test                | a                       |
-| util_test     | t4          | InnoDB  | 2                 | d               | int(11)                 | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c           | util_test                | a                       |
-| util_test     | t5          | InnoDB  | 1                 | product_id      | int(10) unsigned        | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 2                 | name            | varchar(20)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
+| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UPDATE_RULE  | DELETE_RULE  | KEY_CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
+| util_test     | t1          | MEMORY  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None                 | None        | None                     | None                    |
+| util_test     | t2          | MyISAM  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None                 | None        | None                     | None                    |
+| util_test     | t3          | InnoDB  | 1                 | a               | int(11)                 | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | a           | None                     | None                    |
+| util_test     | t3          | InnoDB  | 2                 | b               | varchar(30)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | a           | None                     | None                    |
+| util_test     | t4          | InnoDB  | 1                 | c               | int(11)                 | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3               | c           | util_test                | a                       |
+| util_test     | t4          | InnoDB  | 2                 | d               | int(11)                 | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3               | c           | util_test                | a                       |
+| util_test     | t5          | InnoDB  | 1                 | product_id      | int(10) unsigned        | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 2                 | name            | varchar(20)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
 # FUNCTIONS in util_test:
 +-------+-----------+------------------+-------------------+----------------+-----------------+--------------------------------------------------------------------------+-------------------------+------------------------------------------------------+-----------+-----------------------+-----------------------+--------------------+
 | NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | DEFINER         | PARAM_LIST                                                               | RETURNS                 | BODY                                                 | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
@@ -1131,7 +1131,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: None
+     KEY_CONSTRAINT_NAME: None
                 COL_NAME: None
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -1152,7 +1152,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: None
+     KEY_CONSTRAINT_NAME: None
                 COL_NAME: None
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -1173,7 +1173,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: a
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -1194,7 +1194,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: a
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -1215,7 +1215,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: PRIMARY
              UPDATE_RULE: RESTRICT
              DELETE_RULE: RESTRICT
-         CONSTRAINT_NAME: ref_t3
+     KEY_CONSTRAINT_NAME: ref_t3
                 COL_NAME: c
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
@@ -1236,7 +1236,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: PRIMARY
              UPDATE_RULE: RESTRICT
              DELETE_RULE: RESTRICT
-         CONSTRAINT_NAME: ref_t3
+     KEY_CONSTRAINT_NAME: ref_t3
                 COL_NAME: c
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
@@ -1257,7 +1257,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -1278,7 +1278,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -1299,7 +1299,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -1320,7 +1320,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -1964,20 +1964,20 @@ Test case 21 - GRID format no headers
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
-| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UPDATE_RULE  | DELETE_RULE  | CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
-| util_test     | t1          | MEMORY  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None        | None                     | None                    |
-| util_test     | t2          | MyISAM  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None        | None                     | None                    |
-| util_test     | t3          | InnoDB  | 1                 | a               | int(11)                 | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a           | None                     | None                    |
-| util_test     | t3          | InnoDB  | 2                 | b               | varchar(30)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a           | None                     | None                    |
-| util_test     | t4          | InnoDB  | 1                 | c               | int(11)                 | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c           | util_test                | a                       |
-| util_test     | t4          | InnoDB  | 2                 | d               | int(11)                 | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c           | util_test                | a                       |
-| util_test     | t5          | InnoDB  | 1                 | product_id      | int(10) unsigned        | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 2                 | name            | varchar(20)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
+| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UPDATE_RULE  | DELETE_RULE  | KEY_CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
+| util_test     | t1          | MEMORY  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None                 | None        | None                     | None                    |
+| util_test     | t2          | MyISAM  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None                 | None        | None                     | None                    |
+| util_test     | t3          | InnoDB  | 1                 | a               | int(11)                 | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | a           | None                     | None                    |
+| util_test     | t3          | InnoDB  | 2                 | b               | varchar(30)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | a           | None                     | None                    |
+| util_test     | t4          | InnoDB  | 1                 | c               | int(11)                 | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3               | c           | util_test                | a                       |
+| util_test     | t4          | InnoDB  | 2                 | d               | int(11)                 | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3               | c           | util_test                | a                       |
+| util_test     | t5          | InnoDB  | 1                 | product_id      | int(10) unsigned        | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 2                 | name            | varchar(20)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
 # FUNCTIONS in util_test:
 +-------+-----------+------------------+-------------------+----------------+-----------------+--------------------------------------------------------------------------+-------------------------+------------------------------------------------------+-----------+-----------------------+-----------------------+--------------------+
 | NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | DEFINER         | PARAM_LIST                                                               | RETURNS                 | BODY                                                 | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
@@ -2075,7 +2075,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: None
+     KEY_CONSTRAINT_NAME: None
                 COL_NAME: None
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -2096,7 +2096,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: None
+     KEY_CONSTRAINT_NAME: None
                 COL_NAME: None
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -2117,7 +2117,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: a
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -2138,7 +2138,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: a
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -2159,7 +2159,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: PRIMARY
              UPDATE_RULE: RESTRICT
              DELETE_RULE: RESTRICT
-         CONSTRAINT_NAME: ref_t3
+     KEY_CONSTRAINT_NAME: ref_t3
                 COL_NAME: c
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
@@ -2180,7 +2180,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: PRIMARY
              UPDATE_RULE: RESTRICT
              DELETE_RULE: RESTRICT
-         CONSTRAINT_NAME: ref_t3
+     KEY_CONSTRAINT_NAME: ref_t3
                 COL_NAME: c
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
@@ -2201,7 +2201,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -2222,7 +2222,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -2243,7 +2243,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -2264,7 +2264,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -2776,7 +2776,7 @@ Test case 24 - CS format
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
+TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,KEY_CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
@@ -2849,7 +2849,7 @@ Test case 25 - ta format
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
+TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	KEY_CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
 `util_test`	`t1`	MEMORY	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t2`	MyISAM	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t3`	InnoDB	1	`a`	int(11)	NO		PRI	latin1_swedish_ci							`PRIMARY`	`a`		
@@ -2922,20 +2922,20 @@ Test case 26 - g format
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
-| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UPDATE_RULE  | DELETE_RULE  | CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
-| util_test     | t1          | MEMORY  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None        | None                     | None                    |
-| util_test     | t2          | MyISAM  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None        | None                     | None                    |
-| util_test     | t3          | InnoDB  | 1                 | a               | int(11)                 | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a           | None                     | None                    |
-| util_test     | t3          | InnoDB  | 2                 | b               | varchar(30)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a           | None                     | None                    |
-| util_test     | t4          | InnoDB  | 1                 | c               | int(11)                 | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c           | util_test                | a                       |
-| util_test     | t4          | InnoDB  | 2                 | d               | int(11)                 | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c           | util_test                | a                       |
-| util_test     | t5          | InnoDB  | 1                 | product_id      | int(10) unsigned        | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 2                 | name            | varchar(20)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
+| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UPDATE_RULE  | DELETE_RULE  | KEY_CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
+| util_test     | t1          | MEMORY  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None                 | None        | None                     | None                    |
+| util_test     | t2          | MyISAM  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None                 | None        | None                     | None                    |
+| util_test     | t3          | InnoDB  | 1                 | a               | int(11)                 | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | a           | None                     | None                    |
+| util_test     | t3          | InnoDB  | 2                 | b               | varchar(30)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | a           | None                     | None                    |
+| util_test     | t4          | InnoDB  | 1                 | c               | int(11)                 | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3               | c           | util_test                | a                       |
+| util_test     | t4          | InnoDB  | 2                 | d               | int(11)                 | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3               | c           | util_test                | a                       |
+| util_test     | t5          | InnoDB  | 1                 | product_id      | int(10) unsigned        | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 2                 | name            | varchar(20)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
 # FUNCTIONS in util_test:
 +-------+-----------+------------------+-------------------+----------------+-----------------+--------------------------------------------------------------------------+-------------------------+------------------------------------------------------+-----------+-----------------------+-----------------------+--------------------+
 | NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | DEFINER         | PARAM_LIST                                                               | RETURNS                 | BODY                                                 | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
@@ -3033,7 +3033,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: None
+     KEY_CONSTRAINT_NAME: None
                 COL_NAME: None
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -3054,7 +3054,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: None
+     KEY_CONSTRAINT_NAME: None
                 COL_NAME: None
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -3075,7 +3075,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: a
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -3096,7 +3096,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: a
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -3117,7 +3117,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: PRIMARY
              UPDATE_RULE: RESTRICT
              DELETE_RULE: RESTRICT
-         CONSTRAINT_NAME: ref_t3
+     KEY_CONSTRAINT_NAME: ref_t3
                 COL_NAME: c
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
@@ -3138,7 +3138,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: PRIMARY
              UPDATE_RULE: RESTRICT
              DELETE_RULE: RESTRICT
-         CONSTRAINT_NAME: ref_t3
+     KEY_CONSTRAINT_NAME: ref_t3
                 COL_NAME: c
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
@@ -3159,7 +3159,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -3180,7 +3180,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -3201,7 +3201,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -3222,7 +3222,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -3590,20 +3590,20 @@ Test case 28 - GRID format with BRIEF display
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
-| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UPDATE_RULE  | DELETE_RULE  | CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
-| util_test     | t1          | MEMORY  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None        | None                     | None                    |
-| util_test     | t2          | MyISAM  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None             | None        | None                     | None                    |
-| util_test     | t3          | InnoDB  | 1                 | a               | int(11)                 | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a           | None                     | None                    |
-| util_test     | t3          | InnoDB  | 2                 | b               | varchar(30)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | a           | None                     | None                    |
-| util_test     | t4          | InnoDB  | 1                 | c               | int(11)                 | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c           | util_test                | a                       |
-| util_test     | t4          | InnoDB  | 2                 | d               | int(11)                 | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3           | c           | util_test                | a                       |
-| util_test     | t5          | InnoDB  | 1                 | product_id      | int(10) unsigned        | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 2                 | name            | varchar(20)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| util_test     | t5          | InnoDB  | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-+---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
+| TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UPDATE_RULE  | DELETE_RULE  | KEY_CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
+| util_test     | t1          | MEMORY  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None                 | None        | None                     | None                    |
+| util_test     | t2          | MyISAM  | 1                 | a               | char(30)                | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | None                 | None        | None                     | None                    |
+| util_test     | t3          | InnoDB  | 1                 | a               | int(11)                 | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | a           | None                     | None                    |
+| util_test     | t3          | InnoDB  | 2                 | b               | varchar(30)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | a           | None                     | None                    |
+| util_test     | t4          | InnoDB  | 1                 | c               | int(11)                 | NO           | None            | MUL         | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3               | c           | util_test                | a                       |
+| util_test     | t4          | InnoDB  | 2                 | d               | int(11)                 | NO           | None            |             | latin1_swedish_ci  |                 | ref_t3           | t3                     | PRIMARY                 | RESTRICT     | RESTRICT     | ref_t3               | c           | util_test                | a                       |
+| util_test     | t5          | InnoDB  | 1                 | product_id      | int(10) unsigned        | NO           | None            | PRI         | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 2                 | name            | varchar(20)             | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| util_test     | t5          | InnoDB  | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
++---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
 # FUNCTIONS in util_test:
 +-------+-----------+------------------+-------------------+----------------+-----------------+--------------------------------------------------------------------------+-------------------------+------------------------------------------------------+-----------+-----------------------+-----------------------+--------------------+
 | NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | DEFINER         | PARAM_LIST                                                               | RETURNS                 | BODY                                                 | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
@@ -3684,20 +3684,20 @@ Test case 29 - GRID format with FULL display
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-+----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
-| TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | TABLE_TYPE  | ENGINE  | VERSION  | ROW_FORMAT  | TABLE_ROWS  | AVG_ROW_LENGTH  | DATA_LENGTH  | MAX_DATA_LENGTH   | INDEX_LENGTH  | DATA_FREE  | AUTO_INCREMENT  | CREATE_TIME          | UPDATE_TIME          | CHECK_TIME  | TABLE_COLLATION    | CHECKSUM  | CREATE_OPTIONS  | TABLE_COMMENT  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UNIQUE_CONSTRAINT_SCHEMA  | UPDATE_RULE  | DELETE_RULE  | CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
-+----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
-| None           | util_test     | t1          | BASE TABLE  | MEMORY  | 10       | Fixed       | 7           | 31              | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a               | char(30)                | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | None             | None        | None                     | None                    |
-| None           | util_test     | t2          | BASE TABLE  | MyISAM  | 10       | Fixed       | 4           | 31              | XXXXXXXXXX | XXXXXXXXXX | 1024          | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a               | char(30)                | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | None             | None        | None                     | None                    |
-| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a               | int(11)                 | NO           | None            | PRI         | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | a           | None                     | None                    |
-| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 2                 | b               | varchar(30)             | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | a           | None                     | None                    |
-| None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | XXXXXXXXXX | XXXXXXXXXX | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | c               | int(11)                 | NO           | None            | MUL         | ref_t3           | t3                     | PRIMARY                 | util_test                 | RESTRICT     | RESTRICT     | ref_t3           | c           | util_test                | a                       |
-| None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | XXXXXXXXXX | XXXXXXXXXX | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 2                 | d               | int(11)                 | NO           | None            |             | ref_t3           | t3                     | PRIMARY                 | util_test                 | RESTRICT     | RESTRICT     | ref_t3           | c           | util_test                | a                       |
-| None           | util_test     | t5          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | product_id      | int(10) unsigned        | NO           | None            | PRI         | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| None           | util_test     | t5          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 2                 | name            | varchar(20)             | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| None           | util_test     | t5          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-| None           | util_test     | t5          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY          | product_id  | None                     | None                    |
-+----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+------------------+-------------+--------------------------+-------------------------+
++----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
+| TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | TABLE_TYPE  | ENGINE  | VERSION  | ROW_FORMAT  | TABLE_ROWS  | AVG_ROW_LENGTH  | DATA_LENGTH  | MAX_DATA_LENGTH   | INDEX_LENGTH  | DATA_FREE  | AUTO_INCREMENT  | CREATE_TIME          | UPDATE_TIME          | CHECK_TIME  | TABLE_COLLATION    | CHECKSUM  | CREATE_OPTIONS  | TABLE_COMMENT  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UNIQUE_CONSTRAINT_SCHEMA  | UPDATE_RULE  | DELETE_RULE  | KEY_CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
++----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
+| None           | util_test     | t1          | BASE TABLE  | MEMORY  | 10       | Fixed       | 7           | 31              | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a               | char(30)                | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | None                 | None        | None                     | None                    |
+| None           | util_test     | t2          | BASE TABLE  | MyISAM  | 10       | Fixed       | 4           | 31              | XXXXXXXXXX | XXXXXXXXXX | 1024          | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a               | char(30)                | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | None                 | None        | None                     | None                    |
+| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | a               | int(11)                 | NO           | None            | PRI         | None             | None                   | None                    | None                      | None         | None         | PRIMARY              | a           | None                     | None                    |
+| None           | util_test     | t3          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 2                 | b               | varchar(30)             | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY              | a           | None                     | None                    |
+| None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | XXXXXXXXXX | XXXXXXXXXX | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | c               | int(11)                 | NO           | None            | MUL         | ref_t3           | t3                     | PRIMARY                 | util_test                 | RESTRICT     | RESTRICT     | ref_t3               | c           | util_test                | a                       |
+| None           | util_test     | t4          | BASE TABLE  | InnoDB  | 10       | Compact     | 1           | 16384           | XXXXXXXXXX | XXXXXXXXXX | 16384         | XXXXXXXXXX | None            | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 2                 | d               | int(11)                 | NO           | None            |             | ref_t3           | t3                     | PRIMARY                 | util_test                 | RESTRICT     | RESTRICT     | ref_t3               | c           | util_test                | a                       |
+| None           | util_test     | t5          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 1                 | product_id      | int(10) unsigned        | NO           | None            | PRI         | None             | None                   | None                    | None                      | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| None           | util_test     | t5          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 2                 | name            | varchar(20)             | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| None           | util_test     | t5          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY              | product_id  | None                     | None                    |
+| None           | util_test     | t5          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY              | product_id  | None                     | None                    |
++----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
 # FUNCTIONS in util_test:
 +------------+-------+-----------+----------------+-----------+------------------+-------------------+----------------+--------------------------------------------------------------------------+-------------------------+------------------------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+------------------------------------------------------+
 | DB         | NAME  | TYPE      | SPECIFIC_NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | PARAM_LIST                                                               | RETURNS                 | BODY                                                 | DEFINER         | CREATED              | MODIFIED             | SQL_MODE  | COMMENT  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       | BODY_UTF8                                            |
@@ -3867,7 +3867,7 @@ Test case 31 - CSV format with BRIEF display
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
+TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,KEY_CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
@@ -3940,7 +3940,7 @@ Test case 32 - CSV format with FULL display
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UNIQUE_CONSTRAINT_SCHEMA,UPDATE_RULE,DELETE_RULE,CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
+TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UNIQUE_CONSTRAINT_SCHEMA,UPDATE_RULE,DELETE_RULE,KEY_CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
 ,`util_test`,`t1`,BASE TABLE,MEMORY,10,Fixed,7,31,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,char(30),YES,,,,,,,,,,,,
 ,`util_test`,`t2`,BASE TABLE,MyISAM,10,Fixed,4,31,XXXXXXXXXX,XXXXXXXXXX,1024,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,char(30),YES,,,,,,,,,,,,
 ,`util_test`,`t3`,BASE TABLE,InnoDB,10,Compact,4,4096,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,5,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,int(11),NO,,PRI,,,,,,,`PRIMARY`,`a`,,
@@ -4081,7 +4081,7 @@ Test case 34 - TAB format with BRIEF display
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
+TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	KEY_CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
 `util_test`	`t1`	MEMORY	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t2`	MyISAM	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t3`	InnoDB	1	`a`	int(11)	NO		PRI	latin1_swedish_ci							`PRIMARY`	`a`		
@@ -4154,7 +4154,7 @@ Test case 35 - TAB format with FULL display
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test
 # TABLES in util_test:
-TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE_ROWS	AVG_ROW_LENGTH	DATA_LENGTH	MAX_DATA_LENGTH	INDEX_LENGTH	DATA_FREE	AUTO_INCREMENT	CREATE_TIME	UPDATE_TIME	CHECK_TIME	TABLE_COLLATION	CHECKSUM	CREATE_OPTIONS	TABLE_COMMENT	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UNIQUE_CONSTRAINT_SCHEMA	UPDATE_RULE	DELETE_RULE	CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
+TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE_ROWS	AVG_ROW_LENGTH	DATA_LENGTH	MAX_DATA_LENGTH	INDEX_LENGTH	DATA_FREE	AUTO_INCREMENT	CREATE_TIME	UPDATE_TIME	CHECK_TIME	TABLE_COLLATION	CHECKSUM	CREATE_OPTIONS	TABLE_COMMENT	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UNIQUE_CONSTRAINT_SCHEMA	UPDATE_RULE	DELETE_RULE	KEY_CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
 	`util_test`	`t1`	BASE TABLE	MEMORY	10	Fixed	7	31	XXXXXX	XXXXXXXX	0	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	char(30)	YES												
 	`util_test`	`t2`	BASE TABLE	MyISAM	10	Fixed	4	31	XXXXXX	XXXXXXXX	1024	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	char(30)	YES												
 	`util_test`	`t3`	BASE TABLE	InnoDB	10	Compact	4	4096	XXXXXX	XXXXXXXX	0	XX	5	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	int(11)	NO		PRI							`PRIMARY`	`a`		
@@ -4312,7 +4312,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: None
+     KEY_CONSTRAINT_NAME: None
                 COL_NAME: None
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -4333,7 +4333,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: None
+     KEY_CONSTRAINT_NAME: None
                 COL_NAME: None
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -4354,7 +4354,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: a
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -4375,7 +4375,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: a
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -4396,7 +4396,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: PRIMARY
              UPDATE_RULE: RESTRICT
              DELETE_RULE: RESTRICT
-         CONSTRAINT_NAME: ref_t3
+     KEY_CONSTRAINT_NAME: ref_t3
                 COL_NAME: c
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
@@ -4417,7 +4417,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: PRIMARY
              UPDATE_RULE: RESTRICT
              DELETE_RULE: RESTRICT
-         CONSTRAINT_NAME: ref_t3
+     KEY_CONSTRAINT_NAME: ref_t3
                 COL_NAME: c
  REFERENCED_TABLE_SCHEMA: util_test
   REFERENCED_COLUMN_NAME: a
@@ -4438,7 +4438,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -4459,7 +4459,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -4480,7 +4480,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -4501,7 +4501,7 @@ SET FOREIGN_KEY_CHECKS=0;
   UNIQUE_CONSTRAINT_NAME: None
              UPDATE_RULE: None
              DELETE_RULE: None
-         CONSTRAINT_NAME: PRIMARY
+     KEY_CONSTRAINT_NAME: PRIMARY
                 COL_NAME: product_id
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
@@ -4903,7 +4903,7 @@ SET FOREIGN_KEY_CHECKS=0;
  UNIQUE_CONSTRAINT_SCHEMA: None
               UPDATE_RULE: None
               DELETE_RULE: None
-          CONSTRAINT_NAME: None
+      KEY_CONSTRAINT_NAME: None
                  COL_NAME: None
   REFERENCED_TABLE_SCHEMA: None
    REFERENCED_COLUMN_NAME: None
@@ -4941,7 +4941,7 @@ SET FOREIGN_KEY_CHECKS=0;
  UNIQUE_CONSTRAINT_SCHEMA: None
               UPDATE_RULE: None
               DELETE_RULE: None
-          CONSTRAINT_NAME: None
+      KEY_CONSTRAINT_NAME: None
                  COL_NAME: None
   REFERENCED_TABLE_SCHEMA: None
    REFERENCED_COLUMN_NAME: None
@@ -4979,7 +4979,7 @@ SET FOREIGN_KEY_CHECKS=0;
  UNIQUE_CONSTRAINT_SCHEMA: None
               UPDATE_RULE: None
               DELETE_RULE: None
-          CONSTRAINT_NAME: PRIMARY
+      KEY_CONSTRAINT_NAME: PRIMARY
                  COL_NAME: a
   REFERENCED_TABLE_SCHEMA: None
    REFERENCED_COLUMN_NAME: None
@@ -5017,7 +5017,7 @@ SET FOREIGN_KEY_CHECKS=0;
  UNIQUE_CONSTRAINT_SCHEMA: None
               UPDATE_RULE: None
               DELETE_RULE: None
-          CONSTRAINT_NAME: PRIMARY
+      KEY_CONSTRAINT_NAME: PRIMARY
                  COL_NAME: a
   REFERENCED_TABLE_SCHEMA: None
    REFERENCED_COLUMN_NAME: None
@@ -5055,7 +5055,7 @@ SET FOREIGN_KEY_CHECKS=0;
  UNIQUE_CONSTRAINT_SCHEMA: util_test
               UPDATE_RULE: RESTRICT
               DELETE_RULE: RESTRICT
-          CONSTRAINT_NAME: ref_t3
+      KEY_CONSTRAINT_NAME: ref_t3
                  COL_NAME: c
   REFERENCED_TABLE_SCHEMA: util_test
    REFERENCED_COLUMN_NAME: a
@@ -5093,7 +5093,7 @@ SET FOREIGN_KEY_CHECKS=0;
  UNIQUE_CONSTRAINT_SCHEMA: util_test
               UPDATE_RULE: RESTRICT
               DELETE_RULE: RESTRICT
-          CONSTRAINT_NAME: ref_t3
+      KEY_CONSTRAINT_NAME: ref_t3
                  COL_NAME: c
   REFERENCED_TABLE_SCHEMA: util_test
    REFERENCED_COLUMN_NAME: a
@@ -5131,7 +5131,7 @@ SET FOREIGN_KEY_CHECKS=0;
  UNIQUE_CONSTRAINT_SCHEMA: None
               UPDATE_RULE: None
               DELETE_RULE: None
-          CONSTRAINT_NAME: PRIMARY
+      KEY_CONSTRAINT_NAME: PRIMARY
                  COL_NAME: product_id
   REFERENCED_TABLE_SCHEMA: None
    REFERENCED_COLUMN_NAME: None
@@ -5169,7 +5169,7 @@ SET FOREIGN_KEY_CHECKS=0;
  UNIQUE_CONSTRAINT_SCHEMA: None
               UPDATE_RULE: None
               DELETE_RULE: None
-          CONSTRAINT_NAME: PRIMARY
+      KEY_CONSTRAINT_NAME: PRIMARY
                  COL_NAME: product_id
   REFERENCED_TABLE_SCHEMA: None
    REFERENCED_COLUMN_NAME: None
@@ -5207,7 +5207,7 @@ SET FOREIGN_KEY_CHECKS=0;
  UNIQUE_CONSTRAINT_SCHEMA: None
               UPDATE_RULE: None
               DELETE_RULE: None
-          CONSTRAINT_NAME: PRIMARY
+      KEY_CONSTRAINT_NAME: PRIMARY
                  COL_NAME: product_id
   REFERENCED_TABLE_SCHEMA: None
    REFERENCED_COLUMN_NAME: None
@@ -5245,7 +5245,7 @@ SET FOREIGN_KEY_CHECKS=0;
  UNIQUE_CONSTRAINT_SCHEMA: None
               UPDATE_RULE: None
               DELETE_RULE: None
-          CONSTRAINT_NAME: PRIMARY
+      KEY_CONSTRAINT_NAME: PRIMARY
                  COL_NAME: product_id
   REFERENCED_TABLE_SCHEMA: None
    REFERENCED_COLUMN_NAME: None

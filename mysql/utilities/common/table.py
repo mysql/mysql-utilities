@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -577,7 +577,7 @@ class Table(object):
                 where_values.append("{0} = {1}".format(col_name, value))
         if has_data:
             return "{0} WHERE {1};".format(blob_insert,
-                   " AND ".join(where_values))
+                                           " AND ".join(where_values))
         return None
 
     def _build_insert_blob(self, row, new_db, tbl_name):
@@ -663,7 +663,7 @@ class Table(object):
             # single quoted. For example, 'this' is it' is changed to
             # 'this\' is it'.
             for col in self.text_columns:
-                #Check if the value is not None before replacing quotes
+                # Check if the value is not None before replacing quotes
                 if values[col]:
                     # Apply escape sequences to special characters
                     values[col] = convert_special_characters(values[col])
@@ -730,7 +730,7 @@ class Table(object):
                 next_size = data_size + row_size + 3
                 if ((row_count >= _MAXBULK_VALUES) or
                         (next_size > (int(self.max_packet_size) - 512))):
-                   # add to buffer
+                    # add to buffer
                     data_inserts.append(insert_str)
                     row_count = 0
                 else:
@@ -996,17 +996,14 @@ class Table(object):
                 if row is None:
                     raise StopIteration()
                 rows.append(row)
-                #print "ROWS 1:", rows
             elif num_conn == 1:
                 rows = cur.fetchall()
-                #print "ROWS 2:", rows
                 yield rows
                 raise StopIteration()
             else:
                 rows = cur.fetchmany(segment_size)
                 if not rows:
                     raise StopIteration()
-                #print "ROWS 3:", rows
             if rows is None:
                 raise StopIteration()
             yield rows

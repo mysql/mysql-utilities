@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -181,9 +181,11 @@ if __name__ == '__main__':
         try:
             ssl_opts = get_ssl_dict(opt)
             server_val = parse_connection(opt.server, None, ssl_opts)
-        except FormatError as err:
+        except FormatError:
+            _, err, _ = sys.exc_info()
             parser.error("ERROR: {0}\n".format(err.errmsg))
         except UtilError as err:
+            _, err, _ = sys.exc_info()
             parser.error("ERROR: {0}\n".format(err.errmsg))
 
     # Create dictionary of options

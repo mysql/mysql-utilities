@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -60,6 +60,7 @@ class test(copy_db.test):
                 raise MUTLibError("Cannot spawn needed "
                                   "servers: {0}".format(err.errmsg))
         self.server2 = self.servers.get_server(1)
+        self.server3 = self.servers.get_server(2)
         self.drop_all()
         data_file = os.path.normpath("./std_data/basic_data.sql")
         try:
@@ -76,7 +77,6 @@ class test(copy_db.test):
             raise MUTLibError("Failed to read commands from file {0}: "
                               "{1}".format(data_file_backticks, err.errmsg))
 
-        self.server3 = self.servers.get_server(2)
         # Drop all databases on server3
         try:
             rows = self.server3.exec_query("SHOW DATABASES")
@@ -190,6 +190,21 @@ class test(copy_db.test):
 
     def record(self):
         return self.save_result_file(__name__, self.results)
+
+    def drop_all(self):
+        """Drops all databases and users created.
+        """
+        # this DBs may not be created on subclasses.
+        copy_db.test.drop_all(self)
+
+        drop_user = ["DROP USER 'joe'@'user'", "DROP USER 'joe_wildcard'@'%'",
+                     "DROP USER 'joe'@'localhost'"]
+        for drop in drop_user:
+            try:
+                self.server3.exec_query(drop)
+            except UtilError:
+                pass
+        return True
 
     def cleanup(self):
         self.drop_db(self.server1, 'util_test')

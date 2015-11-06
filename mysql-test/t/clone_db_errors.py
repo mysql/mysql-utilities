@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -100,9 +100,13 @@ class test(clone_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         try:
-            self.server1.exec_query("GRANT ALL ON util_test.* TO 'joe'@'%'")
+            self.server1.exec_query("CREATE USER 'joe'@'%'")
         except UtilDBError as err:
             raise MUTLibError("{0}: failed: {1}".format(comment, err.errmsg))
+        try:
+            self.server1.exec_query("GRANT ALL ON util_test.* TO 'joe'@'%'")
+        except UtilDBError as err:
+            raise MUTLibError("{0}: failed1: {1}".format(comment, err.errmsg))
         try:
             self.server1.exec_query("GRANT SELECT ON mysql.* TO 'joe'@'%'")
         except UtilDBError as err:

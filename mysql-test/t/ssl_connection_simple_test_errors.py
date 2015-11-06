@@ -279,7 +279,11 @@ class test(ssl_connection_simple_test.test):
         self.replace_result("| root[...]",
                             "| root[...]\n")
         self.remove_result_and_lines_after("              config_file:", 16)
-        self.remove_result_and_lines_after("| db_name             |", 12)
+        if self.server2.check_version_compat(5, 7, 7):
+            self.remove_result_and_lines_after("| db_name             |", 13)
+        else:
+            self.remove_result_and_lines_after("| db_name             |", 12)
+
         self.remove_result("# Database totals:")
         self.remove_result_and_lines_after("Total database disk u", 2)
         self.replace_substring("mysqldiskusage: error: Lost connection",
@@ -296,6 +300,14 @@ class test(ssl_connection_simple_test.test):
                             " 'XXXX-XXXX:XXXX'\n")
         self.replace_result("certificate verify failed",
                             "certificate verify failed\n")
+        # Mask password field on grant statements since it stopped appearing on
+        # versions >= 5.7.6
+        self.replace_substring_portion(" IDENTIFIED BY PASSWORD '", "'", "")
+        # Remove warning that appears only on 5.7 and which is not important
+        # for the sake of this test.
+        self.remove_result_and_lines_around(
+            "WARNING: Unable to get size information from 'stderr' "
+            "for 'error log'.", lines_before=3, lines_after=1)
 
     def get_result(self):
         return self.compare(__name__, self.results)

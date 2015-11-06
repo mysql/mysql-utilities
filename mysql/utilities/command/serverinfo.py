@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -162,6 +162,9 @@ def _server_info(server_val, get_defaults=False, options=None):
             raise UtilError("Unable to determine {0} of server '{1}'"
                             ".".format(server_var, server_id))
 
+    # Verify if the server is a local server.
+    server_is_local = server.is_alias('localhost')
+
     # Get _LOG_FILES_VARIABLES values from the server
     for msg, log_tpl in _LOG_FILES_VARIABLES.iteritems():
         res = server.show_server_variable(log_tpl.log_name)
@@ -181,14 +184,31 @@ def _server_info(server_val, get_defaults=False, options=None):
             else:  # log error, so log_file_name is already on params_dict
                 log_file = params_dict[log_tpl.log_name]
 
-            # Now get the information about the size of the logs
+            # Size can only be obtained from the files of a local server.
+            if not server_is_local:
+                params_dict[log_tpl.log_file_size] = 'UNAVAILABLE'
+                # Show warning about log size unaviable.
+                params_dict['warnings'].append("Unable to get information "
+                                               "regarding variable '{0}' "
+                                               "from a remote server."
+                                               "".format(msg))
             # If log file is stderr, we cannot get the correct size.
-            if log_file not in ["stderr", "stdout"]:
+            elif log_file in ["stderr", "stdout"]:
+                params_dict[log_tpl.log_file_size] = 'UNKNOWN'
+                # Show warning about log unknown size.
+                params_dict['warnings'].append("Unable to get size information"
+                                               " from '{0}' for '{1}'."
+                                               "".format(log_file, msg))
+            else:
                 # Now get the information about the size of the logs
                 try:
+                    # log_file might be a relative path, in which case we need
+                    # to prepend the datadir path to it
+                    if not os.path.isabs(log_file):
+                        log_file = os.path.join(params_dict['datadir'],
+                                                log_file)
                     params_dict[log_tpl.log_file_size] = "{0} bytes".format(
                         os.path.getsize(log_file))
-
                 except os.error:
                     # if we are unable to get the log_file_size
                     params_dict[log_tpl.log_file_size] = ''
@@ -245,7 +265,7 @@ def _server_info(server_val, get_defaults=False, options=None):
     defaults = []
     if get_defaults:
         # Can only get defaults for local servers (need to access local data).
-        if server.is_alias('localhost'):
+        if server_is_local:
             try:
                 my_def_path = get_tool_path(params_dict['basedir'],
                                             "my_print_defaults", quote=True)
@@ -398,8 +418,9 @@ def _start_server(server_val, basedir, datadir, options=None):
 
     # Raise last known exception (if unable to connect to the server)
     if error:
-        raise error  # pylint: disable=E0702
-                     # See: http://www.logilab.org/ticket/3207
+        # See: http://www.logilab.org/ticket/3207
+        # pylint: disable=E0702
+        raise error
 
     if verbosity > 0:
         print "# done (server started)."

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -80,6 +80,7 @@ class test(mutlib.System_test):
         # Create users for the test
         create_user_stms = ["CREATE USER priv_test_user@'%'",
                             "CREATE USER priv_test_user2@'%'",
+                            "CREATE USER priv_test_user3@'%'",
                             ]
         for user_stm in create_user_stms:
             try:
@@ -150,6 +151,14 @@ class test(mutlib.System_test):
         cmd = ("{0} util_test util_test.t1 util_test.t2 "
                "util_test.does_not_exist util_test.v1 db_does_not_exist "
                "util_test.t3 {1}".format(cmd_base, cmd_arg))
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - show grants for all objects of a "
+                   "database using wildcard".format(test_num))
+        cmd = "{0} util_test.* ".format(cmd_base,)
         res = self.run_test_case(0, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

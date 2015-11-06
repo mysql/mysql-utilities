@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ _MASTER_INFO_COL = [
     'Master_SSL_CA_File', 'Master_SSL_CA_Path', 'Master_SSL_Cert',
     'Master_SSL_Cipher', 'Master_SSL_Key', 'Master_SSL_Verify_Server_Cert',
     'Heartbeat', 'Bind', 'Ignored_server_ids', 'Uuid', 'Retry_count',
-    'SSL_CRL', 'SSL_CRL_Path', 'Enabled_auto_position',
+    'SSL_CRL', 'SSL_CRL_Path', 'Enabled_auto_position', 'Channel_Name',
 ]
 
 _SLAVE_IO_STATE, _SLAVE_MASTER_HOST, _SLAVE_MASTER_USER, _SLAVE_MASTER_PORT, \
@@ -57,6 +57,12 @@ _MASTER_DO_DB, _MASTER_IGNORE_DB = 2, 3
 
 _RPL_USER_QUERY = """
     SELECT user, host, password = "" as has_password
+    FROM mysql.user
+    WHERE repl_slave_priv = 'Y'
+"""
+# Query for server versions >= 5.7.6.
+_RPL_USER_QUERY_5_7_6 = """
+    SELECT user, host, authentication_string = "" as has_password
     FROM mysql.user
     WHERE repl_slave_priv = 'Y'
 """
@@ -689,7 +695,7 @@ class Replication(object):
             elif not sql_running:
                 if self.verbosity > 0:
                     print "# Retry to start the slave SQL thread..."
-                #SQL thread is not running, retry to start it
+                # SQL thread is not running, retry to start it
                 res = self.slave.start_sql_thread(self.query_options)
             if self.verbosity > 0:
                 print "# Waiting for slave to synchronize with master"
@@ -826,7 +832,12 @@ class Master(Server):
         """
         if options is None:
             options = {}
-        return self.exec_query(_RPL_USER_QUERY, options)
+        # Use the correct query for server (changed for 5.7.6).
+        if self.check_version_compat(5, 7, 6):
+            query = _RPL_USER_QUERY_5_7_6
+        else:
+            query = _RPL_USER_QUERY
+        return self.exec_query(query, options)
 
     def create_rpl_user(self, host, port, r_user, r_pass=None, verbosity=0,
                         ssl=False):
@@ -847,11 +858,17 @@ class Master(Server):
                                     (False, <error>) = error
         """
 
+        grants_enabled = self.grant_tables_enabled()
+        if not grants_enabled:
+            return (True, None)
+
         if "]" in host:
             host = clean_IPv6(host)
 
         # Create user class instance
-        user = User(self, "%s@%s:%s" % (r_user, host, port), verbosity)
+        user = User(self, "%s:%s@%s:%s" % (r_user, r_pass, host, port))
+        if not user.exists():
+            user.create()
 
         if not user.has_privilege("*", "*", "REPLICATION SLAVE"):
             if verbosity > 0:
@@ -1161,9 +1178,14 @@ class MasterInfo(object):
         if res is None or res == []:
             return False
 
+        # Protect overrun of array if the master_info table size has changed
+        # (more rows than expected).
+        num = len(res[0][1:])
+        if num > len(_MASTER_INFO_COL):
+            num = len(_MASTER_INFO_COL)
         # Build dictionary for the information with column information
         rows = []
-        for i in range(0, len(res[0][1:])):
+        for i in range(0, num):
             rows.append(res[0][i + 1])
         self._build_dictionary(rows)
 
@@ -1755,7 +1777,7 @@ class Slave(Server):
         """
         slave_gtids = self.exec_query(_GTID_EXECUTED)[0][0]
         gtids = self.exec_query("SELECT GTID_SUBTRACT('%s','%s')" %
-                               (master_gtids[0][0], slave_gtids))[0]
+                                (master_gtids[0][0], slave_gtids))[0]
         # Init gtid_behind count (if no GTIDs behind then 0 is returned)
         gtid_behind = 0
         # Check if there are GTIDs behind
@@ -1916,7 +1938,7 @@ class Slave(Server):
         if master_passwd is not None:
             change_master += "MASTER_PASSWORD = '%s', " % master_passwd
         change_master += "MASTER_PORT = %s" % master_port
-        if master_ssl:
+        if master_ssl and master_ssl not in ('0', 'OFF'):
             change_master = "{0}, MASTER_SSL = {1}".format(change_master, 1)
         if master_ssl_ca is not None:
             change_master = ("{0}, MASTER_SSL_CA = '{1}'"

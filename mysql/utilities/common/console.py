@@ -1,6 +1,5 @@
-
 #
-# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,7 +46,9 @@ _COMMAND_KEY = {
     '\t': 'TAB',
     '\x7f': 'BACKSPACE_POSIX',
     '\xe0': 'SPECIAL_WIN',
-    '\x08': 'BACKSPACE_WIN'
+    '\x08': 'BACKSPACE_WIN',
+    '\x1bOH': 'HOME',
+    '\x1bOF': 'END'
 }
 
 # Some windows keys are different and require reading two keys.
@@ -57,7 +58,9 @@ _WIN_COMMAND_KEY = {
     'H': 'ARROW_UP',
     'P': 'ARROW_DN',
     'M': 'ARROW_RT',
-    'K': 'ARROW_LT'
+    'K': 'ARROW_LT',
+    'G': 'HOME',
+    'O': 'END'
 }
 
 _COMMAND_COMPLETE = 0
@@ -281,6 +284,23 @@ class _Command(object):
                 i += 1
         elif backspace:
             self._erase_portion(1)
+
+    def home_keypress(self):
+        """Executes the 'HOME' key press.
+
+        This moves the cursor to the beginning of the command.
+        """
+        tmp = self.position
+        self.position = 0
+        sys.stdout.write('\b' * tmp)
+
+    def end_keypress(self):
+        """Executes the 'END' key press.
+
+        This moves the cursor to the end of the command.
+        """
+        sys.stdout.write(self.command[self.position:self.length])
+        self.position = self.length
 
     def delete_keypress(self):
         """Execute the 'DELETE' key press.
@@ -623,7 +643,7 @@ class Console(object):
         defined variables and complete the name of variable. If the user
         types 'TAB' twice, it will display a list of all possible matches.
         """
-        #find the last $
+        # find the last $
         variable = ''
         start_var = 0
         new_var = ''
@@ -811,6 +831,10 @@ class Console(object):
             self.cmd_line.right_arrow_keypress()
         elif cmd_key in ['BACKSPACE_POSIX', 'BACKSPACE_WIN']:
             self.cmd_line.backspace_keypress()
+        elif cmd_key == 'HOME':
+            self.cmd_line.home_keypress()
+        elif cmd_key == 'END':
+            self.cmd_line.end_keypress()
         else:  # 'TAB'
             segment = self._set_complete_mode()
             self.tab_count += 1
@@ -898,7 +922,7 @@ class Console(object):
         cmd_string = ''
         cmd_key = None
         self.tab_count = 0
-        while not cmd_key in ['ENTER_POSIX', 'ENTER_WIN']:
+        while cmd_key not in ['ENTER_POSIX', 'ENTER_WIN']:
             key = getch()
             # If a special key, act on it
             if key in _COMMAND_KEY:

@@ -164,22 +164,21 @@ def add_ssl_options(parser):
     # --ssl options: ssl_ca, ssl_cert, ssl_key
     parser.add_option("--ssl-ca", action="callback",
                       callback=path_callback,
-                      type="string", help="The path to a file that contains "
+                      type="string", help="path to a file that contains "
                       "a list of trusted SSL CAs.")
 
     parser.add_option("--ssl-cert", action="callback",
                       callback=path_callback,
-                      type="string", help="The name of the SSL certificate "
+                      type="string", help="name of the SSL certificate "
                       "file to use for establishing a secure connection.")
 
     parser.add_option("--ssl-key", action="callback",
                       callback=path_callback,
-                      type="string", help="The name of the SSL key file to "
+                      type="string", help="name of the SSL key file to "
                       "use for establishing a secure connection.")
 
     parser.add_option("--ssl", action="callback", callback=ssl_callback,
-                      # default=0,
-                      type="int", help="Specifies if the server "
+                      type="int", help="specifies if the server "
                       "connection requires use of SSL. If an encrypted "
                       "connection cannot be established, the connection "
                       "attempt fails. By default 0 (SSL not required).")

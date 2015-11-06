@@ -358,7 +358,7 @@ class UtilitiesConsole(Console):
         dictionary_list = []
         for key in self.options.keys():
             # Skip variables list and messages
-            if not key in ['variables', 'welcome', 'goodbye']:
+            if key not in ['variables', 'welcome', 'goodbye']:
                 value = self.options.get(key, '')
                 item = {
                     'name': key,

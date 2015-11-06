@@ -6,13 +6,13 @@ Test case 1 : show help
                         <user>[:<password>]@<host>[:<port>][:<socket>] or
                         <login-path>[:<port>][:<socket>] or <config-
                         path>[<[group]>].
-  --ssl-ca=SSL_CA       The path to a file that contains a list of trusted SSL
+  --ssl-ca=SSL_CA       path to a file that contains a list of trusted SSL
                         CAs.
-  --ssl-cert=SSL_CERT   The name of the SSL certificate file to use for
+  --ssl-cert=SSL_CERT   name of the SSL certificate file to use for
                         establishing a secure connection.
-  --ssl-key=SSL_KEY     The name of the SSL key file to use for establishing a
+  --ssl-key=SSL_KEY     name of the SSL key file to use for establishing a
                         secure connection.
-  --ssl=SSL             Specifies if the server connection requires use of
+  --ssl=SSL             specifies if the server connection requires use of
                         SSL. If an encrypted connection cannot be established,
                         the connection attempt fails. By default 0 (SSL not
                         required).

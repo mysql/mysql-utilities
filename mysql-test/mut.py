@@ -301,6 +301,11 @@ def find_tests(path):
                             if wild == fname[0:len(wild)]:
                                 test_files.append(test_ref)
                                 break
+                    elif opt.like:
+                        for like in opt.like:
+                            if like in fname:
+                                test_files.append(test_ref)
+                                break
                     elif opt.skip_tests:
                         for skip in opt.skip_tests:
                             if skip != fname[0:len(skip)]:
@@ -331,6 +336,12 @@ if __name__ == "__main__":
     parser.add_option("--do-tests", action="append", dest="wildcard",
                       type="string", help="execute all tests that begin "
                       "with this string. List option multiple times "
+                      "to add multiple wildcards.")
+
+    # Add test like option
+    parser.add_option("--run-tests-like", action="append", dest="like",
+                      type="string", help="execute all tests that contains "
+                      "this string. List option multiple times "
                       "to add multiple wildcards.")
 
     # Add suite list option
@@ -467,6 +478,11 @@ if __name__ == "__main__":
     if opt.wildcard:
         for wild in opt.wildcard:
             print("  Test wildcard       = '{0}%%'".format(wild))
+
+    # Is there a --do-test?
+    if opt.like:
+        for wild in opt.like:
+            print("  Test wildcard       = '%{0}%'".format(wild))
 
     # Check to see if we're skipping tests
     if opt.skip_test:

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -611,8 +611,7 @@ class SQLTransformer(object):
             values['null'] = " NOT NULL"
         else:
             values['null'] = " NULL"
-        if col_data[_COLUMN_DEFAULT] is not None and \
-           len(col_data[_COLUMN_DEFAULT]) > 0:
+        if col_data[_COLUMN_DEFAULT] is not None:
             def_val = col_data[_COLUMN_DEFAULT]
             # add quotes if needed
             if def_val.upper() != "CURRENT_TIMESTAMP":
@@ -889,7 +888,7 @@ class SQLTransformer(object):
         # Generate DROP foreign key clauses
         for fkey in drop_rows:
             drop_constraints.append("  DROP FOREIGN KEY %s" % fkey[0])
-            #if fkey[0] not in drop_idx_recorded:
+            # if fkey[0] not in drop_idx_recorded:
             #    constraints.append("  DROP INDEX %s" % fkey[0])
 
         # Generate Add foreign key clauses
@@ -989,7 +988,7 @@ class SQLTransformer(object):
 
         # Get the Table instances
         self.dest_tbl = Table(self.destination_db.source, "%s.%s" %
-                             (dest_db, dest_name))
+                              (dest_db, dest_name))
         self.src_tbl = Table(self.source_db.source, "%s.%s" %
                              (src_db, src_name))
 

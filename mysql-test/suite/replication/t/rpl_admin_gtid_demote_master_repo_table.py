@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ class test(rpl_admin.test):
         test_num += 1
         # mysqlrpladmin --master=root:root@localhost:13091
         # --new-master=root:root@localhost:13094
-        #--discover-slaves-login=root:root --demote-master  switchover
+        # --discover-slaves-login=root:root --demote-master  switchover
         # --rpl-user=rpl:rplpass
         comment = ("Test case {0} - demote-master after switchover "
                    "-vvv".format(test_num))
@@ -180,25 +180,6 @@ class test(rpl_admin.test):
                             "| No               | 0             |           "
                             "| 0              |            "
                             "| 0             |\n")
-
-        self.replace_result("+------------+-------+---------+--------"
-                            "+------------+---------+-------------",
-                            "+------------+-------+---------+--------"
-                            "+------------+---------+-------------"
-                            "+-------------------+-----------------"
-                            "+------------+-------------+--------------"
-                            "+------------------+---------------+-----------"
-                            "+----------------+------------+---------------+"
-                            "\n")
-        self.replace_result("| host       | port  | role    | state  "
-                            "| gtid_mode  | health  | version  ",
-                            "| host       | port  | role    | state  "
-                            "| gtid_mode  | health  | version     "
-                            "| master_log_file   | master_log_pos  "
-                            "| IO_Thread  | SQL_Thread  | Secs_Behind  "
-                            "| Remaining_Delay  | IO_Error_Num  | IO_Error  "
-                            "| SQL_Error_Num  | SQL_Error  | Trans_Behind  |"
-                            "\n")
 
         self.mask_column_result("| version", "|", 2, " XXXXXXXX ")
         self.mask_column_result("| master_log_file", "|", 2, " XXXXXXXX ")

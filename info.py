@@ -14,9 +14,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 #
+"""This module containts the Metadata for Python Software Packages"""
 
-import distutils.command.build_scripts
-import distutils.util
 import glob
 import os
 
@@ -35,7 +34,7 @@ def find_packages(*args, **kwrds):
     Packages can be excluded by pattern using the 'exclude' keyword,
     which accepts a list of patterns.  All packages with names that
     match the beginning of an exclude pattern will be excluded.
-    
+
     Root base path can be attached to each package by using 'inc_base'
     keyword.
     """
@@ -44,14 +43,14 @@ def find_packages(*args, **kwrds):
     inc_base = kwrds.get('inc_base', False)
     pkgs = {}
     for base_path in args:
-        for root, _dirs, files in os.walk(base_path):
+        for root, _, files in os.walk(base_path):
             if '__init__.py' in files:
                 assert root.startswith(base_path)
                 pkg = root[len(base_path)+1:].replace(os.sep, '.')
                 if inc_base and pkg:
-                        pkg = os.path.join(base_path, pkg).replace(os.sep, '.')
+                    pkg = os.path.join(base_path, pkg).replace(os.sep, '.')
                 elif inc_base:
-                        pkg = base_path.replace(os.sep, '.')
+                    pkg = base_path.replace(os.sep, '.')
                 pkgs[pkg] = root
 
     result = pkgs.keys()
@@ -67,7 +66,7 @@ def add_optional_resources(*args, **kwrds):
 
     The function will try to find all resources in the directory names given,
     that will be searched to find packages, data files and scripts.
-    
+
     Packages are identified as sub-directories containing an __init__.py file.
     All duplicates will be removed from the list and it will be sorted
     alphabetically. This function uses the find_packages function; see his
@@ -75,12 +74,12 @@ def add_optional_resources(*args, **kwrds):
 
     Scripts must be set on 'scripts', and a list of the desired scripts to add
     must be given by 'scripts' keyword.
-    
-    Data files can be set in a dictionary with the keyword 
+
+    Data files can be set in a dictionary with the keyword
     'data_files', where destination is used as key and a list of source files,
     are the item for that key.
     """
-    
+
     excludes = kwrds.get('exclude', [])
     inc_base = kwrds.get('inc_base', True)
     data_files = kwrds.get('data_files', {})
@@ -94,11 +93,11 @@ def add_optional_resources(*args, **kwrds):
     packages_found.extend(pkgs)
 
     scripts_found = []
-    for root, _dirs, scripts in os.walk('scripts'):
+    for _, _, scripts in os.walk('scripts'):
         for script in scripts:
             script_path = os.path.join('scripts', script)
-            if (not script_path.endswith('.py') and 
-                not os.path.exists('{0}.py'.format(script_path))):
+            if not script_path.endswith('.py') and \
+               not os.path.exists('{0}.py'.format(script_path)):
                 os.rename(script_path, '{0}.py'.format(script_path))
                 script_path = '{0}.py'.format(script_path)
             if script_path.endswith('.py'):
@@ -106,12 +105,12 @@ def add_optional_resources(*args, **kwrds):
     print("scripts found: {0}".format(scripts_found))
 
     data_files_found = []
-    for root, _dirs, data_files in os.walk('data'):
+    for _, _, data_files in os.walk('data'):
         datafiles = []
         zipfiles = []
         otherfiles = []
         for src in data_files:
-            name, ext = os.path.splitext(src)
+            _, ext = os.path.splitext(src)
             if ext == '.zip' and os.name != 'nt':
                 zipfiles.append(os.path.join('data', src))
             else:
@@ -157,8 +156,8 @@ META_INFO = {
         'Operating System :: OS Independent',
         'Operating System :: POSIX',
         'Topic :: Utilities',
-        ],
-    }
+    ],
+}
 
 INSTALL = {
     'packages': [
@@ -166,21 +165,20 @@ INSTALL = {
         'mysql.utilities',
         'mysql.utilities.command',
         'mysql.utilities.common',
-        ],
+    ],
     'scripts': glob.glob('scripts/*.py'),
     'requires': [
         'distutils',
-        ],
+    ],
     'provides': [
         'mysql.utilities',
-        ],
-    }
+    ],
+}
 # This adds any optional resource
 add_optional_resources('mysql', exclude=["tests"])
 
-if __name__=="__main__":
+if __name__ == "__main__":
     for key, item in INSTALL.iteritems():
         print("--> {0}".format(key))
         print("      {0}".format(item))
         print
-

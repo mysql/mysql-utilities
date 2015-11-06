@@ -1,0 +1,390 @@
+Test Case 1 : Testing import with SQL format and BRIEF display for database 'util_test_fk'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 2 : Testing import with SQL format and BRIEF display for database 'util_test_fk2'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 3 : Testing import with SQL format and BRIEF display for database 'util_test_fk3'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 4 : Testing import with CSV format and BRIEF display for database 'util_test_fk'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 5 : Testing import with CSV format and BRIEF display for database 'util_test_fk2'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 6 : Testing import with CSV format and BRIEF display for database 'util_test_fk3'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 7 : Testing import with TAB format and BRIEF display for database 'util_test_fk'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 8 : Testing import with TAB format and BRIEF display for database 'util_test_fk2'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 9 : Testing import with TAB format and BRIEF display for database 'util_test_fk3'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 10 : Testing import with GRID format and BRIEF display for database 'util_test_fk'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 11 : Testing import with GRID format and BRIEF display for database 'util_test_fk2'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 12 : Testing import with GRID format and BRIEF display for database 'util_test_fk3'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 13 : Testing import with VERTICAL format and BRIEF display for database 'util_test_fk'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 14 : Testing import with VERTICAL format and BRIEF display for database 'util_test_fk2'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 15 : Testing import with VERTICAL format and BRIEF display for database 'util_test_fk3'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 16 : Testing import with SQL format and FULL display for database 'util_test_fk'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 17 : Testing import with SQL format and FULL display for database 'util_test_fk2'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 18 : Testing import with SQL format and FULL display for database 'util_test_fk3'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 19 : Testing import with CSV format and FULL display for database 'util_test_fk'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 20 : Testing import with CSV format and FULL display for database 'util_test_fk2'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 21 : Testing import with CSV format and FULL display for database 'util_test_fk3'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 22 : Testing import with TAB format and FULL display for database 'util_test_fk'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 23 : Testing import with TAB format and FULL display for database 'util_test_fk2'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 24 : Testing import with TAB format and FULL display for database 'util_test_fk3'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 25 : Testing import with GRID format and FULL display for database 'util_test_fk'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 26 : Testing import with GRID format and FULL display for database 'util_test_fk2'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 27 : Testing import with GRID format and FULL display for database 'util_test_fk3'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 28 : Testing import with VERTICAL format and FULL display for database 'util_test_fk'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 2, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 29 : Testing import with VERTICAL format and FULL display for database 'util_test_fk2'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 3, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Test Case 30 : Testing import with VERTICAL format and FULL display for database 'util_test_fk3'.
+BEFORE:
+OBJECT COUNTS: tables = 0, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 
+Running export...
+Running import...
+WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+# Importing definitions and data from test_run.txt.
+CAUTION: The following warning messages were included in the import file:
+# WARNING: Using a password on the command line interface can be insecure.
+#...done.
+AFTER:
+OBJECT COUNTS: tables = 1, views = 0, triggers = 0, procedures = 0, functions = 0, events = 0 

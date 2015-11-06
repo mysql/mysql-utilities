@@ -196,7 +196,7 @@ def copy_db(src_val, dest_val, db_list, options):
         dbs = [db[0] for db in db_list]
         for db in all_dbs:
             if db[0].upper() in ["MYSQL", "INFORMATION_SCHEMA",
-                                 "PERFORMANCE_SCHEMA"]:
+                                 "PERFORMANCE_SCHEMA", "SYS"]:
                 continue
             if not db[0] in dbs:
                 print _GTID_BACKUP_WARNING
