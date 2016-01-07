@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -422,7 +422,7 @@ def _export_data(source, server_values, db_list, output_file, options):
     # Get tables list.
     table_list = []
     for db_name in db_list:
-        source_db = Database(source, db_name)
+        source_db = Database(source, db_name, options)
         # Build table list.
         tables = source_db.get_db_objects("TABLE")
         for table in tables:
