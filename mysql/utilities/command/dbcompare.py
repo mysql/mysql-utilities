@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -516,13 +516,16 @@ def compare_all_databases(server1_val, server2_val, exclude_list, options):
     }
     server1, server2 = connect_servers(server1_val, server2_val, conn_options)
 
-    # Check if the specified servers are the same.
-    if server1.port == server2.port and server1.is_alias(server2.host):
+    # Check if the specified servers are the same
+    if server2 is None or server1.port == server2.port and \
+            server1.is_alias(server2.host):
         raise UtilError(
             "Specified servers are the same (server1={host1}:{port1} and "
             "server2={host2}:{port2}). Cannot compare all databases on the "
             "same server.".format(host1=server1.host, port1=server1.port,
-                                  host2=server2.host, port2=server2.port))
+                                  host2=getattr(server2, "host", server1.host),
+                                  port2=getattr(server2, "port", server1.port))
+        )
 
     # Get all databases, except those used in --exclude
     get_dbs_query = """

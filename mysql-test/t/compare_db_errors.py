@@ -282,6 +282,17 @@ class test(compare_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - Cannot compare all databases on the same "
+                   "server and with the same connection string."
+                   "").format(test_num)
+        s2_conn_same_srv = s1_conn.replace('--server1', '--server2')
+        cmd_str = ("mysqldbcompare.py {0} {1} {2}"
+                   "".format(s1_conn, s2_conn_same_srv, "--all"))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask output..
         self.replace_substring(str(self.server1.port), "PORT1")
         self.replace_result("mysqldbcompare: error: Server1 connection "
