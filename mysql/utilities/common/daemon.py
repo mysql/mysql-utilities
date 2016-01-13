@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class Daemon(object):
 
     This is a base class for implementing a POSIX daemon.
     """
-    def __init__(self, pidfile, umask=0, chdir="/", stdin=None, stdout=None,
+    def __init__(self, pidfile, umask=0o27, chdir="/", stdin=None, stdout=None,
                  stderr=None):
         """Constructor
 

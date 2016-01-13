@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ replicate_ms_daemon test.
 
 import os
 import re
+import stat
 import time
 
 import replicate_ms
@@ -116,6 +117,11 @@ class test(replicate_ms.test):
             raise MUTLibError("{0}: failed - timeout waiting for "
                               "logfile '{1}' to be "
                               "created.".format(comment, logfile))
+
+        # Test if pidfile was created with the correct umask
+        if oct(stat.S_IMODE(os.stat(pidfile).st_mode)) != "0640":
+            raise MUTLibError("{0}: failed - the pidfile was not created with "
+                              "the correct umask.".format(comment))
 
         # Wait for switching all the masters
         self.wait_for_switching_all_masters(logfile, comment)
