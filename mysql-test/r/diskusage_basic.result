@@ -12,11 +12,11 @@ Test Case 2 : Testing disk space (with empty)
 WARNING: Using a password on the command line interface can be insecure.
 # Source on localhost: ... connected.
 # Database totals:
-+------------+----------+
-| db_name    |   total  |
-+------------+----------+
-| util_test  | XXXXXXX  |
-+------------+----------+
++------------+---------+
+| db_name    |  total  |
++------------+---------+
+| util_test  | XXXXXX  |
++------------+---------+
 
 Total database disk usage = XXXXXXX
 

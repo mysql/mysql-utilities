@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2014 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2016 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@ def _get_db_dir_size(folder):
         return None
     for item in os.listdir(folder):
         name, ext = os.path.splitext(item)
-        if ext.upper() not in (".MYD", ".MYI") and \
+        if ext.upper() not in (".MYD", ".MYI", ".IBD") and \
            name.upper() not in ('SLOW_LOG', 'GENERAL_LOG'):
             itemfolder = os.path.join(folder, item)
             if os.path.isfile(itemfolder):
@@ -397,10 +397,10 @@ def _build_db_list(server, rows, include_list, datadir, fmt=False,
             db_total = 0
         else:
             data_size = int(row[1])
-            db_total = int(row[1]) + misc_files
+            db_total = dbdir_size
 
         # Count total for all databases
-        total += data_size + misc_files
+        total += dbdir_size
 
         if have_read and not is_remote:
             if verbosity >= 2:  # get all columns
