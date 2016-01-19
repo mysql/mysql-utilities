@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -239,7 +239,9 @@ def server_connect(server1_val, server2_val, object1, object2, options):
     if server2 is None:
         server2 = server1
 
-    if server1 == server2 and object1 == object2:
+    # Check if the specified objects and servers are the same.
+    if object1 == object2 and server1.port == server2.port and \
+       server1.is_alias(server2.host):
         raise UtilError("Comparing the same object on the same server.")
 
     return (server1, server2)
