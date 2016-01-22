@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,28 +49,37 @@ class test(mutlib.System_test):
             self.need_server = True
         return self.check_num_servers(1)
 
-    def setup(self):
+    def setup(self, spawn_servers=True, data_files=None):
         self.res_fname = "result.txt"
-        if self.need_server:
+        if spawn_servers and self.need_server:
             try:
                 self.servers.spawn_new_servers(2)
             except MUTLibError as err:
                 raise MUTLibError("Cannot spawn needed servers: {0}"
                                   "".format(err.errmsg))
-        self.server1 = self.servers.get_server(1)
+        if self.server1 is None:
+            self.server1 = self.servers.get_server(1)
 
         # Cleanup databases
         self.drop_all()
 
         # Load test databases
-        data_file = os.path.normpath("./std_data/basic_data.sql")
+        if data_files is None:
+            data_file = os.path.normpath("./std_data/basic_data.sql")
+        else:
+            data_file = os.path.normpath(data_files[0])
         try:
             self.server1.read_and_exec_SQL(data_file, self.debug)
         except UtilError as err:
             raise MUTLibError("Failed to read commands from file {0}: {1}"
                               "".format(data_file, err.errmsg))
 
-        data_file_backticks = os.path.normpath("./std_data/backtick_data.sql")
+        if data_files is None:
+            data_file_backticks = os.path.normpath(
+                "./std_data/backtick_data.sql"
+            )
+        else:
+            data_file_backticks = os.path.normpath(data_files[1])
         try:
             self.server1.read_and_exec_SQL(data_file_backticks, self.debug)
         except UtilError as err:

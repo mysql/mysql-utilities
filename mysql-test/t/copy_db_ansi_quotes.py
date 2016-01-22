@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
 #
 
 """
-copy_db test.
+copy_db test. Servers with sql_mode=ANSI_QUOTES
 """
 
 import os
 
-import mutlib
+import copy_db
 
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.exception import MUTLibError
@@ -29,80 +29,62 @@ from mysql.utilities.exception import UtilDBError
 from mysql.utilities.exception import UtilError
 
 
-class test(mutlib.System_test):
+_DEFAULT_MYSQL_OPTS = ('"--report-host=localhost --report-port={0} '
+                       '--bind-address=:: --sql-mode=ANSI_QUOTES"')
+
+
+class test(copy_db.test):
     """simple db copy
     This test executes copy database test cases among two servers.
+    Both servers are set with sql_mode=ANSI_QUOTES.
     """
 
     server1 = None
     server2 = None
     need_server = False
+    prev_sql_mode = "''"
 
-    def check_prerequisites(self):
-        self.check_gtid_unsafe()
-        # Need at least one server.
-        self.server1 = None
-        self.server2 = None
-        self.need_server = False
-        if not self.check_num_servers(2):
-            self.need_server = True
-        return self.check_num_servers(1)
+    def setup(self):
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+        self.server1 = self.servers.spawn_server("compare_db_srv1_ansi_quotes",
+                                                 mysqld, True)
+        mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
+        self.server2 = self.servers.spawn_server("compare_db_srv2_ansi_quotes",
+                                                 mysqld, True)
 
-    def setup(self, spawn_servers=True):
-        if spawn_servers:
-            self.server1 = self.servers.get_server(0)
-            if self.need_server:
-                try:
-                    self.servers.spawn_new_servers(2)
-                except MUTLibError as err:
-                    raise MUTLibError("Cannot spawn needed servers: {0}"
-                                      "".format(err.errmsg))
-        if self.server2 is None:
-            self.server2 = self.servers.get_server(1)
         self.drop_all()
-        data_file = os.path.normpath("./std_data/basic_data.sql")
-        try:
-            self.server1.read_and_exec_SQL(data_file, self.debug)
-        except UtilError as err:
-            raise MUTLibError("Failed to read commands from file {0}: {1}"
-                              "".format(data_file, err.errmsg))
 
-        # Create backtick database (with weird names)
-        data_file_backticks = os.path.normpath("./std_data/backtick_data.sql")
-        try:
-            self.server1.read_and_exec_SQL(data_file_backticks, self.debug)
-        except UtilError as err:
-            raise MUTLibError("Failed to read commands from file {0}: {1}"
-                              "".format(data_file_backticks, err.errmsg))
+        std_data = "./std_data/{0}"
+        data_files = ["basic_data_ansi_quotes.sql",
+                      "backtick_data_ansi_quotes.sql",
+                      "db_copy_views_ansi_quotes.sql", "blob_data.sql"]
 
-        # Create database with test VIEWS.
-        data_file_views = os.path.normpath("./std_data/db_copy_views.sql")
-        try:
-            self.server1.read_and_exec_SQL(data_file_views, self.debug)
-        except UtilError as err:
-            raise MUTLibError("Failed to read commands from file "
-                              "{0}: {1}".format(data_file_views, err.errmsg))
+        # load source data files
+        for data_file in data_files:
+            data_fl_path = os.path.normpath(std_data.format(data_file))
+            try:
+                self.server1.read_and_exec_SQL(data_fl_path, self.debug)
+            except UtilError as err:
+                raise MUTLibError("Failed to read commands from file "
+                                  "{0}: {1}".format(data_fl_path, err.errmsg))
 
-        # Load database with with blobs and insert data.
-        data_file_blobs = os.path.normpath("./std_data/blob_data.sql")
-        try:
-            self.server1.read_and_exec_SQL(data_file_blobs, self.debug)
-        except UtilError as err:
-            raise MUTLibError("Failed to read commands from file {0}: {1}"
-                              "".format(data_file_blobs, err.errmsg))
+        # Create user 'joe'@'localhost'
+        for server in [self.server1, self.server2]:
+            try:
+                server.exec_query("CREATE USER 'joe'@'localhost'")
+            except UtilError as err:
+                raise MUTLibError("Failed to create user: {0}"
+                                  "".format(err.errmsg))
 
-        # Create user 'joe'@'localhost' in source server
-        try:
-            self.server1.exec_query("CREATE USER 'joe'@'localhost'")
-        except UtilError as err:
-            raise MUTLibError("Failed to create user: {0}".format(err.errmsg))
+        if self.server1.select_variable("SQL_MODE") != "ANSI_QUOTES":
+            raise MUTLibError("Failed to set SQL_MODE=ANSI_QUOTES to server"
+                              " {0}:{1}".format(self.server1.host,
+                                                self.server1.port))
 
-        # Create user 'joe'@'localhost' in destination server
-        try:
-            self.server2.exec_query("CREATE USER 'joe'@'localhost'")
-        except UtilError as err:
-            raise MUTLibError("Failed to create user: {0}".format(err.errmsg))
-
+        if self.server2.select_variable("SQL_MODE") != "ANSI_QUOTES":
+            raise MUTLibError("Failed to set SQL_MODE=ANSI_QUOTES to server"
+                              " {0}:{1}".format(self.server2.host,
+                                                self.server2.port))
         return True
 
     def run(self):
@@ -176,9 +158,9 @@ class test(mutlib.System_test):
                    "names (backticks)".format(test_num))
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
-            cmd_arg = "'`db``:db`:`db``:db_clone`'"
+            cmd_arg = "'\"db`:db\":\"db`:db_clone\"'"
         else:
-            cmd_arg = '"`db``:db`:`db``:db_clone`"'
+            cmd_arg = '"\\"db`:db\\":\\"db`:db_clone\\""'
         cmd = "mysqldbcopy.py {0} {1} {2}".format(from_conn, to_conn, cmd_arg)
         res = self.exec_util(cmd, self.res_fname)
         self.results.append(res)
@@ -190,9 +172,9 @@ class test(mutlib.System_test):
                    "names (backticks)".format(test_num))
         # Set input parameter with appropriate quotes for the OS
         if os.name == 'posix':
-            cmd_arg = "'`db``:db`'"
+            cmd_arg = "'\"db`:db\"'"
         else:
-            cmd_arg = '"`db``:db`"'
+            cmd_arg = '"\\"db`:db\\""'
         cmd = "mysqldbcopy.py {0} {1} {2}".format(from_conn, to_conn, cmd_arg)
         res = self.exec_util(cmd, self.res_fname)
         self.results.append(res)
@@ -215,14 +197,27 @@ class test(mutlib.System_test):
         # "A partial copy from a server that has GTIDs.." messages
         # when setup is invoke from subclasses and other tests and
         # to avoid the creation of an additional file.
-        queries = [("CREATE DATABASE util_test_default_collation "
-                    "DEFAULT COLLATE utf8_general_ci"),
-                   ("CREATE TABLE util_test_default_collation.t1 "
-                    "(a char(30)) ENGINE=MEMORY"),
-                   ("CREATE DATABASE util_test_default_charset "
-                    "DEFAULT CHARACTER SET utf8"),
-                   ("CREATE TABLE util_test_default_charset.t1 "
-                    "(a char(30)) ENGINE=MEMORY")]
+        queries = [
+            ("CREATE DATABASE util_test_default_collation "
+             "DEFAULT COLLATE utf8_general_ci"),
+            ("CREATE TABLE util_test_default_collation.t1 "
+             "(a char(30)) ENGINE=MEMORY"),
+            ("CREATE DATABASE util_test_default_charset "
+             "DEFAULT CHARACTER SET utf8"),
+            ("CREATE TABLE util_test_default_charset.t1 "
+             "(a char(30)) ENGINE=MEMORY"),
+            'CREATE DATABASE "util""test" ',
+            ('CREATE TABLE "util""test"."t""1" ('
+             '"id" int(11) NOT NULL AUTO_INCREMENT,'
+             '"name" varchar(100) DEFAULT NULL,'
+             'PRIMARY KEY ("id")'
+             ') ENGINE=InnoDB DEFAULT CHARSET=latin1'),
+            ('CREATE TABLE "util""test"."t""2" ('
+             '"i""d" int(11) NOT NULL AUTO_INCREMENT,'
+             '"na""me" varchar(100) DEFAULT NULL,'
+             'PRIMARY KEY ("i""d")'
+             ') ENGINE=InnoDB DEFAULT CHARSET=latin1'),
+        ]
         for query in queries:
             self.server1.exec_query(query)
 
@@ -251,6 +246,8 @@ class test(mutlib.System_test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
+        prev_sql_mode = self.server1.select_variable("SQL_MODE")
+        self.server1.exec_query("SET @@SESSION.SQL_MODE=''")
         try:
             # Grant ALL on `util_test` for user 'joe'@'localhost' on source
             self.server1.exec_query("GRANT ALL ON `util_test`.* "
@@ -286,6 +283,8 @@ class test(mutlib.System_test):
             res = self.server1.exec_query(query)
             for row in res:
                 self.server1.exec_query(row[0])
+            self.server1.exec_query("SET @@SESSION.SQL_MODE={0}"
+                                    "".format(prev_sql_mode))
 
             # Change DEFINER in the triggers on the source server
             self.server1.exec_query("DROP TRIGGER util_test.trg")
@@ -338,7 +337,51 @@ class test(mutlib.System_test):
             raise MUTLibError("Failed to restore SQL_MODE: "
                               "{0}".format(err.errmsg))
 
+        # Database and table with single double quotes (") on identifier
+        test_num += 1
+        comment = "Test case {0} - copydb single double quote".format(test_num)
+        dbs = '\\"util\\"\\"test\\":\\"util\\"\\"test_copy\\"'
+        cmd = ("mysqldbcopy.py --skip-gtid {0} {1} {2} -vv"
+               "".format(from_conn, to_conn, dbs))
+        res = self.run_test_case(0, cmd, comment)
+        self.results.append(res)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Database and table with single double quotes (") on identifier
+        # and destination with SQL_MODE to ''.
+        # Change SQL_MODE to '' in the destination server
+        try:
+            previous_sql_mode = self.server2.select_variable("SQL_MODE")
+            self.server2.exec_query("SET @@GLOBAL.SQL_MODE="
+                                    "''")
+        except UtilError as err:
+            raise MUTLibError("Failed to change SQL_MODE: "
+                              "{0}".format(err.errmsg))
+
+        test_num += 1
+        comment = ("Test case {0} - copydb single double quote "
+                   "and destination server with SQL_MODE set to "
+                   "''".format(test_num))
+        if os.name == 'posix':
+            dbs = "'\"util\"\"test\":`util\"test_no_backslash_escapes`'"
+        else:
+            dbs = '\\"util\\"\\"test\\":`util\\"test_no_backslash_escapes`'
+        cmd = ("mysqldbcopy.py --skip-gtid {0} {1} {2} -vv"
+               "".format(from_conn, to_conn, dbs))
+        res = self.run_test_case(0, cmd, comment)
+        self.results.append(res)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
         return True
+
+        # Restore previous SQL_MODE in the destination server
+        try:
+            self.server2.exec_query("SET @@GLOBAL.SQL_MODE='{0}'"
+                                    "".format(previous_sql_mode))
+        except UtilError as err:
+            raise MUTLibError("Failed to restore SQL_MODE: "
+                              "{0}".format(err.errmsg))
 
     def get_result(self):
         msg = []
@@ -347,7 +390,9 @@ class test(mutlib.System_test):
                                 'db`:db', 'views_test_clone',
                                 'util_db_privileges', 'blob_test_clone',
                                 'blob_test_multi',
-                                'blob_test_no_backslash_escapes']
+                                'blob_test_no_backslash_escapes',
+                                'util"test_copy',
+                                'util"test_no_backslash_escapes']
         copied_db_on_server1 = ["util_test_default_collation_copy",
                                 "util_test_default_charset_copy"]
 
@@ -391,10 +436,7 @@ class test(mutlib.System_test):
             self.server1.exec_query("USE {0}".format(cmp_data[0]))
             res = self.server1.exec_query("SHOW TABLES")
             for row in res:
-                table = quote_with_backticks(
-                    row[0],
-                    self.server1.select_variable("SQL_MODE")
-                )
+                table = quote_with_backticks(row[0], self.prev_sql_mode)
                 base_checksum = self.server1.exec_query(
                     "CHECKSUM TABLE {0}".format(table)
                 )[0][1]
@@ -464,14 +506,15 @@ class test(mutlib.System_test):
                                "util_test_default_collation",
                                "util_test_default_charset_copy",
                                "util_test_default_collation_copy",
-                               "blob_test"]
+                               "blob_test", 'util"test']
         for db in db_drops_on_server1:
             self.drop_db(self.server1, db)
 
         db_drops_on_server2 = ["util_test", 'db`:db', "util_db_clone",
                                'db`:db_clone', "views_test_clone",
                                "blob_test_clone", "blob_test_multi",
-                               "blob_test_no_backslash_escapes"]
+                               "blob_test_no_backslash_escapes",
+                               'util""test_copy']
         for db in db_drops_on_server2:
             self.drop_db(self.server2, db)
 
@@ -486,6 +529,8 @@ class test(mutlib.System_test):
         return True
 
     def cleanup(self):
-        if self.res_fname:
-            os.unlink(self.res_fname)
-        return self.drop_all()
+        # Kill the servers that are only for this test.
+        kill_list = ["compare_db_srv1_ansi_quotes",
+                     "compare_db_srv2_ansi_quotes"]
+        copy_db.test.cleanup(self)
+        return self.kill_server_list(kill_list)

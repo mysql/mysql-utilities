@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ from collections import defaultdict
 from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.database import Database
 from mysql.utilities.common.options import check_engine_options
+from mysql.utilities.common.pattern_matching import parse_object_name
 from mysql.utilities.common.table import Table
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.sql_transform import (quote_with_backticks,
@@ -462,7 +463,8 @@ def _get_db(row):
     return db_name
 
 
-def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
+def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None,
+                        sql_mode=''):
     """Build the CREATE TABLE command for a table.
 
     This method uses the data from the _read_next() method to build a
@@ -473,16 +475,17 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
     engine[in]        Storage engine name for the table
     columns[in]       A list of the column definitions for the table
     col_ref[in]       A dictionary of column names/indexes
+    sql_mode[in]      The sql_mode set in the server
 
     Returns (string) the CREATE TABLE statement.
     """
     if col_ref is None:
         col_ref = {}
     # Quote db_name and tbl_name with backticks if needed
-    if not is_quoted_with_backticks(db_name):
-        db_name = quote_with_backticks(db_name)
-    if not is_quoted_with_backticks(tbl_name):
-        tbl_name = quote_with_backticks(tbl_name)
+    if not is_quoted_with_backticks(db_name, sql_mode):
+        db_name = quote_with_backticks(db_name, sql_mode)
+    if not is_quoted_with_backticks(tbl_name, sql_mode):
+        tbl_name = quote_with_backticks(tbl_name, sql_mode)
 
     create_str = "CREATE TABLE %s.%s (\n" % (db_name, tbl_name)
     stop = len(columns)
@@ -507,8 +510,8 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
         cur_col = columns[column]
         # Quote column name with backticks if needed
         col_name = cur_col[col_name_index]
-        if not is_quoted_with_backticks(col_name):
-            col_name = quote_with_backticks(col_name)
+        if not is_quoted_with_backticks(col_name, sql_mode):
+            col_name = quote_with_backticks(col_name, sql_mode)
         if col_name not in used_columns:
             # Only add the column definitions to the CREATE string once.
             change_line = ",\n" if column > 0 else ""
@@ -551,10 +554,11 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
         key_list = []
         for key in pri_keys:
             # Quote keys with backticks if needed
-            if not is_quoted_with_backticks(key):
+            if not is_quoted_with_backticks(key, sql_mode):
                 # Handle multiple columns separated by a comma (,)
                 cols = key.split(',')
-                key = ','.join([quote_with_backticks(col) for col in cols])
+                key = ','.join([quote_with_backticks(col, sql_mode) for col
+                                in cols])
             key_list.append(key)
         key_str = "PRIMARY KEY({0})".format(",".join(key_list))
         key_strs.append(key_str)
@@ -564,10 +568,11 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
         if not key_constraints[key]:
             # Handle simple keys
             # Quote column key with backticks if needed
-            if not is_quoted_with_backticks(key):
+            if not is_quoted_with_backticks(key, sql_mode):
                 # Handle multiple columns separated by a comma (,)
                 cols = key.split(',')
-                key = ','.join([quote_with_backticks(col) for col in cols])
+                key = ','.join([quote_with_backticks(col, sql_mode) for col
+                                in cols])
             key_str = "{key_type}KEY ({column})".format(key_type=key_type,
                                                         column=key)
             key_strs.append(key_str)
@@ -578,19 +583,20 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
                 key_name = ''
                 if const_def[0] and const_def[0] != const_def[3]:
                     # Quote key name with backticks if needed
-                    if not is_quoted_with_backticks(const_def[0]):
+                    if not is_quoted_with_backticks(const_def[0], sql_mode):
                         key_name = '{0} '.format(
-                            quote_with_backticks(const_def[0]))
+                            quote_with_backticks(const_def[0], sql_mode))
                     else:
                         key_name = '{0} '.format(const_def[0])
                 # Use constraint columns as key if available.
                 if const_def[3]:
                     key = const_def[3]
                 # Quote column key with backticks if needed
-                if not is_quoted_with_backticks(key):
+                if not is_quoted_with_backticks(key, sql_mode):
                     # Handle multiple columns separated by a comma (,)
                     cols = key.split(',')
-                    key = ','.join([quote_with_backticks(col) for col in cols])
+                    key = ','.join([quote_with_backticks(col, sql_mode)
+                                    for col in cols])
                 key_str = "{key_type}KEY {key_name}({column})".format(
                     key_type=key_type, key_name=key_name, column=key
                 )
@@ -599,22 +605,26 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None):
                     # Handle constraint (referenced_table_name found)
                     const_name = const_def[0]
                     # Quote constraint name with backticks if needed
-                    if const_name and not is_quoted_with_backticks(const_name):
-                        const_name = quote_with_backticks(const_name)
+                    if const_name and not is_quoted_with_backticks(const_name,
+                                                                   sql_mode):
+                        const_name = quote_with_backticks(const_name,
+                                                          sql_mode)
                     fkey = const_def[3]
                     # Quote fkey columns with backticks if needed
-                    if not is_quoted_with_backticks(fkey):
+                    if not is_quoted_with_backticks(fkey, sql_mode):
                         # Handle multiple columns separated by a comma (,)
                         cols = fkey.split(',')
                         fkey = ','.join(
-                            [quote_with_backticks(col) for col in cols])
+                            [quote_with_backticks(col, sql_mode) for col
+                             in cols])
                     ref_key = const_def[4]
                     # Quote reference key columns with backticks if needed
-                    if not is_quoted_with_backticks(ref_key):
+                    if not is_quoted_with_backticks(ref_key, sql_mode):
                         # Handle multiple columns separated by a comma (,)
                         cols = ref_key.split(',')
                         ref_key = ','.join(
-                            [quote_with_backticks(col) for col in cols])
+                            [quote_with_backticks(col, sql_mode) for col
+                             in cols])
                     ref_rules = ''
                     if const_def[6] and const_def[6] == 'CASCADE':
                         ref_rules = ' ON DELETE CASCADE'
@@ -657,7 +667,7 @@ def _build_column_ref(row):
     return indexes
 
 
-def _build_create_objects(obj_type, db, definitions):
+def _build_create_objects(obj_type, db, definitions, sql_mode=''):
     """Build the CREATE and GRANT SQL statements for object definitions.
 
     This method takes the object information read from the file using the
@@ -668,6 +678,7 @@ def _build_create_objects(obj_type, db, definitions):
     obj_type[in]      The object type
     db[in]            The database
     definitions[in]   The list of object definition data from the file
+    sql_mode[in]      The sql_mode set in the server
 
     Returns (string[]) - a list of SQL statements for the objects
     """
@@ -700,29 +711,28 @@ def _build_create_objects(obj_type, db, definitions):
             else:
                 create_str = _build_create_table(obj_db, obj_name,
                                                  old_engine,
-                                                 col_list, col_ref)
+                                                 col_list, col_ref, sql_mode)
                 create_strings.append(create_str)
                 obj_db = defn[col_ref.get("TABLE_SCHEMA", 0)]
                 obj_name = defn[col_ref.get("TABLE_NAME", 1)]
                 col_list = [defn]
             # check for end.
             if i + 1 == stop:
-                create_str = _build_create_table(obj_db, obj_name,
-                                                 engine,
-                                                 col_list, col_ref)
+                create_str = _build_create_table(obj_db, obj_name, engine,
+                                                 col_list, col_ref, sql_mode)
                 create_strings.append(create_str)
         elif obj_type == "VIEW":
             # Quote table schema and name with backticks if needed
             if not is_quoted_with_backticks(defn[col_ref.get("TABLE_SCHEMA",
-                                                             0)]):
+                                                             0)], sql_mode):
                 obj_db = quote_with_backticks(defn[col_ref.get("TABLE_SCHEMA",
-                                                               0)])
+                                                               0)], sql_mode)
             else:
                 obj_db = defn[col_ref.get("TABLE_SCHEMA", 0)]
             if not is_quoted_with_backticks(defn[col_ref.get("TABLE_NAME",
-                                                             1)]):
+                                                             1)], sql_mode):
                 obj_name = quote_with_backticks(defn[col_ref.get("TABLE_NAME",
-                                                                 1)])
+                                                                 1)], sql_mode)
             else:
                 obj_name = defn[col_ref.get("TABLE_NAME", 1)]
             # Create VIEW statement
@@ -736,27 +746,33 @@ def _build_create_objects(obj_type, db, definitions):
             create_strings.append(create_str)
         elif obj_type == "TRIGGER":
             # Quote required identifiers with backticks
-            obj_db = quote_with_backticks(db) \
-                if not is_quoted_with_backticks(db) else db
+            obj_db = quote_with_backticks(db, sql_mode) \
+                if not is_quoted_with_backticks(db, sql_mode) else db
 
             if not is_quoted_with_backticks(defn[col_ref.get("TRIGGER_NAME",
-                                                             0)]):
+                                                             0)], sql_mode):
                 obj_name = quote_with_backticks(
-                    defn[col_ref.get("TRIGGER_NAME", 0)])
+                    defn[col_ref.get("TRIGGER_NAME", 0)],
+                    sql_mode
+                )
             else:
                 obj_name = defn[col_ref.get("TRIGGER_NAME", 0)]
 
             if not is_quoted_with_backticks(
-               defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)]):
+               defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)], sql_mode):
                 evt_scma = quote_with_backticks(
-                    defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)])
+                    defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)],
+                    sql_mode
+                )
             else:
                 evt_scma = defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)]
 
             if not is_quoted_with_backticks(
-               defn[col_ref.get("EVENT_OBJECT_TABLE", 4)]):
+               defn[col_ref.get("EVENT_OBJECT_TABLE", 4)], sql_mode):
                 evt_tbl = quote_with_backticks(
-                    defn[col_ref.get("EVENT_OBJECT_TABLE", 4)])
+                    defn[col_ref.get("EVENT_OBJECT_TABLE", 4)],
+                    sql_mode
+                )
             else:
                 evt_tbl = defn[col_ref.get("EVENT_OBJECT_TABLE", 4)]
 
@@ -780,11 +796,13 @@ def _build_create_objects(obj_type, db, definitions):
             create_strings.append(create_str)
         elif obj_type in ("PROCEDURE", "FUNCTION"):
             # Quote required identifiers with backticks
-            obj_db = quote_with_backticks(db) \
-                if not is_quoted_with_backticks(db) else db
+            obj_db = quote_with_backticks(db, sql_mode) \
+                if not is_quoted_with_backticks(db, sql_mode) else db
 
-            if not is_quoted_with_backticks(defn[col_ref.get("NAME", 0)]):
-                obj_name = quote_with_backticks(defn[col_ref.get("NAME", 0)])
+            if not is_quoted_with_backticks(defn[col_ref.get("NAME", 0)],
+                                            sql_mode):
+                obj_name = quote_with_backticks(defn[col_ref.get("NAME", 0)],
+                                                sql_mode)
             else:
                 obj_name = defn[col_ref.get("NAME", 0)]
 
@@ -806,11 +824,13 @@ def _build_create_objects(obj_type, db, definitions):
             create_strings.append(create_str)
         elif obj_type == "EVENT":
             # Quote required identifiers with backticks
-            obj_db = quote_with_backticks(db) \
-                if not is_quoted_with_backticks(db) else db
+            obj_db = quote_with_backticks(db, sql_mode) \
+                if not is_quoted_with_backticks(db, sql_mode) else db
 
-            if not is_quoted_with_backticks(defn[col_ref.get("NAME", 0)]):
-                obj_name = quote_with_backticks(defn[col_ref.get("NAME", 0)])
+            if not is_quoted_with_backticks(defn[col_ref.get("NAME", 0)],
+                                            sql_mode):
+                obj_name = quote_with_backticks(defn[col_ref.get("NAME", 0)],
+                                                sql_mode)
             else:
                 obj_name = defn[col_ref.get("NAME", 0)]
 
@@ -849,10 +869,11 @@ def _build_create_objects(obj_type, db, definitions):
                 tbl = "*"
 
             # Quote required identifiers with backticks
-            obj_db = quote_with_backticks(db) \
-                if not is_quoted_with_backticks(db) else db
-            obj_tbl = quote_with_backticks(tbl) \
-                if (tbl != '*' and not is_quoted_with_backticks(tbl)) else tbl
+            obj_db = quote_with_backticks(db, sql_mode) \
+                if not is_quoted_with_backticks(db, sql_mode) else db
+            obj_tbl = quote_with_backticks(tbl, sql_mode) \
+                if (tbl != '*' and
+                    not is_quoted_with_backticks(tbl, sql_mode)) else tbl
 
             # Create GRANT statement
             create_str = "GRANT %s ON %s.%s TO %s" % (priv, obj_db, obj_tbl,
@@ -1303,11 +1324,12 @@ def import_file(dest_val, file_name, options):
 
     Returns bool True = success, False = error
     """
-    def _process_definitions(statements, table_col_list, db_name):
+    def _process_definitions(statements, table_col_list, db_name, sql_mode):
         """Helper method to dig through the definitions for create statements
         """
         # First, get the SQL strings
-        sql_strs = _build_create_objects(obj_type, db_name, definitions)
+        sql_strs = _build_create_objects(obj_type, db_name, definitions,
+                                         sql_mode)
         statements.extend(sql_strs)
         # Now, save the column list
         col_list = _build_col_metadata(obj_type, definitions)
@@ -1407,6 +1429,7 @@ def import_file(dest_val, file_name, options):
     supports_gtid = servers[0].supports_gtid() == 'ON'
     skip_gtid_warning_printed = False
     gtid_version_checked = False
+    sql_mode = destination.select_variable("SQL_MODE")
 
     if fmt == "raw_csv":
         # Use the first row as columns
@@ -1416,13 +1439,15 @@ def import_file(dest_val, file_name, options):
         use_columns_names = True
 
         table = options.get("table", None)
-        (db_name_part, tbl_name_part) = Database.parse_object_name(table)
+        (db_name_part, tbl_name_part) = parse_object_name(table, sql_mode)
 
         # Work with quoted objects
-        db_name = (db_name_part if is_quoted_with_backticks(db_name_part)
-                   else quote_with_backticks(db_name_part))
-        tbl_name = (tbl_name_part if is_quoted_with_backticks(tbl_name_part)
-                    else quote_with_backticks(tbl_name_part))
+        db_name = (db_name_part if is_quoted_with_backticks(db_name_part,
+                                                            sql_mode)
+                   else quote_with_backticks(db_name_part, sql_mode))
+        tbl_name = (tbl_name_part if is_quoted_with_backticks(tbl_name_part,
+                                                              sql_mode)
+                    else quote_with_backticks(tbl_name_part, sql_mode))
         tbl_name = ".".join([db_name, tbl_name])
 
         # Check database existence and permissions
@@ -1503,8 +1528,8 @@ def import_file(dest_val, file_name, options):
             else:
                 db_name = _get_db(row)
                 # quote db_name with backticks if needed
-                if db_name and not is_quoted_with_backticks(db_name):
-                    db_name = quote_with_backticks(db_name)
+                if db_name and not is_quoted_with_backticks(db_name, sql_mode):
+                    db_name = quote_with_backticks(db_name, sql_mode)
                 # No need to get the db_name when found.
                 get_db = False if db_name else get_db
                 if do_drop and import_type != "data":
@@ -1552,7 +1577,7 @@ def import_file(dest_val, file_name, options):
                     if obj_type != row[0]:
                         if len(definitions) > 0:
                             _process_definitions(statements, table_col_list,
-                                                 db_name)
+                                                 db_name, sql_mode)
                         obj_type = row[0]
                         definitions = []
                     if not _skip_object(row[0], options):
@@ -1560,7 +1585,8 @@ def import_file(dest_val, file_name, options):
         else:
             # see if there are any definitions to process
             if len(definitions) > 0:
-                _process_definitions(statements, table_col_list, db_name)
+                _process_definitions(statements, table_col_list, db_name,
+                                     sql_mode)
                 definitions = []
 
             if import_type in ("data", "both"):
@@ -1579,10 +1605,10 @@ def import_file(dest_val, file_name, options):
                             table_rows = []
                         read_columns = True
                         tbl_name = row[1]
-                        if not is_quoted_with_backticks(tbl_name):
+                        if not is_quoted_with_backticks(tbl_name, sql_mode):
                             db, _, tbl = tbl_name.partition('.')
-                            q_db = quote_with_backticks(db)
-                            q_tbl = quote_with_backticks(tbl)
+                            q_db = quote_with_backticks(db, sql_mode)
+                            q_tbl = quote_with_backticks(tbl, sql_mode)
                             tbl_name = ".".join([q_db, q_tbl])
                     else:
                         if read_columns:
@@ -1604,7 +1630,7 @@ def import_file(dest_val, file_name, options):
                                 has_data = True
     # Process remaining definitions
     if len(definitions) > 0:
-        _process_definitions(statements, table_col_list, db_name)
+        _process_definitions(statements, table_col_list, db_name, sql_mode)
         definitions = []
 
     # Process remaining data rows

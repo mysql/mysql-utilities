@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -45,7 +45,8 @@ from mysql.utilities.common.options import (add_discover_slaves_option,
                                             db_objects_list_to_dictionary,
                                             setup_common_options,
                                             check_password_security)
-from mysql.utilities.common.server import check_hostname_alias, Server
+from mysql.utilities.common.server import (check_hostname_alias,
+                                           connect_servers, Server)
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.topology import parse_topology_connections
 from mysql.utilities.exception import UtilError, UtilRplError
@@ -241,13 +242,26 @@ if __name__ == '__main__':
                                                   slave_host=slave.host,
                                                   slave_port=slave.port)
                 )
+        # Get the sql_mode set in master
+        conn_opts = {
+            'quiet': True,
+            'version': "5.1.30",
+        }
+        try:
+            servers = connect_servers(master_val, None, conn_opts)
+            sql_mode = servers[0].select_variable("SQL_MODE")
+        except UtilError:
+            sql_mode = ''
+    else:
+        sql_mode = ''
 
     # Process list of databases/tables to exclude (check format errors).
     data_to_exclude = {}
     if opt.exclude:
         exclude_list = [val for val in opt.exclude.split(',') if val]
         data_to_exclude = db_objects_list_to_dictionary(parser, exclude_list,
-                                                        'the --exclude option')
+                                                        'the --exclude option',
+                                                        sql_mode=sql_mode)
     elif opt.exclude == '':
         # Issue an error if --exclude is used with no value.
         parser.error(PARSE_ERR_OPT_REQ_VALUE.format(opt='--exclude'))
@@ -257,7 +271,8 @@ if __name__ == '__main__':
     if args:
         data_to_include = db_objects_list_to_dictionary(parser, args,
                                                         'the database/table '
-                                                        'arguments')
+                                                        'arguments',
+                                                        sql_mode=sql_mode)
 
     # Create dictionary of options
     options = {

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,9 @@ from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command.diff import object_diff, database_diff
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.tools import check_connector_python
-from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.pattern_matching import (
+    REGEXP_QUALIFIED_OBJ_NAME,
+    REGEXP_QUALIFIED_OBJ_NAME_AQ)
 from mysql.utilities.common.messages import (PARSE_ERR_DB_OBJ_MISSING,
                                              PARSE_ERR_DB_OBJ_MISSING_MSG,
                                              PARSE_ERR_DB_OBJ_PAIR,
@@ -45,6 +47,7 @@ from mysql.utilities.common.options import (add_difftype, add_verbosity,
                                             add_character_set_option,
                                             get_ssl_dict,
                                             check_password_security)
+from mysql.utilities.common.server import connect_servers
 
 
 # Constants
@@ -166,9 +169,34 @@ if __name__ == '__main__':
     if len(args) == 0:
         parser.error("No objects specified to compare.")
 
+    # Get the sql_mode set on source and destination server
+    conn_opts = {
+        'quiet': True,
+        'version': "5.1.30",
+    }
+    try:
+        servers = connect_servers(server1_values, server2_values, conn_opts)
+        server1_sql_mode = servers[0].select_variable("SQL_MODE")
+        if servers[1] is not None:
+            server2_sql_mode = servers[1].select_variable("SQL_MODE")
+        else:
+            server2_sql_mode = ''
+    except UtilError:
+        server1_sql_mode = ''
+        server2_sql_mode = ''
+
     # run the diff
     diff_failed = False
-    arg_regexp = re.compile(r'{0}(?:\:){0}'.format(REGEXP_QUALIFIED_OBJ_NAME))
+    arg_regex_server1 = REGEXP_QUALIFIED_OBJ_NAME
+    if "ANSI_QUOTES" in server1_sql_mode:
+        arg_regex_server1 = REGEXP_QUALIFIED_OBJ_NAME_AQ
+
+    arg_regex_server2 = REGEXP_QUALIFIED_OBJ_NAME
+    if "ANSI_QUOTES" in server2_sql_mode:
+        arg_regex_server2 = REGEXP_QUALIFIED_OBJ_NAME_AQ
+
+    arg_regexp = re.compile(r'{0}(?:\:){1}'.format(arg_regex_server1,
+                                                   arg_regex_server2))
     for argument in args:
         m_obj = arg_regexp.match(argument)
         if not m_obj:
@@ -178,7 +206,6 @@ if __name__ == '__main__':
                                                       db2_label='db2',
                                                       obj2_label='object2'))
         db1, obj1, db2, obj2 = m_obj.groups()
-
         # Verify if the size of the objects matched by the REGEX is equal to
         # the initial specified string. In general, this identifies the
         # missing use of backticks.

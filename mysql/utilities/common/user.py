@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ from mysql.utilities.common.grants_info import filter_grants
 from mysql.utilities.exception import UtilError, UtilDBError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection, clean_IPv6
 from mysql.utilities.common.messages import ERROR_USER_WITHOUT_PRIVILEGES
-from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.pattern_matching import parse_object_name
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   quote_with_backticks)
 
@@ -205,6 +205,7 @@ class User(object):
         """
 
         self.server1 = server1
+        self.sql_mode = self.server1.select_variable("SQL_MODE")
         self.user, self.passwd, self.host = parse_user_host(user)
         self.verbosity = verbosity
         self.current_user = None
@@ -290,7 +291,7 @@ class User(object):
         return (res is not None and len(res) >= 1)
 
     @staticmethod
-    def _get_grants_as_dict(grant_list, verbosity=0):
+    def _get_grants_as_dict(grant_list, verbosity=0, sql_mode=''):
         """Transforms list of grant string statements into a dictionary.
 
         grant_list[in]    List of grant strings as returned from the server
@@ -299,7 +300,7 @@ class User(object):
         """
         grant_dict = defaultdict(lambda: defaultdict(set))
         for grant in grant_list:
-            grant_tpl = User._parse_grant_statement(grant[0])
+            grant_tpl = User._parse_grant_statement(grant[0], sql_mode)
             # Ignore PROXY privilege, it is not yet supported
             if verbosity > 0:
                 if 'PROXY' in grant_tpl:
@@ -348,7 +349,8 @@ class User(object):
             # Cache user grants
             self.grant_list = grants[:]
             self.grant_dict = User._get_grants_as_dict(self.grant_list,
-                                                       self.verbosity)
+                                                       self.verbosity,
+                                                       self.sql_mode)
             # If current user is already using global host wildcard '%', there
             # is no need to run the show grants again.
             if globals_privs:
@@ -406,25 +408,25 @@ class User(object):
         """
 
         grant_stm_lst = self.get_grants(global_privs)
-        obj_name_regexp = re.compile(REGEXP_QUALIFIED_OBJ_NAME)
-        m_obj = obj_name_regexp.match(qualified_obj_name)
+        m_objs = parse_object_name(qualified_obj_name, self.sql_mode)
         grants = []
-        if not m_obj:
+        if not m_objs:
             raise UtilError("Cannot parse the specified qualified name "
                             "'{0}'".format(qualified_obj_name))
         else:
-            db_name, obj_name = m_obj.groups()
+            db_name, obj_name = m_objs
             # Quote database and object name if necessary
-            if not is_quoted_with_backticks(db_name):
-                db_name = quote_with_backticks(db_name)
+            if not is_quoted_with_backticks(db_name, self.sql_mode):
+                db_name = quote_with_backticks(db_name, self.sql_mode)
             if obj_name and obj_name != '*':
-                if not is_quoted_with_backticks(obj_name):
-                    obj_name = quote_with_backticks(obj_name)
+                if not is_quoted_with_backticks(obj_name, self.sql_mode):
+                    obj_name = quote_with_backticks(obj_name, self.sql_mode)
 
             # For each grant statement look for the ones that apply to this
             # user and object
             for grant_stm in grant_stm_lst:
-                grant_tpl = self._parse_grant_statement(grant_stm[0])
+                grant_tpl = self._parse_grant_statement(grant_stm[0],
+                                                        self.sql_mode)
                 if grant_tpl:
                     # Check if any of the privileges applies to this object
                     # and if it does then check if it inherited from this
@@ -477,11 +479,11 @@ class User(object):
             return True
 
         # Quote db and obj with backticks if necessary
-        if not is_quoted_with_backticks(db) and db != '*':
-            db = quote_with_backticks(db)
+        if not is_quoted_with_backticks(db, self.sql_mode) and db != '*':
+            db = quote_with_backticks(db, self.sql_mode)
 
-        if not is_quoted_with_backticks(obj) and obj != '*':
-            obj = quote_with_backticks(obj)
+        if not is_quoted_with_backticks(obj, self.sql_mode) and obj != '*':
+            obj = quote_with_backticks(obj, self.sql_mode)
 
         # USAGE privilege is the same as no privileges,
         # so everyone has it.
@@ -657,7 +659,7 @@ class User(object):
             res = server.exec_query(grant, self.query_options)
 
     @staticmethod
-    def _parse_grant_statement(statement):
+    def _parse_grant_statement(statement, sql_mode=''):
         """ Returns a namedtuple with the parsed GRANT information.
 
         statement[in] Grant string in the sql format returned by the server.
@@ -671,7 +673,8 @@ class User(object):
             (?:(?:(\*|`?[^']+`?)\.(\*|`?[^']+`?)) # object where grant applies
             | ('[^']*'@'[^']*')) # For proxy grants user/host
             \sTO\s([^@]+@[\S]+) # grantee
-            (?:\sIDENTIFIED\sBY\sPASSWORD(?:\s\'[^\']+\')?)? # optional pwd
+            (?:\sIDENTIFIED\sBY\sPASSWORD
+             (?:(?:\s<secret>)|(?:\s\'[^\']+\')?))? # optional pwd
             (?:\sREQUIRE\sSSL)? # optional SSL
             (\sWITH\sGRANT\sOPTION)? # optional grant option
             $ # End of grant statement
@@ -685,11 +688,11 @@ class User(object):
             # quote database name and object name with backticks
             if match.group(1).upper() != 'PROXY':
                 db = match.group(2)
-                if not is_quoted_with_backticks(db) and db != '*':
-                    db = quote_with_backticks(db)
+                if not is_quoted_with_backticks(db, sql_mode) and db != '*':
+                    db = quote_with_backticks(db, sql_mode)
                 obj = match.group(3)
-                if not is_quoted_with_backticks(obj) and obj != '*':
-                    obj = quote_with_backticks(obj)
+                if not is_quoted_with_backticks(obj, sql_mode) and obj != '*':
+                    obj = quote_with_backticks(obj, sql_mode)
             else:  # if it is not a proxy grant
                 db = obj = None
             grants = grant_tpl_factory(

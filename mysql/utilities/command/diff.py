@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ the definitions of two databases.
 import re
 
 from mysql.utilities.exception import UtilDBError
-from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.pattern_matching import parse_object_name
 from mysql.utilities.common.database import Database
 from mysql.utilities.common.dbcompare import (diff_objects, get_common_objects,
                                               server_connect)
@@ -59,17 +59,16 @@ def object_diff(server1_val, server2_val, object1, object2, options,
     # types can be found with the same name.
     if not object_type:
         # Get object types of object1
-        regexp_obj = re.compile(REGEXP_QUALIFIED_OBJ_NAME)
-        m_obj = regexp_obj.match(object1)
-        db_name, obj_name = m_obj.groups()
+        sql_mode = server1.select_variable("SQL_MODE")
+        db_name, obj_name = parse_object_name(object1, sql_mode)
         db = Database(server1, db_name, options)
         obj1_types = db.get_object_type(obj_name)
         if not obj1_types:
             raise UtilDBError("The object {0} does not exist.".format(object1))
 
         # Get object types of object2
-        m_obj = regexp_obj.match(object2)
-        db_name, obj_name = m_obj.groups()
+        sql_mode = server2.select_variable("SQL_MODE")
+        db_name, obj_name = parse_object_name(object2, sql_mode)
         db = Database(server2, db_name, options)
         obj2_types = db.get_object_type(obj_name)
         if not obj2_types:
@@ -126,9 +125,15 @@ def database_diff(server1_val, server2_val, db1, db2, options):
     if (len(in_db1) > 0 or len(in_db2) > 0) and not force:
         return False
 
+    # Get sql_mode value set on servers
+    server1_sql_mode = server1.select_variable("SQL_MODE")
+    server2_sql_mode = server2.select_variable("SQL_MODE")
+
     # Quote database names with backticks.
-    q_db1 = db1 if is_quoted_with_backticks(db1) else quote_with_backticks(db1)
-    q_db2 = db2 if is_quoted_with_backticks(db2) else quote_with_backticks(db2)
+    q_db1 = db1 if is_quoted_with_backticks(db1, server1_sql_mode) \
+        else quote_with_backticks(db1, server1_sql_mode)
+    q_db2 = db2 if is_quoted_with_backticks(db2, server2_sql_mode) \
+        else quote_with_backticks(db2, server2_sql_mode)
 
     # Do the diff for the databases themselves
     result = object_diff(server1, server2, q_db1, q_db2, options, 'DATABASE')
@@ -140,11 +145,16 @@ def database_diff(server1_val, server2_val, db1, db2, options):
     # For each that match, do object diff
     success = True
     for item in in_both:
-        # Quote object name with backticks (both have the same name).
-        q_obj_name = item[1][0] if is_quoted_with_backticks(item[1][0]) \
-            else quote_with_backticks(item[1][0])
-        object1 = "{0}.{1}".format(q_db1, q_obj_name)
-        object2 = "{0}.{1}".format(q_db2, q_obj_name)
+        # Quote object name with backticks with sql_mode from server1
+        q_obj_name1 = item[1][0] if \
+            is_quoted_with_backticks(item[1][0], server1_sql_mode) \
+            else quote_with_backticks(item[1][0], server1_sql_mode)
+        # Quote object name with backticks with sql_mode from server2
+        q_obj_name2 = item[1][0] if \
+            is_quoted_with_backticks(item[1][0], server2_sql_mode) \
+            else quote_with_backticks(item[1][0], server2_sql_mode)
+        object1 = "{0}.{1}".format(q_db1, q_obj_name1)
+        object2 = "{0}.{1}".format(q_db2, q_obj_name2)
         result = object_diff(server1, server2, object1, object2, options,
                              item[0])
         if result is not None:

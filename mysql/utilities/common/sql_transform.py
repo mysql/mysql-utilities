@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,18 +88,22 @@ def to_sql(obj):
     return str(to_sql.converter.quote(obj))  # pylint: disable=E1101
 
 
-def quote_with_backticks(identifier):
+def quote_with_backticks(identifier, sql_mode=''):
     """Quote the given identifier with backticks, converting backticks (`) in
-    the identifier name with the correct escape sequence (``).
+    the identifier name with the correct escape sequence (``) unless the
+    identifier is quoted (") as in sql_mode set to ANSI_QUOTES.
 
     identifier[in] identifier to quote.
 
     Returns string with the identifier quoted with backticks.
     """
-    return "`" + identifier.replace("`", "``") + "`"
+    if "ANSI_QUOTES" in sql_mode:
+        return '"{0}"'.format(identifier.replace('"', '""'))
+    else:
+        return "`{0}`".format(identifier.replace("`", "``"))
 
 
-def quote_with_backticks_definer(definer):
+def quote_with_backticks_definer(definer, sql_mode=''):
     """Quote the given definer clause with backticks.
 
     This functions quotes the given definer clause with backticks, converting
@@ -114,11 +118,11 @@ def quote_with_backticks_definer(definer):
     parts = definer.split('@')
     if len(parts) != 2:
         return definer
-    return '@'.join([quote_with_backticks(parts[0]),
-                     quote_with_backticks(parts[1])])
+    return '@'.join([quote_with_backticks(parts[0], sql_mode),
+                     quote_with_backticks(parts[1], sql_mode)])
 
 
-def remove_backtick_quoting(identifier):
+def remove_backtick_quoting(identifier, sql_mode=''):
     """Remove backtick quoting from the given identifier, reverting the
     escape sequence (``) to a backtick (`) in the identifier name.
 
@@ -126,20 +130,28 @@ def remove_backtick_quoting(identifier):
 
     Returns string with the identifier without backtick quotes.
     """
-    # remove backtick quotes
+    double_quoting = identifier.startswith('"') and identifier.endswith('"')
+    # remove quotes
     identifier = identifier[1:-1]
-    # Revert backtick escape sequence
-    return identifier.replace("``", "`")
+    if 'ANSI_QUOTES' in sql_mode and double_quoting:
+        return identifier.replace('""', '"')
+    else:
+        # Revert backtick escape sequence
+        return identifier.replace("``", "`")
 
 
-def is_quoted_with_backticks(identifier):
+def is_quoted_with_backticks(identifier, sql_mode=''):
     """Check if the given identifier is quoted with backticks.
 
     identifier[in] identifier to check.
 
     Returns True if the identifier has backtick quotes, and False otherwise.
     """
-    return identifier[0] == "`" and identifier[-1] == "`"
+    if 'ANSI_QUOTES' in sql_mode:
+        return (identifier[0] == "`" and identifier[-1] == "`") or \
+            (identifier[0] == '"' and identifier[-1] == '"')
+    else:
+        return identifier[0] == "`" and identifier[-1] == "`"
 
 
 def convert_special_characters(str_val):
@@ -197,7 +209,7 @@ def build_pkey_where_clause(table, row):
             key_col = pkey[0]                         # get the column name
             col_data = row[col_names.index(key_col)]  # get column value
             # quote key column with backticks
-            q_key_col = quote_with_backticks(key_col)
+            q_key_col = quote_with_backticks(key_col, table.sql_mode)
             pkey_cond_lst.append("{0} = {1}".format(q_key_col,
                                                     to_sql(col_data)))
         where_str = "{0}{1}".format(where_str, ' AND '.join(pkey_cond_lst))
@@ -900,7 +912,7 @@ class SQLTransformer(object):
         return (drop_constraints, add_constraints)
 
     @staticmethod
-    def _get_index_sql_clauses(rows):
+    def _get_index_sql_clauses(rows, sql_mode=''):
         """Return the ALTER TABLE index clauses for the table.
 
         This method returns the SQL index clauses for use in ALTER or CREATE
@@ -922,7 +934,7 @@ class SQLTransformer(object):
             unique_setting = None
             for key in rows:
                 if key[2] == 'PRIMARY':
-                    q_key = quote_with_backticks(key[4])
+                    q_key = quote_with_backticks(key[4], sql_mode)
                     pri_key_cols.append(q_key)
                 else:
                     if unique_name is None:
@@ -1018,7 +1030,10 @@ class SQLTransformer(object):
 
         # Generate ADD index clauses
         if len(add_idx) > 0:
-            add_indexes.extend(self._get_index_sql_clauses(add_idx))
+            add_indexes.extend(self._get_index_sql_clauses(
+                add_idx,
+                self.dest_tbl.sql_mode
+            ))
 
         return (drop_indexes, add_indexes)
 
@@ -1092,10 +1107,12 @@ class SQLTransformer(object):
         dest_tbl_name = self.destination[_TABLE_DEF][_TABLE_NAME]
 
         # Quote identifiers with bacticks
-        q_src_db_name = quote_with_backticks(src_db_name)
-        q_src_tbl_name = quote_with_backticks(src_tbl_name)
-        q_dest_db_name = quote_with_backticks(dest_db_name)
-        q_dest_tbl_name = quote_with_backticks(dest_tbl_name)
+        src_sql_mode = self.source_db.sql_mode
+        q_src_db_name = quote_with_backticks(src_db_name, src_sql_mode)
+        q_src_tbl_name = quote_with_backticks(src_tbl_name, src_sql_mode)
+        dest_sql_mode = self.destination_db.sql_mode
+        q_dest_db_name = quote_with_backticks(dest_db_name, dest_sql_mode)
+        q_dest_tbl_name = quote_with_backticks(dest_tbl_name, dest_sql_mode)
 
         # build a list of the parts
         statement_parts = [
@@ -1284,8 +1301,11 @@ class SQLTransformer(object):
                                          _ROUTINE_PARAMS])
 
         # Quote destination db and routine names with backticks
-        q_dest_db = quote_with_backticks(self.destination[_ROUTINE_DB])
-        q_dest_routine = quote_with_backticks(self.destination[_ROUTINE_NAME])
+        dest_sql_mode = self.destination_db.sql_mode
+        q_dest_db = quote_with_backticks(self.destination[_ROUTINE_DB],
+                                         dest_sql_mode)
+        q_dest_routine = quote_with_backticks(self.destination[_ROUTINE_NAME],
+                                              dest_sql_mode)
 
         # build a list of the parts
         statement_parts = [
@@ -1331,7 +1351,8 @@ class SQLTransformer(object):
 
             # Quote DEFINER with backticks
             statement_parts[2]['val'] = \
-                quote_with_backticks_definer(self.source[_ROUTINE_DEFINER])
+                quote_with_backticks_definer(self.source[_ROUTINE_DEFINER],
+                                             dest_sql_mode)
 
         # Add the returns for functions
         # Only when doing create or modifications to the body

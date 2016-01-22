@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,11 +47,11 @@ from mysql.utilities.common.options import (add_skip_options, add_verbosity,
                                             get_ssl_dict, setup_common_options,
                                             add_character_set_option,
                                             check_password_security)
+from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
 from mysql.utilities.common.tools import (check_connector_python,
                                           print_elapsed_time)
-
 
 # Constants
 NAME = "MySQL Utilities - mysqldbcopy "
@@ -266,12 +266,42 @@ if __name__ == '__main__':
     # Check replication options
     check_rpl_options(parser, opt)
 
+    # Get the sql_mode set on source and destination server
+    conn_opts = {
+        'quiet': True,
+        'version': "5.1.30",
+    }
+    try:
+        servers = connect_servers(source_values, dest_values, conn_opts)
+        src_sql_mode = servers[0].select_variable("SQL_MODE")
+        if servers[1] is not None:
+            dest_sql_mode = servers[1].select_variable("SQL_MODE")
+        else:
+            dest_sql_mode = src_sql_mode
+    except UtilError:
+        # Set defaults in case of invalid connection values
+        src_sql_mode = ''
+        dest_sql_mode = ''
+
+    # Form the regex to parse the database names
+    db_name_regex = r'(`(?:[^`]|``)+`|\w+)'
+    db_name_regex_aq = r'("(?:[^"]|"")+"|\w+)'
+    arg_regex_src = db_name_regex
+    if "ANSI_QUOTES" in src_sql_mode:
+        arg_regex_src = db_name_regex_aq
+
+    arg_regex_dest = db_name_regex
+    if "ANSI_QUOTES" in dest_sql_mode:
+        arg_regex_dest = db_name_regex_aq
+
+    arg_regexp = re.compile(r"{0}(?:(?::){1})?".format(arg_regex_src,
+                                                       arg_regex_dest))
+
     # Build list of databases to copy
     db_list = []
     for db in args:
         # Split the database names considering backtick quotes
-        grp = re.match(r"(`(?:[^`]|``)+`|\w+)(?:(?::)(`(?:[^`]|``)+`|\w+))?",
-                       db)
+        grp = arg_regexp.match(db)
         if not grp:
             parser.error(PARSE_ERR_DB_PAIR.format(db_pair=db,
                                                   db1_label='orig_db',
@@ -295,10 +325,11 @@ if __name__ == '__main__':
                                                       db2_value=new_db))
 
         # Remove backtick quotes (handled later)
-        orig_db = remove_backtick_quoting(orig_db) \
-            if is_quoted_with_backticks(orig_db) else orig_db
-        new_db = remove_backtick_quoting(new_db) \
-            if new_db and is_quoted_with_backticks(new_db) else new_db
+        orig_db = remove_backtick_quoting(orig_db, src_sql_mode) \
+            if is_quoted_with_backticks(orig_db, src_sql_mode) else orig_db
+        new_db = remove_backtick_quoting(new_db, dest_sql_mode) \
+            if new_db and is_quoted_with_backticks(new_db, dest_sql_mode) \
+            else new_db
         db_entry = (orig_db, new_db)
         db_list.append(db_entry)
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2014 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2016 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,11 @@ This file contains output string messages used by MySQL Utilities.
 EXTERNAL_SCRIPT_DOES_NOT_EXIST = ("'{path}' script cannot be found. Please "
                                   "check the path and filename for accuracy "
                                   "and try again.")
+
+ERROR_ANSI_QUOTES_MIX_SQL_MODE = ("One or more servers have SQL mode set to "
+                                  "ANSI_QUOTES, the {utility} requires to all "
+                                  "or none of the servers to be set with the "
+                                  "SQL mode set to ANSI_QUOTES.")
 
 ERROR_USER_WITHOUT_PRIVILEGES = ("User '{user}' on '{host}@{port}' does not "
                                  "have sufficient privileges to "

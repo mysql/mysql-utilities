@@ -438,6 +438,10 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     reporter = _CompareDBReport(options)
     reporter.print_heading()
 
+    # Get sql_mode value from servers
+    server1_sql_mode = server1.select_variable("SQL_MODE")
+    server2_sql_mode = server2.select_variable("SQL_MODE")
+
     # Remaining operations can occur in a loop one for each object.
     for item in in_both:
         error_list = []
@@ -445,10 +449,12 @@ def database_compare(server1_val, server2_val, db1, db2, options):
         # Set the object type
         obj_type = item[0]
 
-        q_obj1 = "{0}.{1}".format(quote_with_backticks(db1),
-                                  quote_with_backticks(item[1][0]))
-        q_obj2 = "{0}.{1}".format(quote_with_backticks(db2),
-                                  quote_with_backticks(item[1][0]))
+        q_obj1 = "{0}.{1}".format(quote_with_backticks(db1, server1_sql_mode),
+                                  quote_with_backticks(item[1][0],
+                                                       server1_sql_mode))
+        q_obj2 = "{0}.{1}".format(quote_with_backticks(db2, server2_sql_mode),
+                                  quote_with_backticks(item[1][0],
+                                                       server2_sql_mode))
 
         reporter.report_object(obj_type, item[1][0])
 

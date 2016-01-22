@@ -25,9 +25,13 @@ import difflib
 
 from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.utilities.common.format import print_list
-from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.pattern_matching import (
+    parse_object_name,
+    REGEXP_QUALIFIED_OBJ_NAME,
+    REGEXP_QUALIFIED_OBJ_NAME_AQ)
 from mysql.utilities.common.database import Database
 from mysql.utilities.common.lock import Lock
+from mysql.utilities.common.options import PARSE_ERR_OBJ_NAME_FORMAT
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.table import Table
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
@@ -107,7 +111,7 @@ _WARNING_INDEX_NOT_USABLE = ("# Warning: Specified index {idx} for table {tb}"
                              " cannot be used. It contains at least one "
                              "column that accepts null values.")
 
-_RE_EMPTY_ALTER_TABLE = "^ALTER TABLE {0};$".format(REGEXP_QUALIFIED_OBJ_NAME)
+_RE_EMPTY_ALTER_TABLE = "^ALTER TABLE {0};$"
 
 _RE_DASHES_DIG = re.compile(r"^\-{3}\s\d+")
 
@@ -154,10 +158,15 @@ def get_create_object(server, object_name, options, object_type):
     verbosity = options.get("verbosity", 0)
     quiet = options.get("quiet", False)
 
-    m_obj = re.match(REGEXP_QUALIFIED_OBJ_NAME, object_name)
-    db_name, obj_name = m_obj.groups()
+    # Get the sql_mode set on server
+    sql_mode = server.select_variable("SQL_MODE")
+
+    db_name, obj_name = parse_object_name(object_name, sql_mode)
     obj = [db_name]
 
+    if db_name is None:
+        raise UtilError(PARSE_ERR_OBJ_NAME_FORMAT.format(
+            obj_name=object_name, option=object_type.lower()))
     db = Database(server, obj[0], options)
 
     # Error if database does not exist
@@ -174,11 +183,11 @@ def get_create_object(server, object_name, options, object_type):
     if verbosity > 0 and not quiet:
         if obj_name:
             print("\n# Definition for object {0}.{1}:"
-                  "".format(remove_backtick_quoting(db_name),
-                            remove_backtick_quoting(obj_name)))
+                  "".format(remove_backtick_quoting(db_name, sql_mode),
+                            remove_backtick_quoting(obj_name, sql_mode)))
         else:
             print("\n# Definition for object {0}:"
-                  "".format(remove_backtick_quoting(db_name)))
+                  "".format(remove_backtick_quoting(db_name, sql_mode)))
         print create_stmt
 
     return create_stmt
@@ -388,10 +397,11 @@ def _get_transform(server1, server2, object1, object2, options,
     """
 
     try:
-        m_obj1 = re.match(REGEXP_QUALIFIED_OBJ_NAME, object1)
-        db1, name1 = m_obj1.groups()
-        m_obj2 = re.match(REGEXP_QUALIFIED_OBJ_NAME, object2)
-        db2, name2 = m_obj2.groups()
+        db1, name1 = parse_object_name(object1,
+                                       server1.select_variable("SQL_MODE"))
+
+        db2, name2 = parse_object_name(object2,
+                                       server2.select_variable("SQL_MODE"))
     except:
         raise UtilError("Invalid object name arguments for _get_transform"
                         "(): %s, %s." % (object1, object2))
@@ -445,10 +455,11 @@ def _check_tables_structure(server1, server2, object1, object2, options,
     the third is a boolean indicating if the partition options are the same.
     """
     try:
-        m_obj1 = re.match(REGEXP_QUALIFIED_OBJ_NAME, object1)
-        db1, name1 = m_obj1.groups()
-        m_obj2 = re.match(REGEXP_QUALIFIED_OBJ_NAME, object2)
-        db2, name2 = m_obj2.groups()
+        db1, name1 = parse_object_name(object1,
+                                       server1.select_variable("SQL_MODE"))
+
+        db2, name2 = parse_object_name(object2,
+                                       server2.select_variable("SQL_MODE"))
     except:
         raise UtilError("Invalid object name arguments for diff_objects(): "
                         "{0}, {1}.".format(object1, object2))
@@ -651,8 +662,12 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
     # Check if ALTER TABLE statement have changes. If not, it is probably
     # because there are differences but they have no influence on the create
     # table, such as different order on indexes.
-    if (diff_list and same_tbl_def and same_part_def
-       and re.match(_RE_EMPTY_ALTER_TABLE, diff_list[1])):
+    if "ANSI_QUOTES" in server1.select_variable("SQL_MODE"):
+        regex_pattern = REGEXP_QUALIFIED_OBJ_NAME_AQ
+    else:
+        regex_pattern = _RE_EMPTY_ALTER_TABLE.format(REGEXP_QUALIFIED_OBJ_NAME)
+    if diff_list and same_tbl_def and same_part_def and \
+       re.match(regex_pattern, diff_list[1]):
         print("[PASS]")
         return None
 
@@ -723,14 +738,15 @@ def _drop_compare_object(server, db_name, tbl_name):
     tbl_name[in]           table name
     """
     # Quote compare table appropriately with backticks
-    q_db_name = db_name if is_quoted_with_backticks(db_name) \
-        else quote_with_backticks(db_name)
-    if is_quoted_with_backticks(tbl_name):
-        q_tbl_name = remove_backtick_quoting(tbl_name)
+    sql_mode = server.select_variable("SQL_MODE")
+    q_db_name = db_name if is_quoted_with_backticks(db_name, sql_mode) \
+        else quote_with_backticks(db_name, sql_mode)
+    if is_quoted_with_backticks(tbl_name, sql_mode):
+        q_tbl_name = remove_backtick_quoting(tbl_name, sql_mode)
     else:
         q_tbl_name = tbl_name
     q_tbl_name = quote_with_backticks(
-        _COMPARE_TABLE_NAME.format(tbl=q_tbl_name))
+        _COMPARE_TABLE_NAME.format(tbl=q_tbl_name), sql_mode)
 
     try:
         # set autocommit=1 if it is 0, because CREATE TEMPORARY TABLE and
@@ -767,17 +783,19 @@ def _get_compare_objects(index_cols, table1,
     table = None
 
     # build primary key col definition
-    index_str = ''.join("{0}, ".format(quote_with_backticks(col[0]))
+    index_str = ''.join("{0}, ".format(quote_with_backticks(col[0],
+                                                            table1.sql_mode))
                         for col in index_cols)
     index_defn = ''.join("{0} {1}, ".
-                         format(quote_with_backticks(col[0]), col[1])
+                         format(quote_with_backticks(col[0], table1.sql_mode),
+                                col[1])
                          for col in index_cols)
     if index_defn == "":
         raise UtilError("Cannot generate index definition")
     else:
         # Quote compare table appropriately with backticks
         q_tbl_name = quote_with_backticks(
-            _COMPARE_TABLE_NAME.format(tbl=table1.tbl_name))
+            _COMPARE_TABLE_NAME.format(tbl=table1.tbl_name), table1.sql_mode)
 
         table = _COMPARE_TABLE.format(db=table1.q_db_name,
                                       compare_tbl=q_tbl_name,
@@ -963,7 +981,9 @@ def _make_sum_rows(table, idx_str, span_key_size=8):
 
     # Quote compare table appropriately with backticks
     q_tbl_name = quote_with_backticks(
-        _COMPARE_TABLE_NAME.format(tbl=table.tbl_name))
+        _COMPARE_TABLE_NAME.format(tbl=table.tbl_name),
+        table.sql_mode
+    )
 
     table.server.exec_query(
         _COMPARE_INSERT.format(db=table.q_db_name, compare_tbl=q_tbl_name,
@@ -1003,7 +1023,9 @@ def _get_rows_span(table, span, index):
     for row in span:
         # Quote compare table appropriately with backticks
         q_tbl_name = quote_with_backticks(
-            _COMPARE_TABLE_NAME.format(tbl=table.tbl_name))
+            _COMPARE_TABLE_NAME.format(tbl=table.tbl_name),
+            table.sql_mode
+        )
 
         span_rows = server.exec_query(
             _COMPARE_DIFF.format(db=table.q_db_name, compare_tbl=q_tbl_name,
@@ -1051,7 +1073,9 @@ def _get_changed_rows_span(table1, table2, span, index):
     for row in span:
         # Quote compare table appropriately with backticks
         q_tbl_name = quote_with_backticks(
-            _COMPARE_TABLE_NAME.format(tbl=table1.tbl_name))
+            _COMPARE_TABLE_NAME.format(tbl=table1.tbl_name),
+            table1.sql_mode
+        )
 
         span_rows = server1.exec_query(
             _COMPARE_DIFF.format(db=table1.q_db_name, compare_tbl=q_tbl_name,
@@ -1067,7 +1091,9 @@ def _get_changed_rows_span(table1, table2, span, index):
     for row in span:
         # Quote compare table appropriately with backticks
         q_tbl_name = quote_with_backticks(
-            _COMPARE_TABLE_NAME.format(tbl=table2.tbl_name))
+            _COMPARE_TABLE_NAME.format(tbl=table2.tbl_name),
+            table2.sql_mode
+        )
 
         span_rows = server2.exec_query(
             _COMPARE_DIFF.format(db=table2.q_db_name, compare_tbl=q_tbl_name,
@@ -1391,18 +1417,32 @@ def check_consistency(server1, server2, table1_name, table2_name,
         if reporter:
             reporter.report_state("SKIP")
 
+    # remove quotations to indexes
+    unq_use_indexes = []
+    if use_indexes:
+        for tbl, index in use_indexes:
+            unq_use_indexes.append((
+                remove_backtick_quoting(tbl, table1.sql_mode),
+                remove_backtick_quoting(index, table1.sql_mode)
+            ))
+            if table1.sql_mode != table2.sql_mode:
+                unq_use_indexes.append((
+                    remove_backtick_quoting(tbl, table2.sql_mode),
+                    remove_backtick_quoting(index, table2.sql_mode)
+                ))
+
     # if given get the unique_key for table_name
     table1_use_indexes = []
     if use_indexes:
         table1_use_indexes.extend(
-            [u_key for tb_name, u_key in use_indexes
-             if table1_name.endswith(".{0}".format(tb_name))]
+            [quote_with_backticks(u_key, table1.sql_mode) for tb_name, u_key
+             in unq_use_indexes if table1.tbl_name == tb_name]
         )
     table2_use_indexes = []
     if use_indexes:
         table2_use_indexes.extend(
-            [u_key for tb_name, u_key in use_indexes
-             if table2_name.endswith(".{0}".format(tb_name))]
+            [quote_with_backticks(u_key, table2.sql_mode) for tb_name, u_key
+             in unq_use_indexes if table2.tbl_name == tb_name]
         )
 
     if options.get('toggle_binlog', 'False'):
@@ -1432,7 +1472,7 @@ def check_consistency(server1, server2, table1_name, table2_name,
     pri_idx_str1, pri_idx_str2, used_index, used_index_name, msgs = (
         _setup_compare(table1, table2,
                        span_key_size,
-                       use_indexes=(table2_use_indexes, table2_use_indexes))
+                       use_indexes=(table1_use_indexes, table2_use_indexes))
     )
 
     # Add warnings to print them later.

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ class test(mutlib.System_test):
     server1 = None
     server2 = None
     need_server = False
+    data_files = []
 
     def check_prerequisites(self):
         self.check_gtid_unsafe()
@@ -47,26 +48,29 @@ class test(mutlib.System_test):
             self.need_server = True
         return self.check_num_servers(1)
 
-    def setup(self):
-        self.server1 = self.servers.get_server(0)
-        if self.need_server:
-            try:
-                self.servers.spawn_new_servers(2)
-            except MUTLibError as err:
-                raise MUTLibError("Cannot spawn needed servers: "
-                                  "{0}".format(err.errmsg))
-        self.server2 = self.servers.get_server(1)
+    def setup(self, spawn_servers=True):
+        if spawn_servers:
+            self.server1 = self.servers.get_server(0)
+            if self.need_server:
+                try:
+                    self.servers.spawn_new_servers(2)
+                except MUTLibError as err:
+                    raise MUTLibError("Cannot spawn needed servers: "
+                                      "{0}".format(err.errmsg))
+        if self.server2 is None:
+            self.server2 = self.servers.get_server(1)
         self.drop_all()
 
         # load SQL source files
-        data_files = [
-            os.path.normpath("./std_data/db_compare_test.sql"),
-            os.path.normpath("./std_data/db_compare_backtick.sql"),
-            os.path.normpath("./std_data/db_compare_use_indexes.sql"),
-            os.path.normpath("./std_data/db_compare_pkeys.sql"),
-            os.path.normpath("./std_data/db_compare_quotes.sql"),
-        ]
-        for data_file in data_files:
+        if not self.data_files:
+            self.data_files = [
+                os.path.normpath("./std_data/db_compare_test.sql"),
+                os.path.normpath("./std_data/db_compare_backtick.sql"),
+                os.path.normpath("./std_data/db_compare_use_indexes.sql"),
+                os.path.normpath("./std_data/db_compare_pkeys.sql"),
+                os.path.normpath("./std_data/db_compare_quotes.sql"),
+            ]
+        for data_file in self.data_files:
             try:
                 self.server1.read_and_exec_SQL(data_file, self.debug)
                 self.server2.read_and_exec_SQL(data_file, self.debug)
@@ -194,7 +198,6 @@ class test(mutlib.System_test):
 
     def run(self):
         self.mask_global = False  # Turn off global masks
-        self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
         s1_conn = "--server1={0}".format(
@@ -490,6 +493,15 @@ class test(mutlib.System_test):
         else:
             cmd_arg = ('no_primary_keys --use-indexes="`nonix_``2_nix_``2`.'
                        '`uk_no``nulls`" -t -vvv --skip-checksum-table')
+        if self.server1.select_variable("SQL_MODE") == "ANSI_QUOTES":
+            if os.name == 'posix':
+                cmd_arg = ("no_primary_keys --use-indexes='\"nonix_`2_nix_`2\""
+                           ".\"uk_no`nulls\"' -t -vvv --skip-checksum-table")
+            else:
+                cmd_arg = ('no_primary_keys --use-indexes='
+                           '"\\"nonix_`2_nix_`2\\".\\"uk_no`nulls\\"" -t -vvv'
+                           ' --skip-checksum-table')
+
         test_num += 1
         comment = ("Test case {0} - using --use-indexes with backticks "
                    "verbose (No differences)".format(test_num))
@@ -508,6 +520,13 @@ class test(mutlib.System_test):
         else:
             cmd_arg = ('no_primary_keys --use-indexes="`nonix_``2_nix_``2`.'
                        '`uk_no``nulls`" -t')
+        if self.server1.select_variable("SQL_MODE") == "ANSI_QUOTES":
+            if os.name == 'posix':
+                cmd_arg = ("no_primary_keys --use-indexes='\"nonix_`2_nix_`2\""
+                           ".\"uk_no`nulls\"' -t")
+            else:
+                cmd_arg = ('no_primary_keys --use-indexes='
+                           '"\\"nonix_`2_nix_`2\\".\\"uk_no`nulls\\"" -t')
         test_num += 1
         comment = ("Test case {0} - using --use-indexes with backticks "
                    "verbose (Differences) ".format(test_num))

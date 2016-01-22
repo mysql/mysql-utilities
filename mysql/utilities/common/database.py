@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ import sys
 from collections import deque
 
 from mysql.utilities.exception import UtilError, UtilDBError
-from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.pattern_matching import parse_object_name
 from mysql.utilities.common.options import obj2sql
 from mysql.utilities.common.server import connect_servers, Server
 from mysql.utilities.common.user import User
@@ -197,8 +197,11 @@ def _copy_table_data(source_srv, destination_srv, db_name, new_db_name,
     if not tbl_options.get("quiet", False):
         print("# Copying data for TABLE {0}.{1}".format(db_name,
                                                         tbl_name))
-    q_tbl_name = "{0}.{1}".format(quote_with_backticks(db_name),
-                                  quote_with_backticks(tbl_name))
+    source_sql_mode = source.select_variable("SQL_MODE")
+    q_tbl_name = "{0}.{1}".format(quote_with_backticks(db_name,
+                                                       source_sql_mode),
+                                  quote_with_backticks(tbl_name,
+                                                       source_sql_mode))
     tbl = Table(source, q_tbl_name, tbl_options)
     if tbl is None:
         raise UtilDBError("Cannot create table object before copy.", -1,
@@ -232,13 +235,17 @@ class Database(object):
         if options is None:
             options = {}
         self.source = source
+        # Get the SQL_MODE set on the source
+        self.sql_mode = self.source.select_variable("SQL_MODE")
         # Keep database identifier considering backtick quotes
-        if is_quoted_with_backticks(name):
+        if is_quoted_with_backticks(name, self.sql_mode):
             self.q_db_name = name
-            self.db_name = remove_backtick_quoting(self.q_db_name)
+            self.db_name = remove_backtick_quoting(self.q_db_name,
+                                                   self.sql_mode)
         else:
             self.db_name = name
-            self.q_db_name = quote_with_backticks(self.db_name)
+            self.q_db_name = quote_with_backticks(self.db_name,
+                                                  self.sql_mode)
         self.verbose = options.get("verbose", False)
         self.skip_tables = options.get("skip_tables", False)
         self.skip_views = options.get("skip_views", False)
@@ -310,9 +317,11 @@ class Database(object):
         """
 
         db = None
+        # Get the SQL_MODE set on the server
+        sql_mode = server.select_variable("SQL_MODE")
         if db_name:
-            db = db_name if is_quoted_with_backticks(db_name) \
-                else quote_with_backticks(db_name)
+            db = db_name if is_quoted_with_backticks(db_name, sql_mode) \
+                else quote_with_backticks(db_name, sql_mode)
         else:
             db = self.q_db_name
         op_ok = False
@@ -340,10 +349,11 @@ class Database(object):
 
         return True = database successfully created, False = error
         """
-
+        # Get the SQL_MODE set on the server
+        sql_mode = server.select_variable("SQL_MODE")
         if db_name:
-            db = db_name if is_quoted_with_backticks(db_name) \
-                else quote_with_backticks(db_name)
+            db = db_name if is_quoted_with_backticks(db_name, sql_mode) \
+                else quote_with_backticks(db_name, sql_mode)
         else:
             db = self.q_db_name
 
@@ -437,7 +447,7 @@ class Database(object):
             # Get view name and use backticks if necessary
             v_name = view[name_idx]
             if need_backtick:
-                v_name = quote_with_backticks(v_name)
+                v_name = quote_with_backticks(v_name, self.sql_mode)
 
             # Get view create statement and for each view in views_to_check
             # see if it is mentioned in the statement
@@ -461,8 +471,8 @@ class Database(object):
             # Mapping from view_names to views(brief, name or full)
             v_name_dict = {}
             for view in view_lst:
-                key = quote_with_backticks(view[name_idx]) if need_backtick \
-                    else view[name_idx]
+                key = quote_with_backticks(view[name_idx], self.sql_mode) if \
+                    need_backtick else view[name_idx]
                 v_name_dict[key] = view
 
             # Initialize sorted_tpl
@@ -587,7 +597,7 @@ class Database(object):
                                                                drop_str))
 
     def __create_object(self, obj_type, obj, show_grant_msg,
-                        quiet=False, new_engine=None, def_engine=None):
+                        quiet=True, new_engine=None, def_engine=None):
         """Create a database object.
 
         obj_type[in]       Object type (string) e.g. DATABASE
@@ -601,16 +611,20 @@ class Database(object):
 
         Note: will handle exception and print error if query fails
         """
+        # Use the sql_mode set on destination server
+        dest_sql_mode = self.destination.select_variable("SQL_MODE")
+        q_new_db = quote_with_backticks(self.new_db, dest_sql_mode)
+        q_db_name = quote_with_backticks(self.db_name, dest_sql_mode)
         if obj_type == _TABLE and self.cloning:
-            obj_name = quote_with_backticks(obj[0])
+            obj_name = quote_with_backticks(obj[0], dest_sql_mode)
             create_list = ["CREATE TABLE {0!s}.{1!s} LIKE {2!s}.{1!s}".format(
-                self.q_new_db, obj_name, self.q_db_name)
+                q_new_db, obj_name, q_db_name)
             ]
         else:
             create_list = [self.__make_create_statement(obj_type, obj)]
         if obj_type == _TABLE:
             may_skip_fk = False  # Check possible issues with FK Constraints
-            obj_name = quote_with_backticks(obj[0])
+            obj_name = quote_with_backticks(obj[0], dest_sql_mode)
             tbl_name = "%s.%s" % (self.q_new_db, obj_name)
             create_list = self.destination.substitute_engine(tbl_name,
                                                              create_list[0],
@@ -826,14 +840,17 @@ class Database(object):
 
         grant_msg_displayed = False
 
+        # Get sql_mode in new_server
+        sql_mode = new_server.select_variable("SQL_MODE")
+
         if new_db:
             # Assign new database identifier considering backtick quotes.
-            if is_quoted_with_backticks(new_db):
+            if is_quoted_with_backticks(new_db, sql_mode):
                 self.q_new_db = new_db
-                self.new_db = remove_backtick_quoting(new_db)
+                self.new_db = remove_backtick_quoting(new_db, sql_mode)
             else:
                 self.new_db = new_db
-                self.q_new_db = quote_with_backticks(new_db)
+                self.q_new_db = quote_with_backticks(new_db, sql_mode)
         else:
             # If new_db is not defined use the same as source database.
             self.new_db = self.db_name
@@ -875,12 +892,15 @@ class Database(object):
                 self.create(self.destination, new_db, character_set,
                             collation)
 
+        # Get sql_mode set on destination server
+        dest_sql_mode = self.destination.select_variable("SQL_MODE")
+
         # Create the objects in the new database
         for obj in self.objects:
             # Drop object if --drop-first specified and database not dropped
             # Grants do not need to be dropped for overwriting
             if options.get("do_drop", False) and obj[0] != _GRANT:
-                obj_name = quote_with_backticks(obj[1][0])
+                obj_name = quote_with_backticks(obj[1][0], dest_sql_mode)
                 self.__drop_object(obj[0], obj_name)
 
             # Create the object
@@ -981,14 +1001,28 @@ class Database(object):
 
         Returns create statement
         """
+        # Save current sql_mode and switch it to '' momentarily as this
+        # prevents issues when copying blobs and destination server is
+        # set with SQL_MODE='NO_BACKSLASH_ESCAPES'
+        prev_sql_mode = ''
+        if (self.destination is not None and 'ANSI_QUOTES' in self.sql_mode and
+            'ANSI_QUOTES' not in self.destination.select_variable("SQL_MODE")):
+            prev_sql_mode = self.source.select_variable("SQL_MODE")
+            self.source.exec_query("SET @@SESSION.SQL_MODE=''")
+            self.sql_mode = ""
+            # Quote with current sql_mode
+            name = (name if not is_quoted_with_backticks(name, prev_sql_mode)
+                    else remove_backtick_quoting(name, prev_sql_mode))
+            db = (db if not is_quoted_with_backticks(db, prev_sql_mode)
+                  else remove_backtick_quoting(db, prev_sql_mode))
         # Quote database and object name with backticks.
-        q_name = (name if is_quoted_with_backticks(name)
-                  else quote_with_backticks(name))
+        q_name = (name if is_quoted_with_backticks(name, self.sql_mode)
+                  else quote_with_backticks(name, self.sql_mode))
         if obj_type == _DATABASE:
             name_str = q_name
         else:
-            q_db = (db if is_quoted_with_backticks(db)
-                    else quote_with_backticks(db))
+            q_db = (db if is_quoted_with_backticks(db, self.sql_mode)
+                    else quote_with_backticks(db, self.sql_mode))
 
             # Switch the default database to execute the
             # SHOW CREATE statement without needing to specify the database
@@ -1005,6 +1039,13 @@ class Database(object):
         row = self.source.exec_query(
             "SHOW CREATE {0} {1}".format(obj_type, name_str)
         )
+
+        # Restore previews sql_mode
+        if prev_sql_mode:
+            self.source.exec_query("SET @@SESSION.SQL_MODE={0}"
+                                   "".format(prev_sql_mode))
+            self.sql_mode = prev_sql_mode
+
         create_statement = None
         if row:
             if obj_type == _TABLE or obj_type == _VIEW or \
@@ -1049,9 +1090,10 @@ class Database(object):
         as the second tuple element.
         """
         # Quote database and table name with backticks.
-        q_table = (table if is_quoted_with_backticks(table)
-                   else quote_with_backticks(table))
-        q_db = db if is_quoted_with_backticks(db) else quote_with_backticks(db)
+        q_table = (table if is_quoted_with_backticks(table, self.sql_mode)
+                   else quote_with_backticks(table, self.sql_mode))
+        q_db = db if is_quoted_with_backticks(db, self.sql_mode) else \
+            quote_with_backticks(db, self.sql_mode)
 
         # Retrieve CREATE TABLE.
         try:
@@ -1094,9 +1136,10 @@ class Database(object):
         For example: ['AUTO_INCREMENT=5','ENGINE=InnoDB']
         """
         # Quote database and table name with backticks.
-        q_table = (table if is_quoted_with_backticks(table)
-                   else quote_with_backticks(table))
-        q_db = db if is_quoted_with_backticks(db) else quote_with_backticks(db)
+        q_table = (table if is_quoted_with_backticks(table, self.sql_mode)
+                   else quote_with_backticks(table, self.sql_mode))
+        q_db = db if is_quoted_with_backticks(db, self.sql_mode) else \
+            quote_with_backticks(db, self.sql_mode)
 
         # Retrieve CREATE TABLE statement.
         try:
@@ -1137,10 +1180,10 @@ class Database(object):
         condition = None
 
         # Remove objects backticks if needed
-        db = remove_backtick_quoting(db) \
-            if is_quoted_with_backticks(db) else db
-        name = remove_backtick_quoting(name) \
-            if is_quoted_with_backticks(name) else name
+        db = remove_backtick_quoting(db, self.sql_mode) \
+            if is_quoted_with_backticks(db, self.sql_mode) else db
+        name = remove_backtick_quoting(name, self.sql_mode) \
+            if is_quoted_with_backticks(name, self.sql_mode) else name
 
         if obj_type == _DATABASE:
             columns = 'SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME, ' + \
@@ -1248,12 +1291,12 @@ class Database(object):
         for pattern in self.exclude_patterns:
             # Check use of qualified object names (with backtick support).
             if pattern.find(".") > 0:
-                use_backtick = is_quoted_with_backticks(pattern)
-                db, name = Database.parse_object_name(pattern)
+                use_backtick = is_quoted_with_backticks(pattern, self.sql_mode)
+                db, name = parse_object_name(pattern, self.sql_mode)
                 if use_backtick:
                     # Remove backtick quotes.
-                    db = remove_backtick_quoting(db)
-                    name = remove_backtick_quoting(name)
+                    db = remove_backtick_quoting(db, self.sql_mode)
+                    name = remove_backtick_quoting(name, self.sql_mode)
                 if db == self.db_name:  # Check if database name matches.
                     value = name  # Only use the object name to exclude.
                 else:
@@ -1284,8 +1327,9 @@ class Database(object):
         object_types = None
 
         # Remove object backticks if needed
-        obj_name = remove_backtick_quoting(object_name) \
-            if is_quoted_with_backticks(object_name) else object_name
+        obj_name = remove_backtick_quoting(object_name, self.sql_mode) \
+            if is_quoted_with_backticks(object_name, self.sql_mode) else \
+            object_name
 
         res = self.source.exec_query(_OBJTYPE_QUERY %
                                      {'db_name': self.db_name,
@@ -1632,11 +1676,13 @@ class Database(object):
                             if i in pos_split_quote:
                                 cols = data.split(',')
                                 data = ','.join(
-                                    [quote_with_backticks(col) for col in cols]
+                                    [quote_with_backticks(col, self.sql_mode)
+                                     for col in cols]
                                 )
                                 r.append(data)
                             else:
-                                r.append(quote_with_backticks(data))
+                                r.append(quote_with_backticks(data,
+                                                              self.sql_mode))
                         else:
                             r.append(data)
                     new_rows.append(tuple(r))
@@ -1655,7 +1701,7 @@ class Database(object):
 
         uname[in]          user name to check
         host[in]           host name of connection
-        acess[in]          privilege to check (e.g. "SELECT")
+        access[in]         privilege to check (e.g. "SELECT")
 
         Returns True if user has permission, False if not
         """
@@ -1874,19 +1920,3 @@ class Database(object):
                                    priv[0]), -1, priv[0])
 
         return True
-
-    @staticmethod
-    def parse_object_name(qualified_name):
-        """Parse db, name from db.name
-
-        qualified_name[in] MySQL object string (e.g. db.table)
-
-        Returns tuple containing name split
-        """
-
-        # Split the qualified name considering backtick quotes
-        parts = re.match(REGEXP_QUALIFIED_OBJ_NAME, qualified_name)
-        if parts:
-            return parts.groups()
-        else:
-            return (None, None)

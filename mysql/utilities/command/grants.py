@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,14 +88,17 @@ def validate_obj_type_dict(server, obj_type_dict):
               '{3}.'.format(plurals[0], plurals[1], plurals[2],
                             ", ".join(non_existing_dbs)))
 
+    # Get sql_mode value set on servers
+    sql_mode = server.select_variable("SQL_MODE")
+
     # Now for each db that actually exists, get the type of the specified
     # objects
     for db_name in dbs_to_check:
         db = Database(server, db_name)
         # quote database name if necessary
         quoted_db_name = db_name
-        if not is_quoted_with_backticks(db_name):
-            quoted_db_name = quote_with_backticks(db_name)
+        if not is_quoted_with_backticks(db_name, sql_mode):
+            quoted_db_name = quote_with_backticks(db_name, sql_mode)
         # if wilcard (db.*) is used add all supported objects of the database
         if '*' in obj_type_dict[db_name]:
             obj_type_dict[db_name] = obj_type_dict[db_name] - set('*')
@@ -113,8 +116,8 @@ def validate_obj_type_dict(server, obj_type_dict):
             else:
                 # get quoted name for obj_name
                 quoted_obj_name = obj_name
-                if not is_quoted_with_backticks(obj_name):
-                    quoted_obj_name = quote_with_backticks(obj_name)
+                if not is_quoted_with_backticks(obj_name, sql_mode):
+                    quoted_obj_name = quote_with_backticks(obj_name, sql_mode)
 
                 # Test if the object exists and if it does, test if it
                 # is one of the supported object types, else

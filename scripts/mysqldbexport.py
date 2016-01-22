@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ from mysql.utilities.common.options import (
     check_skip_options, check_verbosity, setup_common_options,
     check_password_security, get_ssl_dict,
 )
+from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
 from mysql.utilities.common.tools import (check_connector_python,
@@ -305,12 +306,23 @@ if __name__ == '__main__':
         parser.error("Server connection values invalid: "
                      "{0}.".format(err.errmsg))
 
+    # Get the sql_mode set on source and destination server
+    conn_opts = {
+        'quiet': True,
+        'version': "5.1.30",
+    }
+    try:
+        servers = connect_servers(server_values, None, conn_opts)
+        server_sql_mode = servers[0].select_variable("SQL_MODE")
+    except UtilError:
+        server_sql_mode = ''
+
     # Build list of databases to copy
     db_list = []
     for db in args:
         # Remove backtick quotes (handled later)
-        db = remove_backtick_quoting(db) \
-            if is_quoted_with_backticks(db) else db
+        db = remove_backtick_quoting(db, server_sql_mode) \
+            if is_quoted_with_backticks(db, server_sql_mode) else db
         db_list.append(db)
 
     try:

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,13 +22,11 @@ all tables in each database), a list of tables in the for db.table,
 or all tables in all databases except internal databases.
 """
 
-import re
-
 from mysql.utilities.exception import UtilError
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.database import Database
 from mysql.utilities.common.options import PARSE_ERR_OBJ_NAME_FORMAT
-from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.pattern_matching import parse_object_name
 from mysql.utilities.common.table import Table
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   quote_with_backticks,
@@ -88,25 +86,26 @@ def check_index(src_val, table_args, options):
     # 3. loop through database list and add all tables
     # 4. check indexes
 
-    obj_name_regexp = re.compile(REGEXP_QUALIFIED_OBJ_NAME)
+    # Get sql_mode value set on servers
+    sql_mode = source.select_variable("SQL_MODE")
 
     # Perform the options check here. Loop through objects presented.
     for obj in table_args:
-        m_obj = obj_name_regexp.match(obj)
+        m_obj = parse_object_name(obj, sql_mode)
         # Check if a valid database/table name is specified.
-        if not m_obj:
+        if m_obj[0] is None:
             raise UtilError(PARSE_ERR_OBJ_NAME_FORMAT.format(
                 obj_name=obj, option="the database/table arguments"))
         else:
-            db_name, obj_name = m_obj.groups()
+            db_name, obj_name = m_obj
             if obj_name:
                 # Table specified
                 table_list.append(obj)
             # Else we are operating on a specific database.
             else:
                 # Remove backtick quotes.
-                db_name = remove_backtick_quoting(db_name) \
-                    if is_quoted_with_backticks(db_name) else db_name
+                db_name = remove_backtick_quoting(db_name, sql_mode) \
+                    if is_quoted_with_backticks(db_name, sql_mode) else db_name
                 db_list.append(db_name)
 
     # Loop through database list adding tables
@@ -117,8 +116,10 @@ def check_index(src_val, table_args, options):
         if not tables and verbosity >= 1:
             print "# Warning: database %s does not exist. Skipping." % (db)
         for table in tables:
-            table_list.append("{0}.{1}".format(quote_with_backticks(db),
-                                               quote_with_backticks(table[0])))
+            table_list.append("{0}.{1}".format(quote_with_backticks(db,
+                                                                    sql_mode),
+                                               quote_with_backticks(table[0],
+                                                                    sql_mode)))
 
     # Fail if no tables to check
     if not table_list:

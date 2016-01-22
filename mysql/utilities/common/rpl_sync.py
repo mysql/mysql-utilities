@@ -31,7 +31,8 @@ from mysql.utilities.common.database import Database
 from mysql.utilities.common.gtid import (get_last_server_gtid,
                                          gtid_set_cardinality,
                                          gtid_set_union)
-from mysql.utilities.common.messages import ERROR_USER_WITHOUT_PRIVILEGES
+from mysql.utilities.common.messages import (ERROR_USER_WITHOUT_PRIVILEGES,
+                                             ERROR_ANSI_QUOTES_MIX_SQL_MODE)
 from mysql.utilities.common.pattern_matching import convertSQL_LIKE2REGEXP
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.topology import Topology
@@ -66,6 +67,41 @@ class RPLSynchronizer(object):
         self._rpl_topology = Topology(master_cnx_dic, slaves_cnx_dic_lst,
                                       options)
         self._slaves = self._rpl_topology.get_slaves_dict()
+
+        # Verify all the servers in the topology has or does not sql_mode set 
+        # to 'ANSI_QUOTES'.
+        match_group, unmatch_group = \
+            self._rpl_topology.get_servers_with_different_sql_mode(
+                'ANSI_QUOTES'
+            )
+        # List and Raise an error if just some of the server has sql_mode set 
+        # to 'ANSI_QUOTES' instead of all or none.
+        if match_group and unmatch_group:
+            sql_mode = match_group[0].select_variable("SQL_MODE")
+            if sql_mode == '':
+                sql_mode = '""'
+            sql_mode = sql_mode.replace(',', ', ')
+            print("# The SQL mode in the following servers is set to "
+                  "ANSI_QUOTES: {0}".format(sql_mode))
+            for server in match_group:
+                sql_mode = server.select_variable("SQL_MODE")
+                if sql_mode == '':
+                    sql_mode = '""'
+                sql_mode = sql_mode.replace(',', ', ')
+                print("# {0}:{1} sql_mode={2}"
+                      "".format(server.host, server.port, sql_mode))
+            print("# The SQL mode in the following servers is not set to "
+                  "ANSI_QUOTES:")
+            for server in unmatch_group:
+                sql_mode = server.select_variable("SQL_MODE")
+                if sql_mode == '':
+                    sql_mode = '""'
+                print("# {0}:{1} sql_mode={2}"
+                      "".format(server.host, server.port, sql_mode))
+
+            raise UtilError(ERROR_ANSI_QUOTES_MIX_SQL_MODE.format(
+                utility='mysqlrplsync'
+            ))
 
         # Set base server used as reference for comparisons.
         self._base_server = None
@@ -1080,8 +1116,8 @@ class RPLSynchronizer(object):
 
                         # Quote object name with backticks.
                         q_obj = '{0}.{1}'.format(
-                            quote_with_backticks(db_name),
-                            quote_with_backticks(obj_name)
+                            quote_with_backticks(db_name, db.sql_mode),
+                            quote_with_backticks(obj_name, db.sql_mode)
                         )
 
                         # Check object definition.
