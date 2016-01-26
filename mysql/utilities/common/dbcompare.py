@@ -907,7 +907,7 @@ def _setup_compare(table1, table2, span_key_size, use_indexes=None):
     # Build the primary key hash if needed
     tbl1_table, pri_idx1 = _get_compare_objects(table1_idx, table1,
                                                 span_key_size)
-    tbl2_table, pri_idx2 = _get_compare_objects(table1_idx, table2,
+    tbl2_table, pri_idx2 = _get_compare_objects(table2_idx, table2,
                                                 span_key_size)
 
     if tbl1_table is None or tbl2_table is None:
