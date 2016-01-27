@@ -597,7 +597,7 @@ class RPLSynchronizer(object):
         # Return separated list of active and non active replication slaves.
         return active_slaves, not_active_slaves
 
-    def _compute_sync_point(self, active_slaves=None):
+    def _compute_sync_point(self, active_slaves=None, master_uuid=None):
         """Compute the GTID synchronization point.
 
         This method computes the GTID synchronization point based based on the
@@ -610,13 +610,18 @@ class RPLSynchronizer(object):
                             if the master is not available. It is assumed
                             that the list is composed by strings with the
                             format 'host@port', identifying each slave.
+        master_uuid[in]     UUID of the master server used to compute its last
+                            GTID (sync point). If not provided it is
+                            determined, but can lead to issues for servers
+                            >= 5.7.6 if specific tables are locked previously.
 
         Return a GTID set representing to synchronization point (to wait for
         slaves to catch up and stop).
         """
         if self._get_master():
             gtid_set = self._get_master().get_gtid_executed()
-            master_uuid = self._get_master().get_server_uuid()
+            master_uuid = master_uuid if master_uuid \
+                else self._get_master().get_server_uuid()
             return get_last_server_gtid(gtid_set, master_uuid)
         else:
             # Get GTID_EXECUTED on all slaves.
@@ -737,7 +742,6 @@ class RPLSynchronizer(object):
         """
         success = False
         checksum_issues = 0
-
         # If no master used then add base server (slave) to slaves to sync.
         if not self._get_master():
             slaves = slaves + [self._base_server_key]
@@ -746,6 +750,9 @@ class RPLSynchronizer(object):
         active_slaves, not_active_slaves = self._split_active_slaves(slaves)
 
         if self._get_master():
+            # Get uuid of the master server
+            master_uuid = self._get_master().get_server_uuid()
+
             # Lock the table on the master to get GTID synchronization point
             # and perform the table checksum.
             try:
@@ -753,7 +760,8 @@ class RPLSynchronizer(object):
                     "LOCK TABLES {0} READ".format(table)
                 )
 
-                last_exec_gtid = self._compute_sync_point()
+                last_exec_gtid = self._compute_sync_point(
+                        master_uuid=master_uuid)
                 if self._verbosity > 2:
                     print("#   Sync point GTID: {0}".format(last_exec_gtid))
 
