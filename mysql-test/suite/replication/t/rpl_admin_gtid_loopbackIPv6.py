@@ -242,8 +242,7 @@ class test(rpl_admin.test):
                                "                                           |",
                                "| OK      |")
         self.replace_substring_portion("| Slave delay is ",
-                                       "seconds behind master., No, Slave has "
-                                       "1 transactions behind master.  |",
+                                       "transactions behind master.  |",
                                        "| OK      |")
         self.replace_substring("| Slave has 1 transactions behind master.     "
                                "                                          |",
