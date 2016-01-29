@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -633,7 +633,6 @@ def stop_running_server(server, wait=10, drop=True):
 
     res = server.show_server_variable("datadir")
     datadir = os.path.normpath(res[0][1])
-
     # Kill all connections so shutdown will work correctly
     res = server.exec_query("SHOW PROCESSLIST")
     for row in res:
@@ -1980,8 +1979,8 @@ class Server(object):
         Returns bool - True - foreign keys are enabled
         """
         if self.fkeys is None or force:
-            res = self.show_server_variable("foreign_key_checks")
-            self.fkeys = (res is not None) and (res[0][1] == "ON")
+            res = self.exec_query("SELECT @@GLOBAL.foreign_key_checks")
+            self.fkeys = (res is not None) and (res[0][0] == "1")
         return self.fkeys
 
     def disable_foreign_key_checks(self, disable=True):
