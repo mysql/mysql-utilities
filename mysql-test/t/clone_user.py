@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -225,6 +225,8 @@ class test(mutlib.System_test):
         self.remove_result("root,")
         # Remove possible leftovers from other tests.
         self.remove_result("joe_wildcard,")
+        # The mysql.sys user is only on 5.7.9+
+        self.remove_result("mysql.sys,")
         # Mask windows output, remove single quotes around hostname
         if os.name == 'nt':
             self.replace_result("# Dumping grants for user remote@'%'",
