@@ -1,3 +1,19 @@
+Release-1.6.3
+-------------
+- BUG#22628187 : mysqldbcopy does not work with MySQL 5.7
+- BUG#22617526 : mysqlfailover and mysqlrpladmin do not work with MySQL 5.7
+- BUG#22608528 : mysqlrplsync does not work with MySQL 5.7
+- BUG#21966831 : Typo in mysqlbinlogrotate documentation
+- BUG#21845449 : Fix mysqldbcompare when comparing the same object on the same server
+- BUG#21841353 : UnicodeEncodeError in mysqlauditgrep using unicode characters
+- BUG#21839348 : AttributeError in mysqldbcompare using --all option
+- BUG#21784538 : The --exclude option is not working for data in mysqldbexport
+- BUG#21653496 : Daemon processes creates pidfiles with incorrect privileges
+- BUG#21653352 : MySQL Utilities breaks when sql_mode="ANSI_QUOTES"
+- BUG#21572065 : mysqldbcompare raise errors when the index definitions differs
+- BUG#21343759 : Fix my_print_defaults to read .mylogin.cnf on MySQL 5.6.25
+- BUG#76703 : Fix mysqldiskusage incorrect approach to calculate disk usage
+
 Release-1.6.2
 -------------
 - BUG#21327864 : mysqldbimport utility failing with error 1694 with mysql 5.7.7
