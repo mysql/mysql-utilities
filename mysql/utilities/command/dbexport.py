@@ -82,7 +82,7 @@ def check_read_permissions(server, db_list, options):
     exist.
     """
     for db_name in db_list:
-        source_db = Database(server, db_name)
+        source_db = Database(server, db_name, options)
 
         # Error if source database does not exist.
         if not source_db.exists():

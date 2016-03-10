@@ -1292,7 +1292,7 @@ class Database(object):
             # Check use of qualified object names (with backtick support).
             if pattern.find(".") > 0:
                 use_backtick = is_quoted_with_backticks(pattern, self.sql_mode)
-                db, name = parse_object_name(pattern, self.sql_mode)
+                db, name = parse_object_name(pattern, self.sql_mode, True)
                 if use_backtick:
                     # Remove backtick quotes.
                     db = remove_backtick_quoting(db, self.sql_mode)

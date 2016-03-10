@@ -23,7 +23,7 @@ import re
 
 
 # Regular expression to match a database object identifier (support backticks)
-REGEXP_OBJ_NAME = r'(`(?:[^`]|``)+`|\w+|\*)'
+REGEXP_OBJ_NAME = r'(`(?:[^`]|``)+`|\w+|\w+[\%\*]?|[\%\*])'
 
 # Regular expression to match a database object identifier with ansi quotes
 REGEXP_OBJ_NAME_AQ = r'("(?:[^"]|"")+"|\w+|\*)'
@@ -55,11 +55,12 @@ def convertSQL_LIKE2REGEXP(sql_like_pattern):
     return regexp
 
 
-def parse_object_name(qualified_name, sql_mode=''):
+def parse_object_name(qualified_name, sql_mode='', wild=False):
     """Parses a qualified object name from the given string.
 
     qualified_name[in] MySQL object string (e.g. db.table)
     sql_mode[in]       The value of sql_mode from the server.
+    wild[in]           Look for wildcards (stating at end of str)
 
     Returns tuple containing name split
     """
@@ -67,6 +68,8 @@ def parse_object_name(qualified_name, sql_mode=''):
         regex_pattern = REGEXP_QUALIFIED_OBJ_NAME.replace("`", '"')
     else:
         regex_pattern = REGEXP_QUALIFIED_OBJ_NAME
+    if wild:
+        regex_pattern = regex_pattern + r'\Z'
     # Split the qualified name considering backtick quotes
     parts = re.match(regex_pattern, qualified_name)
     if parts:
