@@ -23,7 +23,7 @@ VERSION = (1, 6, 3, 'GA', 0)
 
 VERSION_STRING = "%s.%s.%s" % VERSION[0:3]
 
-COPYRIGHT = "2010, 2015 Oracle and/or its affiliates. All rights reserved."
+COPYRIGHT = "2010, 2016 Oracle and/or its affiliates. All rights reserved."
 
 COPYRIGHT_FULL = "Copyright (c) " + COPYRIGHT + """
 This is a release of dual licensed MySQL Utilities. For the avoidance of
