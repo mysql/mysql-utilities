@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ from mysql.utilities.exception import UtilError
 
 
 _MY_PRINT_DEFAULTS_TOOL = "my_print_defaults"
-_MYLOGIN_FILE = ".mylogin.cnf"
+MYLOGIN_FILE = ".mylogin.cnf"
 
 
 def my_login_config_path():
@@ -49,8 +49,8 @@ def my_login_config_exists():
     """Check if the mylogin file (.mylogin.cnf) exists.
     """
 
-    my_login_fullpath = os.path.normpath(my_login_config_path() + "/"
-                                         + _MYLOGIN_FILE)
+    my_login_fullpath = os.path.normpath(os.path.join(my_login_config_path(),
+                                                      MYLOGIN_FILE))
     return os.path.isfile(my_login_fullpath)
 
 
@@ -132,6 +132,52 @@ class MyDefaultsReader(object):
                             "tools are included in the PATH. Error: %s"
                             % err.errmsg)
 
+    def check_show_required(self):
+        """Check if the '--show' password option is required/supported by this
+        version of the my_print_defaults tool.
+
+        At MySQL Server 5.6.25 and 5.7.8, my_print_defaults' functionality
+        changed to mask passwords by default and added the '--show' password
+        option to display passwords in cleartext (BUG#19953365, BUG#20903330).
+        As this module requires the password to be displayed as cleartext to
+        extract the password, the use of the '--show' password option is also
+        required starting on these version of the server, however the
+        my_print_defaults tool version did not increase with this change, so
+        this method looks at the output of the help text of my_print_defaults
+        tool to determine if the '--show' password option is supported by the
+        my_print_defaults tool available at _tool_path.
+
+        Returns True if this version of the tool supports the'--show' password
+        option, otherwise False.
+        """
+        # The path to the tool must have been previously found.
+        assert self._tool_path, ("First, the required MySQL tool must be "
+                                 "found. E.g., use method "
+                                 "search_my_print_defaults_tool.")
+
+        # Create a temporary file to redirect stdout
+        out_file = tempfile.TemporaryFile()
+        if self._verbosity > 0:
+            subprocess.call([self._tool_path, "--help"], stdout=out_file)
+        else:
+            # Redirect stderr to null
+            null_file = open(os.devnull, "w+b")
+            subprocess.call([self._tool_path, "--help"], stdout=out_file,
+                            stderr=null_file)
+
+        # Read my_print_defaults help output text
+        out_file.seek(0)
+        lines = out_file.readlines()
+        out_file.close()
+
+        # find the "--show" option used to show passwords in plain text.
+        for line in lines:
+            if "--show" in line:
+                return True
+
+        # The option was not found in the tool help output.
+        return False
+
     def check_tool_version(self, major_version, minor_version):
         """Check the version of the my_print_defaults tool.
 
@@ -206,15 +252,18 @@ class MyDefaultsReader(object):
                                  "found. E.g., use method "
                                  "search_my_print_defaults_tool.")
 
+        mp_cmd = [self._tool_path, group]
+        if self.check_show_required():
+            mp_cmd.append("--show")
+
         # Group not found; use my_print_defaults to get group data.
         out_file = tempfile.TemporaryFile()
         if self._verbosity > 0:
-            subprocess.call([self._tool_path, group], stdout=out_file)
+            subprocess.call(mp_cmd, stdout=out_file)
         else:
             # Redirect stderr to null
             null_file = open(os.devnull, "w+b")
-            subprocess.call([self._tool_path, group], stdout=out_file,
-                            stderr=null_file)
+            subprocess.call(mp_cmd, stdout=out_file, stderr=null_file)
 
         # Read and parse group options values.
         out_file.seek(0)

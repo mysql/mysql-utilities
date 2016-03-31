@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -95,11 +95,13 @@ def get_table_privs(server, db_name, table_name):
     Returns list of tuples (<Grantee>, <SET OF GRANTS>).
     """
     tpl_lst = []
+    # Get sql_mode in server
+    sql_mode = server.select_variable("SQL_MODE")
     # Remove backticks if necessary
-    if is_quoted_with_backticks(db_name):
-        db_name = remove_backtick_quoting(db_name)
-    if is_quoted_with_backticks(table_name):
-        table_name = remove_backtick_quoting(table_name)
+    if is_quoted_with_backticks(db_name, sql_mode):
+        db_name = remove_backtick_quoting(db_name, sql_mode)
+    if is_quoted_with_backticks(table_name, sql_mode):
+        table_name = remove_backtick_quoting(table_name, sql_mode)
 
     # Build query
     query = _TABLE_PRIV_QUERY.format(db_name, table_name)
@@ -126,9 +128,11 @@ def get_db_privs(server, db_name):
     Returns list of tuples (<Grantee>, <SET OF GRANTS>).
     """
     tpl_lst = []
+    # Get sql_mode in server
+    sql_mode = server.select_variable("SQL_MODE")
     # remove backticks if necessary
-    if is_quoted_with_backticks(db_name):
-        db_name = remove_backtick_quoting(db_name)
+    if is_quoted_with_backticks(db_name, sql_mode):
+        db_name = remove_backtick_quoting(db_name, sql_mode)
 
     # Build query
     query = _DB_PRIVS_QUERY.format(db_name)
@@ -178,11 +182,13 @@ def get_routine_privs(server, db_name, routine_name):
     Returns list of tuples (<GRANTEE>, <SET OF GRANTS>).
     """
     tpl_lst = []
+    # Get sql_mode in server
+    sql_mode = server.select_variable("SQL_MODE")
     # remove backticks if necesssary
-    if is_quoted_with_backticks(db_name):
-        db_name = remove_backtick_quoting(db_name)
-    if is_quoted_with_backticks(routine_name):
-        routine_name = remove_backtick_quoting(routine_name)
+    if is_quoted_with_backticks(db_name, sql_mode):
+        db_name = remove_backtick_quoting(db_name, sql_mode)
+    if is_quoted_with_backticks(routine_name, sql_mode):
+        routine_name = remove_backtick_quoting(routine_name, sql_mode)
 
     # Build query
     query = _PROCS_PRIV_QUERY.format(db_name, routine_name)

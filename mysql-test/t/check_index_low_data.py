@@ -99,7 +99,10 @@ class test(check_index_parameters.test):
         self.run_test_cases()
 
         # Mask results
-        if self.servers.get_server(0).check_version_compat(5, 7, 5):
+        if self.servers.get_server(0).check_version_compat(5, 7, 9):
+            self.replace_substring("cardinality: 3", "cardinality: XX")
+            self.replace_substring("percent: 18.75", "percent: XXX.XX")
+        elif self.servers.get_server(0).check_version_compat(5, 7, 5):
             self.replace_substring("cardinality: 12", "cardinality: XX")
             self.replace_substring("percent: 75.00", "percent: XXX.XX")
         else:

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,7 +31,8 @@ from mysql.utilities.common.database import Database
 from mysql.utilities.common.gtid import (get_last_server_gtid,
                                          gtid_set_cardinality,
                                          gtid_set_union)
-from mysql.utilities.common.messages import ERROR_USER_WITHOUT_PRIVILEGES
+from mysql.utilities.common.messages import (ERROR_USER_WITHOUT_PRIVILEGES,
+                                             ERROR_ANSI_QUOTES_MIX_SQL_MODE)
 from mysql.utilities.common.pattern_matching import convertSQL_LIKE2REGEXP
 from mysql.utilities.common.sql_transform import quote_with_backticks
 from mysql.utilities.common.topology import Topology
@@ -66,6 +67,41 @@ class RPLSynchronizer(object):
         self._rpl_topology = Topology(master_cnx_dic, slaves_cnx_dic_lst,
                                       options)
         self._slaves = self._rpl_topology.get_slaves_dict()
+
+        # Verify all the servers in the topology has or does not sql_mode set 
+        # to 'ANSI_QUOTES'.
+        match_group, unmatch_group = \
+            self._rpl_topology.get_servers_with_different_sql_mode(
+                'ANSI_QUOTES'
+            )
+        # List and Raise an error if just some of the server has sql_mode set 
+        # to 'ANSI_QUOTES' instead of all or none.
+        if match_group and unmatch_group:
+            sql_mode = match_group[0].select_variable("SQL_MODE")
+            if sql_mode == '':
+                sql_mode = '""'
+            sql_mode = sql_mode.replace(',', ', ')
+            print("# The SQL mode in the following servers is set to "
+                  "ANSI_QUOTES: {0}".format(sql_mode))
+            for server in match_group:
+                sql_mode = server.select_variable("SQL_MODE")
+                if sql_mode == '':
+                    sql_mode = '""'
+                sql_mode = sql_mode.replace(',', ', ')
+                print("# {0}:{1} sql_mode={2}"
+                      "".format(server.host, server.port, sql_mode))
+            print("# The SQL mode in the following servers is not set to "
+                  "ANSI_QUOTES:")
+            for server in unmatch_group:
+                sql_mode = server.select_variable("SQL_MODE")
+                if sql_mode == '':
+                    sql_mode = '""'
+                print("# {0}:{1} sql_mode={2}"
+                      "".format(server.host, server.port, sql_mode))
+
+            raise UtilError(ERROR_ANSI_QUOTES_MIX_SQL_MODE.format(
+                utility='mysqlrplsync'
+            ))
 
         # Set base server used as reference for comparisons.
         self._base_server = None
@@ -597,7 +633,7 @@ class RPLSynchronizer(object):
         # Return separated list of active and non active replication slaves.
         return active_slaves, not_active_slaves
 
-    def _compute_sync_point(self, active_slaves=None):
+    def _compute_sync_point(self, active_slaves=None, master_uuid=None):
         """Compute the GTID synchronization point.
 
         This method computes the GTID synchronization point based based on the
@@ -610,13 +646,18 @@ class RPLSynchronizer(object):
                             if the master is not available. It is assumed
                             that the list is composed by strings with the
                             format 'host@port', identifying each slave.
+        master_uuid[in]     UUID of the master server used to compute its last
+                            GTID (sync point). If not provided it is
+                            determined, but can lead to issues for servers
+                            >= 5.7.6 if specific tables are locked previously.
 
         Return a GTID set representing to synchronization point (to wait for
         slaves to catch up and stop).
         """
         if self._get_master():
             gtid_set = self._get_master().get_gtid_executed()
-            master_uuid = self._get_master().get_server_uuid()
+            master_uuid = master_uuid if master_uuid \
+                else self._get_master().get_server_uuid()
             return get_last_server_gtid(gtid_set, master_uuid)
         else:
             # Get GTID_EXECUTED on all slaves.
@@ -737,7 +778,6 @@ class RPLSynchronizer(object):
         """
         success = False
         checksum_issues = 0
-
         # If no master used then add base server (slave) to slaves to sync.
         if not self._get_master():
             slaves = slaves + [self._base_server_key]
@@ -746,6 +786,9 @@ class RPLSynchronizer(object):
         active_slaves, not_active_slaves = self._split_active_slaves(slaves)
 
         if self._get_master():
+            # Get uuid of the master server
+            master_uuid = self._get_master().get_server_uuid()
+
             # Lock the table on the master to get GTID synchronization point
             # and perform the table checksum.
             try:
@@ -753,7 +796,8 @@ class RPLSynchronizer(object):
                     "LOCK TABLES {0} READ".format(table)
                 )
 
-                last_exec_gtid = self._compute_sync_point()
+                last_exec_gtid = self._compute_sync_point(
+                        master_uuid=master_uuid)
                 if self._verbosity > 2:
                     print("#   Sync point GTID: {0}".format(last_exec_gtid))
 
@@ -1072,8 +1116,8 @@ class RPLSynchronizer(object):
 
                         # Quote object name with backticks.
                         q_obj = '{0}.{1}'.format(
-                            quote_with_backticks(db_name),
-                            quote_with_backticks(obj_name)
+                            quote_with_backticks(db_name, db.sql_mode),
+                            quote_with_backticks(obj_name, db.sql_mode)
                         )
 
                         # Check object definition.

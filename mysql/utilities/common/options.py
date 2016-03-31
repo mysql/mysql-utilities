@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ from mysql.utilities.common.messages import (PARSE_ERR_OBJ_NAME_FORMAT,
                                              INSUFFICIENT_FILE_PERMISSIONS)
 from mysql.utilities.common.my_print_defaults import (MyDefaultsReader,
                                                       my_login_config_exists)
-from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.pattern_matching import parse_object_name
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
 
@@ -977,7 +977,7 @@ def get_absolute_path(path):
 
 
 def db_objects_list_to_dictionary(parser, obj_list, option_desc,
-                                  db_over_tables=True):
+                                  db_over_tables=True, sql_mode=''):
     """Process database object list and convert to a dictionary.
 
     Check the qualified name format of the given database objects and convert
@@ -1004,20 +1004,19 @@ def db_objects_list_to_dictionary(parser, obj_list, option_desc,
     E.g. {'db_name1': set(['table1','table2']), 'db_name2': None}.
     """
     db_objs_dict = {}
-    obj_name_regexp = re.compile(REGEXP_QUALIFIED_OBJ_NAME)
     for obj_name in obj_list:
-        m_obj = obj_name_regexp.match(obj_name)
-        if not m_obj:
+        m_objs = parse_object_name(obj_name, sql_mode)
+        if m_objs[0] is None:
             parser.error(PARSE_ERR_OBJ_NAME_FORMAT.format(
                 obj_name=obj_name, option=option_desc
             ))
         else:
-            db_name, obj_name = m_obj.groups()
+            db_name, obj_name = m_objs
             # Remove backtick quotes.
-            db_name = remove_backtick_quoting(db_name) \
-                if is_quoted_with_backticks(db_name) else db_name
-            obj_name = remove_backtick_quoting(obj_name) \
-                if obj_name and is_quoted_with_backticks(obj_name) \
+            db_name = remove_backtick_quoting(db_name, sql_mode) \
+                if is_quoted_with_backticks(db_name, sql_mode) else db_name
+            obj_name = remove_backtick_quoting(obj_name, sql_mode) \
+                if obj_name and is_quoted_with_backticks(obj_name, sql_mode) \
                 else obj_name
             # Add database object to result dictionary.
             if not obj_name:

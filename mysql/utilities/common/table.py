@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ from mysql.connector.conversion import MySQLConverter
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.database import Database
 from mysql.utilities.common.lock import Lock
+from mysql.utilities.common.pattern_matching import parse_object_name
 from mysql.utilities.common.server import Server
 from mysql.utilities.common.sql_transform import (convert_special_characters,
                                                   quote_with_backticks,
@@ -61,7 +62,7 @@ class Index(object):
         - Print index CREATE statement
     """
 
-    def __init__(self, db, index_tuple, verbose=False):
+    def __init__(self, db, index_tuple, verbose=False, sql_mode=''):
         """Constructor
 
         db[in]             Name of database
@@ -72,14 +73,15 @@ class Index(object):
 
         # Initialize and save values
         self.db = db
-        self.q_db = quote_with_backticks(db)
+        self.sql_mode = sql_mode
+        self.q_db = quote_with_backticks(db, self.sql_mode)
         self.verbose = verbose
         self.columns = []
         self.table = index_tuple[0]
-        self.q_table = quote_with_backticks(index_tuple[0])
+        self.q_table = quote_with_backticks(index_tuple[0], self.sql_mode)
         self.unique = not int(index_tuple[1])
         self.name = index_tuple[2]
-        self.q_name = quote_with_backticks(index_tuple[2])
+        self.q_name = quote_with_backticks(index_tuple[2], self.sql_mode)
         col = (index_tuple[4], index_tuple[7])
         self.columns.append(col)
         self.accept_nulls = True if index_tuple[9] else False
@@ -258,7 +260,7 @@ class Index(object):
         for col in self.columns:
             name, sub_part = (col[0], col[1])
             if backtick_quoting:
-                name = quote_with_backticks(name)
+                name = quote_with_backticks(name, self.sql_mode)
             if sub_part > 0:
                 col_str = "{0}({1})".format(name, sub_part)
             else:
@@ -329,18 +331,25 @@ class Table(object):
         self.quiet = options.get('quiet', False)
         self.server = server1
 
+        # Get sql_mode set on server
+        self.sql_mode = self.server.select_variable("SQL_MODE")
+
         # Keep table identifier considering backtick quotes
-        if is_quoted_with_backticks(name):
+        if is_quoted_with_backticks(name, self.sql_mode):
             self.q_table = name
-            self.q_db_name, self.q_tbl_name = Database.parse_object_name(name)
-            self.db_name = remove_backtick_quoting(self.q_db_name)
-            self.tbl_name = remove_backtick_quoting(self.q_tbl_name)
+            self.q_db_name, self.q_tbl_name = parse_object_name(name,
+                                                                self.sql_mode)
+            self.db_name = remove_backtick_quoting(self.q_db_name,
+                                                   self.sql_mode)
+            self.tbl_name = remove_backtick_quoting(self.q_tbl_name,
+                                                    self.sql_mode)
             self.table = ".".join([self.db_name, self.tbl_name])
         else:
             self.table = name
-            self.db_name, self.tbl_name = Database.parse_object_name(name)
-            self.q_db_name = quote_with_backticks(self.db_name)
-            self.q_tbl_name = quote_with_backticks(self.tbl_name)
+            self.db_name, self.tbl_name = parse_object_name(name, self.sql_mode)
+            self.q_db_name = quote_with_backticks(self.db_name, self.sql_mode)
+            self.q_tbl_name = quote_with_backticks(self.tbl_name,
+                                                   self.sql_mode)
             self.q_table = ".".join([self.q_db_name, self.q_tbl_name])
         self.obj_type = "TABLE"
         self.pri_idx = None
@@ -391,7 +400,7 @@ class Table(object):
 
         db, table = (None, None)
         if tbl_name:
-            db, table = Database.parse_object_name(tbl_name)
+            db, table = parse_object_name(tbl_name, self.sql_mode)
         else:
             db = self.db_name
             table = self.tbl_name
@@ -424,14 +433,15 @@ class Table(object):
         col_format_values = [''] * stop
         if columns is not None:
             for col in range(0, stop):
-                if is_quoted_with_backticks(columns[col][0]):
+                if is_quoted_with_backticks(columns[col][0], self.sql_mode):
                     self.column_names.append(
-                        remove_backtick_quoting(columns[col][0]))
+                        remove_backtick_quoting(columns[col][0],
+                                                self.sql_mode))
                     self.q_column_names.append(columns[col][0])
                 else:
                     self.column_names.append(columns[col][0])
                     self.q_column_names.append(
-                        quote_with_backticks(columns[col][0]))
+                        quote_with_backticks(columns[col][0], self.sql_mode))
                 col_type = columns[col][1].lower()
                 if ('char' in col_type or 'enum' in col_type
                         or 'set' in col_type or 'binary' in col_type):
@@ -462,7 +472,8 @@ class Table(object):
             rows = self.server.exec_query("explain {0}".format(self.q_table))
             for row in rows:
                 self.column_names.append(row[0])
-                self.q_column_names.append(quote_with_backticks(row[0]))
+                self.q_column_names.append(quote_with_backticks(row[0],
+                                                                self.sql_mode))
 
         return self.q_column_names if quote_backticks else self.column_names
 
@@ -480,7 +491,8 @@ class Table(object):
         for row in rows:
             if quote_backticks:
                 self.column_name_type.append(
-                    [quote_with_backticks(row[0])] + list(row[1:])
+                    [quote_with_backticks(row[0], self.sql_mode)] +
+                    list(row[1:])
                 )
             else:
                 self.column_name_type.append(row)
@@ -844,7 +856,6 @@ class Table(object):
 
         if self.column_format is None:
             self.get_column_metadata()
-
         data_lists = self.make_bulk_insert(rows, new_db)
         insert_data = data_lists[0]
         blob_data = data_lists[1]
@@ -939,13 +950,14 @@ class Table(object):
         new_db[in]         Rename the db to this name
         connections[in]    Number of threads(connections) to use for insert
         """
-
+        # Get sql_mode from destination
+        dest_sql_mode = destination.select_variable("SQL_MODE")
         if new_db is None:
             new_db = self.q_db_name
         else:
             # If need quote new_db identifier with backticks
-            if not is_quoted_with_backticks(new_db):
-                new_db = quote_with_backticks(new_db)
+            if not is_quoted_with_backticks(new_db, dest_sql_mode):
+                new_db = quote_with_backticks(new_db, dest_sql_mode)
 
         num_conn = int(connections)
 
@@ -954,6 +966,30 @@ class Table(object):
         else:
             # Read and copy the data
             pthreads = []
+            # Change the sql_mode if the mode is different on each server
+            # and if "ANSI_QUOTES" is set in source, this is for
+            # compatibility between the names.
+            prev_sql_mode = ''
+            if self.sql_mode != dest_sql_mode and \
+               "ANSI_QUOTES" in self.sql_mode:
+                prev_sql_mode = self.server.select_variable("SQL_MODE")
+                self.server.exec_query("SET @@SESSION.SQL_MODE=''")
+                self.sql_mode = ''
+
+                self.q_tbl_name = quote_with_backticks(
+                    self.tbl_name,
+                    self.sql_mode
+                )
+                self.q_db_name = quote_with_backticks(
+                    self.db_name,
+                    self.sql_mode
+                )
+                self.q_table = ".".join([self.q_db_name, self.q_tbl_name])
+                self.q_column_names = []
+                for column in self.column_names:
+                    self.q_column_names.append(
+                        quote_with_backticks(column, self.sql_mode)
+                    )
             for rows in self.retrieve_rows(num_conn):
                 p = self.insert_rows(rows, new_db, destination, num_conn > 1)
                 if p is not None:
@@ -964,6 +1000,25 @@ class Table(object):
                 # Wait for all threads to finish
                 for p in pthreads:
                     p.join()
+            # restoring the previous sql_mode, changed if the sql_mode in both
+            # servers is different and one is "ANSI_QUOTES"
+            if prev_sql_mode:
+                self.server.exec_query("SET @@SESSION.SQL_MODE={0}"
+                                       "".format(prev_sql_mode))
+                self.sql_mode = prev_sql_mode
+                self.q_tbl_name = quote_with_backticks(
+                    self.tbl_name,
+                    self.sql_mode
+                )
+                self.q_db_name = quote_with_backticks(
+                    self.db_name,
+                    self.sql_mode
+                )
+                self.q_table = ".".join([self.q_db_name, self.q_tbl_name])
+                for column in self.column_names:
+                    self.q_column_names.append(
+                        quote_with_backticks(column, self.sql_mode)
+                    )
 
     def retrieve_rows(self, num_conn=1):
         """Retrieve the table data in rows.
@@ -1212,7 +1267,7 @@ class Table(object):
         for row in rows:
             if (row[2] != prev_name) or (prev_name == ""):
                 prev_name = row[2]
-                idx = Index(self.db_name, row)
+                idx = Index(self.db_name, row, sql_mode=self.sql_mode)
                 if idx.type == "BTREE":
                     self.__append(self.btree_indexes, idx)
                 elif idx.type == "HASH":
@@ -1223,7 +1278,8 @@ class Table(object):
                     self.__append(self.fulltext_indexes, idx)
             elif idx:
                 idx.add_column(row[4], row[7], row[9])
-            self.indexes_q_names.append(quote_with_backticks(row[2]))
+            self.indexes_q_names.append(quote_with_backticks(row[2],
+                                                             self.sql_mode))
         return True
 
     def check_indexes(self, show_drops=False):

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -56,13 +56,13 @@ _PRINT_WIDTH = 75
 _MASTER_DO_DB, _MASTER_IGNORE_DB = 2, 3
 
 _RPL_USER_QUERY = """
-    SELECT user, host, password = "" as has_password
+    SELECT user, host, password = '' as has_password
     FROM mysql.user
     WHERE repl_slave_priv = 'Y'
 """
 # Query for server versions >= 5.7.6.
 _RPL_USER_QUERY_5_7_6 = """
-    SELECT user, host, authentication_string = "" as has_password
+    SELECT user, host, authentication_string = '' as has_password
     FROM mysql.user
     WHERE repl_slave_priv = 'Y'
 """
@@ -1032,7 +1032,7 @@ class Master(Server):
         """
         if self.supports_gtid == "ON":
             gtid_executed = self.exec_query("SELECT @@GLOBAL.GTID_EXECUTED")[0]
-            return 'SET @@GLOBAL.GTID_PURGED = "%s"' % gtid_executed
+            return "SET @@GLOBAL.GTID_PURGED = '{0}'".format(gtid_executed)
         else:
             return None
 

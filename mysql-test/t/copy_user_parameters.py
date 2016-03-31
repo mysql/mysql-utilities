@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,6 +88,13 @@ class test(copy_user.test):
         self.remove_result("GRANT ALL PRIVILEGES ON *.* TO 'root'")
         self.remove_result("GRANT PROXY ON ''@'' TO 'root'")
         self.remove_result("# Cannot show grants for user")
+        
+        # The mysql.sys user is only on 5.7.9+
+        self.remove_result("mysql.sys,")
+        self.remove_result("# Dumping grants for user 'mysql.sys'@'localhost'")
+        self.remove_result("GRANT USAGE ON *.* TO 'mysql.sys'@")
+        self.remove_result("GRANT TRIGGER ON `sys`.* TO 'mysql.sys'@")
+        self.remove_result("GRANT SELECT ON `sys`.`sys_config` TO 'mysql.sys'")
 
         self.replace_substring("on [::1]", "on localhost")
 

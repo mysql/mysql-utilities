@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ from mysql.utilities.common.options import (setup_common_options,
                                             add_verbosity,
                                             db_objects_list_to_dictionary)
 
+from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.tools import (check_python_version,
                                           check_connector_python,
                                           join_and_build_str)
@@ -190,13 +191,25 @@ if __name__ == '__main__':
         parser.error("The --show=users can only be used if you specify a "
                      "list of privileges with the --privileges option.")
 
+    conn_opts = {
+        'quiet': True,
+        'version': "5.1.30",
+    }
+    try:
+        servers = connect_servers(server_val, None, conn_opts)
+        sql_mode = servers[0].select_variable("SQL_MODE")
+    except:
+        sql_mode = ''
+
     # Process list objects for which grants will be shown
     # (check format errors).
     objects_to_include = {}
     if args:
         objects_to_include = db_objects_list_to_dictionary(
             parser, args, 'list of objects to show the grants',
-            db_over_tables=False)
+            db_over_tables=False,
+            sql_mode=sql_mode
+        )
     else:
         parser.error("You need to specify at least one object (database, table"
                      " or routine) in order to get the list of grantees.")

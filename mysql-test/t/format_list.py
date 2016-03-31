@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,13 +49,19 @@ class test(mutlib.System_test):
         cols_2 = ['a', 'b']
         rows_3 = [('one', None, 31), ('two', None, 32), ('three', None, 33)]
         cols_3 = ['a', 'b', 'c']
+        rows_4 = [(u'á', u'é', u'í'), (u'á', u'é', u'í'), (u'á', u'é', u'í')]
+        cols_4 = [u'á', u'é', u'í']
 
         format_tabular_list(test_file, cols_1, rows_1)
         format_tabular_list(test_file, cols_2, rows_2)
         format_tabular_list(test_file, cols_3, rows_3)
+        format_tabular_list(test_file, cols_4, rows_4)
+        # Force usage of csv module
+        format_tabular_list(test_file, cols_4, rows_4, {'separator': ','})
         format_vertical_list(test_file, cols_1, rows_1)
         format_vertical_list(test_file, cols_2, rows_2)
         format_vertical_list(test_file, cols_3, rows_3)
+        format_vertical_list(test_file, cols_4, rows_4)
         test_file.close()
 
         test_file = open('format_test', 'r')

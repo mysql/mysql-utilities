@@ -121,3 +121,11 @@ Test case 18 - Cannot compare all databases on the same server.
 # server1 on 127.0.0.1: ... connected.
 # server2 on localhost: ... connected.
 ERROR: Specified servers are the same (server1=127.0.0.1:PORT1 and server2=localhost:PORT1). Cannot compare all databases on the same server.
+Test case 19 - Comparing the same object on the same server.
+# server1 on 127.0.0.1: ... connected.
+# server2 on localhost: ... connected.
+ERROR: Comparing the same object on the same server.
+Test case 20 - Cannot compare all databases on the same server and with the same connection string.
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+ERROR: Specified servers are the same (server1=localhost:PORT1 and server2=localhost:PORT1). Cannot compare all databases on the same server.

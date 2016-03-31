@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -49,7 +49,6 @@ class test(compare_db.test):
         return True
 
     def run(self):
-        self.server1 = self.servers.get_server(0)
         self.res_fname = "result.txt"
 
         s1_conn = "--server1=" + self.build_connection_string(self.server1)
@@ -268,6 +267,27 @@ class test(compare_db.test):
         s2_conn_same_srv = s2_conn_same_srv.replace('--server1', '--server2')
         cmd_str = ("mysqldbcompare.py {0} {1} {2}"
                    "".format(s1_conn_local, s2_conn_same_srv, "--all"))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - Comparing the same object on the same "
+                   "server.").format(test_num)
+        cmd_str = ("mysqldbcompare.py {0} {1} {2}"
+                   "".format(s1_conn_local, s2_conn_same_srv,
+                             "inventory:inventory"))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - Cannot compare all databases on the same "
+                   "server and with the same connection string."
+                   "").format(test_num)
+        s2_conn_same_srv = s1_conn.replace('--server1', '--server2')
+        cmd_str = ("mysqldbcompare.py {0} {1} {2}"
+                   "".format(s1_conn, s2_conn_same_srv, "--all"))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

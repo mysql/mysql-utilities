@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 """
 check_index_errors test.
 """
+
+import os
 
 import check_index
 
@@ -142,8 +144,12 @@ class test(check_index.test):
 
         test_num += 1
         comment = "Test case {0} - error: no tables to check".format(test_num)
-        res = self.run_test_case(1, "mysqlindexcheck.py {0} '`util_test_e.`'"
-                                 "".format(server_conn), comment)
+        if os.name != 'nt':
+            db = "'`util_test_e.`'"
+        else:
+            db = '"`util_test_e.`"'
+        res = self.run_test_case(1, "mysqlindexcheck.py {0} {1}"
+                                 "".format(server_conn, db), comment)
 
         test_num += 1
         comment = "Test case {0} - no server specified".format(test_num)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -52,17 +52,17 @@ _GTID_SUBTRACT_TO_EXECUTED = ("SELECT GTID_SUBTRACT('{0}', "
                               "@@GLOBAL.GTID_EXECUTED)")
 
 # TODO: Remove the use of PASSWORD(), depercated from 5.7.6.
-_UPDATE_RPL_USER_QUERY = ('UPDATE mysql.user '
-                          'SET password = PASSWORD("{passwd}")'
-                          'where user ="{user}"')
+_UPDATE_RPL_USER_QUERY = ("UPDATE mysql.user "
+                          "SET password = PASSWORD('{passwd}')"
+                          "where user ='{user}'")
 # Query for server versions >= 5.7.6.
 _UPDATE_RPL_USER_QUERY_5_7_6 = (
     "UPDATE mysql.user SET authentication_string = PASSWORD('{passwd}') "
     "WHERE user = '{user}'")
 
-_SELECT_RPL_USER_PASS_QUERY = ('SELECT user, host, grant_priv, password, '
-                               'Repl_slave_priv FROM mysql.user '
-                               'WHERE user ="{user}" AND host ="{host}"')
+_SELECT_RPL_USER_PASS_QUERY = ("SELECT user, host, grant_priv, password, "
+                               "Repl_slave_priv FROM mysql.user "
+                               "WHERE user ='{user}' AND host ='{host}'")
 # Query for server versions >= 5.7.6.
 _SELECT_RPL_USER_PASS_QUERY_5_7_6 = (
     "SELECT user, host, grant_priv, authentication_string, "
@@ -2236,3 +2236,39 @@ class Topology(Replication):
         self._report("# Failover complete.")
 
         return True
+
+    def get_servers_with_different_sql_mode(self, look_for):
+        """Returns a tuple of two list with all the server instances in the
+        Topology. The first list is the group of server that have the sql_mode
+        given in look_for, the second list is the group of server that does not
+        have this sql_mode.
+
+        look_for[in]    The sql_mode to search for.
+
+        Returns tuple of Lists - the group of servers instances that have the
+            SQL mode given in look_for, and a group which sql_mode
+            differs from the look_for or an empty list.
+        """
+        # Fill a dict with keys from the SQL modes names and as items the
+        # servers with the same sql_mode.
+        look_for_list = []
+        inconsistent_list = []
+
+        # Get Master sql_mode if given and clasify it.
+        if self.master is not None:
+            master_sql_mode = self.master.select_variable("SQL_MODE")
+            if look_for in master_sql_mode:
+                look_for_list.append(self.master)
+            else:
+                inconsistent_list.append(self.master)
+
+        # Fill the lists with the slaves deppending of his sql_mode.
+        for slave_dict in self.slaves:
+            slave = slave_dict['instance']
+            slave_sql_mode = slave.select_variable("SQL_MODE")
+            if look_for in slave_sql_mode:
+                look_for_list.append(slave)
+            else:
+                inconsistent_list.append(slave)
+
+        return look_for_list, inconsistent_list

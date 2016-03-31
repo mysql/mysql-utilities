@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ def check_read_permissions(server, db_list, options):
     exist.
     """
     for db_name in db_list:
-        source_db = Database(server, db_name)
+        source_db = Database(server, db_name, options)
 
         # Error if source database does not exist.
         if not source_db.exists():
@@ -167,6 +167,7 @@ def _export_metadata(source, db_list, output_file, options):
     skip_funcs = options.get("skip_funcs", False)
     skip_events = options.get("skip_events", False)
     skip_grants = options.get("skip_grants", False)
+    sql_mode = source.select_variable("SQL_MODE")
 
     for db_name in db_list:
 
@@ -197,7 +198,8 @@ def _export_metadata(source, db_list, output_file, options):
                     if dbobj[1][3]:
                         create_str = "GRANT {0} ON {1}.{2} TO {3};\n".format(
                             dbobj[1][1], db.q_db_name,
-                            quote_with_backticks(dbobj[1][3]), dbobj[1][0]
+                            quote_with_backticks(dbobj[1][3], sql_mode),
+                            dbobj[1][0]
                         )
                     else:
                         create_str = "GRANT {0} ON {1}.* TO {2};\n".format(
@@ -418,11 +420,12 @@ def _export_data(source, server_values, db_list, output_file, options):
     frmt = options.get("format", "sql")
     quiet = options.get("quiet", False)
     file_per_table = options.get("file_per_tbl", False)
+    sql_mode = source.select_variable("SQL_MODE")
 
     # Get tables list.
     table_list = []
     for db_name in db_list:
-        source_db = Database(source, db_name)
+        source_db = Database(source, db_name, options)
         # Build table list.
         tables = source_db.get_db_objects("TABLE")
         for table in tables:
@@ -438,7 +441,7 @@ def _export_data(source, server_values, db_list, output_file, options):
             previous_db = db_name
             if not quiet:
                 if frmt == "sql":
-                    q_db_name = quote_with_backticks(db_name)
+                    q_db_name = quote_with_backticks(db_name, sql_mode)
                     output_file.write("USE {0};\n".format(q_db_name))
                 output_file.write(
                     "# Exporting data from {0}\n".format(db_name)
@@ -527,6 +530,7 @@ def _export_table_data(source_srv, table, output_file, options):
     skip_blobs = options.get("skip_blobs", False)
     quiet = options.get("quiet", False)
     file_per_table = options.get("file_per_tbl", False)
+    sql_mode = source_srv.select_variable("SQL_MODE")
 
     # Handle source server instance or server connection values.
     # Note: For multiprocessing the use of connection values instead of a
@@ -545,8 +549,9 @@ def _export_table_data(source_srv, table, output_file, options):
     # Handle qualified table name (with backtick quotes).
     db_name = table[0]
     tbl_name = "{0}.{1}".format(db_name, table[1])
-    q_db_name = quote_with_backticks(db_name)
-    q_tbl_name = "{0}.{1}".format(q_db_name, quote_with_backticks(table[1]))
+    q_db_name = quote_with_backticks(db_name, sql_mode)
+    q_tbl_name = "{0}.{1}".format(q_db_name, quote_with_backticks(table[1],
+                                                                  sql_mode))
 
     # Determine output file to store exported table data.
     if file_per_table:

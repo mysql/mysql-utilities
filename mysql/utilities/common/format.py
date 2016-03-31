@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,14 +24,61 @@ METHODS
                           Writes to a file specified (e.g. sys.stdout)
 """
 
+import codecs
 import csv
 import os
 import textwrap
+
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
+
 from mysql.utilities.common.sql_transform import to_sql
 
 
 _MAX_WIDTH = 78
 _TWO_COLUMN_DISPLAY = "{0:{1}}  {2:{3}}"
+
+
+class UnicodeWriter(object):
+    """A CSV writer which will write rows to CSV file `f_out`,
+    which is encoded in the given encoding.
+    """
+
+    def __init__(self, f_out, dialect="excel", encoding="utf-8", **kwds):
+        """Contructor
+
+        f_out[in]        file to print to (e.g. sys.stdout)
+        dialect[in]      description of the dialect in use by the writer
+        encoding[in]     encoding
+        """
+        # Redirect output to a queue
+        self.queue = StringIO.StringIO()
+        self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
+        self.stream = f_out
+        self.encoder = codecs.getincrementalencoder(encoding)()
+
+    def writerow(self, row):
+        """Write the row parameter to the writer's file object.
+
+        row[in]     sequence of strings or numbers
+        """
+        self.writer.writerow([val.encode("utf-8") if isinstance(val, unicode)
+                              else val for val in row])
+        data = self.queue.getvalue()
+        data = data.decode("utf-8")
+        data = self.encoder.encode(data)
+        self.stream.write(data)
+        self.queue.truncate(0)
+
+    def writerows(self, rows):
+        """Write all rows parameter to the writer's file object.
+
+        rows[in]     list of row objects
+        """
+        for row in rows:
+            self.writerow(row)
 
 
 def _format_col_separator(f_out, columns, col_widths, quiet=False):
@@ -66,7 +113,14 @@ def _format_row_separator(f_out, columns, col_widths, row, quiet=False):
     for i, _ in enumerate(columns):
         if not quiet:
             f_out.write("| ")
-        f_out.write("{0:<{1}} ".format("%s" % row[i], col_widths[i]))
+        val = row[i].encode("utf-8") if isinstance(row[i], unicode) \
+            else row[i]
+        if isinstance(val, str):
+            val = u"{0:<{1}}".format(val.decode("utf-8"), col_widths[i] + 1)
+            f_out.write(val.encode("utf-8"))
+        else:
+            f_out.write("{0:<{1}} ".format("%s" % val, col_widths[i]))
+
     if not quiet:
         f_out.write("|")
     f_out.write("\n")
@@ -102,14 +156,16 @@ def format_tabular_list(f_out, columns, rows, options=None):
     if separator is not None:
         if os.name == "posix":
             # Use \n as line terminator in POSIX (non-Windows) systems.
-            csv_writer = csv.writer(f_out, delimiter=separator,
-                                    lineterminator='\n')
+            csv_writer = UnicodeWriter(f_out, delimiter=separator,
+                                       lineterminator='\n')
         else:
             # Use the default line terminator '\r\n' on Windows.
-            csv_writer = csv.writer(f_out, delimiter=separator)
+            csv_writer = UnicodeWriter(f_out, delimiter=separator)
         if print_header:
             csv_writer.writerow(columns)
         for row in rows:
+            row = [val.encode("utf-8") if isinstance(val, unicode)
+                   else val for val in row]
             if convert_to_sql:
                 # Convert value to SQL (i.e. add quotes if needed).
                 row = ['NULL' if col is None else to_sql(col) for col in row]
@@ -121,19 +177,25 @@ def format_tabular_list(f_out, columns, rows, options=None):
         # Calculate column width for each column
         col_widths = []
         for col in columns:
-            size = len(col)
+            size = len(col.decode("utf-8") if isinstance(col, str) else col)
             col_widths.append(size + 1)
 
         stop = len(columns)
         for row in rows:
+            row = [val.encode("utf-8") if isinstance(val, unicode)
+                   else val for val in row]
             # if there is one column, just use row.
             if stop == 1:
-                col_size = len(str(row[0])) + 1
+                col_size = len(row[0].decode("utf-8")
+                               if isinstance(row[0], str) else str(row[0]))
+                col_size += 1
                 if col_size > col_widths[0]:
                     col_widths[0] = col_size
             else:
                 for i in range(0, stop):
-                    col_size = len(str(row[i])) + 1
+                    col_size = len(row[i].decode("utf-8")
+                                   if isinstance(row[i], str) else str(row[i]))
+                    col_size += 1
                     if col_size > col_widths[i]:
                         col_widths[i] = col_size
 
@@ -194,8 +256,12 @@ def format_vertical_list(f_out, columns, rows, options=None):
             # Convert None values to 'NULL'
             row = ['NULL' if not val else val for val in row]
         for i in range(0, stop):
-            f_out.write("{0:>{1}}: {2}\n".format(columns[i], max_colwidth,
-                                                 row[i]))
+            col = columns[i].decode("utf-8") \
+                if isinstance(columns[i], str) else columns[i]
+            val = row[i].decode("utf-8") \
+                if isinstance(row[i], str) else row[i]
+            out = u"{0:>{1}}: {2}\n".format(col, max_colwidth, val)
+            f_out.write(out.encode("utf-8"))
 
     if row_num > 0:
         row_str = 'rows' if row_num > 1 else 'row'

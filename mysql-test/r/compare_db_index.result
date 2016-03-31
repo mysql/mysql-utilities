@@ -1,0 +1,335 @@
+Test case 1 - check database with No differences
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases index_def on server1 and index_def on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     deduction                               pass    pass    -       
+#           - Compare table checksum                                pass   
+
+# Databases are consistent given skip options specified.
+#
+# ...done
+Test case 2 - check databases with index precision lost and No other differences
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases index_def on server1 and index_def on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     deduction                               FAIL    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- `index_def`.`deduction`
++++ `index_def`.`deduction`
+@@ -1,5 +1,5 @@
+ CREATE TABLE `deduction` (
+-  `company` smallint(5) unsigned NOT NULL,
++  `company` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `deduction` smallint(3) unsigned NOT NULL,
+   `description` varchar(45) NOT NULL,
+   `percent` double NOT NULL,
+
+# Rows in `index_def`.`deduction` not in `index_def`.`deduction`
++----------+------------+----------------+----------+
+| company  | deduction  | description    | percent  |
++----------+------------+----------------+----------+
+| 257      | 1          | deducccion 5%  | 0.95     |
++----------+------------+----------------+----------+
+
+# Rows in `index_def`.`deduction` not in `index_def`.`deduction`
++----------+------------+----------------+----------+
+| company  | deduction  | description    | percent  |
++----------+------------+----------------+----------+
+| 255      | 1          | deducccion 5%  | 0.95     |
++----------+------------+----------------+----------+
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 3 - check databases with index precision lost and known differences in No pk values
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases index_def on server1 and index_def on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     deduction                               FAIL    pass    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- `index_def`.`deduction`
++++ `index_def`.`deduction`
+@@ -1,5 +1,5 @@
+ CREATE TABLE `deduction` (
+-  `company` smallint(5) unsigned NOT NULL,
++  `company` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `deduction` smallint(3) unsigned NOT NULL,
+   `description` varchar(45) NOT NULL,
+   `percent` double NOT NULL,
+# Data differences found among rows:
+--- `index_def`.`deduction`
++++ `index_def`.`deduction`
+@@ -1,47 +1,47 @@
+ +----------+------------+---------------+----------+
+ | company  | deduction  | description   | percent  |
+ +----------+------------+---------------+----------+
+-| 82       | 1          | deduction 5%  | 0.95     |
+-| 88       | 1          | deduction 5%  | 0.95     |
+-| 57       | 1          | deduction 5%  | 0.95     |
+-| 80       | 1          | deduction 5%  | 0.95     |
+-| 72       | 1          | deduction 5%  | 0.95     |
+-| 73       | 1          | deduction 5%  | 0.95     |
+-| 76       | 1          | deduction 5%  | 0.95     |
+-| 79       | 1          | deduction 5%  | 0.95     |
+-| 58       | 1          | deduction 5%  | 0.95     |
+-| 90       | 1          | deduction 5%  | 0.95     |
+-| 91       | 1          | deduction 5%  | 0.95     |
+-| 95       | 1          | deduction 5%  | 0.95     |
+-| 81       | 1          | deduction 5%  | 0.95     |
+-| 69       | 1          | deduction 5%  | 0.95     |
+-| 67       | 1          | deduction 5%  | 0.95     |
+-| 65       | 1          | deduction 5%  | 0.95     |
+-| 78       | 1          | deduction 5%  | 0.95     |
+-| 66       | 1          | deduction 5%  | 0.95     |
+-| 68       | 1          | deduction 5%  | 0.95     |
+-| 54       | 1          | deduction 5%  | 0.95     |
+-| 77       | 1          | deduction 5%  | 0.95     |
+-| 51       | 1          | deduction 5%  | 0.95     |
+-| 70       | 1          | deduction 5%  | 0.95     |
+-| 56       | 1          | deduction 5%  | 0.95     |
+-| 93       | 1          | deduction 5%  | 0.95     |
+-| 64       | 1          | deduction 5%  | 0.95     |
+-| 55       | 1          | deduction 5%  | 0.95     |
+-| 60       | 1          | deduction 5%  | 0.95     |
+-| 89       | 1          | deduction 5%  | 0.95     |
+-| 53       | 1          | deduction 5%  | 0.95     |
+-| 71       | 1          | deduction 5%  | 0.95     |
+-| 87       | 1          | deduction 5%  | 0.95     |
+-| 92       | 1          | deduction 5%  | 0.95     |
+-| 63       | 1          | deduction 5%  | 0.95     |
+-| 75       | 1          | deduction 5%  | 0.95     |
+-| 59       | 1          | deduction 5%  | 0.95     |
+-| 74       | 1          | deduction 5%  | 0.95     |
+-| 61       | 1          | deduction 5%  | 0.95     |
+-| 52       | 1          | deduction 5%  | 0.95     |
+-| 94       | 1          | deduction 5%  | 0.95     |
+-| 86       | 1          | deduction 5%  | 0.95     |
+-| 62       | 1          | deduction 5%  | 0.95     |
+-| 85       | 1          | deduction 5%  | 0.95     |
++| 82       | 1          | deduction 5%  | 0.85     |
++| 88       | 1          | deduction 5%  | 0.85     |
++| 57       | 1          | deduction 5%  | 0.85     |
++| 80       | 1          | deduction 5%  | 0.85     |
++| 72       | 1          | deduction 5%  | 0.85     |
++| 73       | 1          | deduction 5%  | 0.85     |
++| 76       | 1          | deduction 5%  | 0.85     |
++| 79       | 1          | deduction 5%  | 0.85     |
++| 58       | 1          | deduction 5%  | 0.85     |
++| 90       | 1          | deduction 5%  | 0.85     |
++| 91       | 1          | deduction 5%  | 0.85     |
++| 95       | 1          | deduction 5%  | 0.85     |
++| 81       | 1          | deduction 5%  | 0.85     |
++| 69       | 1          | deduction 5%  | 0.85     |
++| 67       | 1          | deduction 5%  | 0.85     |
++| 65       | 1          | deduction 5%  | 0.85     |
++| 78       | 1          | deduction 5%  | 0.85     |
++| 66       | 1          | deduction 5%  | 0.85     |
++| 68       | 1          | deduction 5%  | 0.85     |
++| 54       | 1          | deduction 5%  | 0.85     |
++| 77       | 1          | deduction 5%  | 0.85     |
++| 51       | 1          | deduction 5%  | 0.85     |
++| 70       | 1          | deduction 5%  | 0.85     |
++| 56       | 1          | deduction 5%  | 0.85     |
++| 93       | 1          | deduction 5%  | 0.85     |
++| 64       | 1          | deduction 5%  | 0.85     |
++| 55       | 1          | deduction 5%  | 0.85     |
++| 60       | 1          | deduction 5%  | 0.85     |
++| 89       | 1          | deduction 5%  | 0.85     |
++| 53       | 1          | deduction 5%  | 0.85     |
++| 71       | 1          | deduction 5%  | 0.85     |
++| 87       | 1          | deduction 5%  | 0.85     |
++| 92       | 1          | deduction 5%  | 0.85     |
++| 63       | 1          | deduction 5%  | 0.85     |
++| 75       | 1          | deduction 5%  | 0.85     |
++| 59       | 1          | deduction 5%  | 0.85     |
++| 74       | 1          | deduction 5%  | 0.85     |
++| 61       | 1          | deduction 5%  | 0.85     |
++| 52       | 1          | deduction 5%  | 0.85     |
++| 94       | 1          | deduction 5%  | 0.85     |
++| 86       | 1          | deduction 5%  | 0.85     |
++| 62       | 1          | deduction 5%  | 0.85     |
++| 85       | 1          | deduction 5%  | 0.85     |
+ +----------+------------+---------------+----------+
+
+# Rows in `index_def`.`deduction` not in `index_def`.`deduction`
++----------+------------+----------------+----------+
+| company  | deduction  | description    | percent  |
++----------+------------+----------------+----------+
+| 257      | 1          | deducccion 5%  | 0.95     |
++----------+------------+----------------+----------+
+
+# Rows in `index_def`.`deduction` not in `index_def`.`deduction`
++----------+------------+----------------+----------+
+| company  | deduction  | description    | percent  |
++----------+------------+----------------+----------+
+| 255      | 1          | deducccion 5%  | 0.95     |
++----------+------------+----------------+----------+
+
+
+# Database consistency check failed.
+#
+# ...done
+Test case 4 - check databases with index precision lost and new inserts
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases index_def on server1 and index_def on server2
+#
+#                                                   Defn    Row     Data   
+# Type      Object Name                             Diff    Count   Check  
+# ------------------------------------------------------------------------- 
+# TABLE     deduction                               FAIL    FAIL    -       
+#           - Compare table checksum                                FAIL    
+#           - Find row differences                                  FAIL    
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- `index_def`.`deduction`
++++ `index_def`.`deduction`
+@@ -1,5 +1,5 @@
+ CREATE TABLE `deduction` (
+-  `company` smallint(5) unsigned NOT NULL,
++  `company` tinyint(3) unsigned NOT NULL DEFAULT '0',
+   `deduction` smallint(3) unsigned NOT NULL,
+   `description` varchar(45) NOT NULL,
+   `percent` double NOT NULL,
+# Row counts are not the same among `index_def`.`deduction` and `index_def`.`deduction`.
+#
+# Data differences found among rows:
+--- `index_def`.`deduction`
++++ `index_def`.`deduction`
+@@ -1,47 +1,47 @@
+ +----------+------------+---------------+----------+
+ | company  | deduction  | description   | percent  |
+ +----------+------------+---------------+----------+
+-| 82       | 1          | deduction 5%  | 0.95     |
+-| 88       | 1          | deduction 5%  | 0.95     |
+-| 57       | 1          | deduction 5%  | 0.95     |
+-| 80       | 1          | deduction 5%  | 0.95     |
+-| 72       | 1          | deduction 5%  | 0.95     |
+-| 73       | 1          | deduction 5%  | 0.95     |
+-| 76       | 1          | deduction 5%  | 0.95     |
+-| 79       | 1          | deduction 5%  | 0.95     |
+-| 58       | 1          | deduction 5%  | 0.95     |
+-| 90       | 1          | deduction 5%  | 0.95     |
+-| 91       | 1          | deduction 5%  | 0.95     |
+-| 95       | 1          | deduction 5%  | 0.95     |
+-| 81       | 1          | deduction 5%  | 0.95     |
+-| 69       | 1          | deduction 5%  | 0.95     |
+-| 67       | 1          | deduction 5%  | 0.95     |
+-| 65       | 1          | deduction 5%  | 0.95     |
+-| 78       | 1          | deduction 5%  | 0.95     |
+-| 66       | 1          | deduction 5%  | 0.95     |
+-| 68       | 1          | deduction 5%  | 0.95     |
+-| 54       | 1          | deduction 5%  | 0.95     |
+-| 77       | 1          | deduction 5%  | 0.95     |
+-| 51       | 1          | deduction 5%  | 0.95     |
+-| 70       | 1          | deduction 5%  | 0.95     |
+-| 56       | 1          | deduction 5%  | 0.95     |
+-| 93       | 1          | deduction 5%  | 0.95     |
+-| 64       | 1          | deduction 5%  | 0.95     |
+-| 55       | 1          | deduction 5%  | 0.95     |
+-| 60       | 1          | deduction 5%  | 0.95     |
+-| 89       | 1          | deduction 5%  | 0.95     |
+-| 53       | 1          | deduction 5%  | 0.95     |
+-| 71       | 1          | deduction 5%  | 0.95     |
+-| 87       | 1          | deduction 5%  | 0.95     |
+-| 92       | 1          | deduction 5%  | 0.95     |
+-| 63       | 1          | deduction 5%  | 0.95     |
+-| 75       | 1          | deduction 5%  | 0.95     |
+-| 59       | 1          | deduction 5%  | 0.95     |
+-| 74       | 1          | deduction 5%  | 0.95     |
+-| 61       | 1          | deduction 5%  | 0.95     |
+-| 52       | 1          | deduction 5%  | 0.95     |
+-| 94       | 1          | deduction 5%  | 0.95     |
+-| 86       | 1          | deduction 5%  | 0.95     |
+-| 62       | 1          | deduction 5%  | 0.95     |
+-| 85       | 1          | deduction 5%  | 0.95     |
++| 82       | 1          | deduction 5%  | 0.85     |
++| 88       | 1          | deduction 5%  | 0.85     |
++| 57       | 1          | deduction 5%  | 0.85     |
++| 80       | 1          | deduction 5%  | 0.85     |
++| 72       | 1          | deduction 5%  | 0.85     |
++| 73       | 1          | deduction 5%  | 0.85     |
++| 76       | 1          | deduction 5%  | 0.85     |
++| 79       | 1          | deduction 5%  | 0.85     |
++| 58       | 1          | deduction 5%  | 0.85     |
++| 90       | 1          | deduction 5%  | 0.85     |
++| 91       | 1          | deduction 5%  | 0.85     |
++| 95       | 1          | deduction 5%  | 0.85     |
++| 81       | 1          | deduction 5%  | 0.85     |
++| 69       | 1          | deduction 5%  | 0.85     |
++| 67       | 1          | deduction 5%  | 0.85     |
++| 65       | 1          | deduction 5%  | 0.85     |
++| 78       | 1          | deduction 5%  | 0.85     |
++| 66       | 1          | deduction 5%  | 0.85     |
++| 68       | 1          | deduction 5%  | 0.85     |
++| 54       | 1          | deduction 5%  | 0.85     |
++| 77       | 1          | deduction 5%  | 0.85     |
++| 51       | 1          | deduction 5%  | 0.85     |
++| 70       | 1          | deduction 5%  | 0.85     |
++| 56       | 1          | deduction 5%  | 0.85     |
++| 93       | 1          | deduction 5%  | 0.85     |
++| 64       | 1          | deduction 5%  | 0.85     |
++| 55       | 1          | deduction 5%  | 0.85     |
++| 60       | 1          | deduction 5%  | 0.85     |
++| 89       | 1          | deduction 5%  | 0.85     |
++| 53       | 1          | deduction 5%  | 0.85     |
++| 71       | 1          | deduction 5%  | 0.85     |
++| 87       | 1          | deduction 5%  | 0.85     |
++| 92       | 1          | deduction 5%  | 0.85     |
++| 63       | 1          | deduction 5%  | 0.85     |
++| 75       | 1          | deduction 5%  | 0.85     |
++| 59       | 1          | deduction 5%  | 0.85     |
++| 74       | 1          | deduction 5%  | 0.85     |
++| 61       | 1          | deduction 5%  | 0.85     |
++| 52       | 1          | deduction 5%  | 0.85     |
++| 94       | 1          | deduction 5%  | 0.85     |
++| 86       | 1          | deduction 5%  | 0.85     |
++| 62       | 1          | deduction 5%  | 0.85     |
++| 85       | 1          | deduction 5%  | 0.85     |
+ +----------+------------+---------------+----------+
+
+# Rows in `index_def`.`deduction` not in `index_def`.`deduction`
++----------+------------+----------------+----------+
+| company  | deduction  | description    | percent  |
++----------+------------+----------------+----------+
+| 1024     | 2          | deduction 25%  | 0.75     |
+| 512      | 1          | deducccion 0%  | 0        |
+| 257      | 1          | deducccion 5%  | 0.95     |
++----------+------------+----------------+----------+
+
+# Rows in `index_def`.`deduction` not in `index_def`.`deduction`
++----------+------------+----------------+----------+
+| company  | deduction  | description    | percent  |
++----------+------------+----------------+----------+
+| 255      | 1          | deducccion 5%  | 0.95     |
++----------+------------+----------------+----------+
+
+
+# Database consistency check failed.
+#
+# ...done

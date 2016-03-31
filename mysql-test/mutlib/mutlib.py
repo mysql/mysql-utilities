@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1585,7 +1585,7 @@ class System_test(object):
         if not res:
             return True  # Ok to exit here as there weren't any dbs to drop
         try:
-            q_db = quote_with_backticks(db)
+            q_db = quote_with_backticks(db, server.select_variable("SQL_MODE"))
             server.exec_query("DROP DATABASE {0}".format(q_db))
         except UtilError as err:
             if debug:

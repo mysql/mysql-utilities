@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2011, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@ from mysql.utilities.command.dbcompare import (compare_all_databases,
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.dbcompare import (DEFAULT_SPAN_KEY_SIZE,
                                               MAX_SPAN_KEY_SIZE)
-from mysql.utilities.common.pattern_matching import REGEXP_OBJ_NAME
+from mysql.utilities.common.pattern_matching import (REGEXP_OBJ_NAME,
+                                                     REGEXP_OBJ_NAME_AQ)
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.messages import (PARSE_ERR_DB_PAIR,
                                              PARSE_ERR_DB_PAIR_EXT,
@@ -54,6 +55,7 @@ from mysql.utilities.common.options import (add_difftype, add_regexp,
                                             add_ssl_options, get_ssl_dict,
                                             setup_common_options,
                                             check_password_security)
+from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting,
                                                   quote_with_backticks)
@@ -227,25 +229,7 @@ if __name__ == '__main__':
         print(WARN_OPT_ONLY_USED_WITH.format(opt='--regexp',
                                              used_with='the --exclude option'))
 
-    # check unique keys
-    ukey_regexp = re.compile(r'(?:(?:;){{0,1}}{0}\.{0})'
-                             ''.format(REGEXP_OBJ_NAME))
-
     db_idxes_l = None
-
-    # Split the table names considering backtick quotes
-    if opt.use_indexes:
-        grp = ukey_regexp.findall(opt.use_indexes)
-        if not grp:
-            parser.error("Can't parse the specified --use-indexes argument {0}"
-                         "".format(opt.use_indexes))
-        db_idxes_l = []
-        for table, index in grp:
-            table_uc = (table if is_quoted_with_backticks(table)
-                        else quote_with_backticks(table))
-            index_uc = (index if is_quoted_with_backticks(index)
-                        else quote_with_backticks(index))
-            db_idxes_l.append((table_uc, index_uc))
 
     # Set options for database operations.
     options = {
@@ -303,6 +287,53 @@ if __name__ == '__main__':
         except UtilError:
             _, err, _ = sys.exc_info()
             parser.error("Server2 connection values invalid: %s." % err.errmsg)
+    else:
+        server2_values = None
+
+    # Get the sql_mode set on source and destination server
+    conn_opts = {
+        'quiet': True,
+        'version': "5.1.30",
+    }
+    try:
+        servers = connect_servers(server1_values, server2_values, conn_opts)
+        server1_sql_mode = servers[0].select_variable("SQL_MODE")
+        if servers[1] is not None:
+            server2_sql_mode = servers[1].select_variable("SQL_MODE")
+        else:
+            server2_sql_mode = ''
+    except UtilError:
+        server1_sql_mode = ''
+        server2_sql_mode = ''
+
+    ukey_regex_server1 = REGEXP_OBJ_NAME
+    if  "ANSI_QUOTES" in server1_sql_mode:
+        ukey_regex_server1 = REGEXP_OBJ_NAME_AQ
+
+    ukey_regex_server2 = REGEXP_OBJ_NAME
+    if "ANSI_QUOTES" in server2_sql_mode:
+        ukey_regex_server2 = REGEXP_OBJ_NAME_AQ
+
+    # check unique keys
+    ukey_regexp = re.compile(r'(?:(?:;){{0,1}}{0}\.{1})'
+                             ''.format(ukey_regex_server1, ukey_regex_server2))
+
+    # Split the table names considering backtick quotes
+    if opt.use_indexes:
+        grp = ukey_regexp.findall(opt.use_indexes)
+        if not grp:
+            parser.error("Can't parse the specified --use-indexes argument {0}"
+                         "".format(opt.use_indexes))
+        db_idxes_l = []
+        for table, index in grp:
+            table_uc = (table if is_quoted_with_backticks(table,
+                                                          server1_sql_mode)
+                        else quote_with_backticks(table, server1_sql_mode))
+            index_uc = (index if is_quoted_with_backticks(index,
+                                                          server1_sql_mode)
+                        else quote_with_backticks(index, server1_sql_mode))
+            db_idxes_l.append((table_uc, index_uc))
+        options["use_indexes"] = db_idxes_l
 
     # Check --span-key-size value.
     if opt.span_key_size is not None:
@@ -372,10 +403,12 @@ if __name__ == '__main__':
                                                           db2_value=parts[1]))
 
             # Remove backtick quotes (handled later)
-            db1 = remove_backtick_quoting(parts[0]) \
-                if is_quoted_with_backticks(parts[0]) else parts[0]
-            db2 = remove_backtick_quoting(parts[1]) \
-                if is_quoted_with_backticks(parts[1]) else parts[1]
+            db1 = remove_backtick_quoting(parts[0], server1_sql_mode) \
+                if is_quoted_with_backticks(parts[0], server1_sql_mode) \
+                else parts[0]
+            db2 = remove_backtick_quoting(parts[1], server1_sql_mode) \
+                if is_quoted_with_backticks(parts[1], server1_sql_mode) \
+                else parts[1]
 
             try:
                 res = database_compare(server1_values, server2_values,

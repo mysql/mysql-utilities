@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,8 +71,24 @@ class test(export_parameters_def.test):
 
         test_num += 1
         comment = ("Test case {0} - exclude using SQL LIKE "
-                   "pattern.".format(test_num))
+                   "pattern #1.".format(test_num))
         cmd_opts = "{0} -x f% -x _4".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - exclude using SQL LIKE "
+                   "pattern #2.".format(test_num))
+        cmd_opts = "{0} -x util_test.t%".format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - exclude using SQL LIKE "
+                   "pattern #3.".format(test_num))
+        cmd_opts = "{0} -x %".format(cmd_str)
         res = self.run_test_case(0, cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -142,6 +158,17 @@ class test(export_parameters_def.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         export_parameters_def.test._mask_csv(self)
+
+        test_num += 1
+        comment = ("Test case {0} - exclude by name using --export=both."
+                   "".format(test_num))
+        cmd_opts = ("{0} --export=both "
+                    "--exclude=util_test.t1 --exclude=util_test.t2 "
+                    "--exclude=util_test.t3 --exclude=util_test.t4 "
+                    "".format(cmd_str))
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
 
         # Mask known source.
         self.replace_result("# Source on localhost: ... connected.",

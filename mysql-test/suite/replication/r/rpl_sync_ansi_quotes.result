@@ -1,0 +1,90 @@
+Test case 1 - check empty servers.
+WARNING: Using a password on the command line interface can be insecure.
+#
+# GTID differences between Master and Slaves:
+#
+# Checking data consistency.
+#
+# Using Master 'localhost@PORT1' as base server for comparison.
+#
+#...done.
+#
+# SUMMARY: No data consistency issue found.
+#
+Test case 2 - data consistency check with active replication using master and slaves discovery.
+WARNING: Using a password on the command line interface can be insecure.
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+#
+# GTID differences between Master and Slaves:
+#
+# Checking data consistency.
+#
+# Using Master 'localhost@PORT1' as base server for comparison.
+# Checking 'test_rplsync_db' database...
+# - Checking 't0' table data...
+#   [OK] "test_rplsync_db"."t0" checksum for server 'localhost@PORT2'.
+#   [OK] "test_rplsync_db"."t0" checksum for server 'localhost@PORT3'.
+# - Checking 't1' table data...
+#   [OK] "test_rplsync_db"."t1" checksum for server 'localhost@PORT2'.
+#   [OK] "test_rplsync_db"."t1" checksum for server 'localhost@PORT3'.
+# - Checking 't2' table data...
+#   [OK] "test_rplsync_db"."t2" checksum for server 'localhost@PORT2'.
+#   [OK] "test_rplsync_db"."t2" checksum for server 'localhost@PORT3'.
+# - Checking 't3' table data...
+#   [OK] "test_rplsync_db"."t3" checksum for server 'localhost@PORT2'.
+#   [OK] "test_rplsync_db"."t3" checksum for server 'localhost@PORT3'.
+#
+#...done.
+#
+# SUMMARY: No data consistency issue found.
+#
+Test case 3 - data consistency check with active replication only between slaves (no master).
+WARNING: Using a password on the command line interface can be insecure.
+#
+# Checking data consistency.
+#
+# Using Slave 'localhost@PORT2' as base server for comparison.
+# Checking 'test_rplsync_db' database...
+# - Checking 't0' table data...
+#   [OK] "test_rplsync_db"."t0" checksum for server 'localhost@PORT3'.
+# - Checking 't1' table data...
+#   [OK] "test_rplsync_db"."t1" checksum for server 'localhost@PORT3'.
+# - Checking 't2' table data...
+#   [OK] "test_rplsync_db"."t2" checksum for server 'localhost@PORT3'.
+# - Checking 't3' table data...
+#   [OK] "test_rplsync_db"."t3" checksum for server 'localhost@PORT3'.
+#
+#...done.
+#
+# SUMMARY: No data consistency issue found.
+#
+Test case 4 - data consistency check between master and specified slaves.
+WARNING: Using a password on the command line interface can be insecure.
+#
+# GTID differences between Master and Slaves:
+#
+# Checking data consistency.
+#
+# Using Master 'localhost@PORT1' as base server for comparison.
+# Checking 'test_rplsync_db' database...
+# - Checking 't0' table data...
+#   [OK] "test_rplsync_db"."t0" checksum for server 'localhost@PORT2'.
+#   [OK] "test_rplsync_db"."t0" checksum for server 'localhost@PORT3'.
+# - Checking 't1' table data...
+#   [OK] "test_rplsync_db"."t1" checksum for server 'localhost@PORT2'.
+#   [OK] "test_rplsync_db"."t1" checksum for server 'localhost@PORT3'.
+# - Checking 't2' table data...
+#   [OK] "test_rplsync_db"."t2" checksum for server 'localhost@PORT2'.
+#   [OK] "test_rplsync_db"."t2" checksum for server 'localhost@PORT3'.
+# - Checking 't3' table data...
+#   [OK] "test_rplsync_db"."t3" checksum for server 'localhost@PORT2'.
+#   [OK] "test_rplsync_db"."t3" checksum for server 'localhost@PORT3'.
+#
+#...done.
+#
+# SUMMARY: No data consistency issue found.
+#

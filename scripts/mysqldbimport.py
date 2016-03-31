@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,7 +46,10 @@ from mysql.utilities.common.options import (add_character_set_option,
                                             setup_common_options,
                                             get_ssl_dict,
                                             check_password_security)
-from mysql.utilities.common.pattern_matching import REGEXP_QUALIFIED_OBJ_NAME
+from mysql.utilities.common.pattern_matching import (
+    REGEXP_QUALIFIED_OBJ_NAME,
+    REGEXP_QUALIFIED_OBJ_NAME_AQ)
+from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.tools import (check_connector_python,
                                           print_elapsed_time)
 from mysql.utilities.exception import FormatError, UtilError
@@ -258,6 +261,17 @@ if __name__ == '__main__':
         parser.error("Server connection values invalid: "
                      "{0}.".format(err.errmsg))
 
+    # Get the sql_mode set on source and destination server
+    conn_opts = {
+        'quiet': True,
+        'version': "5.1.30",
+    }
+    try:
+        servers = connect_servers(server_values, None, conn_opts)
+        server_sql_mode = servers[0].select_variable("SQL_MODE")
+    except UtilError:
+        server_sql_mode = ''
+
     # Check values for --format=raw_csv
     if opt.format == "raw_csv":
         if not opt.table:
@@ -265,8 +279,11 @@ if __name__ == '__main__':
                   "--format=raw_csv.")
             sys.exit(1)
         # Validate table name using format <db>.<table>
+        table_regex = REGEXP_QUALIFIED_OBJ_NAME
+        if "ANSI_QUOTES" in server_sql_mode:
+            table_regex = REGEXP_QUALIFIED_OBJ_NAME_AQ
         table_re = re.compile(
-            r"{0}(?:\.){0}".format(REGEXP_QUALIFIED_OBJ_NAME)
+            r"{0}(?:\.){0}".format(table_regex)
         )
         if not table_re.match(opt.table):
             parser.error("Invalid table name: {0}.".format(opt.table))

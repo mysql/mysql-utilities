@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ class test(mutlib.System_test):
     def mask(self):
         """Masks result.
         """
-        self.mask_column_result("| util_test  ", "|", 3, " XXXXXXX  ")
+        self.mask_column_result("| util_test  ", "|", 3, " XXXXXX  ")
 
         self.mask_column_result("ib", ",", 2, "XXXXXXXX")
         self.mask_column_result("general.log", ",", 2, "XXXX")

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ failover_daemon test.
 
 import os
 import re
+import stat
 import time
 
 import failover
@@ -363,6 +364,11 @@ class test(failover.test):
                                       "failover daemon to register master and "
                                       "start its monitoring process"
                                       "".format(comment, msg))
+
+        # Test if pidfile was created with the correct umask
+        if oct(stat.S_IMODE(os.stat(pidfile).st_mode)) != "0640":
+            raise MUTLibError("{0}: failed - the pidfile was not created with "
+                              "the correct umask.".format(comment))
 
         if stop_daemon:
             # Stop daemon

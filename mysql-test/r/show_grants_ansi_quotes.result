@@ -1,0 +1,155 @@
+Test case 1 - Privileges are inherited from global level to db level  and from db level to tables and routines
+# Source on localhost: ... connected.
+
+# DATABASE "util_test":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : EXECUTE, SELECT, UPDATE
+# - 'priv_test_user3'@'%' : ALTER ROUTINE, DELETE, DROP, EXECUTE, TRIGGER, UPDATE
+
+# TABLE "util_test"."t2":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE "util_test"."t3":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, SELECT, TRIGGER, UPDATE
+
+# ROUTINE "util_test"."f1":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES
+
+# ROUTINE "util_test"."p1":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : EXECUTE
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES, GRANT OPTION
+#...done.
+Test case 2 - show grantees, using all types of objects: tables, databases and stored routines
+# Source on localhost: ... connected.
+# WARNING: specified database does not exist on base server and will be skipped along any tables and routines belonging to it: db_does_not_exist.
+# WARNING: specified object is not supported (not a DATABASE, FUNCTION, PROCEDURE or TABLE), as such it will be skipped: "util_test"."v1".
+# WARNING: specified object does not exist. "util_test"."does_not_exist" will be skipped.
+
+# DATABASE "db`:db":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : CREATE TEMPORARY TABLES, GRANT OPTION, INSERT, SELECT, UPDATE
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : DROP, EXECUTE, TRIGGER
+
+# DATABASE "util_test":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : EXECUTE, SELECT, UPDATE
+# - 'priv_test_user3'@'%' : ALTER ROUTINE, DELETE, DROP, EXECUTE, TRIGGER, UPDATE
+
+# TABLE "db`:db"."`t`.`export_2":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : CREATE VIEW, GRANT OPTION, INSERT, SELECT, UPDATE
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : DROP, TRIGGER
+
+# TABLE "util_test"."t1":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE "util_test"."t2":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE "util_test"."t3":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, SELECT, TRIGGER, UPDATE
+
+# ROUTINE "db`:db"."fu`nc":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : EXECUTE
+
+# ROUTINE "db`:db"."pr``oc":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : EXECUTE
+#...done.
+Test case 3 - show grants for all objects of a database using wildcard
+# Source on localhost: ... connected.
+
+# TABLE "util_test"."t1":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE "util_test"."t2":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE "util_test"."t3":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, SELECT, TRIGGER, UPDATE
+
+# TABLE "util_test"."t4":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# TABLE "util_test"."t5":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : GRANT OPTION, SELECT, TRIGGER, UPDATE
+# - 'priv_test_user2'@'%' : SELECT, UPDATE
+# - 'priv_test_user3'@'%' : DELETE, DROP, TRIGGER, UPDATE
+
+# ROUTINE "util_test"."f1":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : ALL PRIVILEGES, GRANT OPTION
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES
+
+# ROUTINE "util_test"."f2":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : EXECUTE
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES
+
+# ROUTINE "util_test"."p1":
+# - 'joe'@'user' : ALL PRIVILEGES
+# - 'joe_wildcard'@'%' : ALL PRIVILEGES
+# - 'priv_test_user'@'%' : EXECUTE, GRANT OPTION
+# - 'priv_test_user2'@'%' : EXECUTE
+# - 'priv_test_user3'@'%' : ALL PRIVILEGES, GRANT OPTION
+#...done.
