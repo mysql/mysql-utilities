@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -316,7 +316,7 @@ def find_tests(path):
                         test_files.append(test_ref)
 
     for suite in suites_found:
-        sys.path.append(os.path.join("suite", suite, "t"))
+        sys.path.append(os.path.join(SUITE_PATH, suite, "t"))
 
     return test_files
 
@@ -443,8 +443,18 @@ if __name__ == "__main__":
     if opt.record and len(args) != 1:
         parser.error("Must specify a single test when using record.")
 
+    # Expand the user's home component if used for Unix and Windows
+    opt.testdir = os.path.expanduser(opt.testdir)
+    opt.utildir = os.path.expanduser(opt.utildir)
+
+    # If testdir is specified, modify variables accordingly
+    if opt.testdir is not TEST_PATH:
+        RESULT_PATH = os.path.join(opt.testdir, 'r')
+        SUITE_PATH = os.path.join(opt.testdir, 'suite')
+        TEST_PATH = os.path.join(opt.testdir, 't')
+
     # Append default paths if options not specified
-    sys.path.append(opt.testdir)
+    sys.path.append(TEST_PATH)
     sys.path.append(opt.utildir)
 
     # Process the server connections
@@ -585,7 +595,7 @@ if __name__ == "__main__":
     skipped_tests = []
 
     test_files.extend(find_tests(SUITE_PATH))
-    test_files.extend(find_tests(opt.testdir))
+    test_files.extend(find_tests(TEST_PATH))
 
     # If no tests, there's nothing to do!
     if len(test_files) == 0:
