@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -91,6 +91,28 @@ class TestUtilitiesConsole(unittest.TestCase):
         self.assertEqual("1234", self.util_con.cmd_line.command)
         self.util_con._process_command_keys('BACKSPACE_WIN')
         self.assertEqual("123", self.util_con.cmd_line.command)
+
+    def test_arrow_delete(self):
+        """Test console response to using arrow keys and the
+        DELETE KEY when the cursor is in the end of the line.
+        """
+
+        self.util_con.cmd_line.command = "12345-123"
+        self.util_con.cmd_line.length = 9
+        self.util_con.cmd_line.position = 9
+        for i in range(0, 5):
+            self.util_con._process_command_keys('ARROW_LT')
+        self.assertEqual("12345-123", self.util_con.cmd_line.command)
+        self.util_con._process_command_keys('ARROW_RT')
+        self.assertEqual("12345-123", self.util_con.cmd_line.command)
+        self.util_con._process_command_keys('DELETE_POSIX')
+        self.assertEqual("12345123", self.util_con.cmd_line.command)
+        self.assertEqual(5, self.util_con.cmd_line.position)
+        self.assertEqual(8, self.util_con.cmd_line.length)
+        self.util_con._process_command_keys('DELETE_POSIX')
+        self.assertEqual("1234523", self.util_con.cmd_line.command)
+        self.assertEqual(5, self.util_con.cmd_line.position)
+        self.assertEqual(7, self.util_con.cmd_line.length)
 
     def test_home_key(self):
         """Test console response to HOME KEY.

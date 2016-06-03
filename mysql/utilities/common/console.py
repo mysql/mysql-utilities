@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -321,8 +321,10 @@ class _Command(object):
                     self.command += old_command[self.position + 1:]
                 sys.stdout.write(self.command[self.position:])
                 self.length = len(self.command)
-                if self.length > 0:
+                spaces = len(self.command[self.position:])
+                for i in range(0, spaces):
                     sys.stdout.write('\b')
+                sys.stdout.flush()
 
     def backspace_keypress(self):
         """Execute the 'BACKSPACE' key press.
