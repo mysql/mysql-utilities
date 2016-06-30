@@ -292,6 +292,20 @@ class test(compare_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        self.server1.exec_query("CREATE DATABASE db_latin "
+                                "DEFAULT CHARACTER SET = latin1")
+        self.server2.exec_query("CREATE DATABASE db_latin "
+                                "DEFAULT CHARACTER SET = latin2")
+        comment = ("Test case {0} - Compare databases where there "
+                   "only the decorators differ for CREATE").format(test_num)
+        s2_conn_same_srv = s1_conn.replace('--server1', '--server2')
+        cmd_str = ("mysqldbcompare.py {0} {1} {2}"
+                   "".format(s1_conn, s2_conn, "db_latin:db_latin"))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask output..
         self.replace_substring(str(self.server1.port), "PORT1")
         self.replace_result("mysqldbcompare: error: Server1 connection "
@@ -314,14 +328,18 @@ class test(compare_db.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
-        try:
-            self.server1.exec_query("DROP DATABASE IF EXISTS inventory")
-        except UtilError as err:
-            raise MUTLibError("Unable to drop inventory database: "
-                              "{0}".format(err.errmsg))
-        try:
-            self.server2.exec_query("DROP DATABASE IF EXISTS inventory")
-        except UtilError as err:
-            raise MUTLibError("Unable to drop inventory database: "
-                              "{0}".format(err.errmsg))
+        dbs = ['inventory', 'db_latin']
+        for db in dbs:
+            try:
+                self.server1.exec_query("DROP DATABASE IF EXISTS "
+                                        "{0}".format(db))
+            except UtilError as err:
+                raise MUTLibError("Unable to drop {0} database: "
+                                  "{1} on server1".format(db, err.errmsg))
+            try:
+                self.server2.exec_query("DROP DATABASE IF EXISTS "
+                                        "{0}".format(db))
+            except UtilError as err:
+                raise MUTLibError("Unable to drop {0} database: "
+                                  "{1} on server2".format(db, err.errmsg))
         return compare_db.test.cleanup(self)

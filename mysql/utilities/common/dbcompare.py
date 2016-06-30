@@ -603,6 +603,20 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
     object1_create = get_create_object(server1, object1, options, object_type)
     object2_create = get_create_object(server2, object2, options, object_type)
 
+    # Only target CREATE DATABASE difference if decorations differ,
+    # not just the database names. So we isolate the CREATE statement
+    # without the names or +/- and compare. If different, print the
+    # difference report otherwise, ignore it.
+    if (object_type == "DATABASE") and (object1 != object2):
+        quotes = ["'", '"', "`"]
+        db1 = object1.translate(None, "".join(quotes))
+        db2 = object2.translate(None, "".join(quotes))
+        first = object1_create.replace(db1, "")[1::]
+        second = object2_create.replace(db2, "")[1::]
+        if first == second:
+            object1_create = ""
+            object2_create = ""
+
     if not quiet:
         msg = "# Comparing {0} to {1} ".format(object1, object2)
         print msg,

@@ -495,15 +495,6 @@ Test case 7 - compare two databases on same server w/server2
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory2 on server2
 #
-# Object definitions differ. (--changes-for=server1)
-#
-
---- `inventory`
-+++ `inventory2`
-@@ -1,1 +1,1 @@
--CREATE DATABASE `inventory` /*!40100 DEFAULT CHARACTER SET latin1 */
-+CREATE DATABASE `inventory2` /*!40100 DEFAULT CHARACTER SET latin1 */
-
 # WARNING: Objects in server1.inventory but not in server1.inventory2:
 #         VIEW: finishing_up
 #        TABLE: supplier
@@ -523,15 +514,6 @@ Test case 8 - compare two databases on same server
 # server1 on localhost: ... connected.
 # Checking databases inventory and inventory2 on server1
 #
-# Object definitions differ. (--changes-for=server1)
-#
-
---- `inventory`
-+++ `inventory2`
-@@ -1,1 +1,1 @@
--CREATE DATABASE `inventory` /*!40100 DEFAULT CHARACTER SET latin1 */
-+CREATE DATABASE `inventory2` /*!40100 DEFAULT CHARACTER SET latin1 */
-
 # WARNING: Objects in server1.inventory but not in server1.inventory2:
 #         VIEW: finishing_up
 #        TABLE: supplier
@@ -1071,8 +1053,6 @@ CREATE TABLE `nonix_1_simple` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
 
 #
-# Warning: Specified index `ix_nonull` for table no_primary_keys.nonix_1_simple cannot be used. It contains at least one column that accepts null values.
-# Warning: Specified index `ix_nonull` for table no_primary_keys.nonix_1_simple cannot be used. It contains at least one column that accepts null values.
 # INFO: for table nonix_1_simple the index uk_nonullclmns is used to compare.
 
 # TABLE     nonix_2_nix_2                           pass    pass    -       
@@ -1532,15 +1512,6 @@ Test case 25 - compare two equal databases with different names (including VIEWS
 # server2 on localhost: ... connected.
 # Checking databases inventory on server1 and inventory_clone on server2
 #
-# Object definitions differ. (--changes-for=server1)
-#
-
---- `inventory`
-+++ `inventory_clone`
-@@ -1,1 +1,1 @@
--CREATE DATABASE `inventory` /*!40100 DEFAULT CHARACTER SET latin1 */
-+CREATE DATABASE `inventory_clone` /*!40100 DEFAULT CHARACTER SET latin1 */
-
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
@@ -1640,24 +1611,6 @@ Test case 29 - table with primary keys and different data and SQL format.
 # server2 on localhost: ... connected.
 # Checking databases compare_db_pkeys_db1 on server1 and compare_db_pkeys_db2 on server2
 #
-
-# WARNING: Cannot generate SQL statements for these objects.
-# Check the difference output for other discrepencies.
---- `compare_db_pkeys_db1`
-+++ `compare_db_pkeys_db2`
-@@ -1,1 +1,1 @@
--CREATE DATABASE `compare_db_pkeys_db1` /*!40100 DEFAULT CHARACTER SET latin1 */
-+CREATE DATABASE `compare_db_pkeys_db2` /*!40100 DEFAULT CHARACTER SET latin1 */
-# WARNING: Could not generate SQL statements for differences between `compare_db_pkeys_db1` and `compare_db_pkeys_db2`. No changes required or not supported difference.
-
-# WARNING: Cannot generate SQL statements for these objects.
-# Check the difference output for other discrepencies.
---- `compare_db_pkeys_db1`
-+++ `compare_db_pkeys_db2`
-@@ -1,1 +1,1 @@
--CREATE DATABASE `compare_db_pkeys_db1` /*!40100 DEFAULT CHARACTER SET latin1 */
-+CREATE DATABASE `compare_db_pkeys_db2` /*!40100 DEFAULT CHARACTER SET latin1 */
-
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
@@ -1682,24 +1635,6 @@ Test case 30 - table with primary keys and missing data and SQL format and --sho
 # server2 on localhost: ... connected.
 # Checking databases compare_db_pkeys_db1 on server1 and compare_db_pkeys_db2 on server2
 #
-
-# WARNING: Cannot generate SQL statements for these objects.
-# Check the difference output for other discrepencies.
---- `compare_db_pkeys_db1`
-+++ `compare_db_pkeys_db2`
-@@ -1,1 +1,1 @@
--CREATE DATABASE `compare_db_pkeys_db1` /*!40100 DEFAULT CHARACTER SET latin1 */
-+CREATE DATABASE `compare_db_pkeys_db2` /*!40100 DEFAULT CHARACTER SET latin1 */
-# WARNING: Could not generate SQL statements for differences between `compare_db_pkeys_db1` and `compare_db_pkeys_db2`. No changes required or not supported difference.
-
-# WARNING: Cannot generate SQL statements for these objects.
-# Check the difference output for other discrepencies.
---- `compare_db_pkeys_db1`
-+++ `compare_db_pkeys_db2`
-@@ -1,1 +1,1 @@
--CREATE DATABASE `compare_db_pkeys_db1` /*!40100 DEFAULT CHARACTER SET latin1 */
-+CREATE DATABASE `compare_db_pkeys_db2` /*!40100 DEFAULT CHARACTER SET latin1 */
-
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 
@@ -1731,24 +1666,6 @@ Test case 31 - data with quotes and sql format
 # server2 on localhost: ... connected.
 # Checking databases compare_db_quotes_1 on server1 and compare_db_quotes_2 on server2
 #
-
-# WARNING: Cannot generate SQL statements for these objects.
-# Check the difference output for other discrepencies.
---- `compare_db_quotes_1`
-+++ `compare_db_quotes_2`
-@@ -1,1 +1,1 @@
--CREATE DATABASE `compare_db_quotes_1` /*!40100 DEFAULT CHARACTER SET latin1 */
-+CREATE DATABASE `compare_db_quotes_2` /*!40100 DEFAULT CHARACTER SET latin1 */
-# WARNING: Could not generate SQL statements for differences between `compare_db_quotes_1` and `compare_db_quotes_2`. No changes required or not supported difference.
-
-# WARNING: Cannot generate SQL statements for these objects.
-# Check the difference output for other discrepencies.
---- `compare_db_quotes_1`
-+++ `compare_db_quotes_2`
-@@ -1,1 +1,1 @@
--CREATE DATABASE `compare_db_quotes_1` /*!40100 DEFAULT CHARACTER SET latin1 */
-+CREATE DATABASE `compare_db_quotes_2` /*!40100 DEFAULT CHARACTER SET latin1 */
-
 #                                                   Defn    Row     Data   
 # Type      Object Name                             Diff    Count   Check  
 # ------------------------------------------------------------------------- 

@@ -129,3 +129,18 @@ Test case 20 - Cannot compare all databases on the same server and with the same
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 ERROR: Specified servers are the same (server1=localhost:PORT1 and server2=localhost:PORT1). Cannot compare all databases on the same server.
+Test case 21 - Compare databases where there only the decorators differ for CREATE
+# server1 on localhost: ... connected.
+# server2 on localhost: ... connected.
+# Checking databases db_latin on server1 and db_latin on server2
+#
+# Object definitions differ. (--changes-for=server1)
+#
+
+--- "db_latin"
++++ "db_latin"
+@@ -1 +1 @@
+-CREATE DATABASE "db_latin" /*!40100 DEFAULT CHARACTER SET latin1 */
++CREATE DATABASE "db_latin" /*!40100 DEFAULT CHARACTER SET latin2 */
+
+ERROR: The object definitions do not match.

@@ -628,6 +628,7 @@ class test(mutlib.System_test):
         # base server.
         self.remove_result("# The database ",
                            except_list=["inventory2"])
+        self.remove_result("# Warning: Specified index")
         # Mask non-deterministic output.
         self.do_replacements()
 
