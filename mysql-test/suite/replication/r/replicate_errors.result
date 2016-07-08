@@ -69,3 +69,9 @@ Test case 16 - option --rpl-user missing
 Usage: mysqlreplicate --master=root@localhost:3306 --slave=root@localhost:3310 --rpl-user=rpl:passwd 
 
 mysqlreplicate: error: Option '--rpl-user' is required.
+Test case 17 - option --rpl-user format
+# master on localhost: ... connected.
+# slave on localhost: ... connected.
+# Checking for binary logging on master...
+# Setting up replication...
+ERROR: Format of --rpl-user option is incorrect. Use userid:passwd or userid.

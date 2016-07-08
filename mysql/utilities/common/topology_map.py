@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.common.replication import Slave
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.user import User
-from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import FormatError, UtilError
+from mysql.utilities.common.messages import USER_PASSWORD_FORMAT
 
 
 _START_PORT = 3306
@@ -201,7 +202,10 @@ class TopologyMap(object):
             return
 
         # Get user and password (supports login-paths)
-        user, password = parse_user_password(discover, options=self.options)
+        try:
+            user, password = parse_user_password(discover, options=self.options)
+        except FormatError:
+            raise UtilError (USER_PASSWORD_FORMAT.format("--discover-slaves"))
 
         # Get replication topology
         slaves = master.get_slaves(user, password)

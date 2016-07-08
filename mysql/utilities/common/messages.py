@@ -189,3 +189,6 @@ INSUFFICIENT_FILE_PERMISSIONS = ("You do not have permission to {permissions} "
 MSG_UTILITIES_VERSION = "MySQL Utilities {utility} version {version}."
 
 MSG_MYSQL_VERSION = "Server '{server}' is using MySQL version {version}."
+
+USER_PASSWORD_FORMAT = ("Format of {0} option is incorrect. Use userid:passwd "
+                        "or userid.")

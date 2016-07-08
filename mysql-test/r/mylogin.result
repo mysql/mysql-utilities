@@ -16,3 +16,4 @@
 ('test_user', '')
 ('user_x', '')
 ('user_x', 'pass_y')
+Unable to parse the specified user credentials (accepted formats: <user>[:<password> or <login-path>): ro:o:t

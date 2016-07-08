@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ mylogin test.
 """
 
 import mutlib
+from mysql.utilities.exception import FormatError
 
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import parse_user_password
@@ -68,10 +69,13 @@ class test(mutlib.System_test):
 
         # Test parse_user_password with login-paths
         user_pass_tests = ["test_user", "test_mylogin", "test_user:",
-                           "user_x:", "user_x:pass_y"]
+                           "user_x:", "user_x:pass_y", "ro:o:t"]
         for test_ in user_pass_tests:
-            user_pass = parse_user_password(test_)
-            self.results.append(user_pass)
+            try:
+                user_pass = parse_user_password(test_)
+                self.results.append(user_pass)
+            except FormatError as err:
+                self.results.append(err)
 
         # Transform list of dictionaries into list of strings
         self.results = ["{0!s}\n".format(con_dic) for con_dic in self.results]

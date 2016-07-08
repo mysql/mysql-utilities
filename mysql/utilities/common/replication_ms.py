@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights
+# Copyright (c) 2014, 2016 Oracle and/or its affiliates. All rights
 # reserved.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@ import sys
 import time
 import logging
 
-from mysql.utilities.exception import UtilError, UtilRplError
+from mysql.utilities.exception import FormatError, UtilError, UtilRplError
 from mysql.utilities.common.daemon import Daemon
 from mysql.utilities.common.format import print_list
 from mysql.utilities.common.ip_parser import hostname_is_ip
@@ -38,6 +38,7 @@ from mysql.utilities.common.server import connect_servers, get_server_state
 from mysql.utilities.common.replication import Replication, Master, Slave
 from mysql.utilities.common.topology import Topology
 from mysql.utilities.common.user import User
+from mysql.utilities.common.messages import USER_PASSWORD_FORMAT
 
 
 _MIN_SERVER_VERSION = (5, 6, 9)
@@ -358,7 +359,10 @@ class ReplicationMultiSource(Daemon):
                 raise UtilRplError(msg)
         else:
             # Parse user and password (support login-paths)
-            (r_user, r_pass,) = parse_user_password(self.rpl_user)
+            try:
+                (r_user, r_pass,) = parse_user_password(self.rpl_user)
+            except FormatError:
+                raise UtilError (USER_PASSWORD_FORMAT.format("--rpl-user"))
 
             # Switch master and start slave
             slave.switch_master(master, r_user, r_pass)
