@@ -217,7 +217,7 @@ class User(object):
             'fetch': False
         }
 
-    def create(self, new_user=None):
+    def create(self, new_user=None, authentication=None):
         """Create the user
 
         Attempts to create the user. If the operation fails, an error is
@@ -226,8 +226,11 @@ class User(object):
         new_user[in]       MySQL user string (user@host:passwd)
                            (optional) If omitted, operation is performed
                            on the class instance user name.
+        authentication[in] Special authentication clause for non-native
+                           authentication plugins
         """
-
+        auth_str = "SELECT * FROM INFORMATION_SCHEMA.PLUGINS WHERE " \
+                   "PLUGIN_NAME = '{0}' AND PLUGIN_STATUS = 'ACTIVE';"
         query_str = "CREATE USER "
         user, passwd, host = None, None, None
         if new_user:
@@ -237,8 +240,19 @@ class User(object):
             query_str += "'%s'@'%s' " % (self.user, self.host)
             passwd = self.passwd
 
+        if passwd and authentication:
+            print("WARNING: using a password and an authentication plugin is "
+                  "not permited. The password will be used instead of the "
+                  "authentication plugin.")
         if passwd:
-            query_str += "IDENTIFIED BY '%s'" % (passwd)
+            query_str += "IDENTIFIED BY '{0}'".format(passwd)
+        elif authentication:
+            # need to validate authentication plugin
+            res = self.server1.exec_query(auth_str.format(authentication))
+            if (res is None) or (res == []):
+                raise UtilDBError("Plugin {0} not loaded or not active. "
+                                  "Cannot create user.".format(authentication))
+            query_str += "IDENTIFIED WITH '{0}'".format(authentication)
         if self.verbosity > 0:
             print query_str
 
@@ -609,6 +623,15 @@ class User(object):
         for grant_tuple in res:
             print grant_tuple[0]
 
+    def _get_authentication(self):
+        res = self.server1.exec_query("SELECT plugin FROM mysql.user "
+                                      "WHERE user='{0}' and host='{1}'"
+                                      "".format(self.user, self.host))
+        if res == [] or res[0][0] in {'mysql_native_password'}:
+            return None
+        return res[0][0]
+
+
     def clone(self, new_user, destination=None, globals_privs=False):
         """Clone the current user to the new user
 
@@ -632,7 +655,10 @@ class User(object):
             # Create an instance of the user class.
             user = User(server, new_user, self.verbosity)
             if not user.exists():
-                user.create()
+                # Get authentication plugin if different from native plugin
+                auth = self._get_authentication()
+                # Add authentication if available
+                user.create(authentication=auth)
 
             if globals_privs and '%' in row[0]:
                 base_user_ticks = "'" + self.user + "'@'" + '%' + "'"

@@ -26,6 +26,13 @@ import mutlib
 from mysql.utilities.common.user import User
 from mysql.utilities.exception import MUTLibError, UtilDBError, UtilError
 
+LOAD_PLUGIN = "INSTALL PLUGIN mysql_no_login soname 'mysql_no_login.{0}'"
+UNLOAD_PLUGIN = "UNINSTALL PLUGIN mysql_no_login"
+CREATE_AUTH_USER = "CREATE USER jillnopass@localhost IDENTIFIED WITH " \
+                   "mysql_no_login"
+CHECK_AUTH_USERS = "SELECT user, host, plugin FROM mysql.user " \
+                   "WHERE user in ('jillnopass', 'jakenopass')"
+
 
 class test(mutlib.System_test):
     """clone user
@@ -209,6 +216,31 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        try:
+            if os.name == 'nt':
+                self.server1.exec_query(LOAD_PLUGIN.format("dll"))
+            else:
+                self.server1.exec_query(LOAD_PLUGIN.format("so"))
+        except:
+            pass  # Ok if already loaded
+        self.server1.exec_query(CREATE_AUTH_USER)
+        comment = ("Test case {0} - mysqluserclone clone user "
+                   "with authentication plugin".format(test_num))
+        cmd_str = ("mysqluserclone.py {0} jillnopass@localhost"
+                   " jakenopass@localhost ".format(
+            from_conn))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+        res = self.server1.exec_query(CHECK_AUTH_USERS)
+        for row in res:
+            self.results.append("{0}\n".format(row))
+        try:
+            self.server2.exec_query(UNLOAD_PLUGIN)
+        except:
+            pass  # Ok if not loaded
+
         # Mask known source and destination host name.
         self.replace_result("# Source on ",
                             "# Source on XXXX-XXXX: ... connected.\n")
@@ -264,7 +296,8 @@ class test(mutlib.System_test):
             return False
         users = ["'joe_pass'@'%'", "joe_pass@user", "'joe_nopass'@'user'",
                  "'amy_nopass'@'user'", "'jill'@'user'", "'jack'@'user'",
-                 "'john'@'user'", "'joe_wildcard'@'%'", "'remote'@'%'", ]
+                 "'john'@'user'", "'joe_wildcard'@'%'", "'remote'@'%'",
+                 "jillnopass@localhost", "jakenopass@localhost",]
 
         dropped_users = [self.drop_user(user, self.server1) for user in users]
 
