@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -166,7 +166,8 @@ class test(rpl_admin_gtid.test):
                 return True
         return False
 
-    def test_failover_console(self, test_case):
+    # Add timeout to allow caller to set value. Default is _TIMEOUT
+    def test_failover_console(self, test_case, timeout=_TIMEOUT):
         """Tests failover console.
 
         test_case[in]     Test case.
@@ -212,7 +213,7 @@ class test(rpl_admin_gtid.test):
         while proc.poll() is not None:
             time.sleep(1)
             i += 1
-            if i > _TIMEOUT:
+            if i > timeout:
                 if self.debug:
                     print("# Timeout console to start.")
                 raise MUTLibError("{0}: failed - timeout waiting for "
@@ -233,7 +234,7 @@ class test(rpl_admin_gtid.test):
         # Wait for logfile file to be created
         if self.debug:
             print("# Waiting for logfile to be created.")
-        for i in range(_TIMEOUT):
+        for i in range(timeout):
             if os.path.exists(log_filename):
                 break
             else:
@@ -244,7 +245,7 @@ class test(rpl_admin_gtid.test):
                               "created.".format(comment, log_filename))
 
         with open(log_filename, 'r') as file_:
-            while i < _TIMEOUT:
+            while i < timeout:
                 line = file_.readline()
                 if not line:
                     i += 1
@@ -284,7 +285,7 @@ class test(rpl_admin_gtid.test):
                                     int(server.port) + 1):
             time.sleep(1)
             i += 1
-            if i > _TIMEOUT:
+            if i > timeout:
                 if self.debug:
                     print("# Timeout master to fail.")
                 raise MUTLibError("{0}: failed - timeout waiting for "
@@ -303,7 +304,7 @@ class test(rpl_admin_gtid.test):
         while not os.path.isdir(self.failover_dir):
             time.sleep(5)
             i += 1
-            if i > _TIMEOUT:
+            if i > timeout:
                 if self.debug:
                     print("# Timeout console failover.")
                 raise MUTLibError("{0}: failed - timeout waiting for "
@@ -318,7 +319,7 @@ class test(rpl_admin_gtid.test):
         while proc.poll() is None:
             time.sleep(1)
             i += 1
-            if i > _TIMEOUT:
+            if i > timeout:
                 if self.debug:
                     print("# Timeout console to end.")
                 raise MUTLibError("{0}: failed - timeout waiting for "

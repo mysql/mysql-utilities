@@ -10,42 +10,50 @@ Test case 3 - Low value for interval.
 Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover: error: The --interval option requires a value greater than or equal to 5.
-Test case 4 - elect mode but no candidates
+Test case 4 - retry fail and script
+Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover: error: The --master-fail-retry option cannot be used with --exec-fail-check.
+Test case 5 - retry fail value
+Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
+
+mysqlfailover: error: The --master-fail-retry option must be a positive integer > 0.
+Test case 6 - elect mode but no candidates
 Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover: error: Failover mode = 'elect' requires at least one candidate.
-Test case 5 - FILE/TABLE mix and missing --rpl-user
+Test case 7 - FILE/TABLE mix and missing --rpl-user
 # Checking privileges.
 ERROR: Failover requires --master-info-repository=TABLE for all slaves.
-Test case 6 - Master listed as a slave - literal
+Test case 8 - Master listed as a slave - literal
 Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover: error: The master and one of the slaves are the same host and port.
-Test case 7 - Master listed as a slave - alias
+Test case 9 - Master listed as a slave - alias
 Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover: error: The master and one of the slaves are the same host and port.
-Test case 8 - Master listed as a candidate - alias
+Test case 10 - Master listed as a candidate - alias
 Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover: error: The master and one of the candidates are the same host and port.
-Test case 9 - Connection failure
+Test case 11 - Connection failure
 # Checking privileges.
 # Checking privileges on candidates.
 ERROR: Can't connect to MySQL server on XXXX
-Test case 10 - script passed to the '--exec-after' option does not exist
+Test case 12 - script passed to the '--exec-after' option does not exist
 Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover: error: 'std_data/does_not_exist.bat' script cannot be found. Please check the path and filename for accuracy and try again.
-Test case 11 - script passed to the '--exec-before' option does not exist
+Test case 13 - script passed to the '--exec-before' option does not exist
 Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover: error: 'std_data/does_not_exist.bat' script cannot be found. Please check the path and filename for accuracy and try again.
-Test case 12 - script passed to the '--exec-fail-check' option does not exist
+Test case 14 - script passed to the '--exec-fail-check' option does not exist
 Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover: error: 'std_data/does_not_exist.bat' script cannot be found. Please check the path and filename for accuracy and try again.
-Test case 13 - script passed to the '--exec-post-failover' option does not exist
+Test case 15 - script passed to the '--exec-post-failover' option does not exist
 Usage: mysqlfailover --master=root@localhost --discover-slaves-login=root --candidates=root@host123:3306,root@host456:3306 
 
 mysqlfailover: error: 'std_data/does_not_exist.bat' script cannot be found. Please check the path and filename for accuracy and try again.
