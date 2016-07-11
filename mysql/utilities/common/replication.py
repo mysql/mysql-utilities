@@ -1986,25 +1986,52 @@ class Slave(Server):
                                    "(slave status is empty)"
                                    ".".format(self.host, self.port))
             return False
-        # pylint: disable=W0633
-        m_host, m_port = self.get_master_host_port()
-        # Suppose the state is True for "Waiting for master to send event"
-        # so we can ignore it if verify_state is not given as True.
-        if verify_state:
-            state = self.get_state() == "Waiting for master to send event"
-            if not state:
-                if raise_error:
-                    raise UtilRplError("Slave '{0}:{1}' is not waiting for "
-                                       "events from master.".format(self.host,
-                                                                    self.port))
-                return False
-        if not master.is_alias(m_host) or int(m_port) != int(master.port):
+        # We must not assume there is one and only one master for a slave.
+        # Starting with 5.7.6, multi-master means a slave could have many
+        # masters, each connected via a replication channel. Thus, we must
+        # loop through the rows in the SHOW SLAVE STATUS and check every
+        # master listed. If no matches to this master is found, we can
+        # declare the slave not connected to the master otherwise, we can
+        # stop the loop when the master is found.
+        m_host = ""
+        m_port = None
+        master_found = False
+        for row in res:
+            # pylint: disable=W0633
+            m_host = row[_SLAVE_MASTER_HOST]  # get master host
+            m_port = row[_SLAVE_MASTER_PORT]  # get master port
+            # Suppose the state is True for "Waiting for master to send event"
+            # so we can ignore it if verify_state is not given as True.
+            if verify_state:
+                state = (row[_SLAVE_IO_STATE] ==
+                         "Waiting for master to send event")
+                if not state:
+                    if raise_error:
+                        raise UtilRplError("Slave '{0}:{1}' is not waiting"
+                                           " for events from master."
+                                           "".format(self.host, self.port))
+                    return False
+            # If we find a match, stop.
+            if master.is_alias(m_host) and int(m_port) == int(master.port):
+                master_found = True
+                break
+        # If no master found, report what we did find or in the case of
+        # multi-master (more than one row in SHOW SLAVE STATUS), state this
+        # master is not among the masters listed for the slave.
+        if not master_found:
             if raise_error:
-                raise UtilRplError("Slave '{0}:{1}' is configured for master "
-                                   "'{2}:{3}' and not '{4}:{5}'"
-                                   ".".format(self.host, self.port, m_host,
-                                              m_port, master.host,
-                                              master.port))
+                if len(res) > 1:
+                    raise UtilRplError("The list of masters for slave "
+                                       "'{0}:{1}' does not include master"
+                                       " '{2}:{3}'"
+                                       ".".format(self.host, self.port,
+                                                  master.host, master.port))
+                else:
+                    raise UtilRplError("Slave '{0}:{1}' is configured for "
+                                       "master '{2}:{3}' and not '{4}:{5}'"
+                                       ".".format(self.host, self.port,
+                                                  m_host, m_port,
+                                                  master.host, master.port))
             return False
         return True
 

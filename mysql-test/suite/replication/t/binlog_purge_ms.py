@@ -29,6 +29,7 @@ _CHANGE_MASTER = ("CHANGE MASTER TO MASTER_HOST = 'localhost', "
                   "MASTER_PORT = {0}, MASTER_AUTO_POSITION=1 "
                   "FOR CHANNEL 'master-{1}'")
 
+
 def flush_server_logs_(server, times=5):
     """Flush logs on a server
 
@@ -71,7 +72,8 @@ class test(replicate_ms.test):
             master.exec_query("GRANT REPLICATION SLAVE ON *.* TO 'rpl'@'{0}' "
                               "IDENTIFIED BY 'rpl'".format(self.server1.host))
             master.exec_query("SET SQL_LOG_BIN= 1")
-        self.server1.exec_query("SET GLOBAL relay_log_info_repository = 'TABLE'")
+        self.server1.exec_query("SET GLOBAL relay_log_info_repository = "
+                                "'TABLE'")
         self.server1.exec_query(_CHANGE_MASTER.format(m1_dict[3], 1))
         self.server1.exec_query(_CHANGE_MASTER.format(m2_dict[3], 2))
         self.server1.exec_query("START SLAVE")
@@ -86,7 +88,8 @@ class test(replicate_ms.test):
         master2_conn = self.build_connection_string(self.server3).strip(' ')
 
         cmd_str = "mysqlbinlogpurge.py --master={0} ".format(master1_conn)
-        cmd_opts = "--discover-slaves={0} ".format(master1_conn.split('@')[0])
+        cmd_opts = ("--discover-slaves={0} --dry-run "
+                    "".format(master1_conn.split('@')[0]))
 
         test_num += 1
         comment = ("Test case {0} - mysqlbinlogpurge: with discover "
