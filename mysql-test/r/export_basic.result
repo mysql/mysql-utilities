@@ -1194,3 +1194,36 @@ INSERT INTO `import_test`.`customers` VALUES (7, '中国简体，客户7');
 INSERT INTO `import_test`.`customers` VALUES (8, 'Клиент 8');
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
+Test case 12 - export data with bit fields
+# WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
+USE `util_test`;
+# Exporting data from util_test
+# Data for table `util_test`.`t1`:
+INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example', 73);
+INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example', 73);
+INSERT INTO `util_test`.`t1` VALUES ('03 Test Basic database example', 73);
+INSERT INTO `util_test`.`t1` VALUES ('04 Test Basic database example', 73);
+INSERT INTO `util_test`.`t1` VALUES ('05 Test Basic database example', 73);
+INSERT INTO `util_test`.`t1` VALUES ('06 Test Basic database example', 73);
+INSERT INTO `util_test`.`t1` VALUES ('07 Test Basic database example', 73);
+# Data for table `util_test`.`t2`:
+INSERT INTO `util_test`.`t2` VALUES ('11 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('12 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES ('13 Test Basic database example');
+INSERT INTO `util_test`.`t2` VALUES (NULL);
+# Data for table `util_test`.`t3`:
+INSERT INTO `util_test`.`t3` VALUES (1, '14 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (2, '15 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (3, '16 test fkeys');
+INSERT INTO `util_test`.`t3` VALUES (4, NULL);
+# Data for table `util_test`.`t4`:
+INSERT INTO `util_test`.`t4` VALUES (3, 2);
+# Data for table `util_test`.`t5`:
+INSERT INTO `util_test`.`t5` VALUES (1, 'kitkat', 0.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (2, 'M&M', 5.99, 19);
+INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
+INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
+#...done.
+SET FOREIGN_KEY_CHECKS=1;

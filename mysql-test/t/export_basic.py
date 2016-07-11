@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -160,6 +160,19 @@ class test(copy_db_parameters.test):
         comment = ("Test case {0} - export data with unicode "
                    "characters".format(test_num))
         cmd_str = "{0} --export=data --format=SQL import_test".format(cmd)
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+
+        self.server1.exec_query("ALTER TABLE util_test.t1 "
+                                "ADD COLUMN c bit(10)")
+        self.server1.exec_query("UPDATE util_test.t1 SET "
+                                "c = b'1001001'")
+        comment = ("Test case {0} - export data with bit fields"
+                   "".format(test_num))
+        cmd_str = "{0} --export=data --format=SQL ".format(cmd)
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

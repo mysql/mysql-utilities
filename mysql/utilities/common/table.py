@@ -363,6 +363,7 @@ class Table(object):
         self.unique_not_null_indexes = None
         self.text_columns = []
         self.blob_columns = []
+        self.bit_columns = []
         self.column_format = None
         self.column_names = []
         self.column_name_type = []
@@ -452,6 +453,9 @@ class Table(object):
                     col_format_values[col] = "%s"
                 elif "date" in col_type or "time" in col_type:
                     col_format_values[col] = "'%s'"
+                elif "bit" in col_type:
+                    self.bit_columns.append(col)
+                    col_format_values[col] = "%d"
                 else:
                     col_format_values[col] = "%s"
         self.column_format = "%s%s%s" % \
@@ -616,6 +620,11 @@ class Table(object):
                     row_vals.append("NULL")
                 else:
                     row_vals.append(convert_special_characters(column))
+            elif index in self.bit_columns:
+                if column is None:
+                    row_vals.append("NULL")
+                else:
+                    row_vals.append(converter._BIT_to_python(column))
             else:
                 if column is None:
                     row_vals.append("NULL")
@@ -679,6 +688,11 @@ class Table(object):
                 if values[col]:
                     # Apply escape sequences to special characters
                     values[col] = convert_special_characters(values[col])
+
+            for col in self.bit_columns:
+                if values[col] is not None:
+                    # Convert BIT to INTEGER for dump.
+                    values[col] = MySQLConverter()._BIT_to_python(values[col])
 
             # Build string (add quotes to "string" like types)
             val_str = self.column_format % tuple(values)
