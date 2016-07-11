@@ -271,6 +271,7 @@ if __name__ == '__main__':
         'quiet': True,
         'version': "5.1.30",
     }
+    servers = None
     try:
         servers = connect_servers(source_values, dest_values, conn_opts)
         src_sql_mode = servers[0].select_variable("SQL_MODE")
@@ -332,6 +333,10 @@ if __name__ == '__main__':
             else new_db
         db_entry = (orig_db, new_db)
         db_list.append(db_entry)
+
+    # Check databases for blob fields set to NOT NULL
+    if servers and dbcopy.check_blobs_not_null(servers[0], db_list):
+        sys.exit(1)
 
     try:
         # Record start time.

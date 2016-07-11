@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -417,6 +417,18 @@ class test(copy_db.test):
         comment = ("Test case {0} - dest user has privileges "
                    "needed").format(test_num)
         res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        try:
+            self.server1.exec_query("CREATE TABLE util_test.b1 (a int not null"
+                                    ", blobby tinytext not null)")
+        except UtilError as err:
+            raise MUTLibError("Failed to execute query: "
+                              "{0}".format(err.errmsg))
+        comment = "Test case {0} - blobs with not null".format(test_num)
+        res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

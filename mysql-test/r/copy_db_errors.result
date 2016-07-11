@@ -239,3 +239,7 @@ Test case 32 - dest user has privileges needed
 # Copying TRIGGER util_test.trg
 # Copying EVENT util_test.e1
 #...done.
+Test case 33 - blobs with not null
+ERROR: The following tables have blob fields set to NOT NULL. The copy operation cannot proceed unless the blob fields permit NULL values. To copy data with NOT NULL blob fields, first remove the NOT NULL restriction, copy the data, then add the NOT NULL restriction using ALTER TABLE statements.
+    util_test.b1 Column blobby
+

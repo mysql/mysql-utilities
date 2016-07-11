@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,6 +48,46 @@ _NON_GTID_WARNING = ("# WARNING: The %s server does not support GTIDs yet the "
                      "%s server does support GTIDs. To suppress this warning, "
                      "use the --skip-gtid option when copying %s a non-GTID "
                      "enabled server.")
+_CHECK_BLOBS_NOT_NULL = """
+    SELECT DISTINCT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE (COLUMN_TYPE LIKE '%BLOB%' OR COLUMN_TYPE LIKE '%TEXT%') AND
+    IS_NULLABLE = 'NO' AND TABLE_SCHEMA IN ({0});
+"""
+_BLOBS_NOT_NULL_ERROR = ("ERROR: The following tables have blob fields set to "
+                         "NOT NULL. The copy operation cannot proceed unless "
+                         "the blob fields permit NULL values. To copy data "
+                         "with NOT NULL blob fields, first remove the NOT "
+                         "NULL restriction, copy the data, then add the NOT "
+                         "NULL restriction using ALTER TABLE statements.")
+
+
+def check_blobs_not_null(server, db_list):
+    """
+    Check for any blob fields that have NOT null set. Prints error message
+    if any are encountered.
+
+    server[in]             Server class instance
+    db_list[in]            List of databases to be copied in form
+                           (src, dst)
+
+    Returns: bool - True = blobs with NOT NULL, False = none found
+    """
+    if not db_list:
+        return False
+    db_name_include = ""
+    for db in db_list:
+        if not db_name_include == "":
+            db_name_include = "{0},".format(db_name_include)
+        db_name_include = "{0}'{1}'".format(db_name_include, db[0])
+    res = server.exec_query(_CHECK_BLOBS_NOT_NULL.format(db_name_include))
+    if res:
+        print(_BLOBS_NOT_NULL_ERROR)
+        for row in res:
+            print("    {0}.{1} Column {2}".format(row[0], row[1], row[2]))
+        print
+        return True
+    return False
 
 
 def _copy_objects(source, destination, db_list, options,
