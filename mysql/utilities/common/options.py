@@ -892,9 +892,9 @@ def parse_user_password(userpass_values, my_defaults_reader=None,
         return login_values[0], login_values[1]
     else:
         # Invalid user credentials format
-        return FormatError("Unable to parse the specified user credentials "
-                           "(accepted formats: <user>[:<password> or "
-                           "<login-path>): %s" % userpass_values)
+        raise FormatError("Unable to parse the specified user credentials "
+                          "(accepted formats: <user>[:<password> or "
+                          "<login-path>): %s" % userpass_values)
 
 
 def add_basedir_option(parser):

@@ -25,11 +25,13 @@ import StringIO
 import socket
 
 from mysql.utilities.exception import UtilError, UtilRplWarn, UtilRplError
+from mysql.utilities.exception import FormatError
 from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.common.server import Server
 from mysql.utilities.common.user import User
 from mysql.utilities.common.ip_parser import clean_IPv6, format_IPv6
 from mysql.utilities.common.format import format_tabular_list
+from mysql.utilities.common.messages import USER_PASSWORD_FORMAT
 
 
 _MASTER_INFO_COL = [
@@ -175,7 +177,10 @@ def negotiate_rpl_connection(server, is_master=True, strict=True,
                     passwd = res[0][1]
             else:
                 # Parse username and password (supports login-paths)
-                uname, passwd = parse_user_password(rpl_user, options=options)
+                try:
+                    uname, passwd = parse_user_password(rpl_user, options=options)
+                except FormatError as fmt_err:
+                    raise UtilError (USER_PASSWORD_FORMAT.format("--rpl-user"))
                 if not passwd:
                     passwd = ''
 
@@ -566,7 +571,10 @@ class Replication(object):
         result = True
 
         # Parse user and password (support login-paths)
-        r_user, r_pass = parse_user_password(rpl_user)
+        try:
+            r_user, r_pass = parse_user_password(rpl_user)
+        except FormatError as fmt_err:
+            raise UtilError (USER_PASSWORD_FORMAT.format("--rpl-user"))
 
         # Check to see if rpl_user is present, else create her
         if not self.create_rpl_user(r_user, r_pass)[0]:

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -104,7 +104,10 @@ class test(rpl_admin.test):
              mock_master2, slaves_str, "--new-master={0}".format(slave3_conn)),
             ("Failover command requires --slaves", 2, "failover"),
             ("Failover command cannot be used with --discover-slaves-login", 2,
-             "--discover-slaves-login=root", "failover",)
+             "--discover-slaves-login=root", "failover",),
+            ("--discover-slaves format error", 1, "switchover",
+             mock_master2, "--disco=roo:t:t ",
+             "--new-master={0}".format(slave3_conn)),
         ]
 
         test_num = 1

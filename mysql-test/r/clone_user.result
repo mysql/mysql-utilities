@@ -89,3 +89,10 @@ Test case 11 - mysqluserclone --dump user with global privileges
 # Dumping grants for user remote@%
 GRANT USAGE ON *.* TO 'remote'@'%'
 GRANT SELECT ON `util_test`.* TO 'remote'@'%'
+Test case 12 - mysqluserclone clone user with authentication plugin
+# Source on XXXX-XXXX: ... connected.
+# Cloning 1 users...
+# Cloning jillnopass@localhost to user jakenopass@localhost 
+# ...done.
+('jillnopass', 'localhost', 'mysql_no_login')
+('jakenopass', 'localhost', 'mysql_no_login')

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -73,6 +73,24 @@ class test(rpl_admin_gtid.test):
         comment = "Test case {0} - Low value for interval.".format(test_num)
         cmd_str = "mysqlfailover.py --interval=1"
         cmd_opts = " --master=root:root@localhost"
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str + cmd_opts,
+                                               comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - retry fail and script".format(test_num))
+        cmd_str = "mysqlfailover.py --master-fail=10 --exec-fail=test.py "
+        cmd_opts = " --master=root:root@localhost --disco=root:root "
+        res = mutlib.System_test.run_test_case(self, 2, cmd_str + cmd_opts,
+                                               comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - retry fail value".format(test_num))
+        cmd_str = "mysqlfailover.py --master-fail=-1 "
+        cmd_opts = " --master=root:root@localhost --disco=root:root "
         res = mutlib.System_test.run_test_case(self, 2, cmd_str + cmd_opts,
                                                comment)
         if not res:

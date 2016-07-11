@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -197,6 +197,15 @@ if __name__ == '__main__':
                            "values can be used separated by commas. The "
                            "default is health.")
 
+    # Add master failover delay check
+    parser.add_option("--master-fail-retry", action="store", dest="fail_retry",
+                      type="int", default=None, help="time in seconds to wait "
+                      "to determine master is down. The failover check will "
+                      "be run again when the retry delay expires. Can be used "
+                      "to introduce a longer period between when master is "
+                      "detected as unavailable to declaring it down. This "
+                      "option is not used with --exec-fail-check. ")
+
     # Add verbosity mode
     add_verbosity(parser, False)
 
@@ -240,6 +249,14 @@ if __name__ == '__main__':
     if opt.failover_mode == 'elect' and opt.candidates is None:
         parser.error("Failover mode = 'elect' requires at least one "
                      "candidate.")
+
+    if opt.fail_retry and opt.exec_fail:
+        parser.error("The --master-fail-retry option cannot be used "
+                     "with --exec-fail-check.")
+
+    if opt.fail_retry and opt.fail_retry < 1:
+        parser.error("The --master-fail-retry option must be a positive "
+                     "integer > 0.")
 
     # Parse the master, slaves, and candidates connection parameters
     try:
@@ -285,6 +302,7 @@ if __name__ == '__main__':
         'pidfile': opt.pidfile,
         'report_values': opt.report_values,
         'script_threshold': opt.script_threshold,
+        'fail_retry': opt.fail_retry,
     }
 
     # Purge log file of old data

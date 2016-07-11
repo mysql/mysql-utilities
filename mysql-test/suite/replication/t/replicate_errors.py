@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -253,6 +253,14 @@ class test(replicate.test):
         comment = "Test case {0} - option --rpl-user missing".format(test_num)
         cmd = "mysqlreplicate.py {0} {1}".format(master_str, slave_str)
         res = self.run_test_case(2, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = "Test case {0} - option --rpl-user format".format(test_num)
+        cmd = "mysqlreplicate.py {0} {1} {2}".format(master_str, slave_str,
+                                                     "--rpl-user=roo:t:t")
+        res = self.run_test_case(1, cmd, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

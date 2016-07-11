@@ -38,6 +38,7 @@ from mysql.utilities.common.user import User
 from mysql.utilities.common.server import (get_server_state, get_server,
                                            get_connection_dictionary,
                                            log_server_version)
+from mysql.utilities.common.messages import USER_PASSWORD_FORMAT
 
 
 _HEALTH_COLS = ["host", "port", "role", "state", "gtid_mode", "health"]
@@ -370,7 +371,10 @@ class Topology(Replication):
             return
 
         # Get user and password (support login-path)
-        user, password = parse_user_password(discover, options=self.options)
+        try:
+            user, password = parse_user_password(discover, options=self.options)
+        except FormatError:
+            raise UtilError (USER_PASSWORD_FORMAT.format("--discover-slaves"))
 
         # Find discovered slaves
         new_slaves_found = False
@@ -565,7 +569,10 @@ class Topology(Replication):
             return (user, passwd)
 
         # Get user and password (support login-path)
-        user, passwd = parse_user_password(self.rpl_user, options=self.options)
+        try:
+            user, passwd = parse_user_password(self.rpl_user, options=self.options)
+        except FormatError:
+            raise UtilError (USER_PASSWORD_FORMAT.format("--rpl-user"))
         return (user, passwd)
 
     def run_script(self, script, quiet, options=None):
@@ -747,7 +754,10 @@ class Topology(Replication):
                 raise
 
             # Get user and password (support login-path)
-            user, _ = parse_user_password(self.rpl_user)
+            try:
+                user, _ = parse_user_password(self.rpl_user)
+            except FormatError:
+                raise UtilError (USER_PASSWORD_FORMAT.format("--rpl-user"))
 
             # Make new master forget was a slave using slave methods
             s_candidate = self._change_role(slave, slave=False)

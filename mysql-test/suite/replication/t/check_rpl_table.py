@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -197,6 +197,7 @@ class test(replicate.test):
         # Mask values of master information file that changed for 5.7 servers.
         self.replace_result("                     Heartbeat :",
                             "                     Heartbeat : XXXXX\n")
+        self.remove_result("            Master_TLS_Version :")
 
     def get_result(self):
         return self.compare(__name__, self.results)

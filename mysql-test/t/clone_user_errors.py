@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,6 +24,11 @@ import os
 import clone_user
 
 from mysql.utilities.exception import MUTLibError, UtilDBError
+
+LOAD_PLUGIN = "install plugin mysql_no_login soname 'mysql_no_login.so'"
+UNLOAD_PLUGIN = "uninstall plugin mysql_no_login"
+CREATE_AUTH_USER = "CREATE USER jillnopass@localhost IDENTIFIED WITH " \
+                   "mysql_no_login"
 
 
 class test(clone_user.test):
@@ -162,6 +167,33 @@ class test(clone_user.test):
                    "".format(from_conn, to_conn))
         comment = ("Test case {0} - user from destination server does not "
                    "have enough privileges to clone".format(test_num))
+        res = self.run_test_case(1, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        try:
+            self.server1.exec_query(LOAD_PLUGIN)
+        except:
+            pass  # Ok if already loaded
+        self.server1.exec_query(CREATE_AUTH_USER)
+        cmd_str = ("mysqluserclone.py {0} jillnopass@localhost "
+                   "jakenopass:test123@localhost".format(from_conn))
+        comment = ("Test case {0} - using authentication and "
+                   "password".format(test_num))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        try:
+            self.server2.exec_query(UNLOAD_PLUGIN)
+        except:
+            pass  # Ok if not loaded
+        cmd_str = ("mysqluserclone.py {0} {1} jillnopass@localhost "
+                   "jakenopass@localhost".format(from_conn, to_conn))
+        comment = ("Test case {0} - using authentication no plugin"
+                   "loaded".format(test_num))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

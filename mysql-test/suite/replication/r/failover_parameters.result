@@ -83,6 +83,13 @@ Test case 1 - show help
                         daemon. It can be health, gtid or uuid. Multiple
                         values can be used separated by commas. The default is
                         health.
+  --master-fail-retry=FAIL_RETRY
+                        time in seconds to wait to determine master is down.
+                        The failover check will be run again when the retry
+                        delay expires. Can be used to introduce a longer
+                        period between when master is detected as unavailable
+                        to declaring it down. This option is not used with
+                        --exec-fail-check.
   -v, --verbose         control how much information is displayed. e.g., -v =
                         verbose, -vv = more verbose, -vvv = debug
   --rpl-user=RPL_USER   the user and password for the replication user

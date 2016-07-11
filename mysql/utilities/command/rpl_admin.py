@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -811,6 +811,7 @@ class RplCommands(object):
         exec_fail = self.options.get("exec_fail", None)
         post_fail = self.options.get("post_fail", None)
         pedantic = self.options.get('pedantic', False)
+        fail_retry = self.options.get('fail_retry', None)
 
         # Only works for GTID_MODE=ON
         if not self.topology.gtid_enabled():
@@ -907,6 +908,19 @@ class RplCommands(object):
                     except:
                         pass
 
+                # If user specified a master fail retry, wait for the
+                # predetermined time and attempt to check the master again.
+                if fail_retry is not None and \
+                   not self.topology.master.is_alive():
+                    msg = "Master is still not reachable. Waiting for %s " \
+                          "seconds to retry detection." % fail_retry
+                    self._report(msg, logging.INFO, False)
+                    time.sleep(fail_retry)
+                    try:
+                        self.topology.master.connect()
+                    except:
+                        pass
+
                 # Check the master again. If no connection or lost connection,
                 # try ping. This performs the timeout threshold for detecting
                 # a down master. If still not alive, try to reconnect and if
@@ -929,6 +943,9 @@ class RplCommands(object):
                     if failover:
                         self._report("Failed to reconnect to the master after "
                                      "3 attemps.", logging.INFO)
+                    else:
+                        self._report("Master is Ok. Resuming watch.",
+                                     logging.INFO)
 
             if failover:
                 self._report("Master is confirmed to be down or unreachable.",

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -392,6 +392,7 @@ class test(rpl_admin.test):
         self.remove_result("               Until_Condition :")
         self.remove_result("                Until_Log_File :")
         self.remove_result("                 Until_Log_Pos :")
+        self.remove_result("            Master_TLS_Version :")
 
         self.remove_result_and_lines_after("         Seconds_Behind_Master :",
                                            16)
