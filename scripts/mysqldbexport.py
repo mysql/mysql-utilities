@@ -41,7 +41,7 @@ from mysql.utilities.common.options import (
     add_no_headers_option, add_regexp, add_rpl_mode, add_rpl_user,
     add_skip_options, add_verbosity, check_all, check_rpl_options,
     check_skip_options, check_verbosity, setup_common_options,
-    check_password_security, get_ssl_dict,
+    check_password_security, get_ssl_dict, add_exclude, check_exclude_pattern
 )
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
@@ -120,14 +120,7 @@ if __name__ == '__main__':
                       "or --export=both.")
 
     # Add the exclude database option
-    parser.add_option("-x", "--exclude", action="append", dest="exclude",
-                      type="string", default=None, help="exclude one or more "
-                      "objects from the operation using either a specific "
-                      "name (e.g. db1.t1), a LIKE pattern (e.g. db1.t% or "
-                      "db%.%) or a REGEXP search pattern. To use a REGEXP "
-                      "search pattern for all exclusions, you must also "
-                      "specify the --regexp option. Repeat the --exclude "
-                      "option for multiple exclusions.")
+    add_exclude(parser)
 
     # Add the all database options
     add_all(parser, "databases")
@@ -222,6 +215,9 @@ if __name__ == '__main__':
         exclude_list = [pattern.strip("'\"") for pattern in opt.exclude]
     else:
         exclude_list = opt.exclude
+
+    # Check for regexp symbols
+    check_exclude_pattern(exclude_list, opt.use_regexp)
 
     # Check multiprocessing options.
     if opt.multiprocess < 0:

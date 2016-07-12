@@ -221,7 +221,46 @@ SET FOREIGN_KEY_CHECKS=0;
 # TRIGGERS in util_test: (none found)
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
-Test case 12 - exclude by name using --export=both.
+Test case 12 - try exclude everything without using pattern.
+# WARNING: One or more of your --exclude patterns contains symbols that could be regexp patterns. You may need to include --regexp to ensure your exclude pattern is evaluated as REGEXP and not a SQL LIKE expression.
+# Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
+# Exporting metadata from util_test
+# TABLES in util_test:
+`util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+`util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
+`util_test`,`t3`,InnoDB,1,`a`,int(11),NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
+`util_test`,`t3`,InnoDB,2,`b`,varchar(30),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`a`,,
+`util_test`,`t4`,InnoDB,1,`c`,int(11),NO,,MUL,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
+`util_test`,`t4`,InnoDB,2,`d`,int(11),NO,,,latin1_swedish_ci,,`ref_t3`,`t3`,`PRIMARY`,RESTRICT,RESTRICT,`ref_t3`,`c`,`util_test`,`a`
+`util_test`,`t5`,InnoDB,1,`product_id`,int(10) unsigned,NO,,PRI,latin1_swedish_ci,,,,,,,`PRIMARY`,`product_id`,,
+`util_test`,`t5`,InnoDB,2,`name`,varchar(20),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`product_id`,,
+`util_test`,`t5`,InnoDB,3,`base_price`,"decimal(20,2) unsigned",YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`product_id`,,
+`util_test`,`t5`,InnoDB,4,`tax_percentage`,"decimal(3,0) unsigned",YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`product_id`,,
+# FUNCTIONS in util_test:
+`f1`,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,utf8,utf8_general_ci,latin1_swedish_ci
+`f2`,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,"base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED","decimal(21,2) unsigned",RETURN base_price + base_price*(tax_percentage/100),,utf8,utf8_general_ci,latin1_swedish_ci
+# PROCEDURES in util_test:
+`p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,utf8,utf8_general_ci,latin1_swedish_ci
+# VIEWS in util_test:
+`util_test`,`v2`,root@localhost,DEFINER,"select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`",NONE,YES,utf8,utf8_general_ci
+`util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
+# TRIGGERS in util_test:
+`trg`,root@localhost,INSERT,`util_test`,`t1`,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,utf8,utf8_general_ci,latin1_swedish_ci
+#...done.
+SET FOREIGN_KEY_CHECKS=1;
+Test case 13 - try exclude everything with using pattern and regexp.
+# Source on XXXX-XXXX: ... connected.
+SET FOREIGN_KEY_CHECKS=0;
+# Exporting metadata from util_test
+# TABLES in util_test: (none found)
+# FUNCTIONS in util_test: (none found)
+# PROCEDURES in util_test: (none found)
+# VIEWS in util_test: (none found)
+# TRIGGERS in util_test: (none found)
+#...done.
+SET FOREIGN_KEY_CHECKS=1;
+Test case 14 - exclude by name using --export=both.
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # Exporting metadata from util_test

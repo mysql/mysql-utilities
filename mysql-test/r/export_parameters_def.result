@@ -3719,11 +3719,11 @@ SET FOREIGN_KEY_CHECKS=0;
 | None           | util_test     | v1          | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | root@localhost  | DEFINER        | utf8                  | utf8_general_ci       |
 +----------------+---------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------+----------------+-----------------------+-----------------------+
 # TRIGGERS in util_test:
-+------------------+-----------------+---------------+---------------------+-----------------------+----------------------+---------------------+---------------+-------------------+--------------------------------------------------------+---------------------+----------------+-----------------------------+-----------------------------+---------------------------+---------------------------+----------+-----------+-----------------+-----------------------+-----------------------+---------------------+
-| TRIGGER_CATALOG  | TRIGGER_SCHEMA  | TRIGGER_NAME  | EVENT_MANIPULATION  | EVENT_OBJECT_CATALOG  | EVENT_OBJECT_SCHEMA  | EVENT_OBJECT_TABLE  | ACTION_ORDER  | ACTION_CONDITION  | ACTION_STATEMENT                                       | ACTION_ORIENTATION  | ACTION_TIMING  | ACTION_REFERENCE_OLD_TABLE  | ACTION_REFERENCE_NEW_TABLE  | ACTION_REFERENCE_OLD_ROW  | ACTION_REFERENCE_NEW_ROW  | CREATED  | SQL_MODE  | DEFINER         | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
-+------------------+-----------------+---------------+---------------------+-----------------------+----------------------+---------------------+---------------+-------------------+--------------------------------------------------------+---------------------+----------------+-----------------------------+-----------------------------+---------------------------+---------------------------+----------+-----------+-----------------+-----------------------+-----------------------+---------------------+
-| None             | util_test       | trg           | INSERT              | None                  | util_test            | t1                  | 0             | None              | INSERT INTO util_test.t2 VALUES('Test objects count')  | ROW                 | AFTER          | None                        | None                        | OLD                       | NEW                       | None     |           | root@localhost  | utf8                  | utf8_general_ci       | latin1_swedish_ci   |
-+------------------+-----------------+---------------+---------------------+-----------------------+----------------------+---------------------+---------------+-------------------+--------------------------------------------------------+---------------------+----------------+-----------------------------+-----------------------------+---------------------------+---------------------------+----------+-----------+-----------------+-----------------------+-----------------------+---------------------+
++------------------+-----------------+---------------+---------------------+
+| TRIGGER_CATALOG  | TRIGGER_SCHEMA  | TRIGGER_NAME  |
++------------------+-----------------+---------------+---------------------+
+| None             | util_test       | trg           | INSERT
++------------------+-----------------+---------------+---------------------+
 # EVENTS in util_test:
 +------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
 | DB         | NAME  | BODY                                            | DEFINER         | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | CREATED              | MODIFIED             | LAST_EXECUTED  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | SQL_MODE  | COMMENT  | ORIGINATOR  | TIME_ZONE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       | BODY_UTF8                                       |
@@ -3964,7 +3964,7 @@ TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,
 ,`util_test`,`v1`,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,root@localhost,DEFINER,utf8,utf8_general_ci
 # TRIGGERS in util_test:
 TRIGGER_CATALOG,TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_MANIPULATION,EVENT_OBJECT_CATALOG,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORDER,ACTION_CONDITION,ACTION_STATEMENT,ACTION_ORIENTATION,ACTION_TIMING,ACTION_REFERENCE_OLD_TABLE,ACTION_REFERENCE_NEW_TABLE,ACTION_REFERENCE_OLD_ROW,ACTION_REFERENCE_NEW_ROW,CREATED,SQL_MODE,DEFINER,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
-,`util_test`,`trg`,INSERT,,`util_test`,`t1`,0,,XXXXXXXXXX,XXXXXXXXXX,AFTER,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,utf8,utf8_general_ci,latin1_swedish_ci
+,`util_test`,`trg`,INSERT,,`util_test`,`t1`,X,,XXXXXXXXXX,XXXXXXXXXX,AFTER,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,utf8,utf8_general_ci,latin1_swedish_ci
 # EVENTS in util_test:
 DB,NAME,BODY,DEFINER,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,CREATED,MODIFIED,LAST_EXECUTED,STARTS,ENDS,STATUS,ON_COMPLETION,SQL_MODE,COMMENT,ORIGINATOR,TIME_ZONE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION,BODY_UTF8
 `util_test`,`e1`,"DELETE FROM util_test.t1 WHERE a = ""not there""",root@localhost,,1,YEAR,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,XXXX-XX-XX XX:XX:XX,,DISABLED,DROP,,,XX,SYSTEM,utf8,utf8_general_ci,latin1_swedish_ci,"DELETE FROM util_test.t1 WHERE a = ""not there"""
@@ -4178,7 +4178,7 @@ TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	
 	`util_test`	`v1`	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	root@localhost	DEFINER	utf8	utf8_general_ci
 # TRIGGERS in util_test:
 TRIGGER_CATALOG	TRIGGER_SCHEMA	TRIGGER_NAME	EVENT_MANIPULATION	EVENT_OBJECT_CATALOG	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORDER	ACTION_CONDITION	ACTION_STATEMENT	ACTION_ORIENTATION	ACTION_TIMING	ACTION_REFERENCE_OLD_TABLE	ACTION_REFERENCE_NEW_TABLE	ACTION_REFERENCE_OLD_ROW	ACTION_REFERENCE_NEW_ROW	CREATED	SQL_MODE	DEFINER	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
-	`util_test`	`trg`	INSERT		`util_test`	`t1`	0		XXXXXX	XXXXXXXX	AFTER	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			root@localhost	utf8	utf8_general_ci	latin1_swedish_ci
+	`util_test`	`trg`	INSERT		`util_test`	`t1`	1		XXXXXX	XXXXXXXX	AFTER	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		root@localhost	utf8	utf8_general_ci	latin1_swedish_ci
 # EVENTS in util_test:
 DB	NAME	BODY	DEFINER	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	CREATED	MODIFIED	LAST_EXECUTED	STARTS	ENDS	STATUS	ON_COMPLETION	SQL_MODE	COMMENT	ORIGINATOR	TIME_ZONE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION	BODY_UTF8
 `util_test`	`e1`	"DELETE FROM util_test.t1 WHERE a = ""not there"""	root@localhost		1	YEAR	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		XXXX-XX-XX XX:XX:XX		DISABLED	DROP			XX	SYSTEM	utf8	utf8_general_ci	latin1_swedish_ci	"DELETE FROM util_test.t1 WHERE a = ""not there"""
@@ -5350,7 +5350,7 @@ SET FOREIGN_KEY_CHECKS=0;
        EVENT_OBJECT_CATALOG: None
         EVENT_OBJECT_SCHEMA: util_test
          EVENT_OBJECT_TABLE: t1
-               ACTION_ORDER: 0
+               ACTION_ORDER: X
            ACTION_CONDITION: None
            ACTION_STATEMENT: INSERT INTO util_test.t2 VALUES('Test objects count')
          ACTION_ORIENTATION: ROW
@@ -5359,7 +5359,7 @@ SET FOREIGN_KEY_CHECKS=0;
  ACTION_REFERENCE_NEW_TABLE: None
    ACTION_REFERENCE_OLD_ROW: OLD
    ACTION_REFERENCE_NEW_ROW: NEW
-                    CREATED: None
+                    CREATED: XXXX-XX-XX XX:XX:XX
                    SQL_MODE: 
                     DEFINER: root@localhost
        CHARACTER_SET_CLIENT: utf8

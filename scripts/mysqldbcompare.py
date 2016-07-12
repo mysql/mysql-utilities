@@ -54,7 +54,8 @@ from mysql.utilities.common.options import (add_difftype, add_regexp,
                                             add_character_set_option,
                                             add_ssl_options, get_ssl_dict,
                                             setup_common_options,
-                                            check_password_security)
+                                            check_password_security,
+                                            add_exclude, check_exclude_pattern)
 from mysql.utilities.common.server import connect_servers
 from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting,
@@ -141,13 +142,7 @@ if __name__ == '__main__':
                       default=False, help="check all databases")
 
     # Add the exclude database option
-    parser.add_option("-x", "--exclude", action="append", dest="exclude",
-                      type="string", default=None, help="exclude one or more "
-                      "databases from the operation using either a specific "
-                      "name (e.g. db1), a LIKE pattern (e.g. db%) or a REGEXP "
-                      "search pattern. To use a REGEXP search pattern for all "
-                      "exclusions, you must also specify the --regexp option. "
-                      "Repeat the --exclude option for multiple exclusions.")
+    add_exclude(parser, "databases", "db1", "db%")
 
     # Add compact option for resulting diff
     parser.add_option("-c", "--compact", action="store_true",
@@ -228,6 +223,9 @@ if __name__ == '__main__':
     if opt.use_regexp and not opt.exclude:
         print(WARN_OPT_ONLY_USED_WITH.format(opt='--regexp',
                                              used_with='the --exclude option'))
+
+    # Check for regexp symbols
+    check_exclude_pattern(exclude_list, opt.use_regexp)
 
     db_idxes_l = None
 

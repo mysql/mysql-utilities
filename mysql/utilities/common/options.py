@@ -557,6 +557,48 @@ def add_locking(parser):
                       "transaction.")
 
 
+def add_exclude(parser, object_type="objects",
+                example1="db1.t1", example2="db1.t% or db%.%"):
+    """Add the --exclude option.
+
+    parser[in]        the parser instance
+    example1[in]
+    example2[in]
+    """
+    parser.add_option("-x", "--exclude", action="append", dest="exclude",
+                      type="string", default=None, help="exclude one or more "
+                      "{0} from the operation using either a specific "
+                      "name (e.g. {1}), a LIKE pattern (e.g. {2}) or a REGEXP "
+                      "search pattern. To use a REGEXP search pattern for all "
+                      "exclusions, you must also specify the --regexp option. "
+                      "Repeat the --exclude option for multiple exclusions."
+                      "".format(object_type, example1, example2))
+
+
+def check_exclude_pattern(exclude_list, use_regexp):
+    """Check the --exclude pattern to determine if there are special symbols
+    that may be regexp symbols and the --use-regexp option is not specified.
+    Prints warning if this is true.
+
+    parser[in]        the parser instance
+    use_regexp[in]    the option to use regexp
+    """
+    # ignore null lists
+    if not exclude_list:
+        return True
+    for row in exclude_list:
+        # replace _ and % and see if still not alnum()
+        test = row.replace('_', '').replace('%', '').replace('`', '')
+        test = test.replace("'", "").replace('.', '').replace('"', '')
+        if len(test) > 0 and not test.isalnum() and not use_regexp:
+            print "# WARNING: One or more of your --exclude patterns " \
+                  "contains symbols that could be regexp patterns. You may " \
+                  "need to include --regexp to ensure your exclude pattern " \
+                  "is evaluated as REGEXP and not a SQL LIKE expression."
+            return False
+    return True
+
+
 def add_regexp(parser):
     """Add the --regexp option.
 

@@ -157,6 +157,28 @@ class test(export_parameters_def.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - try exclude everything without using "
+                   "pattern.".format(test_num))
+        if os.name == 'posix':
+            cmd_opts = "{0} -x 'u*' ".format(cmd_str)
+        else:
+            cmd_opts = '{0} -x "u*" '.format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - try exclude everything with using "
+                   "pattern and regexp.".format(test_num))
+        if os.name == 'posix':
+            cmd_opts = "{0} -x 'u*' --regexp".format(cmd_str)
+        else:
+            cmd_opts = '{0} -x "u*" --regexp'.format(cmd_str)
+        res = self.run_test_case(0, cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         export_parameters_def.test._mask_csv(self)
 
         test_num += 1

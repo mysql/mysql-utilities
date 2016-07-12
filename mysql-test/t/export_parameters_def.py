@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,6 +38,9 @@ class test(export_basic.test):
         sql_mode = self.server0.show_server_variable("SQL_MODE")[0]
         if len(sql_mode[1]):
             raise MUTLibError("Test requires servers with sql_mode = ''.")
+        innodb_row_format = self.server0.show_server_variable("innodb_default_row_format")[0]
+        if not innodb_row_format[1].upper() == "COMPACT":
+            raise MUTLibError("Test requires servers with innodb_default_row_format = 'COMPACT'.")
         return export_basic.test.check_prerequisites(self)
 
     def setup(self):
@@ -280,6 +283,15 @@ class test(export_basic.test):
                                 " XXXX-XX-XX XX:XX:XX  ")
         self.mask_column_result("| util_test  | f2", "|", 15,
                                 " XXXX-XX-XX XX:XX:XX  ")
+        self.mask_column_result("| util_test  | f2", "|", 15,
+                                " XXXX-XX-XX XX:XX:XX  ")
+        # Fix MySQL 5.7 output differences
+        self.replace_result("+------------------+-----------------+---------------+---------------------+",
+                            "+------------------+-----------------+---------------+---------------------+\n")
+        self.replace_result("| None             | util_test       | trg           | INSERT",
+                            "| None             | util_test       | trg           | INSERT\n")
+        self.replace_result("| TRIGGER_CATALOG  | TRIGGER_SCHEMA  | TRIGGER_NAME  |",
+                            "| TRIGGER_CATALOG  | TRIGGER_SCHEMA  | TRIGGER_NAME  |\n")
 
     def _mask_csv(self):
         """Masks CSV.
@@ -320,6 +332,9 @@ class test(export_basic.test):
         self.mask_column_result("`util_test`,`e1`", ",", 11,
                                 "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("`util_test`,`e1`", ",", 17, "XX")
+        # Mask MySQL 5.7 changes
+        self.mask_column_result(",`util_test`,`trg", ",", 8, "X")
+        self.mask_column_result(",`util_test`,`trg", ",", 17, "")
 
     def _mask_tab(self):
         """Masks tab.
@@ -359,6 +374,9 @@ class test(export_basic.test):
         self.mask_column_result("`util_test`	`e1`", "\t", 9,
                                 "XXXX-XX-XX XX:XX:XX")
         self.mask_column_result("`util_test`	`e1`", "\t", 11,
+                                "XXXX-XX-XX XX:XX:XX")
+        # Mask MySQL 5.7 changes
+        self.mask_column_result("	`util_test`	`trg", "\t", 17,
                                 "XXXX-XX-XX XX:XX:XX")
 
     def _mask_vertical(self):
@@ -427,6 +445,11 @@ class test(export_basic.test):
                             "            TRIGGER_CATALOG: None\n")
         self.replace_result("       EVENT_OBJECT_CATALOG: def",
                             "       EVENT_OBJECT_CATALOG: None\n")
+        # Mask MySQL 5.7 changes
+        self.replace_result("               ACTION_ORDER:",
+                            "               ACTION_ORDER: X\n")
+        self.replace_result("                    CREATED:",
+                            "                    CREATED: XXXX-XX-XX XX:XX:XX\n")
 
     def get_result(self):
         return self.compare(__name__, self.results)

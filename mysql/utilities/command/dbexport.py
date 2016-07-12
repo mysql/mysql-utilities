@@ -530,7 +530,6 @@ def _export_table_data(source_srv, table, output_file, options):
     skip_blobs = options.get("skip_blobs", False)
     quiet = options.get("quiet", False)
     file_per_table = options.get("file_per_tbl", False)
-    sql_mode = source_srv.select_variable("SQL_MODE")
 
     # Handle source server instance or server connection values.
     # Note: For multiprocessing the use of connection values instead of a
@@ -545,6 +544,9 @@ def _export_table_data(source_srv, table, output_file, options):
         }
         servers = connect_servers(source_srv, None, conn_options)
         source = servers[0]
+
+    # Must be after the connection test to get SQL_MODE
+    sql_mode = source.select_variable("SQL_MODE")
 
     # Handle qualified table name (with backtick quotes).
     db_name = table[0]
