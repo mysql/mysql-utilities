@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -137,7 +137,8 @@ class test(mutlib.System_test):
                                 "0::0:1", "[0::1]", "0::0:0:1"]
         # All elements of List of bad test cases are expected to return False.
         self.bad_test_cases = ["0.0.0.2", "[::2]", "host_local", "::2",
-                               "0:0:0:0:0:0:0:2", "oracle.com", "TEST_DOMAIN"]
+                               "0:0:0:0:0:0:0:2", "oracle.com", "TEST_DOMAIN",
+                               "localhost.locodomain.loco.loco.loco.local"]
 
         return True
 

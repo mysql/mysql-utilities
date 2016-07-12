@@ -842,14 +842,20 @@ class Server(object):
                 # Add alias with and without suffix from self.aliases
                 for alias in self.aliases:
                     if alias.endswith(suffix):
-                        host, _ = alias.rsplit('.')
-                        no_suffix_server_aliases.add(host)
+                        try:
+                            host, _ = alias.rsplit('.', 1)
+                            no_suffix_host_aliases.add(host)
+                        except:
+                            pass  # Ok if parts don't split correctly
                     no_suffix_server_aliases.add(alias)
                 # Add alias with and without suffix from host_aliases
                 for alias in host_or_ip_aliases:
                     if alias.endswith(suffix):
-                        host, _ = alias.rsplit('.')
-                        no_suffix_host_aliases.add(host)
+                        try:
+                            host, _ = alias.rsplit('.', 1)
+                            no_suffix_host_aliases.add(host)
+                        except:
+                            pass  # Ok if parts don't split correctly
                     no_suffix_host_aliases.add(alias)
             # Check if there is any alias in common
             common_alias = no_suffix_host_aliases.intersection(
