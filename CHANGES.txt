@@ -1,3 +1,21 @@
+Release-1.6.4
+-------------
+- BUG#23300260 : mysql utilities fail with "too many values to unpack" in _update_alias
+- BUG#23111808 : mysqldbbcopy copy blob data when some field's value is null
+- BUG#22932375 : ha utilties must set connection_timeout in c/py connection to short value
+- BUG#22905132 : handling regexp for few of the utilities
+- BUG#22878052 : add master outage delay for mysqlfailover
+- BUG#22780854 : valueerror while using mysqlrplsync discover-slave option with host:port
+- BUG#22764612 : valueerror: too many values to unpack " running mysqlrpladmin
+- BUG#22619159 : special char in password causes error with mysqlrplshow
+- BUG#22543517 : mysqlbinlogpurge does not work with other than the first replication channel
+- BUG#22495193 : mysqldbexport does not dump bit fields correctly
+- BUG#22393353 : mysql-utilities-1.5.6-osx10.9.dmg won't install under osx 10.11.2 (el capitan)
+- BUG#22242601 : yum install of mysql-utilities-1.5.6-1.el6.src.rpm fails (documentation updated)
+- BUG#22076859 : after pressing <delete> in mysql utility console the command buffer is corrupt
+- BUG#21222808 : mysqldiff: encoding comments always make databases definitions look different
+- BUG#17666275 : add authentication plugin info to mysqluserclone
+
 Release-1.6.3
 -------------
 - BUG#22964855 : year needs updation in readme,license and mysqluc in mu 1.6.3 packages

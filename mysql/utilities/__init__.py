@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 """mysql.utilities"""
 
 # Major, Minor, Patch, Status
-VERSION = (1, 6, 3, 'GA', 0)
+VERSION = (1, 6, 4, 'GA', 0)
 # Future versions will have to include only the X, Y (no Z).
 
 VERSION_STRING = "%s.%s.%s" % VERSION[0:3]
