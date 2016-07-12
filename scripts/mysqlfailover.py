@@ -197,6 +197,20 @@ if __name__ == '__main__':
                            "values can be used separated by commas. The "
                            "default is health.")
 
+    # Add connection timeout for C/Py connections
+    #
+    # Note: we do not set a default here as we want C/Py to host the
+    # default. Utilities need not control the default, rather, we only
+    # want to provide an option for the user to set it should she have
+    # need to tune for a particular failover scenario. See BUG#22932375
+    # for more details.
+    parser.add_option("--connection-timeout", action="store", type="int",
+                      dest = "conn_timeout", default = None, help = "set the "
+                      "connection timeout for TCP and Unix socket "
+                      "connections for all master, slaves, and candidate "
+                      "slaves specified. Default is 10 as provided in the "
+                      "Connector/Python module.")
+
     # Add master failover delay check
     parser.add_option("--master-fail-retry", action="store", dest="fail_retry",
                       type="int", default=None, help="time in seconds to wait "

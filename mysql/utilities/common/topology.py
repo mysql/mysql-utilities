@@ -86,6 +86,10 @@ def parse_topology_connections(options, parse_candidates=True):
 
     Returns tuple - (master, slaves, candidates) dictionaries
     """
+    timeout = options.conn_timeout
+    if timeout and options.verbosity > 2:
+        print("Note: running with --connection-timeout={0}".format(timeout))
+
     # Create a basic configuration reader, without looking for the tool
     # my_print_defaults to avoid raising exceptions. This is used for
     # optimization purposes, to reuse data and avoid repeating the execution of
@@ -97,6 +101,9 @@ def parse_topology_connections(options, parse_candidates=True):
         try:
             master_val = parse_connection(options.master, config_reader,
                                           options)
+            # Add connection timeout if present in options
+            if timeout:
+                master_val['connection_timeout'] = timeout
         except FormatError as err:
             msg = ("Master connection values invalid or cannot be parsed: %s "
                    "(%s)." % (options.master, err))
@@ -115,6 +122,9 @@ def parse_topology_connections(options, parse_candidates=True):
         for slave in slaves:
             try:
                 s_values = parse_connection(slave, config_reader, options)
+                # Add connection timeout if present in options
+                if timeout:
+                    s_values['connection_timeout'] = timeout
                 slaves_val.append(s_values)
             except FormatError as err:
                 msg = ("Slave connection values invalid or cannot be parsed: "
@@ -131,6 +141,9 @@ def parse_topology_connections(options, parse_candidates=True):
         for slave in candidates:
             try:
                 s_values = parse_connection(slave, config_reader, options)
+                # Add connection timeout if present in options
+                if timeout:
+                    s_values['connection_timeout'] = timeout
                 candidates_val.append(s_values)
             except FormatError as err:
                 msg = "Candidate connection values invalid or " + \

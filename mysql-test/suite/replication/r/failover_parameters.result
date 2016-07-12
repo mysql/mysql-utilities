@@ -83,6 +83,11 @@ Test case 1 - show help
                         daemon. It can be health, gtid or uuid. Multiple
                         values can be used separated by commas. The default is
                         health.
+  --connection-timeout=CONN_TIMEOUT
+                        set the connection timeout for TCP and Unix socket
+                        connections for all master, slaves, and candidate
+                        slaves specified. Default is 10 as provided in the
+                        Connector/Python module.
   --master-fail-retry=FAIL_RETRY
                         time in seconds to wait to determine master is down.
                         The failover check will be run again when the retry
