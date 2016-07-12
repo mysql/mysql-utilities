@@ -57,65 +57,63 @@ Test case 14 - Failover command cannot be used with --discover-slaves-login
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: Invalid --discover-slaves-login option for 'failover'. Use --slaves instead.
-Test case 15 - --discover-slaves format error
-ERROR: ('Format of --discover-slaves option is incorrect. Use userid:passwd or userid.', 0)
-Test case 16 - Master listed as a slave - literal
+Test case 15 - Master listed as a slave - literal
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: The master localhost:PORT1 and one of the specified slaves are the same localhost:PORT1.
-Test case 17 - Master listed as a slave - alias
+Test case 16 - Master listed as a slave - alias
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: The master localhost:PORT1 and one of the specified slaves are the same <hostname>:PORT1.
-Test case 18 - Master listed as a candidate - alias
+Test case 17 - Master listed as a candidate - alias
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: The master localhost:PORT1 and one of the specified candidates are the same <hostname>:PORT1.
-Test case 19 - Start without --slaves
+Test case 18 - Start without --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: 'start' requires the following option(s): --slaves.
-Test case 20 - Stop without --slaves
+Test case 19 - Stop without --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: 'stop' requires the following option(s): --slaves.
-Test case 21 - Reset without --slaves
+Test case 20 - Reset without --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: 'reset' requires the following option(s): --slaves.
-Test case 22 - Start using --discover-slaves-login and --slaves
+Test case 21 - Start using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
-Test case 23 - Stop using --discover-slaves-login and --slaves
+Test case 22 - Stop using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
-Test case 24 - Reset using --discover-slaves-login and --slaves
+Test case 23 - Reset using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
-Test case 25 - Health using --discover-slaves-login and --slaves
+Test case 24 - Health using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
-Test case 26 - Failover using --discover-slaves-login and --slaves
+Test case 25 - Failover using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
-Test case 27 - Switchover using --discover-slaves-login and --slaves
+Test case 26 - Switchover using --discover-slaves-login and --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: Options --discover-slaves-login and --slaves cannot be used together.
-Test case 28 - Switchover using switchover new master is the actual master with --discover-slaves
+Test case 27 - Switchover using switchover new master is the actual master with --discover-slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: The specified new master localhost:PORT1 is the same as the actual master localhost:PORT1.
-Test case 29 - Switchover using switchover new master is the actual master, replacing new-master host with alias.
+Test case 28 - Switchover using switchover new master is the actual master, replacing new-master host with alias.
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: The specified new master 127.0.0.1:PORT1 is the same as the actual master localhost:PORT1.
-Test case 30 - Switchover using a wrong slave (without --force)
+Test case 29 - Switchover using a wrong slave (without --force)
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
@@ -123,7 +121,7 @@ Test case 30 - Switchover using a wrong slave (without --force)
 # Checking slaves configuration to master.
 # ERROR: Slave localhost:PORT5 is not configured with master localhost:PORT1.
 ERROR: Slave localhost:PORT5 is not configured with master localhost:PORT1. Note: If you want to ignore this issue, please use the utility with the --force option.
-Test case 31 - Switchover using a wrong slave and with --force
+Test case 30 - Switchover using a wrong slave and with --force
 # Checking privileges.
 # WARNING: You may be mixing host names and IP addresses. This may result in negative status reporting if your DNS services do not support reverse name lookup.
 # Performing switchover from master at localhost:PORT1 to slave at localhost:PORT2.
@@ -149,14 +147,14 @@ Test case 31 - Switchover using a wrong slave and with --force
 | localhost  | PORT5  | SLAVE   | UP     | XXX        | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-Test case 32 - Connect failure
+Test case 31 - Connect failure
 ERROR: Can't connect to XXXXXXX
-Test case 33 - script passed to the '--exec-after' option does not exist
+Test case 32 - script passed to the '--exec-after' option does not exist
 WARNING: The --master option is not required for 'failover' (option ignored).
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
 mysqlrpladmin: error: 'std_data/does_not_exist.bat' script cannot be found. Please check the path and filename for accuracy and try again.
-Test case 34 - script passed to the '--exec-before' option does not exist
+Test case 33 - script passed to the '--exec-before' option does not exist
 WARNING: The --master option is not required for 'failover' (option ignored).
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 

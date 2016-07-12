@@ -836,8 +836,8 @@ def parse_user_password(userpass_values, my_defaults_reader=None,
     """
     if options is None:
         options = {}
-    # Split on the ':' to determine if a login-path is used.
-    login_values = userpass_values.split(':')
+    # Split on the first ':' to determine if a login-path is used.
+    login_values = userpass_values.split(':', 1)
     if len(login_values) == 1:
         # Format is config-path, login-path or user (without a password):
         # First check if the value is a config-path

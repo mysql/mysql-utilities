@@ -462,6 +462,7 @@ class test(rpl_admin.test):
 
         # Remove slave_master_info data available for servers starting 5.7.6.
         self.remove_result("                  Channel_Name :")
+        self.remove_result("            Master_TLS_Version :")
 
     def get_result(self):
         return self.compare(__name__, self.results)

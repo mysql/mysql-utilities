@@ -59,7 +59,8 @@ class test(mutlib.System_test):
                      "test-hyphen1234#:13000:my.socket",
                      "test' \\\"-hyphen:3306",
                      "test' \\\"-hyphen:3306:my.socket",
-                     "test' \\\"-hyphen:13001:my.socket"]
+                     "test' \\\"-hyphen:13001:my.socket",
+                     "rpl:'L5!w1Sj40(p?tF@(_@:z(HXc'@'localhost':3308:sock1"]
 
         for test_ in con_tests:
             con_dic = parse_connection(test_, options={"charset": "utf8"})
@@ -69,7 +70,8 @@ class test(mutlib.System_test):
 
         # Test parse_user_password with login-paths
         user_pass_tests = ["test_user", "test_mylogin", "test_user:",
-                           "user_x:", "user_x:pass_y", "ro:o:t"]
+                           "user_x:", "user_x:pass_y",
+                           "rpl:'L5!w1SJzVuj40(p?tF@(9Y70_@:z(HXc'"]
         for test_ in user_pass_tests:
             try:
                 user_pass = parse_user_password(test_)
