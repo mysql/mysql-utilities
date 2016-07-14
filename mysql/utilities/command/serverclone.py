@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -307,9 +307,10 @@ def clone_server(conn_val, options):
         if os.name == "posix":
             try:
                 os.kill(proc.pid, subprocess.signal.SIGTERM)
-            except OSError:
-                raise UtilError("Failed to kill process with pid '{0}'"
-                                "".format(proc.pid))
+            except OSError as error:
+                if not error.strerror.startswith("No such process"):
+                    raise UtilError("Failed to kill process with pid '{0}'"
+                                    "".format(proc.pid))
         else:
             ret_code = subprocess.call("taskkill /F /T /PID "
                                        "{0}".format(proc.pid), shell=True)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -382,8 +382,10 @@ def _start_server(server_val, basedir, datadir, options=None):
         args.extend(server_args)
 
     socket = server_val.get('unix_socket', None)
+    if not socket and post_5_7_4 and os.name == "posix":
+        socket = os.path.normpath(os.path.join(datadir, "mysql.sock"))
     if socket is not None:
-        args.append("--socket=%(unix_socket)s" % server_val)
+        args.append("--socket={0}".format(socket))
     if verbosity > 0:
         subprocess.Popen(args, shell=False)
     else:

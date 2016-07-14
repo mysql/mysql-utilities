@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -324,9 +324,9 @@ class test(rpl_admin.test):
                               "with master")
 
     def do_masks(self):
-        self.replace_substring(str(self.server1.port), "PORT1")
-        self.replace_substring(str(self.server2.port), "PORT2")
-        self.replace_substring(str(self.server3.port), "PORT3")
+        self.replace_substring(str(self.server1.port), "PORTX")
+        self.replace_substring(str(self.server2.port), "PORTX")
+        self.replace_substring(str(self.server3.port), "PORTX")
 
         self.remove_result("# - Slave '")
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ clone_server test.
 """
 
 import os
-
+import time
 import mutlib
 
 from mysql.utilities.common.server import Server
@@ -133,6 +133,7 @@ class test(mutlib.System_test):
         server = self.check_connect(port2, "cloned_server_basedir")
         self.servers.stop_server(server)
         self.servers.clear_last_port()
+        time.sleep(5)  # Wait for shutdown to complete (5.7.12+)
 
         # Test clone server option mysqld with SSL and basedir option
         # Also Used for next test, clone a running server with SSL

@@ -5,7 +5,7 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 # Checking data consistency.
 #
-# Using Master 'localhost@PORT1' as base server for comparison.
+# Using Master 'localhost@PORTX' as base server for comparison.
 #
 #...done.
 #
@@ -13,30 +13,30 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 Test case 2 - data consistency check with active replication using master and slaves discovery.
 WARNING: Using a password on the command line interface can be insecure.
-# Discovering slaves for master at localhost:PORT1
-# Discovering slave at localhost:PORT2
-# Found slave: localhost:PORT2
-# Discovering slave at localhost:PORT3
-# Found slave: localhost:PORT3
+# Discovering slaves for master at localhost:PORTX
+# Discovering slave at localhost:PORTX
+# Found slave: localhost:PORTX
+# Discovering slave at localhost:PORTX
+# Found slave: localhost:PORTX
 #
 # GTID differences between Master and Slaves:
 #
 # Checking data consistency.
 #
-# Using Master 'localhost@PORT1' as base server for comparison.
+# Using Master 'localhost@PORTX' as base server for comparison.
 # Checking 'test_rplsync_db' database...
 # - Checking 't0' table data...
-#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORT2'.
-#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORTX'.
+#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORTX'.
 # - Checking 't1' table data...
-#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORT2'.
-#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORTX'.
+#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORTX'.
 # - Checking 't2' table data...
-#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORT2'.
-#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORTX'.
+#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORTX'.
 # - Checking 't3' table data...
-#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORT2'.
-#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORTX'.
+#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORTX'.
 #
 #...done.
 #
@@ -47,16 +47,16 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 # Checking data consistency.
 #
-# Using Slave 'localhost@PORT2' as base server for comparison.
+# Using Slave 'localhost@PORTX' as base server for comparison.
 # Checking 'test_rplsync_db' database...
 # - Checking 't0' table data...
-#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORTX'.
 # - Checking 't1' table data...
-#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORTX'.
 # - Checking 't2' table data...
-#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORTX'.
 # - Checking 't3' table data...
-#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORTX'.
 #
 #...done.
 #
@@ -69,20 +69,20 @@ WARNING: Using a password on the command line interface can be insecure.
 #
 # Checking data consistency.
 #
-# Using Master 'localhost@PORT1' as base server for comparison.
+# Using Master 'localhost@PORTX' as base server for comparison.
 # Checking 'test_rplsync_db' database...
 # - Checking 't0' table data...
-#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORT2'.
-#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORTX'.
+#   [OK] `test_rplsync_db`.`t0` checksum for server 'localhost@PORTX'.
 # - Checking 't1' table data...
-#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORT2'.
-#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORTX'.
+#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORTX'.
 # - Checking 't2' table data...
-#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORT2'.
-#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORTX'.
+#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORTX'.
 # - Checking 't3' table data...
-#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORT2'.
-#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORT3'.
+#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORTX'.
+#   [OK] `test_rplsync_db`.`t3` checksum for server 'localhost@PORTX'.
 #
 #...done.
 #

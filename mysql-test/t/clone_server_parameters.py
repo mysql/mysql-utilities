@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -102,6 +102,7 @@ class test(mutlib.System_test):
                 raise MUTLibError("Cannot connect to spawned server.")
             drop = False if restart else True
             self.servers.stop_server(new_server, drop=drop)
+            time.sleep(5)
             # if restart, try to use the generated script to restart the
             # server.
             if restart:
@@ -159,12 +160,6 @@ class test(mutlib.System_test):
             ("write command to file and run it",
              " -w {0} ".format(self.start_cmd_fl), True, False,
              self.start_cmd_fl),
-            ("use --skip-innodb",
-             ("--mysqld={0}--skip-innodb --default-storage-engine=MYISAM "
-              "--default-tmp-storage-engine=MYISAM{0}".format(os_quote)),
-             True, False, False),
-            ("use --innodb", "--mysqld={0}--innodb{0}".format(os_quote),
-             True, False, False),
         ]
 
         test_num = 1

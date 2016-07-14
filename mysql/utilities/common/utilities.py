@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -541,3 +541,32 @@ class Utilities(object):
             return False
 
         return util_info['usage']
+
+
+def kill_process(pid, force=False, silent=False):
+    """This function tries to kill the given subprocess.
+
+    pid [in]    Process id of the subprocess to kill.
+    force [in]  Boolean value, if False try to kill process with SIGTERM
+                (Posix only) else kill it forcefully.
+    silent[in]  If true, do no print message
+
+    Returns True if operation was successful and False otherwise.
+    """
+    res = True
+    if os.name == "posix":
+        if force:
+            os.kill(pid, subprocess.signal.SIGABRT)
+        else:
+            os.kill(pid, subprocess.signal.SIGTERM)
+    else:
+        with open(os.devnull, 'w') as f_out:
+            ret_code = subprocess.call("taskkill /F /T /PID {0}".format(pid),
+                                       shell=True, stdout=f_out, stdin=f_out)
+            if ret_code not in (0, 128):
+                res = False
+                if not silent:
+                    print("Unable to successfully kill process with PID "
+                          "{0}".format(pid))
+    return res
+

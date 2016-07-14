@@ -86,7 +86,10 @@ def parse_topology_connections(options, parse_candidates=True):
 
     Returns tuple - (master, slaves, candidates) dictionaries
     """
-    timeout = options.conn_timeout
+    try:
+        timeout = options.conn_timeout
+    except:
+        timeout = None
     if timeout and options.verbosity > 2:
         print("Note: running with --connection-timeout={0}".format(timeout))
 

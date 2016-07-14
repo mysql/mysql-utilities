@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -77,7 +77,12 @@ class test(mutlib.System_test):
         for utility in AVAILABLE_UTILITIES:
             self.replace_result(
                 "MySQL Utilities {0} version".format(utility),
-                "MySQL Utilities {0} version X.Y.Z\n".format(utility))
+                "MySQL Utilities {0} version X.Y.Z\n".format(utility)
+            )
+            self.replace_result(
+                "Copyright (c) 2010",
+                "Copyright (c) 2010...\n"
+            )
 
         return True
 
