@@ -1,5 +1,6 @@
 Release-1.6.4
 -------------
+- BUG#24348569 : utilities fail to properly detect 5.7.13 servers
 - BUG#23300260 : mysql utilities fail with "too many values to unpack" in _update_alias
 - BUG#23111808 : mysqldbbcopy copy blob data when some field's value is null
 - BUG#22932375 : ha utilties must set connection_timeout in c/py connection to short value
