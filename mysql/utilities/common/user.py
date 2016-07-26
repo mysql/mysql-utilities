@@ -205,7 +205,10 @@ class User(object):
         """
 
         self.server1 = server1
-        self.sql_mode = self.server1.select_variable("SQL_MODE")
+        if server1.db_conn:
+            self.sql_mode = self.server1.select_variable("SQL_MODE")
+        else:
+            self.sql_mode = ""
         self.user, self.passwd, self.host = parse_user_host(user)
         self.verbosity = verbosity
         self.current_user = None

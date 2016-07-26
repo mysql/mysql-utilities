@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -244,6 +244,25 @@ def ping_host(host, timeout):
     return (ret_val == 0)
 
 
+def parse_mysqld_version(vers_str):
+    pattern = r"mysqld(?:\.exe)?\s+Ver\s+(\d+\.\d+\.\S+)\s"
+    match = re.search(pattern, vers_str)
+    if not match:
+        return None
+    version = match.group(1)
+    num_dots = vers_str.count('.')
+    try:
+        # get the version digits. If more than 2, we get first 3 parts
+        if num_dots == 2:
+            maj_ver, min_ver, dev = version.split(".", 2)
+        else:
+            maj_ver, min_ver, dev, __ = version.split(".", 3)
+        rel = dev.split("-", 1)
+        return (maj_ver, min_ver, rel[0])
+    except:
+        return None
+
+
 def get_mysqld_version(mysqld_path):
     """Return the version number for a mysqld executable.
 
@@ -270,19 +289,7 @@ def get_mysqld_version(mysqld_path):
 
     if line is None:
         return None
-    pattern = r"mysqld(?:\.exe)?\s+Ver\s+(\d+\.\d+\.\S+)\s"
-    match = re.search(pattern, line)
-    if not match:
-        return None
-    version = match.group(1)
-    try:
-        maj_ver, min_ver, dev = version.split(".")
-        rel = dev.split("-")
-        return (maj_ver, min_ver, rel[0])
-    except:
-        return None
-
-    return None
+    return parse_mysqld_version(line)
 
 
 def show_file_statistics(file_name, wild=False, out_format="GRID"):
