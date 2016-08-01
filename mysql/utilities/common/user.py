@@ -630,7 +630,7 @@ class User(object):
         res = self.server1.exec_query("SELECT plugin FROM mysql.user "
                                       "WHERE user='{0}' and host='{1}'"
                                       "".format(self.user, self.host))
-        if res == [] or res[0][0] in {'mysql_native_password'}:
+        if res == [] or res[0][0] == 'mysql_native_password':
             return None
         return res[0][0]
 
