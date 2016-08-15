@@ -23,9 +23,6 @@ metadata for objects in a database and data for tables.
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import multiprocessing
 import os
 import sys
@@ -54,6 +51,8 @@ from mysql.utilities.common.tools import (check_connector_python,
                                           print_elapsed_time)
 from mysql.utilities.exception import FormatError, UtilError
 
+# Check Python version compatibility
+check_python_version()
 
 # Constants
 NAME = "MySQL Utilities - mysqldbimport "

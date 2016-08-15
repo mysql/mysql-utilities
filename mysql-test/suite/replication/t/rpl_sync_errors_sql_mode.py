@@ -40,7 +40,7 @@ class test(rpl_sync.test):
         # Spawn servers.
         self.server0 = self.servers.get_server(0)
         mysqld = MYSQL_OPTS_DEFAULT.format(port=self.servers.view_next_port(),
-                                           mode='MSSQL') # ANSI_QUOTES
+                                           mode='MSSQL')  # ANSI_QUOTES
         self.server1 = self.servers.spawn_server("rpl_master_gtid_aq", mysqld,
                                                  True)
         mysqld = MYSQL_OPTS_DEFAULT.format(port=self.servers.view_next_port(),
@@ -84,7 +84,7 @@ class test(rpl_sync.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-         # Mask out non-deterministic data
+        # Mask out non-deterministic data
         self.do_masks()
 
         return True

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -122,5 +122,6 @@ class test(mutlib.System_test):
         if self.res_fname:
             os.unlink(self.res_fname)
         # Drop databases and kill spawned servers
-        return (self.drop_all() and self.kill_server(self.server1.role)
-                and self.kill_server(self.server2.role))
+        return (self.drop_all() and
+                self.kill_server(self.server1.role) and
+                self.kill_server(self.server2.role))

@@ -23,9 +23,6 @@ metadata for objects in a database and data for tables.
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import multiprocessing
 import os
 import shutil
@@ -51,6 +48,9 @@ from mysql.utilities.common.tools import (check_connector_python,
 
 from mysql.utilities.exception import FormatError
 from mysql.utilities.exception import UtilError
+
+# Check Python version compatibility
+check_python_version()
 
 # Constants
 NAME = "MySQL Utilities - mysqldbexport "
@@ -230,8 +230,8 @@ if __name__ == '__main__':
 
     # Warning for non-posix (windows) systems if too many process are used.
     num_db = len(args)
-    if (os.name != 'posix' and num_db and opt.multiprocess > num_db
-            and not opt.quiet):
+    if (os.name != 'posix' and num_db and opt.multiprocess > num_db and
+            not opt.quiet):
         print("# WARNING: Number of processes '{0}' is greater than the "
               "number of databases to export '{1}'.".format(opt.multiprocess,
                                                             num_db))

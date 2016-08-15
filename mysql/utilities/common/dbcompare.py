@@ -695,10 +695,10 @@ def diff_objects(server1, server2, object1, object2, options, object_type):
 
     # Check for failure to generate SQL statements
     if (difftype == 'sql') and \
-       ((direction == 'server1' and transform_server1 == []
-         and diff_server1 != []) or
-        (direction == 'server2' and transform_server2 == []
-         and diff_server2 != [])):
+       ((direction == 'server1' and transform_server1 == [] and
+         diff_server1 != []) or
+        (direction == 'server2' and transform_server2 == [] and
+         diff_server2 != [])):
 
         # Here we found no transformations. So either the change is nothing
         # more than the database name or we missed something. Send a

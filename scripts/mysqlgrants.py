@@ -36,10 +36,10 @@ from mysql.utilities.common.tools import (check_python_version,
 # Check Python version compatibility
 from mysql.utilities.exception import UtilError, FormatError
 
-check_python_version()
-
 import os
 import sys
+
+check_python_version()
 
 # Check for connector/python
 if not check_connector_python():

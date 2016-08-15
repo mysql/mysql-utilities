@@ -23,9 +23,6 @@ definitions of two objects and return the difference (like diff).
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import os
 import re
 import sys
@@ -49,6 +46,8 @@ from mysql.utilities.common.options import (add_difftype, add_verbosity,
                                             check_password_security)
 from mysql.utilities.common.server import connect_servers
 
+# Check Python version compatibility
+check_python_version()
 
 # Constants
 NAME = "MySQL Utilities - mysqldiff "

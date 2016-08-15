@@ -362,7 +362,7 @@ class ReplicationMultiSource(Daemon):
             try:
                 (r_user, r_pass,) = parse_user_password(self.rpl_user)
             except FormatError:
-                raise UtilError (USER_PASSWORD_FORMAT.format("--rpl-user"))
+                raise UtilError(USER_PASSWORD_FORMAT.format("--rpl-user"))
 
             # Switch master and start slave
             slave.switch_master(master, r_user, r_pass)

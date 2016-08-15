@@ -23,9 +23,6 @@ perform replication operations on one or more slaves.
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import logging
 import os
 import signal
@@ -48,6 +45,8 @@ from mysql.utilities.common.options import (add_failover_options,
                                             check_password_security,
                                             check_script_option)
 
+# Check Python version compatibility
+check_python_version()
 
 # Constants
 NAME = "MySQL Utilities - mysqlfailover "
@@ -205,7 +204,7 @@ if __name__ == '__main__':
     # need to tune for a particular failover scenario. See BUG#22932375
     # for more details.
     parser.add_option("--connection-timeout", action="store", type="int",
-                      dest = "conn_timeout", default = None, help = "set the "
+                      dest="conn_timeout", default=None, help="set the "
                       "connection timeout for TCP and Unix socket "
                       "connections for all master, slaves, and candidate "
                       "slaves specified. Default is 10 as provided in the "

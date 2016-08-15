@@ -680,8 +680,8 @@ class SQLTransformer(object):
 
         # Check to see if previous column has been added. If it has,
         # don't include the BEFORE|AFTER - it will be ordered correctly.
-        if (src_loc_idx - 1 >= 0
-           and source[src_loc_idx - 1][_COLUMN_NAME] in add_cols):
+        if (src_loc_idx - 1 >= 0 and
+                source[src_loc_idx - 1][_COLUMN_NAME] in add_cols):
             return ""
 
         # compare ordinal position - if not the same find where it goes
@@ -1059,8 +1059,8 @@ class SQLTransformer(object):
         elif len(destination_row) == 0:
             return None
         elif len(destination_row) == 1:
-            if not (destination_row[0][3] is None
-                    and source_row[0][3] is None):
+            if not (destination_row[0][3] is None and
+                    source_row[0][3] is None):
                 part_changes_found = True
         else:
             part_stop = len(destination_row)

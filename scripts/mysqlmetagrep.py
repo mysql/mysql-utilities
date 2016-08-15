@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,9 +22,6 @@ This file contains the metagrep utility which allows users to search metadata.
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import os.path
 import re
 import sys
@@ -37,6 +34,9 @@ from mysql.utilities.common.options import (add_regexp, setup_common_options,
                                             get_ssl_dict,
                                             check_password_security)
 from mysql.utilities.exception import UtilError
+
+# Check Python version compatibility
+check_python_version()
 
 # Check for connector/python
 if not check_connector_python():

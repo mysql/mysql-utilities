@@ -23,9 +23,6 @@ on two databases.
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import os
 import re
 import sys
@@ -61,6 +58,8 @@ from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting,
                                                   quote_with_backticks)
 
+# Check Python version compatibility
+check_python_version()
 
 # Constants
 NAME = "MySQL Utilities - mysqldbcompare "
@@ -305,7 +304,7 @@ if __name__ == '__main__':
         server2_sql_mode = ''
 
     ukey_regex_server1 = REGEXP_OBJ_NAME
-    if  "ANSI_QUOTES" in server1_sql_mode:
+    if "ANSI_QUOTES" in server1_sql_mode:
         ukey_regex_server1 = REGEXP_OBJ_NAME_AQ
 
     ukey_regex_server2 = REGEXP_OBJ_NAME

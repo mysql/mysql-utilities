@@ -88,7 +88,7 @@ class test(copy_user.test):
         self.remove_result("GRANT ALL PRIVILEGES ON *.* TO 'root'")
         self.remove_result("GRANT PROXY ON ''@'' TO 'root'")
         self.remove_result("# Cannot show grants for user")
-        
+
         # The mysql.sys user is only on 5.7.9+
         self.remove_result("mysql.sys,")
         self.remove_result("# Dumping grants for user 'mysql.sys'@'localhost'")

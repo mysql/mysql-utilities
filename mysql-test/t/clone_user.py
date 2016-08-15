@@ -228,8 +228,7 @@ class test(mutlib.System_test):
         comment = ("Test case {0} - mysqluserclone clone user "
                    "with authentication plugin".format(test_num))
         cmd_str = ("mysqluserclone.py {0} jillnopass@localhost"
-                   " jakenopass@localhost ".format(
-            from_conn))
+                   " jakenopass@localhost ".format(from_conn))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -297,8 +296,7 @@ class test(mutlib.System_test):
         users = ["'joe_pass'@'%'", "joe_pass@user", "'joe_nopass'@'user'",
                  "'amy_nopass'@'user'", "'jill'@'user'", "'jack'@'user'",
                  "'john'@'user'", "'joe_wildcard'@'%'", "'remote'@'%'",
-                 "jillnopass@localhost", "jakenopass@localhost",]
-
+                 "jillnopass@localhost", "jakenopass@localhost", ]
         dropped_users = [self.drop_user(user, self.server1) for user in users]
 
         return all(dropped_users)

@@ -23,9 +23,6 @@ is exactly the same among two servers.
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import multiprocessing
 import os
 import re
@@ -53,6 +50,9 @@ from mysql.utilities.common.sql_transform import (is_quoted_with_backticks,
                                                   remove_backtick_quoting)
 from mysql.utilities.common.tools import (check_connector_python,
                                           print_elapsed_time)
+
+# Check Python version compatibility
+check_python_version()
 
 # Constants
 NAME = "MySQL Utilities - mysqldbcopy "
@@ -191,8 +191,8 @@ if __name__ == '__main__':
 
     # Warning for non-posix (windows) systems if too many process are used.
     num_db = len(args)
-    if (os.name != 'posix' and num_db and opt.multiprocess > num_db
-            and not opt.quiet):
+    if (os.name != 'posix' and num_db and opt.multiprocess > num_db and
+            not opt.quiet):
         print("# WARNING: Number of processes '{0}' is greater than the "
               "number of databases to copy '{1}'.".format(opt.multiprocess,
                                                           num_db))

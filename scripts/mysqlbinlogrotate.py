@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,9 +22,6 @@ This file contains the rotate binlog utility. It is used to rotate binary logs.
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import os
 import sys
 
@@ -35,6 +32,8 @@ from mysql.utilities.common.options import setup_common_options
 from mysql.utilities.common.options import add_verbosity, get_ssl_dict
 from mysql.utilities.exception import UtilError, FormatError
 
+# Check Python version compatibility
+check_python_version()
 
 # Constants
 NAME = "MySQL Utilities - mysqlbinlogrotate "

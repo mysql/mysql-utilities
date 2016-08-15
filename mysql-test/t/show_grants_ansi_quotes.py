@@ -113,5 +113,5 @@ class test(show_grants.test):
 
     def cleanup(self):
         kill_list = ["show_grants_srv_ansi_quotes"]
-        return (show_grants.test.cleanup(self)
-                and self.kill_server_list(kill_list))
+        return (show_grants.test.cleanup(self) and
+                self.kill_server_list(kill_list))

@@ -595,8 +595,8 @@ def _export_table_data(source_srv, table, output_file, options):
     # then rows won't be correctly copied using the update statement,
     # so we must warn the user.
     if (not skip_blobs and frmt == "sql" and
-            (cur_table.blob_columns == len(cur_table.column_names)
-             or (not unique_indexes and cur_table.blob_columns))):
+        (cur_table.blob_columns == len(cur_table.column_names) or
+            (not unique_indexes and cur_table.blob_columns))):
         print("# WARNING: Table {0}.{1} contains only BLOB and TEXT "
               "fields. Rows will be generated with separate INSERT "
               "statements.".format(cur_table.db_name, cur_table.tbl_name))

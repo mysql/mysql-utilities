@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,9 +24,6 @@ from specific users, search patterns, date ranges, or query types).
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import os.path
 import sys
 
@@ -44,6 +41,9 @@ from mysql.utilities.common.options import (add_verbosity, add_regexp,
                                             license_callback,
                                             UtilitiesParser,
                                             check_password_security)
+
+# Check Python version compatibility
+check_python_version()
 
 
 class MyParser(UtilitiesParser):
@@ -159,8 +159,8 @@ if __name__ == '__main__':
     def exist_search_criteria():
         """Return true if at least one search criteria is specified.
         """
-        return (opt.users or opt.start_date or opt.end_date or opt.pattern
-                or opt.query_type or opt.event_type or opt.status)
+        return (opt.users or opt.start_date or opt.end_date or opt.pattern or
+                opt.query_type or opt.event_type or opt.status)
 
     # Parse the command line arguments.
     opt, args = parser.parse_args()

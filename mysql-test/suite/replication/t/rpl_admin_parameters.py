@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -245,5 +245,5 @@ class test(rpl_admin.test):
             pass
         # Kill the servers that are only for this test.
         kill_list = ['no_slaved']
-        return (rpl_admin.test.cleanup(self)
-                and self.kill_server_list(kill_list))
+        return (rpl_admin.test.cleanup(self) and
+                self.kill_server_list(kill_list))

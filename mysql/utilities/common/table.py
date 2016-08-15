@@ -346,7 +346,8 @@ class Table(object):
             self.table = ".".join([self.db_name, self.tbl_name])
         else:
             self.table = name
-            self.db_name, self.tbl_name = parse_object_name(name, self.sql_mode)
+            self.db_name, self.tbl_name = parse_object_name(name,
+                                                            self.sql_mode)
             self.q_db_name = quote_with_backticks(self.db_name, self.sql_mode)
             self.q_tbl_name = quote_with_backticks(self.tbl_name,
                                                    self.sql_mode)
@@ -444,8 +445,8 @@ class Table(object):
                     self.q_column_names.append(
                         quote_with_backticks(columns[col][0], self.sql_mode))
                 col_type = columns[col][1].lower()
-                if ('char' in col_type or 'enum' in col_type
-                        or 'set' in col_type or 'binary' in col_type):
+                if ('char' in col_type or 'enum' in col_type or
+                        'set' in col_type or 'binary' in col_type):
                     self.text_columns.append(col)
                     col_format_values[col] = "'%s'"
                 elif 'blob' in col_type or 'text'in col_type:
@@ -549,8 +550,8 @@ class Table(object):
                  idx.unique]
             )
             no_null_idxes.extend(
-                [idx for idx in self.fulltext_indexes if not idx.accept_nulls
-                 and idx.unique]
+                [idx for idx in self.fulltext_indexes
+                 if not idx.accept_nulls and idx.unique]
             )
             self.unique_not_null_indexes = no_null_idxes
 
@@ -662,8 +663,9 @@ class Table(object):
         # If all columns are blobs or there aren't any UNIQUE NOT NULL indexes
         # then rows won't be correctly copied using the update statement,
         # so we must use insert statements instead.
-        if not skip_blobs and (len(self.blob_columns) == len(self.column_names)
-                               or self.blob_columns and not unique_indexes):
+        if not skip_blobs and \
+                (len(self.blob_columns) == len(self.column_names) or
+                 self.blob_columns and not unique_indexes):
             blob_inserts.append(self._build_insert_blob(row, new_db,
                                                         self.q_tbl_name))
             is_blob_insert = True

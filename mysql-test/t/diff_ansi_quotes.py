@@ -325,5 +325,4 @@ class test(diff.test):
         # Kill the servers that are only for this test.
         kill_list = ["diff_srv1_ansi_quotes",
                      "diff_srv2_ansi_quotes"]
-        return (self.drop_all()
-                and self.kill_server_list(kill_list))
+        return (self.drop_all() and self.kill_server_list(kill_list))

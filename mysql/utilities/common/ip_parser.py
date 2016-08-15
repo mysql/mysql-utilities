@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -679,8 +679,8 @@ def _verify_parsing(connection_str, host, port, socket, address_type,
             diff = diff.replace(socket, "")
         log.debug("diff {0}".format(diff))
     log.debug("unparsed {0}".format(unparsed))
-    if unparsed or (exp_connection_str != parsed_connection
-                    and (diff and diff != ":")):
+    if unparsed or (exp_connection_str != parsed_connection and
+                    (diff and diff != ":")):
         log.debug("raising exception")
         parsed_args = "host:%s, port:%s, socket:%s" % (host, port, socket)
         log.debug(_UNPARSED_CONN_FORMAT.format(connection_str,

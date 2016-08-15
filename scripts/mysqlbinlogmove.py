@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,9 +23,6 @@ files to a different location, updating the binlog index files accordingly.
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import os
 import sys
 
@@ -45,6 +42,9 @@ from mysql.utilities.common.options import (add_verbosity, check_date_time,
                                             setup_common_options)
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.exception import FormatError, UtilError
+
+# Check Python version compatibility
+check_python_version()
 
 # Check for connector/python
 if not check_connector_python():

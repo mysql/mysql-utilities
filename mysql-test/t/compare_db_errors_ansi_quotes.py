@@ -73,5 +73,5 @@ class test(compare_db_errors.test):
         # Kill the servers that are only for this test.
         kill_list = ["compare_db_srv1_ansi_quotes",
                      "compare_db_srv2_ansi_quotes"]
-        return (compare_db_errors.test.cleanup(self)
-                and self.kill_server_list(kill_list))
+        return (compare_db_errors.test.cleanup(self) and
+                self.kill_server_list(kill_list))

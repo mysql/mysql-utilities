@@ -299,8 +299,8 @@ def read_next(file_h, fmt):
             elif multiline:  # Save multiple line statements.
                 sql_cmd = "{0}{1}".format(sql_cmd, row)
             # Identify specific statements (command types).
-            elif (len(row) > _GTID_PREFIX
-                  and row[0:_GTID_PREFIX] in _GTID_COMMANDS):
+            elif (len(row) > _GTID_PREFIX and
+                    row[0:_GTID_PREFIX] in _GTID_COMMANDS):
                 # Remove trailing whitespaces and delimiter.
                 sql_cmd = sql_cmd.rstrip()[0:-len(delimiter)]
                 if len(sql_cmd) > 0:
@@ -418,8 +418,8 @@ def read_next(file_h, fmt):
                 continue
             else:
                 # We're reading rows here
-                if (len(row[0]) > 0
-                   and (row[0][0] == "#" or row[0][0:2] == "--")):
+                if (len(row[0]) > 0 and
+                        (row[0][0] == "#" or row[0][0:2] == "--")):
                     continue
                 else:
                     # skip column_names only if we're not dealing with DATA
@@ -445,8 +445,8 @@ def _get_db(row):
             # Identify the database name in statements:
             # DROP {DATABASE | SCHEMA} [IF EXISTS] db_name
             # CREATE {DATABASE | SCHEMA} [IF NOT EXISTS] db_name
-            if (parts[0] in ('DROP', 'CREATE')
-               and parts[1] in ('DATABASE', 'SCHEMA')):
+            if (parts[0] in ('DROP', 'CREATE') and
+                    parts[1] in ('DATABASE', 'SCHEMA')):
                 db_name = parts[len(parts) - 1].rstrip().strip(";")
             # USE db_name
             elif parts[0] == 'USE':
@@ -1070,9 +1070,9 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
     for statement in statements:
         # Each statement can be either a string or a list of strings (BLOB
         # statements).
-        if (isinstance(statement, str)
-                and (new_engine is not None or def_engine is not None)
-                and statement[0:12].upper() == "CREATE TABLE"):
+        if (isinstance(statement, str) and
+            (new_engine is not None or def_engine is not None) and
+                statement[0:12].upper() == "CREATE TABLE"):
             # Add statements to substitute engine.
             i = statement.find(' ', 13)
             tbl_name = statement[13:i]
@@ -1082,8 +1082,8 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
         elif bulk_insert:
             # Bulk insert (if possible) to execute as a single statement.
             # Need to guard against lists of BLOB statements.
-            if (isinstance(statement, str)
-                    and statement[0:6].upper().startswith('INSERT')):
+            if (isinstance(statement, str) and
+                    statement[0:6].upper().startswith('INSERT')):
                 # Parse INSERT statement.
                 insert_start, values = _parse_insert_statement(statement,
                                                                re_value_split)

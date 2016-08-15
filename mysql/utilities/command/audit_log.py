@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2015 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2016 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -326,8 +326,8 @@ class AuditLog(object):
 
         command_value = self.options.get("value", None)
         # Check for valid value if needed
-        if (command_requires_value(command)
-           and not check_command_value(command, command_value)):
+        if (command_requires_value(command) and
+                not check_command_value(command, command_value)):
             raise UtilError("Please provide the correct value for the %s "
                             "command." % command)
 
