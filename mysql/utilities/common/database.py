@@ -1006,7 +1006,8 @@ class Database(object):
         # set with SQL_MODE='NO_BACKSLASH_ESCAPES'
         prev_sql_mode = ''
         if (self.destination is not None and 'ANSI_QUOTES' in self.sql_mode and
-            'ANSI_QUOTES' not in self.destination.select_variable("SQL_MODE")):
+                'ANSI_QUOTES' not in
+                self.destination.select_variable("SQL_MODE")):
             prev_sql_mode = self.source.select_variable("SQL_MODE")
             self.source.exec_query("SET @@SESSION.SQL_MODE=''")
             self.sql_mode = ""

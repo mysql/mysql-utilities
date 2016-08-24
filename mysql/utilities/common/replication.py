@@ -178,9 +178,10 @@ def negotiate_rpl_connection(server, is_master=True, strict=True,
             else:
                 # Parse username and password (supports login-paths)
                 try:
-                    uname, passwd = parse_user_password(rpl_user, options=options)
+                    uname, passwd = parse_user_password(rpl_user,
+                                                        options=options)
                 except FormatError as fmt_err:
-                    raise UtilError (USER_PASSWORD_FORMAT.format("--rpl-user"))
+                    raise UtilError(USER_PASSWORD_FORMAT.format("--rpl-user"))
                 if not passwd:
                     passwd = ''
 
@@ -574,7 +575,7 @@ class Replication(object):
         try:
             r_user, r_pass = parse_user_password(rpl_user)
         except FormatError as fmt_err:
-            raise UtilError (USER_PASSWORD_FORMAT.format("--rpl-user"))
+            raise UtilError(USER_PASSWORD_FORMAT.format("--rpl-user"))
 
         # Check to see if rpl_user is present, else create her
         if not self.create_rpl_user(r_user, r_pass)[0]:
@@ -1580,8 +1581,8 @@ class Slave(Server):
         rpl_wild_do_table = res[0][_SLAVE_WILD_DO_TABLE]
         rpl_wild_ignore_table = res[0][_SLAVE_WILD_IGNORE_TABLE]
 
-        if (rpl_do_db or rpl_ignore_db or rpl_do_table or rpl_ignore_table
-                or rpl_wild_do_table or rpl_wild_ignore_table):
+        if (rpl_do_db or rpl_ignore_db or rpl_do_table or rpl_ignore_table or
+                rpl_wild_do_table or rpl_wild_ignore_table):
             return (rpl_do_db, rpl_ignore_db, rpl_do_table, rpl_ignore_table,
                     rpl_wild_do_table, rpl_wild_ignore_table)
         else:

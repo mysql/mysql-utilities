@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,9 +22,6 @@ multi-source replication topology.
 """
 
 from mysql.utilities.common.tools import check_python_version
-
-# Check Python version compatibility
-check_python_version()
 
 import os.path
 import sys
@@ -50,6 +47,8 @@ from mysql.utilities.common.my_print_defaults import MyDefaultsReader
 from mysql.utilities.command.rpl_admin import purge_log
 from mysql.utilities.command.setup_rpl import start_ms_replication
 
+# Check Python version compatibility
+check_python_version()
 
 # Constants
 NAME = "MySQL Utilities - mysqlrplms "

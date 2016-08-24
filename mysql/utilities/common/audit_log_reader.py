@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -114,16 +114,17 @@ class AuditLogReader(object):
                 multiline = True
                 next_line = line
                 continue
-            elif (line.lstrip().startswith('<AUDIT_RECORD')
-                  and not line.endswith('/>\n')):
+            elif (line.lstrip().startswith('<AUDIT_RECORD') and
+                  not line.endswith('/>\n')):
                 # Found (first) record line in the old format.
                 next_line = "{0} ".format(line.strip('\n'))
                 if not line.endswith('/>\n'):
                     multiline = True
                     continue
             elif multiline:
-                if ((new_format and line.strip().endswith('</AUDIT_RECORD>'))
-                        or (not new_format and line.endswith('/>\n'))):
+                if ((new_format and
+                    line.strip().endswith('</AUDIT_RECORD>')) or
+                        (not new_format and line.endswith('/>\n'))):
                     # Detect end of record in the old and new format and
                     # append last record line.
                     next_line += line

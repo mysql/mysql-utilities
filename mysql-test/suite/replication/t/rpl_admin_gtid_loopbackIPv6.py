@@ -276,5 +276,5 @@ class test(rpl_admin.test):
                      'rep_slave1_gtid_loopback_ipv6',
                      'rep_slave2_gtid_loopback_ipv6',
                      'rep_slave3_gtid_loopback_ipv6']
-        return (rpl_admin.test.cleanup(self)
-                and self.kill_server_list(kill_list))
+        return (rpl_admin.test.cleanup(self) and
+                self.kill_server_list(kill_list))

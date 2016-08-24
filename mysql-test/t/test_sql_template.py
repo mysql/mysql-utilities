@@ -167,8 +167,8 @@ class test(mutlib.System_test):
                 try:
                     self.servers.spawn_new_servers(2)
                 except MUTLibError as err:
-                    raise MUTLibError("Cannot spawn needed servers: {0}".format(
-                        err.errmsg))
+                    raise MUTLibError("Cannot spawn needed servers:"
+                                      " {0}".format(err.errmsg))
         if self.server2 is None:
             self.server2 = self.servers.get_server(1)
 

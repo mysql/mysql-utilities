@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,9 +25,6 @@ or all tables in all databases except internal databases.
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import os.path
 import sys
 
@@ -40,6 +37,8 @@ from mysql.utilities.common.options import (add_verbosity, add_format_option,
                                             get_ssl_dict, setup_common_options,
                                             check_password_security)
 
+# Check Python version compatibility
+check_python_version()
 
 # Constants
 DESCRIPTION = "mysqlindexcheck - check for duplicate or redundant indexes"

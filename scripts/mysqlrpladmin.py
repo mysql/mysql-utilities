@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,9 +22,6 @@ perform replication operations on one or more slaves.
 """
 
 from mysql.utilities.common.tools import check_python_version
-
-# Check Python version compatibility
-check_python_version()
 
 import logging
 import os.path
@@ -59,6 +56,9 @@ from mysql.utilities.common.messages import (PARSE_ERR_OPT_INVALID_CMD_TIP,
 from mysql.utilities.command.rpl_admin import (RplCommands, purge_log,
                                                get_valid_rpl_commands,
                                                get_valid_rpl_command_text)
+
+# Check Python version compatibility
+check_python_version()
 
 
 class MyParser(UtilitiesParser):

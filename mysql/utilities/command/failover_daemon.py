@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -570,8 +570,8 @@ class FailoverDaemon(Daemon):
                 failover_mode = self.register_instance()
 
             # discover slaves if option was specified at startup
-            elif (self.options.get("discover", None) is not None
-                  and not first_pass):
+            elif (self.options.get("discover", None) is not None and
+                  not first_pass):
                 # Force refresh of health list if new slaves found
                 if self.rpl.topology.discover_slaves():
                     self.list_data = None

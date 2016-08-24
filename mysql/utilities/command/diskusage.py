@@ -706,8 +706,8 @@ def show_log_usage(server, datadir, options):
         else:
             # Requires SUPER for server < 5.6.6 or also REPLICATION CLIENT for
             # server >= 5.6.6 to execute: SHOW BINARY LOGS.
-            if (server.check_version_compat(5, 6, 6)
-               and not has_super and not has_rpl_client):
+            if (server.check_version_compat(5, 6, 6) and
+                    not has_super and not has_rpl_client):
                 print("# {0} information not accessible. User must have the "
                       "SUPER or REPLICATION CLIENT "
                       "privilege.".format(log_type.capitalize()))

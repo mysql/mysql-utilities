@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -297,5 +297,5 @@ class test(rpl_admin.test):
         kill_list = ['rep_master_gtid', 'rep_slave1_gtid', 'rep_slave2_gtid',
                      'rep_slave3_gtid', 'rep_slave4_gtid',
                      'rep_master_gtid_off', 'rep_slave_gtid_off']
-        return (rpl_admin.test.cleanup(self)
-                and self.kill_server_list(kill_list))
+        return (rpl_admin.test.cleanup(self) and
+                self.kill_server_list(kill_list))

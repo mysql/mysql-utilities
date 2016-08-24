@@ -297,5 +297,5 @@ class test(rpl_admin.test):
         # Kill the servers that are only for this test.
         kill_list = ['rep_master_gtid_loopback', 'rep_slave1_gtid_loopback',
                      'rep_slave2_gtid_loopback', 'rep_slave3_gtid_loopback']
-        return (rpl_admin.test.cleanup(self)
-                and self.kill_server_list(kill_list))
+        return (rpl_admin.test.cleanup(self) and
+                self.kill_server_list(kill_list))

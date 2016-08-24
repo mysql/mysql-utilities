@@ -311,7 +311,8 @@ def _get_max_key_dict_list(dictionary_list, key, alias_key=None):
 
     Returns int - max width of key
     """
-    lcal = lambda x: len(str(x or ''))
+    def lcal(x):
+        return len(str(x or ''))
     dl = dictionary_list
     tmp = [(lcal(item[key]), lcal(item.get(alias_key, 0))) for item in dl]
     return max([(x[0] + x[1] + 3) if x[1] else x[0] for x in tmp])

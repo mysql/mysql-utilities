@@ -388,9 +388,10 @@ class Topology(Replication):
 
         # Get user and password (support login-path)
         try:
-            user, password = parse_user_password(discover, options=self.options)
+            user, password = parse_user_password(discover,
+                                                 options=self.options)
         except FormatError:
-            raise UtilError (USER_PASSWORD_FORMAT.format("--discover-slaves"))
+            raise UtilError(USER_PASSWORD_FORMAT.format("--discover-slaves"))
 
         # Find discovered slaves
         new_slaves_found = False
@@ -586,9 +587,10 @@ class Topology(Replication):
 
         # Get user and password (support login-path)
         try:
-            user, passwd = parse_user_password(self.rpl_user, options=self.options)
+            user, passwd = parse_user_password(self.rpl_user,
+                                               options=self.options)
         except FormatError:
-            raise UtilError (USER_PASSWORD_FORMAT.format("--rpl-user"))
+            raise UtilError(USER_PASSWORD_FORMAT.format("--rpl-user"))
         return (user, passwd)
 
     def run_script(self, script, quiet, options=None):
@@ -773,7 +775,7 @@ class Topology(Replication):
             try:
                 user, _ = parse_user_password(self.rpl_user)
             except FormatError:
-                raise UtilError (USER_PASSWORD_FORMAT.format("--rpl-user"))
+                raise UtilError(USER_PASSWORD_FORMAT.format("--rpl-user"))
 
             # Make new master forget was a slave using slave methods
             s_candidate = self._change_role(slave, slave=False)
@@ -994,8 +996,8 @@ class Topology(Replication):
                                                                    port=s_port)
                 # Print warning or raise an error according to the default
                 # failover behavior and defined options.
-                if ((stop_on_error and not self.force)
-                   or (not stop_on_error and self.pedantic)):
+                if ((stop_on_error and not self.force) or
+                        (not stop_on_error and self.pedantic)):
                     print("# ERROR: {0}".format(msg))
                     self._report(msg, logging.CRITICAL, False)
                     if stop_on_error and not self.force:
@@ -1021,8 +1023,8 @@ class Topology(Replication):
                        "slave.").format(host=s_host, port=s_port)
                 # Print warning or raise an error according to the default
                 # failover behavior and defined options.
-                if ((stop_on_error and not self.force)
-                   or (not stop_on_error and self.pedantic)):
+                if ((stop_on_error and not self.force) or
+                        (not stop_on_error and self.pedantic)):
                     print("# ERROR: {0}".format(msg))
                     self._report(msg, logging.CRITICAL, False)
                     if stop_on_error and not self.force:
@@ -1059,8 +1061,8 @@ class Topology(Replication):
                            "replication-problems.html")
                 # Print warning or raise an error according to the default
                 # failover behavior and defined options.
-                if ((stop_on_error and not self.force)
-                   or (not stop_on_error and self.pedantic)):
+                if ((stop_on_error and not self.force) or
+                        (not stop_on_error and self.pedantic)):
                     print("# ERROR: {0}".format(msg))
                     self._report(msg, logging.CRITICAL, False)
                     print("# {0}".format(msg_thread))

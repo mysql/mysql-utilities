@@ -38,9 +38,11 @@ class test(export_basic.test):
         sql_mode = self.server0.show_server_variable("SQL_MODE")[0]
         if len(sql_mode[1]):
             raise MUTLibError("Test requires servers with sql_mode = ''.")
-        innodb_row_format = self.server0.show_server_variable("innodb_default_row_format")[0]
+        innodb_row_format = \
+            self.server0.show_server_variable("innodb_default_row_format")[0]
         if not innodb_row_format[1].upper() == "COMPACT":
-            raise MUTLibError("Test requires servers with innodb_default_row_format = 'COMPACT'.")
+            raise MUTLibError("Test requires servers with"
+                              " innodb_default_row_format = 'COMPACT'.")
         return export_basic.test.check_prerequisites(self)
 
     def setup(self):
@@ -286,12 +288,18 @@ class test(export_basic.test):
         self.mask_column_result("| util_test  | f2", "|", 15,
                                 " XXXX-XX-XX XX:XX:XX  ")
         # Fix MySQL 5.7 output differences
-        self.replace_result("+------------------+-----------------+---------------+---------------------+",
-                            "+------------------+-----------------+---------------+---------------------+\n")
-        self.replace_result("| None             | util_test       | trg           | INSERT",
-                            "| None             | util_test       | trg           | INSERT\n")
-        self.replace_result("| TRIGGER_CATALOG  | TRIGGER_SCHEMA  | TRIGGER_NAME  |",
-                            "| TRIGGER_CATALOG  | TRIGGER_SCHEMA  | TRIGGER_NAME  |\n")
+        self.replace_result("+------------------+-----------------+"
+                            "---------------+---------------------+",
+                            "+------------------+-----------------+"
+                            "---------------+---------------------+\n")
+        self.replace_result("| None             | util_test       |"
+                            "trg           | INSERT",
+                            "| None             | util_test       |"
+                            "trg           | INSERT\n")
+        self.replace_result("| TRIGGER_CATALOG  | TRIGGER_SCHEMA  |"
+                            " TRIGGER_NAME  |",
+                            "| TRIGGER_CATALOG  | TRIGGER_SCHEMA  |"
+                            " TRIGGER_NAME  |\n")
 
     def _mask_csv(self):
         """Masks CSV.
@@ -449,7 +457,8 @@ class test(export_basic.test):
         self.replace_result("               ACTION_ORDER:",
                             "               ACTION_ORDER: X\n")
         self.replace_result("                    CREATED:",
-                            "                    CREATED: XXXX-XX-XX XX:XX:XX\n")
+                            "                    CREATED: "
+                            "XXXX-XX-XX XX:XX:XX\n")
 
     def get_result(self):
         return self.compare(__name__, self.results)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -101,31 +101,31 @@ class AuditLogParser(AuditLogReader):
                     matching_record = False
 
             # Check if record matches event type criteria
-            if (matching_record and self.options['event_type']
-                and not self.match_event_type(record,
+            if (matching_record and self.options['event_type'] and
+                    not self.match_event_type(record,
                                               self.options['event_type'])):
                 matching_record = False
 
             # Check if record matches status criteria
-            if (matching_record and self.options['status']
-               and not self.match_status(record, self.options['status'])):
+            if (matching_record and self.options['status'] and
+                    not self.match_status(record, self.options['status'])):
                 matching_record = False
 
             # Check if record matches datetime range criteria
-            if (matching_record
-                and not self.match_datetime_range(record,
+            if (matching_record and
+                    not self.match_datetime_range(record,
                                                   self.options['start_date'],
                                                   self.options['end_date'])):
                 matching_record = False
 
             # Check if record matches query type criteria
-            if (matching_record and self.options['query_type']
-               and not self.match_query_type(record)):
+            if (matching_record and self.options['query_type'] and
+                    not self.match_query_type(record)):
                 matching_record = False
 
             # Search attributes values for matching pattern
-            if (matching_record and self.regexp_pattern
-               and not self.match_pattern(record)):
+            if (matching_record and self.regexp_pattern and
+                    not self.match_pattern(record)):
                 matching_record = False
 
             # Store record into resulting rows (i.e., survived defined filters)

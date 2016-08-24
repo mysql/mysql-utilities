@@ -209,5 +209,5 @@ class test(replicate.test):
     def cleanup(self):
         # Kill the servers that are only for this test.
         kill_list = ['rep_slave_table']
-        return (replicate.test.cleanup(self)
-                and self.kill_server_list(kill_list))
+        return (replicate.test.cleanup(self) and
+                self.kill_server_list(kill_list))

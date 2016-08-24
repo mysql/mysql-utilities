@@ -447,9 +447,9 @@ class test(rpl_admin_gtid.test):
         test_num += 1
         self.test_cases.append(
             (self.server5, str_, False, FAILOVER_LOG.format('4'),
-            "Test case {0} - Simple failover with "
-            "--failover=fail and --connection-timeout=3.".format(test_num),
-            "Master has failed and not automatic (no slaves either)", True)
+                "Test case {0} - Simple failover with "
+                "--failover=fail and --connection-timeout=3.".format(test_num),
+                "Master has failed and not automatic (no slaves either)", True)
         )
 
         for test_case in self.test_cases:

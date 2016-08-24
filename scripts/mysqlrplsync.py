@@ -24,9 +24,6 @@ data if requested by the user).
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import os
 import sys
 
@@ -50,6 +47,9 @@ from mysql.utilities.common.server import (check_hostname_alias,
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.topology import parse_topology_connections
 from mysql.utilities.exception import UtilError, UtilRplError
+
+# Check Python version compatibility
+check_python_version()
 
 # Check for connector/python
 if not check_connector_python():

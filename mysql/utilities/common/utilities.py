@@ -569,4 +569,3 @@ def kill_process(pid, force=False, silent=False):
                     print("Unable to successfully kill process with PID "
                           "{0}".format(pid))
     return res
-

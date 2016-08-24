@@ -203,9 +203,10 @@ class TopologyMap(object):
 
         # Get user and password (supports login-paths)
         try:
-            user, password = parse_user_password(discover, options=self.options)
+            user, password = parse_user_password(discover,
+                                                 options=self.options)
         except FormatError:
-            raise UtilError (USER_PASSWORD_FORMAT.format("--discover-slaves"))
+            raise UtilError(USER_PASSWORD_FORMAT.format("--discover-slaves"))
 
         # Get replication topology
         slaves = master.get_slaves(user, password)

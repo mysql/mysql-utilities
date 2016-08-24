@@ -634,7 +634,6 @@ class User(object):
             return None
         return res[0][0]
 
-
     def clone(self, new_user, destination=None, globals_privs=False):
         """Clone the current user to the new user
 

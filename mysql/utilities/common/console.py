@@ -19,10 +19,6 @@
 This module contains classes and functions used to manage a console utility.
 """
 
-_COMMAND_COMPLETE = 0
-_OPTION_COMPLETE = 1
-_VARIABLE_COMPLETE = 2
-
 import os
 import sys
 import shlex
@@ -30,6 +26,10 @@ import shlex
 from mysql.utilities.common.format import print_dictionary_list
 from mysql.utilities.common.variables import Variables
 from mysql.utilities.exception import UtilError
+
+_COMMAND_COMPLETE = 0
+_OPTION_COMPLETE = 1
+_VARIABLE_COMPLETE = 2
 
 # TODO remove this pylint disable regarding duplicate keys
 # pylint: disable=W0109

@@ -28,6 +28,7 @@ import failover
 
 FAILOVER_LOG = "{0}fail_log.txt"
 
+
 class test(failover.test):
     """test replication failover console
     This test exercises the mysqlfailover utility master retry option.
@@ -66,7 +67,7 @@ class test(failover.test):
              "Master is still not reachable.", False)
         )
         for test_case in self.test_cases:
-            res = self.test_failover_console(test_case,60)
+            res = self.test_failover_console(test_case, 60)
             if res is not None:
                 self.test_results.append(res)
             else:

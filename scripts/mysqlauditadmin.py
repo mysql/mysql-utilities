@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,9 +24,6 @@ log file rotation, and copy log files to other locations).
 
 from mysql.utilities.common.tools import check_python_version
 
-# Check Python version compatibility
-check_python_version()
-
 import os.path
 import sys
 
@@ -46,6 +43,9 @@ from mysql.utilities.common.options import (add_ssl_options, add_verbosity,
                                             check_password_security)
 from mysql.utilities.common.tools import (check_connector_python,
                                           show_file_statistics)
+
+# Check Python version compatibility
+check_python_version()
 
 
 class MyParser(UtilitiesParser):
@@ -180,8 +180,8 @@ if __name__ == '__main__':
 
     # The --server option must be used with --show-options and/or a valid
     # command
-    if opt.server and (not opt.show_options
-                       and not command_requires_server(command)):
+    if opt.server and (not opt.show_options and
+                       not command_requires_server(command)):
         parser.error("The --server option requires --show-options and/or "
                      "a valid command.")
 
@@ -194,8 +194,8 @@ if __name__ == '__main__':
         parser.error("The --audit-log-name option is required for the {0} "
                      "command.".format(command))
 
-    if opt.log_name and (not opt.file_stats
-                         and not command_requires_log_name(command)):
+    if opt.log_name and (not opt.file_stats and
+                         not command_requires_log_name(command)):
         parser.error("The --audit-log-name option requires --file-stats "
                      "and/or a valid command.")
 

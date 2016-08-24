@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -147,5 +147,6 @@ class test(import_basic.test):
         if self.export_import_file:
             os.unlink(self.export_import_file)
         # Drop databases and kill spawned servers
-        return (self.drop_all() and self.kill_server(self.server1.role)
-                and self.kill_server(self.server2.role))
+        return (self.drop_all() and
+                self.kill_server(self.server1.role) and
+                self.kill_server(self.server2.role))
