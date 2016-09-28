@@ -104,6 +104,7 @@ class test(mutlib.System_test):
         self.remove_result_and_lines_around(
             "WARNING: Unable to get size information from 'stderr' "
             "for 'error log'.", lines_before=3, lines_after=1)
+        self.remove_result("# Warning: cannot get server version")
 
     def start_stop_newserver(self, delete_log=True, stop_server=True):
         """Start and stop new server.
