@@ -136,7 +136,7 @@ class test(mutlib.System_test):
                                 self.host_name, "::1", "0:0:0:0:0:0:0:1",
                                 "0::0:1", "[0::1]", "0::0:0:1"]
         # All elements of List of bad test cases are expected to return False.
-        self.bad_test_cases = ["[::2]", "host_local", "::2",
+        self.bad_test_cases = ["0.0.0.2", "[::2]", "host_local", "::2",
                                "0:0:0:0:0:0:0:2", "oracle.com", "TEST_DOMAIN",
                                "localhost.locodomain.loco.loco.loco.local"]
 
