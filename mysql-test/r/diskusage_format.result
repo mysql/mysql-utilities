@@ -19,11 +19,11 @@ Total database disk usage = XXXXXXX
 Test Case 3 : Testing disk space with GRID format 
 # Source on localhost: ... connected.
 # Database totals:
-+------------+---------+
-| db_name    |  total  |
-+------------+---------+
++----
+| db_name ... total
++----
 | util_test  | XXXXXX  |
-+------------+---------+
++----
 
 Total database disk usage = XXXXXXX
 
