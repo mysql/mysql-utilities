@@ -42,6 +42,15 @@ class test(mutlib.System_test):
     server1 = None
 
     def check_prerequisites(self):
+        self.server0 = self.servers.get_server(0)
+        res = self.server0.exec_query("SELECT PLUGIN_STATUS FROM "
+                                      "INFORMATION_SCHEMA.PLUGINS "
+                                      "WHERE plugin_name = "
+                                      "'mysql_no_login'")
+        if not res:
+            raise MUTLibError("Test requires the mysql_no_login plugin.")
+        if not srv.check_version_compat(5, 7, 6):
+            raise MUTLibError("Test requires server version 5.7.6 and later.")
         return self.check_num_servers(1)
 
     def setup(self):

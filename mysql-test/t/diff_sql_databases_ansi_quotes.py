@@ -21,6 +21,8 @@ diff_sql_databases test.
 
 import test_sql_template
 
+from mysql.utilities.exception import MUTLibError
+
 
 # (comment, def1, def2, expected result)
 _DATABASE_TESTS = [
@@ -49,8 +51,12 @@ class test(test_sql_template.test):
     """
 
     utility = None
+    server1 = None
 
     def check_prerequisites(self):
+        self.server0 = self.servers.get_server(0)
+        if not self.server0.check_version_compat(5, 6, 5):
+            raise MUTLibError("Test requires server version 5.6.5 and later.")
         return test_sql_template.test.check_prerequisites(self)
 
     def setup(self):
@@ -85,6 +91,8 @@ class test(test_sql_template.test):
         return True  # Not a comparative test
 
     def cleanup(self):
+        if not self.server1:
+            return True   # Nothing to do
         # Kill the servers that are only for this test.
         kill_list = ["diff_sql_srv1_ansi_quotes",
                      "diff_sql_srv2_ansi_quotes"]

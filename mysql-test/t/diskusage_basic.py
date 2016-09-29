@@ -148,6 +148,10 @@ class test(mutlib.System_test):
         self.replace_result("clone-bin.000001,", "clone-bin.000001,XXXX\n")
         self.replace_result("clone-bin.index,", "clone-bin.index,XXXX\n")
 
+        # Mask the grid output
+        self.replace_result("+----", "+----\n")
+        self.replace_result("| db_name ", "| db_name ... total\n")
+
     def run(self):
         self.mask_global = False  # Turn off global masks
         self.res_fname = "result.txt"

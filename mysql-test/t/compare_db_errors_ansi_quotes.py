@@ -44,6 +44,8 @@ class test(compare_db_errors.test):
 
     def setup(self):
         self.server0 = self.servers.get_server(0)
+        if not self.server0.check_version_compat(5, 6, 5):
+            raise MUTLibError("Test requires server version 5.6.5 and later.")
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server1 = self.servers.spawn_server("compare_db_srv1_ansi_quotes",
                                                  mysqld, True)
@@ -70,6 +72,8 @@ class test(compare_db_errors.test):
         return self.save_result_file(__name__, self.results)
 
     def cleanup(self):
+        if not self.server1:
+            return True   # Nothing to do
         # Kill the servers that are only for this test.
         kill_list = ["compare_db_srv1_ansi_quotes",
                      "compare_db_srv2_ansi_quotes"]

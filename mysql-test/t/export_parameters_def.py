@@ -35,6 +35,8 @@ class test(export_basic.test):
 
     def check_prerequisites(self):
         self.server0 = self.servers.get_server(0)
+        if not self.server0.check_version_compat(5, 7, 9):
+            raise MUTLibError("Test requires server version 5.7.9 and later.")
         sql_mode = self.server0.show_server_variable("SQL_MODE")[0]
         if len(sql_mode[1]):
             raise MUTLibError("Test requires servers with sql_mode = ''.")
