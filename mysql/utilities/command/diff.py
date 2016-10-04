@@ -20,8 +20,6 @@ This file contains the diff commands for finding the difference among
 the definitions of two databases.
 """
 
-import re
-
 from mysql.utilities.exception import UtilDBError
 from mysql.utilities.common.pattern_matching import parse_object_name
 from mysql.utilities.common.database import Database

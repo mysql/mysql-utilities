@@ -22,11 +22,10 @@ manage the audit log (i.e., view/edit control variables; perform on-demand
 log file rotation, and copy log files to other locations).
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os.path
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command import audit_log
@@ -151,7 +150,7 @@ if __name__ == '__main__':
         parser.error("You can only perform one command at a time.")
 
     # Valid command?
-    if args and not args[0].upper() in audit_log.VALID_COMMANDS:
+    if args and args[0].upper() not in audit_log.VALID_COMMANDS:
         parser.error("The command '%s' is not a valid command." % args[0])
 
     if args:
@@ -221,7 +220,7 @@ if __name__ == '__main__':
                      "file.")
 
     # The --copy-to option requires the command COPY
-    if opt.copy_location and not (command == "COPY"):
+    if opt.copy_location and (command != "COPY"):
         parser.error("The --copy-to option can only be used with the COPY "
                      "command.")
 
@@ -233,7 +232,7 @@ if __name__ == '__main__':
 
     # Check args for copy-to, file-stats
     if ((command and command == "COPY" and opt.copy_location) or
-       opt.file_stats) and not opt.log_name:
+            opt.file_stats) and not opt.log_name:
         parser.error("You must specify the --audit-log-name option for "
                      "copying log files or viewing file statistics.")
 

@@ -213,14 +213,14 @@ def _read_row(file_h, fmt, skip_comments=False):
                     yield new_row
             else:
                 if (len(row[0]) == 0 or row[0][0] != '#' or
-                    row[0][0:2] != "--") or ((row[0][0] == '#' or
-                                              row[0][0:2] == "--") and
-                                             not skip_comments):
+                        row[0][0:2] != "--") or ((row[0][0] == '#' or
+                                                  row[0][0:2] == "--") and
+                                                 not skip_comments):
                     yield row
 
     if warnings_found:
         print("CAUTION: The following warning messages were included in "
-              "the import file:".format(len(warnings_found)))
+              "the import file:")
         for row in warnings_found:
             print(row.strip('\n'))
 
@@ -235,10 +235,7 @@ def _check_for_object_list(row, obj_type):
                      False = object is not obj_type
     """
     if row[0:len(obj_type) + 2].upper() == "# %s" % obj_type:
-        if row.find("none found") < 0:
-            return True
-        else:
-            return False
+        return row.find("none found") < 0
     else:
         return False
 
@@ -285,6 +282,7 @@ def read_next(file_h, fmt):
                 delimiter = stripped_row[10:]
                 cmd_type = "sql"
                 # Enable/disable multi-line according to the found delimiter.
+                # pylint: disable=R0102
                 if delimiter != ';':
                     multiline = True
                 else:
@@ -300,7 +298,7 @@ def read_next(file_h, fmt):
                 sql_cmd = "{0}{1}".format(sql_cmd, row)
             # Identify specific statements (command types).
             elif (len(row) > _GTID_PREFIX and
-                    row[0:_GTID_PREFIX] in _GTID_COMMANDS):
+                  row[0:_GTID_PREFIX] in _GTID_COMMANDS):
                 # Remove trailing whitespaces and delimiter.
                 sql_cmd = sql_cmd.rstrip()[0:-len(delimiter)]
                 if len(sql_cmd) > 0:
@@ -380,7 +378,7 @@ def read_next(file_h, fmt):
                 continue
             # Check for basic command
             if (first_word == "" and
-               row[0][0:row[0].find(' ')].upper() in _BASIC_COMMANDS):
+                    row[0][0:row[0].find(' ')].upper() in _BASIC_COMMANDS):
                 yield("BASIC_COMMAND", row[0])
                 continue
             # Check to see if we have a marker for rows of objects or data
@@ -630,12 +628,12 @@ def _build_create_table(db_name, tbl_name, engine, columns, col_ref=None,
                         ref_rules = ' ON DELETE CASCADE'
                     if const_def[5] and const_def[5] == 'CASCADE':
                         ref_rules = '{0} ON UPDATE CASCADE'.format(ref_rules)
-                    key_str = (" CONSTRAINT {cstr} FOREIGN KEY ({fk}) "
-                               "REFERENCES {ref_schema}.{ref_table} "
-                               "({ref_column}){ref_rules}").format(
-                        cstr=const_name, fk=fkey, ref_schema=const_def[1],
-                        ref_table=const_def[2], ref_column=ref_key,
-                        ref_rules=ref_rules)
+                    key_str = (
+                        " CONSTRAINT {cstr} FOREIGN KEY ({fk}) REFERENCES "
+                        "{ref_schema}.{ref_table} ({ref_column}){ref_rules}"
+                    ).format(cstr=const_name, fk=fkey, ref_schema=const_def[1],
+                             ref_table=const_def[2], ref_column=ref_key,
+                             ref_rules=ref_rules)
                     const_strs.append(key_str)
 
     # Build remaining CREATE TABLE string
@@ -706,7 +704,7 @@ def _build_create_objects(obj_type, db, definitions, sql_mode=''):
                 obj_db = defn[col_ref.get("TABLE_SCHEMA", 0)]
                 obj_name = defn[col_ref.get("TABLE_NAME", 1)]
             if (obj_db == defn[col_ref.get("TABLE_SCHEMA", 0)] and
-               obj_name == defn[col_ref.get("TABLE_NAME", 1)]):
+                    obj_name == defn[col_ref.get("TABLE_NAME", 1)]):
                 col_list.append(defn)
             else:
                 create_str = _build_create_table(obj_db, obj_name,
@@ -736,13 +734,13 @@ def _build_create_objects(obj_type, db, definitions, sql_mode=''):
             else:
                 obj_name = defn[col_ref.get("TABLE_NAME", 1)]
             # Create VIEW statement
-            create_str = ("CREATE ALGORITHM=UNDEFINED DEFINER={defr} "
-                          "SQL SECURITY {sec} VIEW {scma}.{tbl} AS {defv}; "
-                          ).format(defr=defn[col_ref.get("DEFINER", 2)],
-                                   sec=defn[col_ref.get("SECURITY_TYPE", 3)],
-                                   scma=obj_db, tbl=obj_name,
-                                   defv=defn[col_ref.get("VIEW_DEFINITION",
-                                                         4)])
+            create_str = (
+                "CREATE ALGORITHM=UNDEFINED DEFINER={defr} "
+                "SQL SECURITY {sec} VIEW {scma}.{tbl} AS {defv}; "
+            ).format(defr=defn[col_ref.get("DEFINER", 2)],
+                     sec=defn[col_ref.get("SECURITY_TYPE", 3)],
+                     scma=obj_db, tbl=obj_name,
+                     defv=defn[col_ref.get("VIEW_DEFINITION", 4)])
             create_strings.append(create_str)
         elif obj_type == "TRIGGER":
             # Quote required identifiers with backticks
@@ -759,7 +757,7 @@ def _build_create_objects(obj_type, db, definitions, sql_mode=''):
                 obj_name = defn[col_ref.get("TRIGGER_NAME", 0)]
 
             if not is_quoted_with_backticks(
-               defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)], sql_mode):
+                    defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)], sql_mode):
                 evt_scma = quote_with_backticks(
                     defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)],
                     sql_mode
@@ -768,7 +766,7 @@ def _build_create_objects(obj_type, db, definitions, sql_mode=''):
                 evt_scma = defn[col_ref.get("EVENT_OBJECT_SCHEMA", 3)]
 
             if not is_quoted_with_backticks(
-               defn[col_ref.get("EVENT_OBJECT_TABLE", 4)], sql_mode):
+                    defn[col_ref.get("EVENT_OBJECT_TABLE", 4)], sql_mode):
                 evt_tbl = quote_with_backticks(
                     defn[col_ref.get("EVENT_OBJECT_TABLE", 4)],
                     sql_mode
@@ -780,19 +778,17 @@ def _build_create_objects(obj_type, db, definitions, sql_mode=''):
             # Important Note: There is a bug in the server when backticks are
             # used in the trigger statement, i.e. the ACTION_STATEMENT value in
             # INFORMATION_SCHEMA.TRIGGERS is incorrect (see BUG##16291011).
-            create_str = ("CREATE DEFINER={defr} "
-                          "TRIGGER {scma}.{trg} {act_t} {evt_m} "
-                          "ON {evt_s}.{evt_t} FOR EACH {act_o} {act_s};"
-                          ).format(defr=defn[col_ref.get("DEFINER", 1)],
-                                   scma=obj_db, trg=obj_name,
-                                   act_t=defn[col_ref.get("ACTION_TIMING", 6)],
-                                   evt_m=defn[col_ref.get("EVENT_MANIPULATION",
-                                                          2)],
-                                   evt_s=evt_scma, evt_t=evt_tbl,
-                                   act_o=defn[col_ref.get("ACTION_ORIENTATION",
-                                                          5)],
-                                   act_s=defn[col_ref.get("ACTION_STATEMENT",
-                                                          7)])
+            create_str = (
+                "CREATE DEFINER={defr} "
+                "TRIGGER {scma}.{trg} {act_t} {evt_m} "
+                "ON {evt_s}.{evt_t} FOR EACH {act_o} {act_s};"
+            ).format(defr=defn[col_ref.get("DEFINER", 1)],
+                     scma=obj_db, trg=obj_name,
+                     act_t=defn[col_ref.get("ACTION_TIMING", 6)],
+                     evt_m=defn[col_ref.get("EVENT_MANIPULATION", 2)],
+                     evt_s=evt_scma, evt_t=evt_tbl,
+                     act_o=defn[col_ref.get("ACTION_ORIENTATION", 5)],
+                     act_s=defn[col_ref.get("ACTION_STATEMENT", 7)])
             create_strings.append(create_str)
         elif obj_type in ("PROCEDURE", "FUNCTION"):
             # Quote required identifiers with backticks
@@ -813,14 +809,15 @@ def _build_create_objects(obj_type, db, definitions, sql_mode=''):
                     func_str = "%s DETERMINISTIC" % func_str
             else:
                 func_str = ""
-            create_str = ("CREATE DEFINER={defr}"
-                          " {type} {scma}.{name}({par_lst})"
-                          "{func_ret} {body};"
-                          ).format(defr=defn[col_ref.get("DEFINER", 5)],
-                                   type=obj_type, scma=obj_db, name=obj_name,
-                                   par_lst=defn[col_ref.get("PARAM_LIST", 6)],
-                                   func_ret=func_str,
-                                   body=defn[col_ref.get("BODY", 8)])
+            create_str = (
+                "CREATE DEFINER={defr}"
+                " {type} {scma}.{name}({par_lst})"
+                "{func_ret} {body};"
+            ).format(defr=defn[col_ref.get("DEFINER", 5)],
+                     type=obj_type, scma=obj_db, name=obj_name,
+                     par_lst=defn[col_ref.get("PARAM_LIST", 6)],
+                     func_ret=func_str,
+                     body=defn[col_ref.get("BODY", 8)])
             create_strings.append(create_str)
         elif obj_type == "EVENT":
             # Quote required identifiers with backticks
@@ -835,16 +832,14 @@ def _build_create_objects(obj_type, db, definitions, sql_mode=''):
                 obj_name = defn[col_ref.get("NAME", 0)]
 
             # Create EVENT statement
-            create_str = ("CREATE EVENT {scma}.{name} "
-                          "ON SCHEDULE EVERY {int_v} {int_f} "
-                          "STARTS '{starts}' "
-                          ).format(scma=obj_db, name=obj_name,
-                                   int_v=defn[col_ref.get("INTERVAL_VALUE",
-                                                          5)],
-                                   int_f=defn[col_ref.get("INTERVAL_FIELD",
-                                                          6)],
-                                   starts=defn[col_ref.get("STARTS", 8)]
-                                   )
+            create_str = (
+                "CREATE EVENT {scma}.{name} "
+                "ON SCHEDULE EVERY {int_v} {int_f} "
+                "STARTS '{starts}' "
+            ).format(scma=obj_db, name=obj_name,
+                     int_v=defn[col_ref.get("INTERVAL_VALUE", 5)],
+                     int_f=defn[col_ref.get("INTERVAL_FIELD", 6)],
+                     starts=defn[col_ref.get("STARTS", 8)])
 
             ends_index = col_ref.get("ENDS", 9)
             if len(defn[ends_index]) > 0 and \
@@ -1067,11 +1062,12 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
     exec_commit = False
 
     # Process all statements.
+    # pylint: disable=R0101
     for statement in statements:
         # Each statement can be either a string or a list of strings (BLOB
         # statements).
         if (isinstance(statement, str) and
-            (new_engine is not None or def_engine is not None) and
+                (new_engine is not None or def_engine is not None) and
                 statement[0:12].upper() == "CREATE TABLE"):
             # Add statements to substitute engine.
             i = statement.find(' ', 13)
@@ -1468,6 +1464,7 @@ def import_file(dest_val, file_name, options):
 
     # Read the file one object/definition group at a time
     databases = []
+    # pylint: disable=R0101
     for row in read_next(file_h, fmt):
         # Check if --format=raw_csv
         if fmt == "raw_csv":
@@ -1547,7 +1544,7 @@ def import_file(dest_val, file_name, options):
                                               "database before importing."
                                               "".format(db_name))
                     if not _skip_object("CREATE_DB", options) and \
-                       not fmt == 'sql':
+                       fmt != 'sql':
                         statements.append("CREATE DATABASE %s;" % db_name)
 
         # This is the first time through the loop so we must

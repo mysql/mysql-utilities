@@ -21,11 +21,10 @@ This file contains the replicate utility. It is used to establish a
 master/slave replication topology among two servers.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os.path
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command.setup_rpl import setup_replication
 from mysql.utilities.common.ip_parser import parse_connection

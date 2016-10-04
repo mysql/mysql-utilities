@@ -39,10 +39,11 @@ class test(compare_db_errors.test):
     methods.
     """
 
+    server0 = None
     server1 = None
     server2 = None
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         self.server0 = self.servers.get_server(0)
         if not self.server0.check_version_compat(5, 6, 5):
             raise MUTLibError("Test requires server version 5.6.5 and later.")

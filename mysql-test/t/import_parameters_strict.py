@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ class test(import_parameters.test):
         if run_ok:
             for server in self.server_lst:
                 sql_mode = server.select_variable('sql_mode', 'global')
-                if not sql_mode.upper() == "STRICT_ALL_TABLES":
+                if sql_mode.upper() != "STRICT_ALL_TABLES":
                     return False
         return True
 

@@ -105,7 +105,6 @@ class test(rpl_admin_gtid_loopback.test):
         return True
 
     def run(self):
-        test_num = 1
         rpl_admin_gtid_loopback.test.run(self)
 
         self.results.append("\n")

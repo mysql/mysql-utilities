@@ -35,7 +35,7 @@ class test(copy_db.test):
     def check_prerequisites(self):
         return copy_db.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         res = copy_db.test.setup(self)
         if not res:
             return res

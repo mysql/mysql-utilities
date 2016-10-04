@@ -44,7 +44,7 @@ class test(copy_db.test):
     need_server = False
     prev_sql_mode = "''"
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server1 = self.servers.spawn_server("compare_db_srv1_ansi_quotes",
                                                  mysqld, True)
@@ -373,7 +373,6 @@ class test(copy_db.test):
         self.results.append(res)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
-        return True
 
         # Restore previous SQL_MODE in the destination server
         try:
@@ -382,6 +381,8 @@ class test(copy_db.test):
         except UtilError as err:
             raise MUTLibError("Failed to restore SQL_MODE: "
                               "{0}".format(err.errmsg))
+
+        return True
 
     def get_result(self):
         msg = []
@@ -462,9 +463,9 @@ class test(copy_db.test):
         check_db_info_on_server1 = [("util_test_default_collation_copy",
                                      "DEFAULT_COLLATION_NAME",
                                      "utf8_general_ci", "COLLATION_NAME"), (
-                                    "util_test_default_charset_copy",
-                                    "DEFAULT_CHARACTER_SET_NAME", "utf8",
-                                    "CHARACTER_SET_NAME")]
+                                         "util_test_default_charset_copy",
+                                         "DEFAULT_CHARACTER_SET_NAME", "utf8",
+                                         "CHARACTER_SET_NAME")]
         for db in check_db_info_on_server1:
             try:
                 res = self.server1.exec_query(qry_db.format(db[1], db[0]))

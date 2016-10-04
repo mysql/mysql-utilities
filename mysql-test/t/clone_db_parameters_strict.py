@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2015, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ class test(clone_db_parameters.test):
         if run_ok:
             sql_mode = self.server1.select_variable('sql_mode', 'global')
 
-            if not sql_mode.upper() == "STRICT_ALL_TABLES":
+            if sql_mode.upper() != "STRICT_ALL_TABLES":
                 return False
         return True
 

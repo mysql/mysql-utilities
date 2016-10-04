@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class test(show_rpl.test):
             raise MUTLibError(err.errmsg)
 
         test_num += 1
-        cmd_str = "mysqlrplshow.py --disco=root:root ".format(master_str)
+        cmd_str = "mysqlrplshow.py --disco=root:root {0} ".format(master_str)
         comment = "Test case {0} - show topology - bad format".format(test_num)
         cmd_opts = "  --show-list --recurse --format=XXXXXX"
         res = mutlib.System_test.run_test_case(self, 2, cmd_str + cmd_opts,
@@ -103,7 +103,7 @@ class test(show_rpl.test):
         test_num += 1
         cmd_str = ("mysqlrplshow.py --disco=root:root --master=josh@localhost:"
                    "{0}".format(self.server_list[2].port))
-        if not self.server_list[2].socket is None:
+        if self.server_list[2].socket is not None:
             cmd_str = "{0}:{1}".format(cmd_str, self.server_list[2].socket)
 
         comment = ("Test case {0}a - show topology - not enough "

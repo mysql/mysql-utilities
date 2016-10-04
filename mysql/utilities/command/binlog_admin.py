@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -445,10 +445,11 @@ def binlog_purge(server_cnx_val, master_cnx_val, slaves_cnx_val, options):
         " dictionary with server connection values"
 
     if master_cnx_val is not None:
-        purger = RPLBinaryLogPurge(master_cnx_val, slaves_cnx_val, options)
+        rpl_purger = RPLBinaryLogPurge(master_cnx_val, slaves_cnx_val, options)
+        rpl_purger.purge()
     else:
-        purger = BinaryLogPurge(server_cnx_val, options)
-    purger.purge()
+        binlog_purger = BinaryLogPurge(server_cnx_val, options)
+        binlog_purger.purge()
 
 
 class BinaryLogPurge(object):

@@ -25,13 +25,12 @@ Methods:
 
 import copy
 import optparse
+from optparse import Option as CustomOption, OptionValueError
 import os.path
 import re
 
 from datetime import datetime
-from optparse import Option as CustomOption, OptionValueError
 from ip_parser import find_password, parse_login_values_config_path
-
 from mysql.utilities import LICENSE_FRM, VERSION_FRM
 from mysql.utilities.exception import UtilError, FormatError
 from mysql.connector.conversion import MySQLConverter
@@ -1137,7 +1136,7 @@ def get_value_intervals_list(parser, option_value, option_name, value_name):
     # Filter empty values and convert all to integers (values and intervals).
     values = option_value.split(",")
     values = [value for value in values if value]
-    if not len(values) > 0:
+    if len(values) <= 0:
         parser.error(PARSE_ERR_OPT_INVALID_VALUE.format(option=option_name,
                                                         value=option_value))
     res_list = []
@@ -1288,7 +1287,7 @@ def check_password_security(options, args, prefix=""):
     """
     result = False
     for value in options.__dict__.values():
-        if type(value) == list:
+        if isinstance(value, list):
             for item in value:
                 if find_password(item):
                     result = True

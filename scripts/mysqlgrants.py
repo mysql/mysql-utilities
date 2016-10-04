@@ -21,6 +21,10 @@ This file contains the privilege display utility. It is used to show
 the list of users and their privileges over the set of objects presented by
 the user.
 """
+
+import os
+import sys
+
 from mysql.utilities.command.grants import check_grants
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import (setup_common_options,
@@ -32,12 +36,8 @@ from mysql.utilities.common.tools import (check_python_version,
                                           check_connector_python,
                                           join_and_build_str)
 
-
 # Check Python version compatibility
 from mysql.utilities.exception import UtilError, FormatError
-
-import os
-import sys
 
 check_python_version()
 
@@ -245,7 +245,7 @@ if __name__ == '__main__':
         _, e, _ = sys.exc_info()
         print("ERROR: {0}".format(e.errmsg))
         sys.exit(1)
-    except Exception:
+    except:
         _, e, _ = sys.exc_info()
         print("ERROR: {0}".format(e))
         sys.exit(1)

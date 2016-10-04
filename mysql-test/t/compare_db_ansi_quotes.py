@@ -20,8 +20,6 @@ compare_db test.
 """
 
 import os
-
-import mutlib
 import compare_db
 
 from mysql.utilities.exception import MUTLibError
@@ -41,11 +39,11 @@ class test(compare_db.test):
     separate servers.
     """
 
+    server0 = None
     server1 = None
     server2 = None
-    need_server = False
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         self.server0 = self.servers.get_server(0)
         if not self.server0.check_version_compat(5, 6, 5):
             raise MUTLibError("Test requires server version 5.6.5 and later.")

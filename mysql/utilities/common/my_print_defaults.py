@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -207,11 +207,11 @@ class MyDefaultsReader(object):
         match = re.search(r'(?:Ver )(\d)\.(\d)', line)
         if match:
             major, minor = match.groups()
-            if (major_version < int(major)) or \
-               (major_version == int(major) and minor_version <= int(minor)):
-                return True
-            else:
-                return False
+            return (
+                (major_version < int(major)) or
+                (major_version == int(major) and
+                 minor_version <= int(minor))
+            )
         else:
             raise UtilError("Unable to determine tool version - %s" %
                             self._tool_path)
@@ -239,10 +239,7 @@ class MyDefaultsReader(object):
         out_file.close()
 
         # Check the existence of a "login-path" option
-        if 'login-path' in help_output:
-            return True
-        else:
-            return False
+        return ('login-path' in help_output)
 
     def _read_group_data(self, group):
         """Read group options data using my_print_defaults tool.

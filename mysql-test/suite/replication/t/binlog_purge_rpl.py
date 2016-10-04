@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@ from binlog_rotate import binlog_range_files_exists
 
 from mysql.utilities.exception import MUTLibError
 
-_DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin '
-                       ' --report-host=localhost '
-                       '--report-port={0} --bind-address=:: '
-                       '"').format('{0}', "")
+_DEFAULT_MYSQL_OPTS = (
+    '"--log-bin=mysql-bin --report-host=localhost '
+    '--report-port={0} --bind-address=:: "'
+)
 
 
 def flush_server_logs_(server, times=5):
@@ -113,8 +113,9 @@ class test(rpl_admin.test):
         slave3_conn = self.build_connection_string(self.server4).strip(' ')
 
         comment = "mysqlrplshow.py"
-        cmd_opts = ("-r --discover-slaves-login={0} "
-                    ).format(master_conn.split('@')[0])
+        cmd_opts = (
+            "-r --discover-slaves-login={0} "
+        ).format(master_conn.split('@')[0])
         cmds = "mysqlrplshow.py --master={0} {1}".format(master_conn, cmd_opts)
         self.run_test_case(0, cmds, comment)
 
@@ -136,7 +137,7 @@ class test(rpl_admin.test):
         test_num += 1
         comment = ("Test case {0} - mysqlbinlogpurge: with discover "
                    "and verbose options".format(test_num))
-        cmds = ("{0} {1} -vv"
+        cmds = ("{0} {1} {2} -vv"
                 "").format(cmd_str, cmd_opts, "binlog_purge{0}.log".format(1))
         res = self.run_test_case(0, cmds, comment)
         # Binlog Files 6 and 10 must not exists

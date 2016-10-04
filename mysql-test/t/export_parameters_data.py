@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class test(export_parameters_def.test):
     def check_prerequisites(self):
         return export_parameters_def.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
 
         res = export_parameters_def.test.setup(self)
         if not res:

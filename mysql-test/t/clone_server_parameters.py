@@ -71,7 +71,7 @@ class test(mutlib.System_test):
         port1 = int(self.servers.get_next_port())
         cmd_str = "{0} --new-port={1} ".format(cmd_str, port1)
         full_datadir = os.path.join(os.getcwd(),
-                                    "temp with spaces".format(port1))
+                                    "temp with spaces {0}".format(port1))
         cmd_str = "{0} --new-data={2}{1}{2} --delete ".format(cmd_str,
                                                               full_datadir,
                                                               quote_char)
@@ -144,7 +144,6 @@ class test(mutlib.System_test):
                     "--root-password=root ".format(
                         self.build_connection_string(
                             self.servers.get_server(0))))
-        os_quote = '"' if os.name == 'nt' else "'"
         #  (comment, command options, kill running server, restart_with_cmd)
         test_cases = [
             ("show help", " --help ", False, True, False),

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights
+# Copyright (c) 2014, 2016 Oracle and/or its affiliates. All rights
 # reserved.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -98,7 +98,7 @@ def determine_purgeable_binlogs(active_binlog_index, slaves, reporter,
     # Determine old no needed binlogs
     master_log_file_in_use = []
     index_last_in_use = active_binlog_index
-
+    # pylint: disable=R0101
     if slaves:
         for slave in slaves:
             if reporter is not None and verbosity >= 1:
@@ -173,10 +173,11 @@ def purge(server, purge_to_binlog, server_binlogs_list=None,
     # in the log index file, prior to the specified log file name.
     # Verify purge_to_binlog is listed on server binlog list and if not is the
     # first in the list continue the purge, else there is no binlogs to purge
-    if purge_to_binlog in server_binlogs_list and \
-       purge_to_binlog != server_binlogs_list[0]:
-        purge_query = ("PURGE BINARY LOGS TO '{0}'"
-                       ).format(purge_to_binlog)
+    if (purge_to_binlog in server_binlogs_list and
+            purge_to_binlog != server_binlogs_list[0]):
+        purge_query = (
+            "PURGE BINARY LOGS TO '{0}'"
+        ).format(purge_to_binlog)
         if dryrun:
             reporter("# To manually purge purge the binary logs Execute the "
                      "following query:")

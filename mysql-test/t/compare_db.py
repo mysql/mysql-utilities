@@ -48,6 +48,7 @@ class test(mutlib.System_test):
             self.need_server = True
         return self.check_num_servers(1)
 
+    # pylint: disable=W0221
     def setup(self, spawn_servers=True):
         if spawn_servers:
             self.server1 = self.servers.get_server(0)

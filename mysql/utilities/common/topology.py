@@ -398,6 +398,7 @@ class Topology(Replication):
         self._report("# Discovering slaves for master at "
                      "{0}:{1}".format(self.master.host, self.master.port))
         discovered_slaves = self.master.get_slaves(user, password)
+        # pylint: disable=R0101
         for slave in discovered_slaves:
             if "]" in slave:
                 host, port = slave.split("]:")
@@ -526,7 +527,7 @@ class Topology(Replication):
             candidate = self.options.get("candidate", None)
 
         assert (candidate is not None), "A candidate server is required."
-        assert (type(candidate) == Master), \
+        assert (isinstance(candidate, Master)), \
             "A candidate server must be a Master class instance."
 
         # If master has GTID=ON, ensure all servers have GTID=ON
@@ -1122,7 +1123,7 @@ class Topology(Replication):
             slave_set = set()
             for others_slave_dic in self.slaves:
                 if (slave_dict['host'] != others_slave_dic['host'] or
-                   slave_dict['port'] != others_slave_dic['port']):
+                        slave_dict['port'] != others_slave_dic['port']):
                     other_slave = others_slave_dic['instance']
                     # Skip not defined or dead slaves
                     if not other_slave or not other_slave.is_alive():
@@ -1194,7 +1195,7 @@ class Topology(Replication):
                     iteration += 1
             if slave_ok and self.verbose and not self.quiet:
                 self._report("# %s:%s status: Ok " % (slave_dict['host'],
-                             slave_dict['port']))
+                                                      slave_dict['port']))
 
         if len(slave_errors) > 0:
             self._report("WARNING - The following slaves failed to connect to "
@@ -1351,7 +1352,7 @@ class Topology(Replication):
             # No master makes these impossible to determine.
             have_gtid = "OFF"
             master_log = ""
-            master_log_pos = ""
+            master_log_pos = ""  # pylint: disable=R0204
 
         # Get the health of the slaves
         slave_rows = []
@@ -1604,14 +1605,15 @@ class Topology(Replication):
                                    'SUPER'))
             else:
                 if (not user_inst.has_privilege("*", "*", "SUPER") or
-                    not user_inst.has_privilege("*", "*", "GRANT OPTION") or
-                    not user_inst.has_privilege("*", "*", "SELECT") or
-                    not user_inst.has_privilege("*", "*", "RELOAD") or
-                    not user_inst.has_privilege("*", "*", "DROP") or
-                    not user_inst.has_privilege("*", "*", "CREATE") or
-                    not user_inst.has_privilege("*", "*", "INSERT") or
-                    not user_inst.has_privilege("*", "*",
-                                                "REPLICATION SLAVE")):
+                        not user_inst.has_privilege("*", "*",
+                                                    "GRANT OPTION") or
+                        not user_inst.has_privilege("*", "*", "SELECT") or
+                        not user_inst.has_privilege("*", "*", "RELOAD") or
+                        not user_inst.has_privilege("*", "*", "DROP") or
+                        not user_inst.has_privilege("*", "*", "CREATE") or
+                        not user_inst.has_privilege("*", "*", "INSERT") or
+                        not user_inst.has_privilege("*", "*",
+                                                    "REPLICATION SLAVE")):
                     errors.append((server.user, server.host, server.port,
                                    'SUPER, GRANT OPTION, REPLICATION SLAVE, '
                                    'SELECT, RELOAD, DROP, CREATE, INSERT'))
@@ -2031,11 +2033,11 @@ class Topology(Replication):
             'conn_info': get_connection_dictionary(server),
             'verbose': self.verbose,
         }
-        if slave and type(server) != Slave:
+        if slave and not isinstance(server, Slave):
             slave_conn = Slave(conn_dict)
             slave_conn.connect()
             return slave_conn
-        if not slave and type(server) != Master:
+        if not slave and not isinstance(server, Master):
             master_conn = Master(conn_dict)
             master_conn.connect()
             return master_conn

@@ -102,11 +102,11 @@ _BASE_COMMANDS = [
     {'name': '<TAB>',
      'alias': '',
      'text': 'Press TAB for type completion of utility, '
-     'option, or variable names.'},
+             'option, or variable names.'},
     {'name': '<TAB><TAB>',
      'alias': '',
      'text': 'Press TAB twice for list of matching type '
-     'completion (context sensitive).'}
+             'completion (context sensitive).'}
 ]
 
 
@@ -114,9 +114,11 @@ _BASE_COMMANDS = [
 # a custom getch() method to return keys.
 try:
     # Win32
+    # pylint: disable=C0413
     from msvcrt import getch  # pylint: disable=F0401
 except ImportError:
     # UNIX/Posix
+    # pylint: disable=C0411,C0413
     import termios
 
     def getch():
@@ -322,6 +324,7 @@ class _Command(object):
                 sys.stdout.write(self.command[self.position:])
                 self.length = len(self.command)
                 spaces = len(self.command[self.position:])
+                # pylint: disable=W0612
                 for i in range(0, spaces):
                     sys.stdout.write('\b')
                 sys.stdout.flush()
@@ -930,7 +933,7 @@ class Console(object):
             if key in _COMMAND_KEY:
                 cmd_key = _COMMAND_KEY[key]
                 # Windows does things oddly for some keys
-                if not os.name == 'posix' and cmd_key == 'SPECIAL_WIN':
+                if os.name != 'posix' and cmd_key == 'SPECIAL_WIN':
                     key = getch()
                     cmd_key = _WIN_COMMAND_KEY.get(key)
                     if cmd_key is None:

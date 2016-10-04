@@ -22,11 +22,10 @@ to check the data consistency between master and slaves (and synchronize the
 data if requested by the user).
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.command.rpl_admin import skip_slaves_trx
 from mysql.utilities.common.messages import PARSE_ERR_OPTS_REQ
 from mysql.utilities.common.options import (add_slaves_option, add_verbosity,

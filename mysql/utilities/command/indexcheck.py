@@ -128,6 +128,7 @@ def check_index(src_val, table_args, options):
     if verbosity > 1:
         print "# Checking indexes..."
     # Check indexes for each table in the list
+    # pylint: disable=R0101
     for table_name in table_list:
         tbl_options = {
             'verbose': verbosity >= 1,

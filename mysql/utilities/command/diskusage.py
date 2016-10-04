@@ -297,6 +297,7 @@ def _build_innodb_list(per_table, folder, datadir, specs, verbosity=0):
     total_size = 0
     tablespaces = []
     # Here, we want to capture log files as well as tablespace files.
+    # pylint: disable=R0101
     if specs is not None:
         for item in os.listdir(folder):
             name, _ = os.path.splitext(item)
@@ -377,7 +378,6 @@ def _build_db_list(server, rows, include_list, datadir, fmt=False,
 
     total = 0
     results = []
-    max_col = 0
 
     # build the list
     for row in rows:
@@ -461,6 +461,7 @@ def _build_db_list(server, rows, include_list, datadir, fmt=False,
     else:
         fmt_rows = results
 
+    # pylint: disable=R0101
     if include_empty:
         dbs = server.exec_query("SHOW DATABASES")
         if len(fmt_rows) != len(dbs) - 1:
@@ -476,7 +477,7 @@ def _build_db_list(server, rows, include_list, datadir, fmt=False,
                     if fmt:
                         fmt_data = ['', '', '', '', '']
                         for i in range(0, num_cols):
-                            if type(row[i + 1]) == type(int):
+                            if isinstance(row[i + 1], int):
                                 fmt_data[i] = locale.format("%s",
                                                             int(row[i + 1]),
                                                             grouping=True)
@@ -838,6 +839,7 @@ def show_innodb_usage(server, datadir, options):
 
     # Check to see if innodb_file_per_table is ON
     res = server.show_server_variable('innodb_file_per_table')
+    # pylint: disable=R0102
     if res != [] and res[0][1].upper() == "ON":
         innodb_file_per_table = True
     else:
@@ -907,10 +909,10 @@ def show_innodb_usage(server, datadir, options):
                 if tablespace[1] != 'log file':
                     parts = tablespace[3].split(":")
                     if len(parts) > 2:
-                        size = int(tablespace[1]) / _MB
+                        ts_size = int(tablespace[1]) / _MB
                         print "Tablespace %s can be " % tablespace[3] + \
                               "extended by using %s:%sM[...]\n" % \
-                              (parts[0], size)
+                              (parts[0], ts_size)
     elif is_remote:
         print("# InnoDB data information not accessible from a remote host.")
     else:
@@ -923,9 +925,9 @@ def show_innodb_usage(server, datadir, options):
             if len(res) > 1:
                 raise UtilError("Found multiple rows for freespace.")
             else:
-                size = int(res[0][0])
+                fs_size = int(res[0][0])
                 if not quiet:
-                    _print_size("InnoDB freespace = ", size)
+                    _print_size("InnoDB freespace = ", fs_size)
                     print
 
     return True

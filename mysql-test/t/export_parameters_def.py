@@ -40,14 +40,17 @@ class test(export_basic.test):
         sql_mode = self.server0.show_server_variable("SQL_MODE")[0]
         if len(sql_mode[1]):
             raise MUTLibError("Test requires servers with sql_mode = ''.")
+        # The innodb_default_row_format was introduce in 5.7.9
+        if not self.servers.get_server(0).check_version_compat(5, 7, 9):
+            raise MUTLibError("Test requires server version 5.7.9 and later.")
         innodb_row_format = \
             self.server0.show_server_variable("innodb_default_row_format")[0]
-        if not innodb_row_format[1].upper() == "COMPACT":
+        if innodb_row_format[1].upper() != "COMPACT":
             raise MUTLibError("Test requires servers with"
                               " innodb_default_row_format = 'COMPACT'.")
         return export_basic.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         return export_basic.test.setup(self)
 
     def run(self):

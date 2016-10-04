@@ -39,6 +39,7 @@ class test(mutlib.System_test):
     This test clones a user on a single server copying all grants.
     """
 
+    server0 = None
     server1 = None
 
     def check_prerequisites(self):
@@ -49,7 +50,7 @@ class test(mutlib.System_test):
                                       "'mysql_no_login'")
         if not res:
             raise MUTLibError("Test requires the mysql_no_login plugin.")
-        if not srv.check_version_compat(5, 7, 6):
+        if not self.server0.check_version_compat(5, 7, 6):
             raise MUTLibError("Test requires server version 5.7.6 and later.")
         return self.check_num_servers(1)
 

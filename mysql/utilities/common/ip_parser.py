@@ -607,6 +607,7 @@ def parse_server_address(connection_str):
     address_type = None
     unparsed = None
     # From the matchers look the one that match a host.
+    # pylint: disable=R0101
     for IP_matcher in IP_matchers_list:
         try:
             group = _match(IP_matchers[IP_matcher], connection_str)
@@ -750,7 +751,7 @@ def find_password(value):
 
     value[in]           String to search for password
     """
-    if not type(value) == str:
+    if not isinstance(value, str):
         return False
     # has to have an @ sign
     if '@' not in value:

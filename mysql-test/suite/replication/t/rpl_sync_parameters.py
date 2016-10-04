@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -185,7 +185,7 @@ class test(rpl_sync.test):
             print("\nChanging data on slaves.")
         self.server2.exec_query("UPDATE `test_rplsync_db`.`t1` "
                                 "SET rnd_txt0='changed value' "
-                                "WHERE id=1".format(last_tbl))
+                                "WHERE id=1")
         self.server3.exec_query("INSERT INTO `test_rplsync_db`.`t0` "
                                 "(rnd_txt0) VALUES ('new value')")
 

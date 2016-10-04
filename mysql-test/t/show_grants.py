@@ -49,6 +49,7 @@ class test(mutlib.System_test):
             self.need_server = True
         return self.check_num_servers(1)
 
+    # pylint: disable=W0221
     def setup(self, spawn_servers=True, data_files=None):
         self.res_fname = "result.txt"
         if spawn_servers and self.need_server:
@@ -89,8 +90,7 @@ class test(mutlib.System_test):
         # Create users for the test
         create_user_stms = ["CREATE USER priv_test_user@'%'",
                             "CREATE USER priv_test_user2@'%'",
-                            "CREATE USER priv_test_user3@'%'",
-                            ]
+                            "CREATE USER priv_test_user3@'%'", ]
         for user_stm in create_user_stms:
             try:
                 self.server1.exec_query(user_stm)

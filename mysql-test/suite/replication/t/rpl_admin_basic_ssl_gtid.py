@@ -149,8 +149,9 @@ class test(rpl_admin.test):
         test_num += 1
         comment = ("Test case {0} - SSL "
                    "switchover demote-master ".format(test_num))
-        cmd_str = ("mysqlrpladmin.py --master={0} {1} "
-                   ).format(master_conn, ssl_util_opts())
+        cmd_str = (
+            "mysqlrpladmin.py --master={0} {1} "
+        ).format(master_conn, ssl_util_opts())
         cmd_opts = (" --new-master={0} --discover-slaves={1} "
                     "--rpl-user=rpluser:hispassword --demote-master "
                     "switchover".format(slave1_conn,

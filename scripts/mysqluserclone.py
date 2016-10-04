@@ -22,11 +22,10 @@ MySQL user to one or more new user accounts copying all grant statements
 to the new users.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os.path
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command import userclone
 from mysql.utilities.common.ip_parser import parse_connection

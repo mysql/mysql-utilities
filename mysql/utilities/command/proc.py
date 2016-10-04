@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -173,7 +173,7 @@ class ProcessGrep(object):
         params = {
             'select': "\n      ".join(self.__select.split("\n")),
             'kill': 'CONNECTION' if KILL_CONNECTION in self.__actions
-            else 'QUERY',
+                    else 'QUERY',
         }
         if KILL_CONNECTION in self.__actions or KILL_QUERY in self.__actions:
             sql = _KILL_BODY.format(**params)

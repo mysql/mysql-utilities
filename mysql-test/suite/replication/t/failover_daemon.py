@@ -362,7 +362,7 @@ class test(failover.test):
                           "master and start its monitoring process")
                     raise MUTLibError("{0}: failed - timeout waiting for "
                                       "failover daemon to register master and "
-                                      "start its monitoring process"
+                                      "start its monitoring process: {1}"
                                       "".format(comment, msg))
 
         # Test if pidfile was created with the correct umask
@@ -470,10 +470,9 @@ class test(failover.test):
                                   self.fail_event_script, "")
         self.test_cases.append(
             (self.server3, cmd, False, _FAILOVER_LOG.format("3"),
-             "Test case {0} - Simple failover with --failover=fail.",
-             "Master has failed and automatic".format(i), True)
+             "Test case {0} - Simple failover with --failover=fail.".format(i),
+             "Master has failed and automatic", True)
         )
-
         i += 1
         cmd = failover_cmd.format("nodetach",
                                   "--master={0}".format(slave3_conn), "fail",

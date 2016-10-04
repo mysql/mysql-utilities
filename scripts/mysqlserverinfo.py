@@ -19,11 +19,11 @@
 """
 This file contains the server information utility.
 """
-from mysql.utilities.common.tools import check_python_version
 
 import os
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.exception import UtilError
 from mysql.utilities.command.serverinfo import show_server_info
 from mysql.utilities.common.tools import check_connector_python
@@ -156,7 +156,7 @@ if __name__ == '__main__':
         _, e, _ = sys.exc_info()
         print("ERROR: {0}".format(e.errmsg))
         sys.exit(1)
-    except Exception:
+    except:
         _, e, _ = sys.exc_info()
         print("ERROR: {0}".format(e))
         sys.exit(1)

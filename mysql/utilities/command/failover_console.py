@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016 Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -65,9 +65,11 @@ _IDLE_TIME_INPUT_POLLING = 0.01  # 10 ms
 # a custom getch() method to return keys.
 try:
     # Win32
+    # pylint: disable=C0413
     from msvcrt import getch, kbhit  # pylint: disable=F0401
 except ImportError:
     # UNIX/Posix
+    # pylint: disable=C0413, C0411
     import termios
     from select import select
 

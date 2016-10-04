@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,15 +23,14 @@ import os
 import shlex
 import subprocess
 import time
-
 import rpl_admin
 
-from mysql.utilities.exception import MUTLibError, UtilError
 from mutlib.mutlib import stop_process
+from mysql.utilities import VERSION_STRING
+from mysql.utilities.exception import MUTLibError, UtilError
 from mysql.utilities.common.server import get_connection_dictionary
 from mysql.utilities.common.messages import (MSG_UTILITIES_VERSION,
                                              MSG_MYSQL_VERSION)
-from mysql.utilities import VERSION_STRING
 
 
 _RPLMS_LOG = "{0}rplms_log.txt"

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,26 +34,27 @@ _PARENT_TABLE = ("CREATE TABLE diff_table.t2 (a_i INT NOT NULL PRIMARY KEY) "
 #  - various
 
 # (comment, def1, def2, expected result, error_codes)
-_TABLE_TESTS = [("Table constraints primary key",
-                 "CREATE TABLE diff_table.t1(a INT NOT NULL PRIMARY KEY);",
-                 "CREATE TABLE diff_table.t1(a INT NOT NULL);", 0, None),
-                ("Table constraints foreign key",
-                 "CREATE TABLE diff_table.t1(a INT NOT NULL, d INT) "
-                 "ENGINE=INNODB;",
-                 "CREATE TABLE diff_table.t1(a INT NOT NULL, d INT, "
-                 "CONSTRAINT ref_t2 FOREIGN KEY(d) REFERENCES "
-                 "diff_table.t2(a_i)) ENGINE=INNODB;", 0, None),
-                ("Table constraints unique index",
-                 "CREATE TABLE diff_table.t1(a INT NOT NULL, INDEX A1 (a));",
-                 "CREATE TABLE diff_table.t1(a INT NOT NULL);", 0, None),
-                ("Table constraints various",
-                 "CREATE TABLE diff_table.t1(a INT NOT NULL PRIMARY KEY, "
-                 "b char(30), d INT, CONSTRAINT ref_t2 "
-                 "FOREIGN KEY(d) REFERENCES diff_table.t2(a_i), INDEX A1 (b)) "
-                 "ENGINE=INNODB;",
-                 "CREATE TABLE diff_table.t1(a INT NOT NULL) "
-                 "ENGINE=INNODB;", 0, None),
-                ]
+_TABLE_TESTS = [
+    ("Table constraints primary key",
+     "CREATE TABLE diff_table.t1(a INT NOT NULL PRIMARY KEY);",
+     "CREATE TABLE diff_table.t1(a INT NOT NULL);", 0, None),
+    ("Table constraints foreign key",
+     "CREATE TABLE diff_table.t1(a INT NOT NULL, d INT) "
+     "ENGINE=INNODB;",
+     "CREATE TABLE diff_table.t1(a INT NOT NULL, d INT, "
+     "CONSTRAINT ref_t2 FOREIGN KEY(d) REFERENCES "
+     "diff_table.t2(a_i)) ENGINE=INNODB;", 0, None),
+    ("Table constraints unique index",
+     "CREATE TABLE diff_table.t1(a INT NOT NULL, INDEX A1 (a));",
+     "CREATE TABLE diff_table.t1(a INT NOT NULL);", 0, None),
+    ("Table constraints various",
+     "CREATE TABLE diff_table.t1(a INT NOT NULL PRIMARY KEY, "
+     "b char(30), d INT, CONSTRAINT ref_t2 "
+     "FOREIGN KEY(d) REFERENCES diff_table.t2(a_i), INDEX A1 (b)) "
+     "ENGINE=INNODB;",
+     "CREATE TABLE diff_table.t1(a INT NOT NULL) "
+     "ENGINE=INNODB;", 0, None),
+]
 
 
 class test(test_sql_template.test):
@@ -67,7 +68,7 @@ class test(test_sql_template.test):
     def check_prerequisites(self):
         return test_sql_template.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         test_object = {'db1': 'diff_table', 'db2': 'diff_table',
                        'object_name': 't1', 'startup_cmds': [_PARENT_TABLE],
                        'shutdown_cmds': [], }

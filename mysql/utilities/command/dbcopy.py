@@ -77,7 +77,7 @@ def check_blobs_not_null(server, db_list):
         return False
     db_name_include = ""
     for db in db_list:
-        if not db_name_include == "":
+        if db_name_include != "":
             db_name_include = "{0},".format(db_name_include)
         db_name_include = "{0}'{1}'".format(db_name_include, db[0])
     res = server.exec_query(_CHECK_BLOBS_NOT_NULL.format(db_name_include))
@@ -238,7 +238,7 @@ def copy_db(src_val, dest_val, db_list, options):
             if db[0].upper() in ["MYSQL", "INFORMATION_SCHEMA",
                                  "PERFORMANCE_SCHEMA", "SYS"]:
                 continue
-            if not db[0] in dbs:
+            if db[0] not in dbs:
                 print _GTID_BACKUP_WARNING
                 break
 

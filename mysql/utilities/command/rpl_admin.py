@@ -213,6 +213,7 @@ def skip_slaves_trx(gtid_set, slaves_cnx_val, options):
 
     # Skip transactions for the given list of slaves.
     print("#")
+    # pylint: disable=R0101
     if has_gtid_to_skip:
         for host, port, gtids_to_skip in gtids_by_slave:
             if gtids_to_skip:
@@ -422,7 +423,7 @@ class RplCommands(object):
                 if host_port:
                     host = host_port[0]
                 if (not host or uses_ip != hostname_is_ip(slave.host) or
-                   uses_ip != hostname_is_ip(host)):
+                        uses_ip != hostname_is_ip(host)):
                     return False
         return True
 
@@ -437,7 +438,7 @@ class RplCommands(object):
         # Check new master is not actual master - need valid candidate
         candidate = self.options.get("new_master", None)
         if (self.topology.master.is_alias(candidate['host']) and
-           self.master_vals['port'] == candidate['port']):
+                self.master_vals['port'] == candidate['port']):
             err_msg = ERROR_SAME_MASTER.format(candidate['host'],
                                                candidate['port'],
                                                self.master_vals['host'],
@@ -486,11 +487,10 @@ class RplCommands(object):
             print("# WARNING: {0}".format(warn_msg))
             self._report(warn_msg, logging.WARN, False)
 
-        self._report(" ".join(["# Performing switchover from master at",
-                     "%s:%s" % (self.master_vals['host'],
-                                self.master_vals['port']),
-                               "to slave at %s:%s." %
-                               (candidate['host'], candidate['port'])]))
+        self._report(" ".join(
+            ["# Performing switchover from master at",
+             "%s:%s" % (self.master_vals['host'], self.master_vals['port']),
+             "to slave at %s:%s." % (candidate['host'], candidate['port'])]))
         if not self.topology.switchover(candidate):
             self._report("# Errors found. Switchover aborted.", logging.ERROR)
             return False
@@ -885,9 +885,10 @@ class RplCommands(object):
                 else:
                     self._report("# Spawning external script for failover "
                                  "checking.")
-                    res = execute_script(exec_fail, None,
-                                         [old_host, old_port], self.verbose)
-                    if res == 0:
+                    script_res = execute_script(exec_fail, None,
+                                                [old_host, old_port],
+                                                self.verbose)
+                    if script_res == 0:
                         self._report("# Failover check script completed Ok. "
                                      "Failover averted.")
                     else:

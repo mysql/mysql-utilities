@@ -20,12 +20,11 @@
 This file contains the metagrep utility which allows users to search metadata.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os.path
 import re
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.command.grep import ObjectGrep, OBJECT_TYPES
 from mysql.utilities.common.tools import check_connector_python
 from mysql.utilities.common.options import (add_regexp, setup_common_options,

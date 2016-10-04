@@ -21,14 +21,13 @@ This file contains the copy database utility which ensures a database
 is exactly the same among two servers.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import multiprocessing
 import os
 import re
 import sys
 import time
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command import dbcopy
 from mysql.utilities.common.ip_parser import parse_connection

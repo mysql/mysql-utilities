@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,12 +57,14 @@ class test(mutlib.System_test):
         self.config_file_path = 'replicate_ssl.cnf'
         self.server0 = self.servers.get_server(0)
 
-        mysqld = ("--log-bin=mysql-bin --report-port={0} {1}"
-                  ).format(self.servers.view_next_port(), SSL_OPTS)
+        mysqld = (
+            "--log-bin=mysql-bin --report-port={0} {1}"
+        ).format(self.servers.view_next_port(), SSL_OPTS)
         self.server1 = self.servers.spawn_server(
             "rep_server1_ssl", mysqld, True)
-        mysqld = ("--log-bin=mysql-bin --report-port={0} {1}"
-                  ).format(self.servers.view_next_port(), SSL_OPTS)
+        mysqld = (
+            "--log-bin=mysql-bin --report-port={0} {1}"
+        ).format(self.servers.view_next_port(), SSL_OPTS)
         self.server2 = self.servers.spawn_server(
             "rep_server2_ssl", mysqld, True)
 
@@ -168,12 +170,13 @@ class test(mutlib.System_test):
         if not save_for_compare:
             self.results.append(comment)
         if use_rpl_user_group:
-            cmd = ("mysqlreplicate.py --rpl-user={0}[{1}] {2}"
-                   ).format(self.config_file_path, _RPL_USER_GROUP_NAME,
-                            conn_str)
+            cmd = (
+                "mysqlreplicate.py --rpl-user={0}[{1}] {2}"
+            ).format(self.config_file_path, _RPL_USER_GROUP_NAME, conn_str)
         else:
-            cmd = ("mysqlreplicate.py --rpl-user={0}:{1} {2}"
-                   ).format(rpl_user, rpl_pass, conn_str)
+            cmd = (
+                "mysqlreplicate.py --rpl-user={0}:{1} {2}"
+            ).format(rpl_user, rpl_pass, conn_str)
         if ssl:
             cmd = "{0} {1}".format(cmd, ssl_opts)
         if options:

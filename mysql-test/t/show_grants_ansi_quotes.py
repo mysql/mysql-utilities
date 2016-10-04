@@ -38,7 +38,7 @@ class test(show_grants.test):
     server1 = None
     need_server = False
 
-    def setup(self):
+    def setup(self, spawn_servers=True, data_files=None):
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server1 = self.servers.spawn_server("show_grants_srv_ansi_quotes",
                                                  mysqld, True)

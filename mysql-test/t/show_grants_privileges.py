@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ class test(show_grants.test):
     prerequisites
     """
 
-    def setup(self):
+    def setup(self, spawn_servers=True, data_files=None):
         self.res_fname = "result.txt"
         if self.need_server:
             try:

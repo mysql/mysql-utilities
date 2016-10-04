@@ -21,12 +21,11 @@ This file contains the disk usage utility for showing the estimated disk
 storage of the databases and system files.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os
 import sys
 import time
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command import diskusage
 from mysql.utilities.common.server import connect_servers

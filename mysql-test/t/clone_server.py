@@ -21,10 +21,10 @@ clone_server test.
 
 import os
 import time
-import mutlib
 
 from mysql.utilities.common.server import Server
 from mysql.utilities.exception import UtilError, MUTLibError
+import mutlib
 from mutlib.ssl_certs import (CREATE_SSL_USER_2, SSL_CA, SSL_CERT, SSL_KEY,
                               SSL_OPTS_UTIL, STD_DATA_PATH, ssl_server_opts)
 
@@ -162,10 +162,10 @@ class test(mutlib.System_test):
         self.results.append(comment + "\n")
         full_datadir = os.path.join(os.getcwd(), "temp with spaces "
                                                  "{0}".format(port3))
-        cmd_str = ("mysqlserverclone.py --server={0} --delete-data "
-                   ).format(self.build_custom_connection_string(ssl_server,
-                                                                "root_ssl",
-                                                                "root_ssl"))
+        cmd_str = (
+            "mysqlserverclone.py --server={0} --delete-data "
+        ).format(self.build_custom_connection_string(
+            ssl_server, "root_ssl", "root_ssl"))
         cmd_str = ("{0} --new-data={2}{1}{2} "
                    "".format(cmd_str, full_datadir, quote_char))
         cmd_str = ('{0} {1} --new-port={2} --root-password=root --mysqld='

@@ -1262,7 +1262,7 @@ class SQLTransformer(object):
             {'fmt': " %s", 'col': _TRIGGER_EVENT, 'val': ""},
             # trigger table
             {'fmt': " ON %s." % self.destination[_TRIGGER_DB] +
-             "%s FOR EACH ROW",
+                    "%s FOR EACH ROW",
              'col': _TRIGGER_TABLE, 'val': ""},
             # trigger body
             {'fmt': " %s;", 'col': _TRIGGER_BODY, 'val': ""},
@@ -1358,7 +1358,8 @@ class SQLTransformer(object):
         # Only when doing create or modifications to the body
         if self.obj_type.upper() == "FUNCTION":
             if (do_create or
-               self.destination[_ROUTINE_BODY] != self.source[_ROUTINE_BODY]):
+                    (self.destination[_ROUTINE_BODY] !=
+                     self.source[_ROUTINE_BODY])):
                 statement_parts[5]['val'] = self.source[_ROUTINE_RETURNS]
             # Add deterministic
             if do_create:

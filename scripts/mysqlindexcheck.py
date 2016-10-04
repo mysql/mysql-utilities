@@ -23,11 +23,10 @@ all tables in each database), a list of tables in the for db.table,
 or all tables in all databases except internal databases.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os.path
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command import indexcheck
 from mysql.utilities.common.ip_parser import parse_connection

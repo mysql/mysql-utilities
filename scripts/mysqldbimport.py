@@ -21,14 +21,13 @@ This file contains the import database utility which allows users to import
 metadata for objects in a database and data for tables.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import multiprocessing
 import os
 import sys
 import time
 import re
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.command import dbimport
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.messages import (WARN_OPT_ONLY_USED_WITH,
@@ -178,7 +177,7 @@ if __name__ == '__main__':
     if len(args) == 0:
         parser.error("You must specify at least one file to import.")
 
-    if opt.skip_blobs and not opt.import_type == "data" and not opt.quiet:
+    if opt.skip_blobs and opt.import_type != "data" and not opt.quiet:
         print("# WARNING: --skip-blobs option ignored for metadata import.")
 
     if "data" in skips and opt.import_type == "data":

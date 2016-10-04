@@ -126,10 +126,10 @@ def get_connection_dictionary(conn_info, ssl_dict=None):
     if isinstance(conn_info, dict) and 'host' in conn_info:
         # Not update conn_info if already has any ssl certificate.
         if (ssl_dict is not None and
-            not (conn_info.get("ssl_ca", None) or
-                 conn_info.get("ssl_cert", None) or
-                 conn_info.get("ssl_key", None) or
-                 conn_info.get("ssl", None))):
+                not (conn_info.get("ssl_ca", None) or
+                     conn_info.get("ssl_cert", None) or
+                     conn_info.get("ssl_key", None) or
+                     conn_info.get("ssl", None))):
             conn_info.update(ssl_dict)
         conn_val = conn_info
     elif isinstance(conn_info, Server):
@@ -177,9 +177,9 @@ def set_ssl_opts_in_connection_info(ssl_opts, connection_info):
     # empty string i.e '' to avoid an error from C/py about ca option being
     # the None value.
     if ('ssl_cert' in connection_info.keys() or
-        'ssl_key' in connection_info.keys() or
-        ssl_opts.get('ssl')) and \
-       'ssl_ca' not in connection_info.keys():
+            'ssl_key' in connection_info.keys() or
+            ssl_opts.get('ssl')) and \
+            'ssl_ca' not in connection_info.keys():
         connection_info['ssl_ca'] = ''
 
     # The ca certificate is verified only if the ssl option is also specified.
@@ -327,8 +327,10 @@ def get_server(name, values, quiet, verbose=False):
     if name.lower() == 'master':
         server_conn = Master(server_options)
     elif name.lower() == 'slave':
+        # pylint: disable=R0204
         server_conn = Slave(server_options)
     else:
+        # pylint: disable=R0204
         server_conn = Server(server_options)
     try:
         server_conn.connect()
@@ -593,18 +595,18 @@ def stop_running_server(server, wait=10, drop=True):
     # Build the shutdown command
     res = server.show_server_variable("basedir")
     mysqladmin_client = "mysqladmin"
-    if not os.name == "posix":
+    if os.name != 'posix':
         mysqladmin_client = "mysqladmin.exe"
     mysqladmin_path = os.path.normpath(os.path.join(res[0][1], "bin",
                                                     mysqladmin_client))
     if not os.path.exists(mysqladmin_path):
         mysqladmin_path = os.path.normpath(os.path.join(res[0][1], "client",
                                                         mysqladmin_client))
-    if not os.path.exists(mysqladmin_path) and not os.name == 'posix':
+    if not os.path.exists(mysqladmin_path) and os.name != 'posix':
         mysqladmin_path = os.path.normpath(os.path.join(res[0][1],
                                                         "client/debug",
                                                         mysqladmin_client))
-    if not os.path.exists(mysqladmin_path) and not os.name == 'posix':
+    if not os.path.exists(mysqladmin_path) and os.name != 'posix':
         mysqladmin_path = os.path.normpath(os.path.join(res[0][1],
                                                         "client/release",
                                                         mysqladmin_client))
@@ -723,7 +725,7 @@ class Server(object):
         if options is None:
             options = {}
 
-        assert not options.get("conn_info") is None
+        assert options.get("conn_info") is not None
 
         self.verbose = options.get("verbose", False)
         self.db_conn = None
@@ -877,8 +879,8 @@ class Server(object):
                 my_host = socket.gethostbyaddr(clean_IPv6(host))
                 aliases.add(my_host[0])
                 # socket.gethostbyname_ex() does not work with ipv6
-                if (not my_host[0].count(":") < 1 or
-                   not my_host[0] == "ip6-localhost"):
+                if (my_host[0].count(":") >= 1 or
+                        my_host[0] != "ip6-localhost"):
                     host_ip = socket.gethostbyname_ex(my_host[0])
                 else:
                     addrinfo = socket.getaddrinfo(my_host[0], None)
@@ -924,7 +926,6 @@ class Server(object):
                           "reason: {1}".format(host, error.strerror))
         aliases.update(set(host_ip[1]))
         aliases.update(set(host_ip[2]))
-
         return aliases
 
     def is_alias(self, host_or_ip):
@@ -939,7 +940,7 @@ class Server(object):
 
         host_or_ip = clean_IPv6(host_or_ip.lower())
 
-        # for quickness, verify in the existing  aliases, if they exist.
+        # for quickness, verify in the existing aliases, if they exist.
         if self.aliases:
             if host_or_ip.lower() in self.aliases:
                 return True
@@ -1115,9 +1116,9 @@ class Server(object):
             # option, so we use an empty string i.e '' to avoid an error from
             # C/py about ca option being the None value.
             if ('ssl_cert' in parameters.keys() or
-                'ssl_key' in parameters.keys() or
-                self.ssl) and \
-               'ssl_ca' not in parameters:
+                    'ssl_key' in parameters.keys() or
+                    self.ssl) and \
+                    'ssl_ca' not in parameters:
                 parameters['ssl_ca'] = ''
 
             # The ca certificate is verified only if the ssl option is also
@@ -1286,6 +1287,7 @@ class Server(object):
                 q_killer.stop()
 
         # Fetch rows (only if available or fetch = True).
+        # pylint: disable=R0101
         if cur.with_rows:
             if fetch or columns:
                 try:
@@ -1295,6 +1297,7 @@ class Server(object):
                         col_names = []
                         for col in col_headings:
                             col_names.append(col)
+                        # pylint: disable=R0204
                         results = col_names, results
                 except mysql.connector.Error as err:
                     raise UtilDBError("Error fetching all query data: "
@@ -1426,14 +1429,15 @@ class Server(object):
         Raises UtilRplError when errors occur.
         """
         errors = []
-        if not self.supports_gtid() == "ON":
+        if self.supports_gtid() != "ON":
             errors.append("    GTID is not enabled.")
         if not self.check_version_compat(5, 6, 9):
             errors.append("    Server version must be 5.6.9 or greater.")
         if errors:
-            errors = "\n".join(errors)
-            errors = "\n".join([_GTID_ERROR % (self.host, self.port), errors])
-            raise UtilRplError(errors)
+            error_str = "\n".join(errors)
+            error_str = "\n".join([_GTID_ERROR % (self.host, self.port),
+                                   error_str])
+            raise UtilRplError(error_str)
 
     def check_gtid_executed(self, operation="copy"):
         """Check to see if the gtid_executed variable is clear
@@ -1913,6 +1917,7 @@ class Server(object):
             version.append(None)
 
         results = self.show_server_variable("have_innodb")
+        # pylint: disable=R0102
         if results is not None and results != [] and \
            results[0][1].lower() == "yes":
             have_innodb = True

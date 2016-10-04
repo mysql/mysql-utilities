@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,8 +32,7 @@ _TRIGGER_TESTS = [("Trigger definition",
                    "VALUES(1, 'Wax on, wax off');",
                    "CREATE TRIGGER diff_trig.trg AFTER INSERT ON diff_trig.t1 "
                    "FOR EACH ROW INSERT INTO diff_trig.t2 "
-                   "VALUES(3, 'Wasabi?');", 0),
-                  ]
+                   "VALUES(3, 'Wasabi?');", 0), ]
 
 
 class test(test_sql_template.test):
@@ -47,7 +46,7 @@ class test(test_sql_template.test):
     def check_prerequisites(self):
         return test_sql_template.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         test_object = {'db1': 'diff_trig', 'db2': 'diff_trig',
                        'object_name': 'trg',
                        'startup_cmds': [_TRIG_TABLE, _DIFF_TABLE],

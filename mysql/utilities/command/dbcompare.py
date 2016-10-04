@@ -548,8 +548,7 @@ def compare_all_databases(server1_val, server2_val, exclude_list, options):
         operator = 'REGEXP' if options['use_regexp'] else 'LIKE'
         conditions = "AND {0}".format(" AND ".join(
             ["SCHEMA_NAME NOT {0} '{1}'".format(operator, db)
-             for db in exclude_list])
-        )
+             for db in exclude_list]))
 
     server1_dbs = set(
         [db[0] for db in server1.exec_query(get_dbs_query.format(conditions))]

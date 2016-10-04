@@ -39,7 +39,7 @@ class test(compare_db_errors.test):
     server1 = None
     server2 = None
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port(), "")
         self.server1 = self.servers.spawn_server("compare_db_srv1_aq_mix",
                                                  mysqld, True)

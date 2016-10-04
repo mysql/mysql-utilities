@@ -21,12 +21,11 @@ This file contains the binlog relocate utility. It is used to move binlog
 files to a different location, updating the binlog index files accordingly.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os
 import sys
-
 import mysql.utilities.command.binlog_admin as binlog_admin
+
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.common.binary_log_file import (LOG_TYPE_BIN,
                                                     LOG_TYPE_RELAY,
                                                     LOG_TYPES)

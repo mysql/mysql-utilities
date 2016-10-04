@@ -21,11 +21,10 @@ This file contains the procgrep utility which allows users to search process
 information.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os.path
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.exception import EmptyResultError
 from mysql.utilities.command.proc import (ProcessGrep, KILL_CONNECTION,
                                           KILL_QUERY, PRINT_PROCESS, ID, USER,
@@ -156,7 +155,7 @@ if __name__ == '__main__':
         _, details, _ = sys.exc_info()
         sys.stderr.write("No matches\n")
         sys.exit(1)
-    except Exception:
+    except:
         _, details, _ = sys.exc_info()
         sys.stderr.write('ERROR: {0}\n'.format(details))
         sys.exit(2)

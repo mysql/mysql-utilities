@@ -83,7 +83,6 @@ class test(replicate_ms.test):
     def run(self):
         test_num = 0
 
-        slave_conn = self.build_connection_string(self.server1).strip(' ')
         master1_conn = self.build_connection_string(self.server2).strip(' ')
         master2_conn = self.build_connection_string(self.server3).strip(' ')
 
@@ -94,7 +93,7 @@ class test(replicate_ms.test):
         test_num += 1
         comment = ("Test case {0} - mysqlbinlogpurge: with discover "
                    "and verbose options - master 1".format(test_num))
-        cmds = ("{0} {1} -vv"
+        cmds = ("{0} {1} {2} -vv"
                 "").format(cmd_str, cmd_opts, "binlog_purge{0}.log".format(1))
         res = self.run_test_case(0, cmds, comment)
         if not res:
@@ -107,7 +106,7 @@ class test(replicate_ms.test):
         test_num += 1
         comment = ("Test case {0} - mysqlbinlogpurge: with discover "
                    "and verbose options - master 2".format(test_num))
-        cmds = ("{0} {1} -vv"
+        cmds = ("{0} {1} {2} -vv"
                 "").format(cmd_str, cmd_opts, "binlog_purge{0}.log".format(2))
         res = self.run_test_case(0, cmds, comment)
         if not res:

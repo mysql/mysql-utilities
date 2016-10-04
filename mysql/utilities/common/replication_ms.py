@@ -246,7 +246,7 @@ class ReplicationMultiSource(Daemon):
             for any_priv_tuple in master_priv:
                 has_privilege = any(
                     [user_obj.has_privilege('*', '*', priv)
-                        for priv in any_priv_tuple]
+                     for priv in any_priv_tuple]
                 )
                 if not has_privilege:
                     msg = ERROR_USER_WITHOUT_PRIVILEGES.format(
@@ -272,7 +272,7 @@ class ReplicationMultiSource(Daemon):
         for any_priv_tuple in slave_priv:
             has_privilege = any(
                 [user_obj.has_privilege('*', '*', priv)
-                    for priv in any_priv_tuple]
+                 for priv in any_priv_tuple]
             )
             if not has_privilege:
                 msg = ("User '{0}' on '{1}@{2}' does not have sufficient "
@@ -295,7 +295,7 @@ class ReplicationMultiSource(Daemon):
         if host_port:
             host = host_port[0]
         if (not host or uses_ip != hostname_is_ip(slave.host) or
-           uses_ip != hostname_is_ip(host)):
+                uses_ip != hostname_is_ip(host)):
             return False
         return True
 
@@ -349,7 +349,7 @@ class ReplicationMultiSource(Daemon):
 
             # Check master for binary logging
             errors = rpl.check_master_binlog()
-            if not errors == []:
+            if errors != []:
                 raise UtilRplError(errors[0])
 
             # Setup replication
@@ -634,6 +634,7 @@ class ReplicationMultiSource(Daemon):
         num_masters = len(self.masters_vals)
         use_rpl_setup = True
 
+        # pylint: disable=R0101
         while True:
             # Round-robin scheduling on the masters
             for idx in range(num_masters):

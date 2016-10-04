@@ -61,7 +61,7 @@ class test(compare_db.test):
             raise MUTLibError("Test requires server version prior to 5.7.0")
         return self.check_num_servers(1)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         self.server1 = self.servers.get_server(0)
         if self.need_server:
             try:
@@ -169,7 +169,7 @@ class test(compare_db.test):
 
             if self.debug:
                 print("{0}.{1} rows had been increased from {2} to {3}"
-                      "".format(self.db_test_name, table, count_before[0][0],
+                      "".format(self.db_test_name, tb, count_before[0][0],
                                 count_after[0][0]))
 
         except UtilError as err:

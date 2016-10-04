@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -144,8 +144,9 @@ class test(rpl_admin.test):
         nb_server_conn = self.build_connection_string(self.server5).strip(' ')
 
         comment = "mysqlrplshow.py"
-        cmd_opts = ("-r --discover-slaves-login={0} "
-                    ).format(master_conn.split('@')[0])
+        cmd_opts = (
+            "-r --discover-slaves-login={0} "
+        ).format(master_conn.split('@')[0])
         cmds = "mysqlrplshow.py --master={0} {1}".format(master_conn, cmd_opts)
         self.run_test_case(0, cmds, comment)
 

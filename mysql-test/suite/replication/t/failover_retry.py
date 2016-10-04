@@ -19,12 +19,8 @@
 failover master retry test.
 """
 
-import os
-import subprocess
-import tempfile
-import time
-
 import failover
+from mysql.utilities.exception import MUTLibError
 
 FAILOVER_LOG = "{0}fail_log.txt"
 

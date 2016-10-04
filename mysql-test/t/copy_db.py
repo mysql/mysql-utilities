@@ -48,6 +48,7 @@ class test(mutlib.System_test):
             self.need_server = True
         return self.check_num_servers(1)
 
+    # pylint: disable=W0221
     def setup(self, spawn_servers=True):
         if spawn_servers:
             self.server1 = self.servers.get_server(0)
@@ -420,9 +421,9 @@ class test(mutlib.System_test):
         check_db_info_on_server1 = [("util_test_default_collation_copy",
                                      "DEFAULT_COLLATION_NAME",
                                      "utf8_general_ci", "COLLATION_NAME"), (
-                                    "util_test_default_charset_copy",
-                                    "DEFAULT_CHARACTER_SET_NAME", "utf8",
-                                    "CHARACTER_SET_NAME")]
+                                         "util_test_default_charset_copy",
+                                         "DEFAULT_CHARACTER_SET_NAME", "utf8",
+                                         "CHARACTER_SET_NAME")]
         for db in check_db_info_on_server1:
             try:
                 res = self.server1.exec_query(qry_db.format(db[1], db[0]))

@@ -109,7 +109,7 @@ def grant_proxy_ssl_privileges(server, user, passw, at='localhost',
     Note: Raises UtilError on any Error.
     """
 
-    grant = [
+    grant_parts = [
         "GRANT", privs,
         "ON *.*",
         "TO '{0}'@'{1}'".format(user, at),
@@ -119,7 +119,7 @@ def grant_proxy_ssl_privileges(server, user, passw, at='localhost',
     ]
 
     try:
-        server.exec_query(" ".join(grant))
+        server.exec_query(" ".join(grant_parts))
     except UtilDBError as err:
         raise UtilError("Cannot create new user {0} at {1}:{2} reason:"
                         "{3}".format(user, server.host, server.port,
@@ -510,18 +510,18 @@ class User(object):
         # OPTION privilege.
         # Check server wide grants.
         elif (access in grant_dict['*']['*'] or
-                "ALL PRIVILEGES" in grant_dict['*']['*'] and
-                access != "GRANT OPTION"):
+              "ALL PRIVILEGES" in grant_dict['*']['*'] and
+              access != "GRANT OPTION"):
             return True
         # Check database level grants.
         elif (access in grant_dict[db]['*'] or
-                "ALL PRIVILEGES" in grant_dict[db]['*'] and
-                access != "GRANT OPTION"):
+              "ALL PRIVILEGES" in grant_dict[db]['*'] and
+              access != "GRANT OPTION"):
             return True
         # Check object level grants.
         elif (access in grant_dict[db][obj] or
-                "ALL PRIVILEGES" in grant_dict[db][obj] and
-                access != "GRANT OPTION"):
+              "ALL PRIVILEGES" in grant_dict[db][obj] and
+              access != "GRANT OPTION"):
             return True
         else:
             return False
@@ -627,6 +627,7 @@ class User(object):
             print grant_tuple[0]
 
     def _get_authentication(self):
+        """ Return authentication string """
         res = self.server1.exec_query("SELECT plugin FROM mysql.user "
                                       "WHERE user='{0}' and host='{1}'"
                                       "".format(self.user, self.host))

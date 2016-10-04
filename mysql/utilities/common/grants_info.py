@@ -394,7 +394,7 @@ def _has_all_privileges(query_priv_set, grantee_priv_set, obj_type):
     # automatically return True
     if ("GRANT OPTION" in grantee_priv_set and
             ('ALL PRIVILEGES' in grantee_priv_set or
-                'ALL' in grantee_priv_set)):
+             'ALL' in grantee_priv_set)):
         return True
 
     # Remove USAGE privilege because it is the same has having nothing
@@ -438,6 +438,7 @@ def get_grantees(server, valid_obj_type_dict, req_privileges=None,
     grantee_dict = defaultdict(
         lambda: defaultdict(lambda: defaultdict(set)))
 
+    # pylint: disable=R0101
     for obj_type in valid_obj_type_dict:
         for db_name, obj_name in valid_obj_type_dict[obj_type]:
             if obj_type == DATABASE_TYPE:

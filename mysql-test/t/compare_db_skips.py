@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ class test(compare_db.test):
     def check_prerequisites(self):
         return compare_db.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         return compare_db.test.setup(self)
 
     def run(self):

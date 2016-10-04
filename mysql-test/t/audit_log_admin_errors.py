@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ class test(audit_log_admin.test):
         num_test += 1
         comment = ("Test case {0} - Invalid remote-login "
                    "format".format(num_test))
-        cmd_opts = ("copy --audit-log-name={0} --copy-to={0} --remote-login="
+        cmd_opts = ("copy --audit-log-name={0} --copy-to={1} --remote-login="
                     "xpto".format(audit_log_name, data_dir))
         res = self.run_test_case(2, cmd_base + cmd_opts, comment)
         if not res:

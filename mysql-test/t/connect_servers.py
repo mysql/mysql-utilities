@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ connect_servers test.
 
 import mutlib
 
-from mysql.utilities.exception import UtilError, FormatError
+from mysql.utilities.exception import UtilError
 from mysql.utilities.common.server import connect_servers
 
 
@@ -46,28 +46,28 @@ class test(mutlib.System_test):
         self.connect_dict = self.servers.get_connection_values(self.server0)
 
         # list of tuples (comment, src, dest, result, fail)
-        self.test_cases = [('Server and Server', self.server0, self.server0,
-                            None, False),
-                           ('Server and Dictionary', self.server0,
-                            self.connect_dict, None, False),
-                           ('Server and String', self.server0,
-                            self.connect_str, None, False),
-                           ('Dictionary and String', self.connect_dict,
-                            self.connect_str, None, False),
-                           ('Dictionary and Server', self.connect_dict,
-                            self.server0, None, False),
-                           ('String and Server', self.connect_str,
-                            self.server0, None, False),
-                           ('String and Dictionary', self.connect_str,
-                            self.connect_dict, None, False),
-                           # Include at least one Failure to show that it
-                           # does still fail
-                           ('Bad String and Server', 'DAS*!@#MASD&UKKLKDA)!@#',
-                            self.server0, "Connection 'DAS*!@#MASD"
-                                          "&UKKLKDA)!@#' cannot be parsed as "
-                                          "a connection",
-                            True),
-                           ]
+        self.test_cases = [
+            ('Server and Server', self.server0, self.server0,
+             None, False),
+            ('Server and Dictionary', self.server0,
+             self.connect_dict, None, False),
+            ('Server and String', self.server0,
+             self.connect_str, None, False),
+            ('Dictionary and String', self.connect_dict,
+             self.connect_str, None, False),
+            ('Dictionary and Server', self.connect_dict,
+             self.server0, None, False),
+            ('String and Server', self.connect_str,
+             self.server0, None, False),
+            ('String and Dictionary', self.connect_str,
+             self.connect_dict, None, False),
+            # Include at least one Failure to show that it
+            # does still fail
+            ('Bad String and Server', 'DAS*!@#MASD&UKKLKDA)!@#',
+             self.server0, "Connection 'DAS*!@#MASD"
+                           "&UKKLKDA)!@#' cannot be parsed as "
+                           "a connection", True),
+        ]
         return True
 
     def run(self):
@@ -79,8 +79,6 @@ class test(mutlib.System_test):
                 connect_servers(test_case[1], test_case[2], server_options)
             except UtilError as err:
                 self.results.append((test_case[0], True, err.errmsg))
-            except FormatError as err:
-                self.results.append((test_case[0], True, err))
             else:
                 self.results.append((test_case[0], False, None))
 
@@ -100,7 +98,7 @@ class test(mutlib.System_test):
 
         # Check results to make sure test case completes as expected
         for test_case, result in zip(self.test_cases, self.results):
-            if not test_case[4] == result[1]:
+            if test_case[4] != result[1]:
                 return False, result[2]
 
         return True, None

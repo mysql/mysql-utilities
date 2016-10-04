@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -322,11 +322,11 @@ def _get_create_statement(server, temp_datadir,
             if new_engine:
                 create_str = create_str.replace("ENGINE=MEMORY",
                                                 "ENGINE=%s" % new_engine)
-            elif not current_engine[1].upper() == "MEMORY":
+            elif current_engine[1].upper() != "MEMORY":
                 create_str = create_str.replace("ENGINE=MEMORY",
                                                 "ENGINE=%s" %
                                                 current_engine[1])
-            if frm_file[0] and not frm_file[0] == ".":
+            if frm_file[0] and frm_file[0] != ".":
                 create_str = create_str.replace("CREATE TABLE ",
                                                 "CREATE TABLE `%s`." %
                                                 frm_file[0])

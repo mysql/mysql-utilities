@@ -159,7 +159,7 @@ class test(mutlib.System_test):
             print(comment)
         self.results.append("{0}\n".format(comment))
         res = server.is_alias(test_case)
-        if not res == exp_res:
+        if res != exp_res:
             msg = _BAD_RESULT_MSG.format(test_num, repr(exp_res), repr(res))
             if self.debug:
                 print("{0} {1}".format(_FAIL, msg))

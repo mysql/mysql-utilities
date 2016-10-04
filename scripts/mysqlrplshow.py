@@ -22,11 +22,10 @@ find the slaves for a given master and can traverse the list of slaves
 checking for additional master/slave connections.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os.path
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command.show_rpl import show_topology
 from mysql.utilities.common.ip_parser import parse_connection

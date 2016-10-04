@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,8 +40,7 @@ _NONE = False
 _IPv4_TEST_CASES = (("127.0.0.1", (_NONE, "127.0.0.1", None, None)),
                     ("127.0.0.1:3306", (_NONE, "127.0.0.1", "3306", None)),
                     ("0.0.0.1", (_NONE, "0.0.0.1", None, None)),
-                    ("0.0.0.1:3306", (_NONE, "0.0.0.1", "3306", None)),
-                    )
+                    ("0.0.0.1:3306", (_NONE, "0.0.0.1", "3306", None)), )
 
 _IPv6_TEST_CASES = (
     ("0:1:2:3:4:5:6:7", (_NONE, "[0:1:2:3:4:5:6:7]", None, None)),

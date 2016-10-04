@@ -67,7 +67,7 @@ class UnicodeWriter(object):
         self.writer.writerow([val.encode("utf-8") if isinstance(val, unicode)
                               else val for val in row])
         data = self.queue.getvalue()
-        data = data.decode("utf-8")
+        data = data.decode("utf-8")  # pylint: disable=R0204
         data = self.encoder.encode(data)
         self.stream.write(data)
         self.queue.truncate(0)
@@ -312,6 +312,7 @@ def _get_max_key_dict_list(dictionary_list, key, alias_key=None):
     Returns int - max width of key
     """
     def lcal(x):
+        """ calculate string length """
         return len(str(x or ''))
     dl = dictionary_list
     tmp = [(lcal(item[key]), lcal(item.get(alias_key, 0))) for item in dl]

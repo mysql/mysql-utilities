@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights
 # reserved.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -92,7 +92,7 @@ def setup_replication(master_vals, slave_vals, rpl_user,
     # Check master for binary logging
     print "# Checking for binary logging on master..."
     errors = rpl.check_master_binlog()
-    if not errors == []:
+    if errors != []:
         raise UtilError(errors[0])
 
     # Setup replication

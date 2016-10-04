@@ -185,7 +185,7 @@ class RPLSynchronizer(object):
             for any_priv_tuple in master_priv:
                 has_privilege = any(
                     [user_obj.has_privilege('*', '*', priv)
-                        for priv in any_priv_tuple]
+                     for priv in any_priv_tuple]
                 )
                 if not has_privilege:
                     raise UtilError(ERROR_USER_WITHOUT_PRIVILEGES.format(
@@ -203,7 +203,7 @@ class RPLSynchronizer(object):
             for any_priv_tuple in slave_priv:
                 has_privilege = any(
                     [user_obj.has_privilege('*', '*', priv)
-                        for priv in any_priv_tuple]
+                     for priv in any_priv_tuple]
                 )
                 if not has_privilege:
                     raise UtilError(
@@ -378,7 +378,7 @@ class RPLSynchronizer(object):
                     else:
                         return True
                 elif (rpl_filter['replicate_ignore_db'] and
-                        obj_name in rpl_filter['replicate_ignore_db']):
+                      obj_name in rpl_filter['replicate_ignore_db']):
                     return True
             else:
                 if (rpl_filter['replicate_do_table'] and
@@ -977,7 +977,7 @@ class RPLSynchronizer(object):
             dbs_not_in_base_srv = slave_dbs - base_server_dbs
             filtered_dbs = set(
                 [db for db in dbs_not_in_base_srv
-                    if self._is_rpl_filtered(db, slave=self._base_server_key)]
+                 if self._is_rpl_filtered(db, slave=self._base_server_key)]
             )
             dbs_not_in_base_srv -= filtered_dbs
             for db in filtered_dbs:
@@ -994,6 +994,7 @@ class RPLSynchronizer(object):
         filter_srv = None if self._get_master() else self._base_server_key
 
         # Check data consistency for each table on the base server.
+        # pylint: disable=R0101
         for db_name in base_server_dbs:
             # Skip database if filtered by defined replication rules.
             if self._is_rpl_filtered(db_name, slave=filter_srv):
@@ -1098,8 +1099,8 @@ class RPLSynchronizer(object):
                     for slave_key in slaves_to_check:
                         # Skip table if filtered by defined replication rules.
                         if (obj_type == 'TABLE' and
-                            self._is_rpl_filtered(db_name, obj_name,
-                                                  slave=slave_key)):
+                                self._is_rpl_filtered(db_name, obj_name,
+                                                      slave=slave_key)):
                             print("# [SKIP] Table '{0}' check for '{1}' - "
                                   "filtered by replication rule."
                                   "".format(obj_name, slave_key))

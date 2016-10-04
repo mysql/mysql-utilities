@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,24 +25,25 @@ import test_sql_template
 _TEST_VIEW_TABLE = "CREATE TABLE `diff_view`.`t1` (a int)"
 
 # (comment, def1, def2, expected result)
-_VIEW_TESTS = [("View definition",
-                "CREATE VIEW diff_view.v1 as SELECT 1;",
-                "CREATE VIEW diff_view.v1 as SELECT 2;", 0),
-               ("View definer",
-                "CREATE definer='root'@'localhost' VIEW diff_view.v1 "
-                "as SELECT 3;",
-                "CREATE definer='joe'@'otherhost' VIEW diff_view.v1 "
-                "as SELECT 3;", 0),
-               ("View security",
-                "CREATE SQL SECURITY DEFINER VIEW diff_view.v1 as SELECT 4;",
-                "CREATE SQL SECURITY INVOKER VIEW diff_view.v1 "
-                "as SELECT 4;", 0),
-               ("View check option",
-                "CREATE VIEW diff_view.v1 as SELECT * FROM `diff_view`.`t1` "
-                "WHERE a < 11 WITH CASCADED CHECK OPTION;",
-                "CREATE VIEW diff_view.v1 as SELECT * FROM `diff_view`.`t1` "
-                "WHERE a < 11;", 0),
-               ]
+_VIEW_TESTS = [
+    ("View definition",
+     "CREATE VIEW diff_view.v1 as SELECT 1;",
+     "CREATE VIEW diff_view.v1 as SELECT 2;", 0),
+    ("View definer",
+     "CREATE definer='root'@'localhost' VIEW diff_view.v1 "
+     "as SELECT 3;",
+     "CREATE definer='joe'@'otherhost' VIEW diff_view.v1 "
+     "as SELECT 3;", 0),
+    ("View security",
+     "CREATE SQL SECURITY DEFINER VIEW diff_view.v1 as SELECT 4;",
+     "CREATE SQL SECURITY INVOKER VIEW diff_view.v1 "
+     "as SELECT 4;", 0),
+    ("View check option",
+     "CREATE VIEW diff_view.v1 as SELECT * FROM `diff_view`.`t1` "
+     "WHERE a < 11 WITH CASCADED CHECK OPTION;",
+     "CREATE VIEW diff_view.v1 as SELECT * FROM `diff_view`.`t1` "
+     "WHERE a < 11;", 0),
+]
 
 
 class test(test_sql_template.test):
@@ -56,7 +57,7 @@ class test(test_sql_template.test):
     def check_prerequisites(self):
         return test_sql_template.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         test_object = {'db1': 'diff_view', 'db2': 'diff_view',
                        'object_name': 'v1', 'startup_cmds': [_TEST_VIEW_TABLE],
                        'shutdown_cmds': [], }

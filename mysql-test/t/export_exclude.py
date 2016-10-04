@@ -36,7 +36,7 @@ class test(export_parameters_def.test):
     def check_prerequisites(self):
         return export_parameters_def.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         return export_parameters_def.test.setup(self)
 
     def run(self):

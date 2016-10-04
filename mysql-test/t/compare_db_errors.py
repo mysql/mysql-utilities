@@ -36,7 +36,7 @@ class test(compare_db.test):
     def check_prerequisites(self):
         return compare_db.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         self.server1 = self.servers.get_server(0)
         if self.need_server:
             try:
@@ -181,7 +181,7 @@ class test(compare_db.test):
         test_num += 1
         cmd_str = ("mysqldbcompare.py {0} {1} {2} "
                    "".format(s1_conn, s2_conn, "inventory:inventory -t"))
-        comment = ("Test case {0} - No pri key".format(test_num, cmd_opts))
+        comment = ("Test case {0} - No pri key".format(test_num))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -191,7 +191,7 @@ class test(compare_db.test):
                    "--character-set=unsupported_charset"
                    "".format(s1_conn, s2_conn, "inventory:inventory -t"))
         comment = ("Test case {0} - Invalid --character-set"
-                   "".format(test_num, cmd_opts))
+                   "".format(test_num))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -229,7 +229,7 @@ class test(compare_db.test):
                    "--use-indexes=box_3.invalid_index --skip-diff"
                    "".format(s1_conn, s2_conn, "inventory:inventory -t"))
         comment = ("Test case {0} - Invalid --use-indexes and different "
-                   "indexes".format(test_num, cmd_opts))
+                   "indexes".format(test_num))
         res = self.run_test_case(1, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))

@@ -21,13 +21,12 @@ This file contains the replication slave administration utility. It is used to
 perform replication operations on one or more slaves.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import logging
 import os
 import signal
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities import VERSION_FRM, VERSION_STRING
 from mysql.utilities.exception import UtilError, UtilRplError
 from mysql.utilities.command.rpl_admin import RplCommands, purge_log
@@ -67,6 +66,7 @@ if __name__ == '__main__':
     # If posix, save old terminal settings so we can restore them on exit.
     try:
         # Only valid for *nix systems.
+        # pylint: disable=C0413,C0411
         import termios
         old_terminal_settings = termios.tcgetattr(sys.stdin)
     except:
@@ -86,6 +86,7 @@ if __name__ == '__main__':
 
     # If ctypes present, we have Windows so define the exit with decorators
     try:
+        # pylint: disable=C0413,C0411
         import ctypes
 
         @ctypes.WINFUNCTYPE(ctypes.c_int, ctypes.c_uint)

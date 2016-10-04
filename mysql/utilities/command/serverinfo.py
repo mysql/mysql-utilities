@@ -67,8 +67,9 @@ _COLUMNS.extend(_SERVER_VARIABLES)
 
 # Retrieve column names from the _LOG_FILES_VARIABLES, filter the
 # None value, sort them alphabetically and add them to the  _COLUMNS list
-_COLUMNS.extend(sorted(
-    val for val in chain(*_LOG_FILES_VARIABLES.values()) if val is not None)
+_COLUMNS.extend(
+    sorted(val for val in chain(
+        *_LOG_FILES_VARIABLES.values()) if val is not None)
 )
 
 # Used to get O(1) performance in checking if an item is already present
@@ -216,9 +217,9 @@ def _server_info(server_val, get_defaults=False, options=None):
                     params_dict['warnings'].append(warning_msg)
 
         else:
-            params_dict['warnings'].append("Unable to get information "
-                                           "regarding variable '{0}'"
-                                           ).format(msg)
+            params_dict['warnings'].append(
+                "Unable to get information regarding variable '{0}'"
+            ).format(msg)
 
     # if audit_log plugin is installed and enabled
     if server.supports_plugin('audit'):
@@ -272,9 +273,8 @@ def _server_info(server_val, get_defaults=False, options=None):
             except UtilError as err:
                 raise UtilError("Unable to retrieve the defaults data "
                                 "(requires access to my_print_defaults): {0} "
-                                "(basedir: {1})".format(err.errmsg,
-                                                        params_dict['basedir'])
-                                )
+                                "(basedir: {1})"
+                                "".format(err.errmsg, params_dict['basedir']))
             out_file = tempfile.TemporaryFile()
             # Execute tool: <basedir>/my_print_defaults mysqld
             cmd_list = shlex.split(my_def_path)
@@ -576,16 +576,16 @@ def show_server_info(servers, options):
             # If we got errno 2003 and we do not have
             # socket, instead we check if server is localhost.
             elif (util_error.errno == CR_CONN_HOST_ERROR and
-                    server1.is_alias("localhost")):
+                  server1.is_alias("localhost")):
                 server_is_off = True
             # If we got errno 1045 it means Access denied,
             # notify the user if a password was used or not.
             elif util_error.errno == ER_ACCESS_DENIED_ERROR:
                 use_pass = 'YES' if conn_dict['passwd'] else 'NO'
-                err_msg = ("Access denied for user '{0}'@'{1}' using "
+                err_msg = ["Access denied for user '{0}'@'{1}' using "
                            "password: {2}".format(conn_dict['user'],
                                                   conn_dict['host'],
-                                                  use_pass))
+                                                  use_pass)]
             # Use the error message from the connection attempt.
             else:
                 err_msg = [util_error.errmsg]

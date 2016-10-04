@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@ import stat
 import struct
 import time
 
+from pprint import pprint
 from mysql.utilities.common.charsets import CharsetInfo
 from mysql.utilities.exception import UtilError
-from pprint import pprint
 
 
 #
@@ -623,9 +623,8 @@ class FrmReader(object):
                 if self.verbosity > 1:
                     print "# Reading key part %s." % j
                 key_part_info = {
-                    'field_num': struct.unpack("<H",
-                                               self.frm_file.read(2))[0] &
-                    _FIELD_NR_MASK,
+                    'field_num': struct.unpack(
+                        "<H", self.frm_file.read(2))[0] & _FIELD_NR_MASK,
                     'offset': struct.unpack("<H",
                                             self.frm_file.read(2))[0] - 1,
                     'key_type': struct.unpack("<H",
@@ -907,7 +906,7 @@ class FrmReader(object):
                     'field_length': data[2],  # 1, +3
                     'bytes_in_col': int(data[3]) + (int(data[4]) << 8),
                     'recpos': (int(data[6]) << 8) +
-                    (int(data[5])) + (int(data[4]) << 16),
+                              (int(data[5])) + (int(data[4]) << 16),
                     'unireg': data[7],  # 1, +8
                     'flags': data[8],  # 1, +9
                     'flags_extra': data[9],  # 1, +10
@@ -995,6 +994,7 @@ class FrmReader(object):
         self.frm_file.read(len(col_names) + col_len + 2)
         intervals = []
         interval_num = 0
+        # pylint: disable=R0101
         for i in range(0, len(col_names)):
             self.column_data[i]['name'] = col_names[i]
             # Here we read enums and match them to interval_nr.
@@ -1005,7 +1005,7 @@ class FrmReader(object):
                     cols = []
                     char_found = 99
                     col_str = ''
-                    while not char_found == 0:
+                    while char_found != 0:
                         char_found = struct.unpack("B",
                                                    self.frm_file.read(1))[0]
                         if char_found == 255:
@@ -1128,7 +1128,7 @@ class FrmReader(object):
                         (1 if (col_flags & _FIELDFLAG_DECIMAL) or
                          (length == 0) else 0)
                 if decimals == _FIELDFLAG_MAX_DEC:
-                    if not col['field_type_name'].upper() in \
+                    if col['field_type_name'].upper() not in \
                        ["FLOAT", "DOUBLE"]:
                         length_str = "(%s)" % length
                 else:
@@ -1138,9 +1138,11 @@ class FrmReader(object):
                                   col['field_type_name'].lower(),
                                   length_str))
             else:
-                col_parts.append("  `%s` %s(%s)" % (col['name'],
-                                 col['field_type_name'].lower(),
-                                 length))
+                col_parts.append(
+                    "  `%s` %s(%s)" % (col['name'],
+                                       col['field_type_name'].lower(),
+                                       length)
+                )
 
             # unsigned
             if col_flags & _FIELDFLAG_DECIMAL == 0 and _is_unsigned(col):
@@ -1222,7 +1224,7 @@ class FrmReader(object):
             else:
                 size_info = "(UNKNOWN)"
 
-        elif not field_len == key_len and \
+        elif field_len != key_len and \
                 not int(flags) & _HA_FULLTEXT and not int(flags) & _HA_SPATIAL:
             if self.csi:
                 size_info = "(%d)" % (key_len / maxlen)
@@ -1261,7 +1263,7 @@ class FrmReader(object):
                 if k < len(info['key_parts']) - 1:
                     key_cols += ","
             algorithm = _KEY_ALG[info['algorithm']]
-            if not algorithm == 'UNDEFINED':
+            if algorithm != 'UNDEFINED':
                 key_str += " USING %s" % algorithm
             if i < num_keys - 1:
                 key_str += ","
@@ -1424,7 +1426,7 @@ class FrmReader(object):
         file_type = struct.unpack("<H", self.frm_file.read(2))[0]
 
         # Take action based on file type
-        if not file_type == _TABLE_TYPE:
+        if file_type != _TABLE_TYPE:
             return
 
         # Read general information
@@ -1575,7 +1577,7 @@ class FrmReader(object):
             return None
 
         # Abort if not table.
-        if not file_type == _TABLE_TYPE:
+        if file_type != _TABLE_TYPE:
             raise UtilError("Invalid file type. Magic bytes = %02x" %
                             file_type)
 

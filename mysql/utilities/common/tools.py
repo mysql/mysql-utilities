@@ -245,6 +245,12 @@ def ping_host(host, timeout):
 
 
 def parse_mysqld_version(vers_str):
+    """ Parse the MySQL version string.
+
+    vers_str[in]     MySQL Version from client
+
+    Returns string = version string
+    """
     pattern = r"mysqld(?:\.exe)?\s+Ver\s+(\d+\.\d+\.\S+)\s"
     match = re.search(pattern, vers_str)
     if not match:
@@ -253,6 +259,7 @@ def parse_mysqld_version(vers_str):
     num_dots = vers_str.count('.')
     try:
         # get the version digits. If more than 2, we get first 3 parts
+        # pylint: disable=W0612
         if num_dots == 2:
             maj_ver, min_ver, dev = version.split(".", 2)
         else:

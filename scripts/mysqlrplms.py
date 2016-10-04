@@ -21,12 +21,11 @@ This file contains the replicate utility. It is used to establish a
 multi-source replication topology.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os.path
 import sys
 import logging
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities import VERSION_STRING
 from mysql.utilities.exception import FormatError, UtilError, UtilRplError
 from mysql.utilities.common.ip_parser import parse_connection

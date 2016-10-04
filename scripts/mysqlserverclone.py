@@ -21,11 +21,10 @@ This file contains the clone server utility which launches a new instance
 of an existing server.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os.path
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities import exception
 from mysql.utilities.command import serverclone
 from mysql.utilities.common.ip_parser import parse_connection

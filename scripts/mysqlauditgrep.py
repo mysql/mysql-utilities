@@ -22,11 +22,10 @@ retrieve log entries according to the specified search criteria (i.e.,
 from specific users, search patterns, date ranges, or query types).
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os.path
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities import VERSION_FRM
 from mysql.utilities.exception import UtilError
 from mysql.utilities.command import audit_log
@@ -194,7 +193,7 @@ if __name__ == '__main__':
     if opt.users:
         users = opt.users.split(",")
         users = [user for user in users if user]
-        if not len(users) > 0:
+        if len(users) <= 0:
             parser.error("The value for the option --users is not valid: "
                          "'{0}'".format(opt.users))
 
@@ -204,7 +203,7 @@ if __name__ == '__main__':
         query_types = opt.query_type.split(",")
         # filter empty values and convert all to lower cases
         query_types = [q_type.lower() for q_type in query_types if q_type]
-        if not len(query_types) > 0:
+        if len(query_types) <= 0:
             parser.error("The value for the option --query-type is not "
                          "valid: '{0}'".format(opt.query_type))
         else:
@@ -222,7 +221,7 @@ if __name__ == '__main__':
         event_types = opt.event_type.split(",")
         event_types = [e_type.lower() for e_type in event_types if e_type]
 
-        if not len(event_types) > 0:
+        if len(event_types) <= 0:
             parser.error("The value for the option --event-type is not "
                          "valid: '{0}'".format(opt.event_type))
         else:

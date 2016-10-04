@@ -37,6 +37,7 @@ if not check_connector_python():
     sys.exit(1)
 
 try:
+    # pylint: disable=C0413,C0411
     from mysql.utilities import VERSION_FRM, VERSION_STRING, COPYRIGHT_FULL
     from mysql.utilities.exception import UtilError
     from mysql.utilities.command.utilitiesconsole import UtilitiesConsole

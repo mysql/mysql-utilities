@@ -278,11 +278,10 @@ class test(rpl_admin.test):
         comment = ("Test case {0} - SSL "
                    "failover ".format(test_num))
         cmd_str = "mysqlrpladmin.py --master={0}".format(slave1)
-        slaves = ",".join([slave2, slave3,
-                           master])
+        slave_str = ",".join([slave2, slave3, master])
         cmd_opts = (" --slaves={0} --rpl-user=rpluser:hispassword "
-                    "failover".format(slaves))
-        cmd_opts = "{0} --candidates={1}".format(cmd_opts, slaves)
+                    "failover".format(slave_str))
+        cmd_opts = "{0} --candidates={1}".format(cmd_opts, slave_str)
         cmds = "{0} {1}".format(cmd_str, cmd_opts)
         res = self.run_test_case(0, cmds, comment)
         if not res:

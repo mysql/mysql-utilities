@@ -114,7 +114,7 @@ class TopologyMap(object):
 
         # Clear socket if used with a local server
         if (conn['host'] == 'localhost' or conn['host'] == "127.0.0.1" or
-           conn['host'] == "::1" or conn['host'] == "[::1]"):
+                conn['host'] == "::1" or conn['host'] == "[::1]"):
             conn['unix_socket'] = None
 
         # Increment num_retries if not set when --prompt is used
@@ -343,7 +343,7 @@ class TopologyMap(object):
                 new_preamble = "{0}   ".format(preamble)
                 print("{0}|".format(new_preamble))
                 role = "(SLAVE"
-                if not slave[1] == [] or slave[0] in masters_found:
+                if slave[1] != [] or slave[0] in masters_found:
                     role = "{0} + MASTER".format(role)
                 role = "{0})".format(role)
 
@@ -366,7 +366,7 @@ class TopologyMap(object):
                     print "-",
                 print role
 
-                if not slave[1] == []:
+                if slave[1] != []:
                     if i < stop - 1:
                         new_preamble = "{0}|".format(new_preamble)
                     else:

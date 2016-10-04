@@ -21,11 +21,10 @@ This file contains the purge binlog utility. It is used to purge binlog on
 demand or by schedule and standalone or on a establish replication topology.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.command.binlog_admin import binlog_purge
 from mysql.utilities.common.messages import (ERROR_MASTER_IN_SLAVES,
                                              PARSE_ERR_OPT_REQ_OPT,

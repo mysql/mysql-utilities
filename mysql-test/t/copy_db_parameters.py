@@ -51,7 +51,7 @@ class test(copy_db.test):
             self.need_server = True
         return self.check_num_servers(1)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         self.server1 = self.servers.get_server(0)
         if self.need_server:
             try:
@@ -81,7 +81,7 @@ class test(copy_db.test):
         try:
             rows = self.server3.exec_query("SHOW DATABASES")
             for row in rows:
-                if not row[0].upper() in _SYSTEM_DATABASES:
+                if row[0].upper() not in _SYSTEM_DATABASES:
                     self.drop_db(self.server3, row[0])
             self.server3.exec_query("CREATE DATABASE wesaysocorp")
         except UtilError as err:

@@ -38,7 +38,7 @@ class test(copy_db_parameters.test):
     def check_prerequisites(self):
         return copy_db_parameters.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         copy_db_parameters.test.setup(self)
 
         # Create database to export data with unicode characters

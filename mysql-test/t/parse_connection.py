@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -280,7 +280,7 @@ class test(mutlib.System_test):
             return False, "Invalid number of test case results."
 
         for i in range(0, len(_TEST_RESULTS)):
-            if not self.results[i] == _TEST_RESULTS[i][2]:
+            if self.results[i] != _TEST_RESULTS[i][2]:
                 return (False, (
                     "Got wrong result for test case {0}. Expected: {1}, got: "
                     "{2}.".format(i + 1, _TEST_RESULTS[i][2],
@@ -288,7 +288,7 @@ class test(mutlib.System_test):
 
         for test_case in _TEST_RESULTS_WITH_CREDENTIALS:
             i += 1  # pylint: disable=W0631
-            if not self.results[i] == test_case[2]:
+            if self.results[i] != test_case[2]:
                 msg = (u"Got wrong result for test case {0}. "
                        u"Expected: {1}, got: {2}.")
                 return (False, msg.format(i + 1, test_case[2],

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2011, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ _NEW_BASE_COMMANDS = [
     {'name': 'show last error',
      'alias': '',
      'text': 'Display the last error captured during the execution of the'
-     ' utilities'}
+             ' utilities'}
 ]
 
 _UTILS_MISSING = "MySQL Utilities are either not installed or " + \
@@ -85,7 +85,7 @@ class UtilitiesConsole(Console):
         try:
             self.path = get_util_path(options.get("utildir", ""))
             if self.path is None:
-                raise
+                raise UtilError(_UTILS_MISSING)
         except:
             raise UtilError(_UTILS_MISSING)
         self.utils = Utilities(options)

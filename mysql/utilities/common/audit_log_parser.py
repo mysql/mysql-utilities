@@ -149,8 +149,8 @@ class AuditLogParser(AuditLogReader):
 
         # Register new connection_id (and corresponding user)
         if (name_upper.upper() == "CONNECT" and
-           (user and (user in self.options['users'])) or
-           (priv_user and (priv_user in self.options['users']))):
+                (user and (user in self.options['users'])) or
+                (priv_user and (priv_user in self.options['users']))):
             self.connection_ids.append((user, priv_user,
                                         record.get("CONNECTION_ID")))
 
@@ -253,10 +253,7 @@ class AuditLogParser(AuditLogReader):
         event_types[in] list of matching record/event types;
         """
         name = record.get('NAME').lower()
-        if name in event_types:
-            return True
-        else:
-            return False
+        return(name in event_types)
 
     @staticmethod
     def match_status(record, status_list):

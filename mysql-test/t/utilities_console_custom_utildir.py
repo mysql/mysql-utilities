@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ class test(utilities_console_base.test):
         new_util_path = utils.get_util_path(self.tmp_dir)
         self.results.append(
             "returned path from get_util_path: {0}\n".format(new_util_path))
-        if not new_util_path == self.tmp_dir:
+        if new_util_path != self.tmp_dir:
             raise MUTLibError("get_util_path fails to get expected path")
         self.results.append("Test Pass \n")
         self.results.append("\n")

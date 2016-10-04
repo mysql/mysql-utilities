@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,20 +21,20 @@ connection_values test.
 
 import mutlib
 
-from mysql.utilities.exception import (ConnectionValuesError, FormatError,
-                                       UtilError)
+from mysql.utilities.exception import (ConnectionValuesError, UtilError)
 from mysql.utilities.common.server import (get_connection_dictionary,
                                            connect_servers)
 
 # List of tuples (comment, input, fail)
-_TEST_CASES = [('Good connection string but cannot connect',
-                'root:pass@hostname.com:3306:/my.sock', True),
-               ('Bad connection string', 'DAS*!@#MASD&UKKLKDA)!@#', True),
-               ('Good dictionary but cannot connect',
-                {'user': 'root', 'passwd': 'pass', 'host': 'localhost',
-                 'port': '3306', 'unix_socket': '/my.sock'}, True),
-               ('Bad dictionary', {'something': 'else'}, True),
-               ]
+_TEST_CASES = [
+    ('Good connection string but cannot connect',
+     'root:pass@hostname.com:3306:/my.sock', True),
+    ('Bad connection string', 'DAS*!@#MASD&UKKLKDA)!@#', True),
+    ('Good dictionary but cannot connect',
+     {'user': 'root', 'passwd': 'pass', 'host': 'localhost',
+      'port': '3306', 'unix_socket': '/my.sock'}, True),
+    ('Bad dictionary', {'something': 'else'}, True),
+]
 
 
 class test(mutlib.System_test):
@@ -75,8 +75,6 @@ class test(mutlib.System_test):
                 self.results.append((True, err.errmsg))
             except ConnectionValuesError as err:
                 self.results.append((True, err.errmsg))
-            except FormatError as err:
-                self.results.append((True, err))
             else:
                 self.results.append((False, ''))
             if self.debug:
@@ -89,12 +87,12 @@ class test(mutlib.System_test):
             return False, "Invalid number of test case results."
 
         for i in range(0, len(_TEST_CASES)):
-            if not self.results[i][0] == _TEST_CASES[i][2]:
+            if self.results[i][0] != _TEST_CASES[i][2]:
                 msg = ("Got wrong result for test case {0}. "
                        "Expected: {1}, got: {2}.".format(
                            i + 1, _TEST_CASES[i][2], self.results[i][0]))
                 if self.results[i][1] == '':
-                    errors = msg
+                    errors = (msg, '')
                 else:
                     errors = (msg, "\nException: {0}.".format(
                         self.results[i][1]))

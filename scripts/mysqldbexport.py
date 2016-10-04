@@ -21,8 +21,6 @@ This file contains the export database utility which allows users to export
 metadata for objects in a database and data for tables.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import multiprocessing
 import os
 import shutil
@@ -30,6 +28,7 @@ import sys
 import tempfile
 import time
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.command.dbexport import export_databases
 from mysql.utilities.command.dbexport import multiprocess_db_export_task
 from mysql.utilities.common.ip_parser import parse_connection
@@ -196,7 +195,7 @@ if __name__ == '__main__':
     # Fail if we have arguments and all databases option listed.
     check_all(parser, opt, args, "databases")
 
-    if opt.skip_blobs and not opt.export == "data":
+    if opt.skip_blobs and opt.export != "data":
         print("# WARNING: --skip-blobs option ignored for metadata export.")
 
     if opt.file_per_tbl and opt.export in ("definitions", "both"):

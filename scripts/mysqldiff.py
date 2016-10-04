@@ -21,12 +21,11 @@ This file contains the object diff utility which allows users to compare the
 definitions of two objects and return the difference (like diff).
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os
 import re
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.exception import FormatError, UtilError
 from mysql.utilities.command.diff import object_diff, database_diff
 from mysql.utilities.common.ip_parser import parse_connection

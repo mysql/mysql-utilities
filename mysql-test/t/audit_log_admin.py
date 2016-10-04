@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ class test(mutlib.System_test):
                               "plug-in installed and enabled.")
         # Check the server version.
         if (not srv.check_version_compat(5, 6, 20) or  # < 5.6.20
-            (srv.check_version_compat(5, 7, 0) and     # >= 5.7.0 and < 5.7.5
-             not srv.check_version_compat(5, 7, 5))):
+                (srv.check_version_compat(5, 7, 0) and  # >= 5.7.0 and < 5.7.5
+                 not srv.check_version_compat(5, 7, 5))):
             raise MUTLibError("Test requires a server with version >= 5.6.20 "
                               "and < 5.7.0, or >= 5.7.5.")
         return self.check_num_servers(1)
@@ -216,6 +216,7 @@ class test(mutlib.System_test):
 
         # Remove new audit log variable recently introduced.
         self.remove_result("| audit_log_format")
+        self.remove_result("| audit_log_filter_id")
 
         # Mask output of file stats after rotate to support filename changes
         # (e.g. filename with and without .xml extension).

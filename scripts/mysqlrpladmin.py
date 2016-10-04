@@ -21,12 +21,11 @@ This file contains the replication slave administration utility. It is used to
 perform replication operations on one or more slaves.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import logging
 import os.path
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities import VERSION_FRM, VERSION_STRING
 from mysql.utilities.exception import UtilError, UtilRplError, FormatError
 from mysql.utilities.common.ip_parser import parse_connection
@@ -157,7 +156,7 @@ if __name__ == '__main__':
 
     # At least one of the options --discover-slaves-login or --slaves is
     # required unless we are doing a health command.
-    if not opt.discover and not opt.slaves and not command == 'health':
+    if not opt.discover and not opt.slaves and command != 'health':
         parser.error(PARSE_ERR_SLAVE_DISCO_REQ)
 
     # --discover-slaves-login and --slaves cannot be used simultaneously
@@ -224,7 +223,7 @@ if __name__ == '__main__':
             opt.master = None
 
     # --ping only used by 'health' command
-    if opt.ping and not command == 'health':
+    if opt.ping and command != 'health':
         print(WARN_OPT_NOT_REQUIRED_ONLY_FOR.format(opt='--ping', cmd=command,
                                                     only_cmd='health'))
         opt.ping = None

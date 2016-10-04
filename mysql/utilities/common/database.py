@@ -361,7 +361,7 @@ class Database(object):
         if charset_name:
             specification = " DEFAULT CHARACTER SET {0}".format(charset_name)
         if collation_name:
-            specification = "{0} DEFAULT COLLATE {0}".format(specification,
+            specification = "{0} DEFAULT COLLATE {1}".format(specification,
                                                              collation_name)
         query_create_db = "CREATE DATABASE {0} {1}".format(db, specification)
         server.exec_query(query_create_db, self.query_options)
@@ -617,8 +617,9 @@ class Database(object):
         q_db_name = quote_with_backticks(self.db_name, dest_sql_mode)
         if obj_type == _TABLE and self.cloning:
             obj_name = quote_with_backticks(obj[0], dest_sql_mode)
-            create_list = ["CREATE TABLE {0!s}.{1!s} LIKE {2!s}.{1!s}".format(
-                q_new_db, obj_name, q_db_name)
+            create_list = [
+                "CREATE TABLE {0!s}.{1!s} LIKE {2!s}.{1!s}"
+                "".format(q_new_db, obj_name, q_db_name)
             ]
         else:
             create_list = [self.__make_create_statement(obj_type, obj)]
@@ -674,7 +675,7 @@ class Database(object):
                     if not user.exists():
                         user.create()
                 self.destination.exec_query(stm, self.query_options)
-            except Exception as e:
+            except UtilDBError as e:
                 raise UtilDBError("Cannot operate on {0} object."
                                   " Error: {1}".format(obj_type, e.errmsg),
                                   -1, self.db_name)
@@ -688,7 +689,7 @@ class Database(object):
             try:
                 query = _FK_CONSTRAINT_QUERY.format(**params)
                 fkey_constr = self.source.exec_query(query)
-            except Exception as e:
+            except UtilDBError as e:
                 raise UtilDBError("Unable to obtain Foreign Key constraint "
                                   "information for table {0}.{1}. "
                                   "Error: {2}".format(self.db_name, obj[0],
@@ -756,8 +757,7 @@ class Database(object):
                                   "{3}".format(params['DATABASE'],
                                                params['TABLE'],
                                                params['REFERENCED_DATABASE'],
-                                               params['REFERENCED_TABLE'])
-                                  )
+                                               params['REFERENCED_TABLE']))
                         query = _ALTER_TABLE_ADD_FK_CONSTRAINT.format(**params)
 
                         # Store constraint query for later execution
@@ -774,8 +774,7 @@ class Database(object):
                                   "{3}".format(params['DATABASE'],
                                                params['TABLE'],
                                                params['REFERENCED_DATABASE'],
-                                               params['REFERENCED_TABLE'])
-                                  )
+                                               params['REFERENCED_TABLE']))
             elif fkey_constr and may_skip_fk:
                 print("# WARNING: FOREIGN KEY constraints for table {0}.{1} "
                       "are missing because the new storage engine for "
@@ -802,7 +801,7 @@ class Database(object):
                 print(query)
             try:
                 self.destination.exec_query(query, query_opts)
-            except Exception as err:
+            except UtilDBError as err:
                 raise UtilDBError("Unable to execute constraint query "
                                   "{0}. Error: {1}".format(query, err.errmsg),
                                   -1, self.new_db)
@@ -1634,6 +1633,7 @@ class Database(object):
         }
         pos_to_quote = ()
         pos_split_quote = ()
+        # pylint: disable=R0101
         if obj_type == _GRANT:
             query = _OBJECT_QUERY % (self.db_name, self.db_name,
                                      self.db_name, self.db_name)
@@ -1844,6 +1844,7 @@ class Database(object):
                             break
 
         # CREATE ROUTINE and EXECUTE are needed for functions
+        # pylint: disable=R0101
         if not options.get("skip_funcs", False):
             funcs = source_objects.get("funcs", None)
             if funcs:

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -198,20 +198,19 @@ _SERVER2_TEST2 = [
     "'repair', '', 1);", ]
 
 # (comment, def1, def2, expected result)
-_TABLE_CONSISTENCY_TESTS = [(
-                            "Table consistency and transform drops and "
-                            "inserts only",
-                            _SERVER1_TEST1, _SERVER2_TEST1, None), (
-                            "Table consistency and transform updates only",
-                            _SERVER1_TEST2, _SERVER2_TEST2, None), (
-                            "Table consistency all changes",
-                            _SERVER1_TEST1 + _SERVER1_TEST2,
-                            _SERVER2_TEST1 + _SERVER2_TEST2, None), (
-                            "Table consistency no changes",
-                            _SERVER1_TEST1 + _SERVER1_TEST2,
-                            _SERVER1_TEST1 + _SERVER1_TEST2,
-                            [0, 0, 0, 0, 0, 0, 0, 0]),
-                            ]  # All tests should return 0]
+_TABLE_CONSISTENCY_TESTS = [
+    ("Table consistency and transform drops and inserts only",
+     _SERVER1_TEST1, _SERVER2_TEST1, None),
+    ("Table consistency and transform updates only",
+     _SERVER1_TEST2, _SERVER2_TEST2, None),
+    ("Table consistency all changes",
+     _SERVER1_TEST1 + _SERVER1_TEST2,
+     _SERVER2_TEST1 + _SERVER2_TEST2, None),
+    ("Table consistency no changes",
+     _SERVER1_TEST1 + _SERVER1_TEST2,
+     _SERVER1_TEST1 + _SERVER1_TEST2,
+     [0, 0, 0, 0, 0, 0, 0, 0]),
+]  # All tests should return 0]
 
 
 class test(test_sql_template.test):
@@ -227,7 +226,7 @@ class test(test_sql_template.test):
         self.check_gtid_unsafe()
         return test_sql_template.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         test_object = {'db1': 'comp_db', 'db2': 'comp_db', 'object_name': '',
                        'startup_cmds': [], 'shutdown_cmds': [], }
         for tbl_check in _TABLE_CONSISTENCY_TESTS:

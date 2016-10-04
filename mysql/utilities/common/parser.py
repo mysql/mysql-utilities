@@ -814,6 +814,7 @@ class SlowQueryLogEntry(LogEntryBase):
             param['datetime'] = param['datetime'].strftime("%Y-%m-%d %H:%M:%S")
         except AttributeError:
             param['datetime'] = ''
-        return ("<%(clsname)s %(datetime)s [%(user)s@%(host)s] "
-                "%(query_time)s/%(lock_time)s/%(rows_examined)s/%(rows_sent)s>"
-                ) % param
+        return (
+            "<%(clsname)s %(datetime)s [%(user)s@%(host)s] "
+            "%(query_time)s/%(lock_time)s/%(rows_examined)s/%(rows_sent)s>"
+        ) % param

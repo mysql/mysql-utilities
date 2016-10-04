@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class test(mutlib.System_test):
 
     def check_prerequisites(self):
         fail = None
-        if not os.name == "nt":
+        if os.name != "nt":
             fail = True
         self.old_server = None
         stop = self.servers.num_servers()

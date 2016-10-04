@@ -20,11 +20,10 @@
 This file contains the rotate binlog utility. It is used to rotate binary logs.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.command.binlog_admin import binlog_rotate
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.messages import PARSE_ERR_OPTS_REQ
@@ -87,6 +86,7 @@ if __name__ == '__main__':
         ssl_opts = get_ssl_dict(opt)
         server_val = parse_connection(opt.server, None, ssl_opts)
     except FormatError as err:
+        # pylint: disable=E1101
         parser.error("ERROR: {0}\n".format(err.errmsg))
     except UtilError as err:
         parser.error("ERROR: {0}\n".format(err.errmsg))

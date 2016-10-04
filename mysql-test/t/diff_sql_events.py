@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,38 +26,39 @@ _DIFF_TABLE = "CREATE TABLE `diff_event`.`t1` (a char(30)) ENGINE=InnoDB"
 
 # interval, on completion, status, body
 # (comment, def1, def2, expected result)
-_EVENT_TESTS = [("Event schedule interval",
-                 "CREATE definer=root@localhost EVENT diff_event.e1 ON "
-                 "SCHEDULE EVERY 2 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
-                 "DO DELETE FROM diff_event.t1 WHERE a = 'not there';",
-                 "CREATE definer=root@localhost EVENT diff_event.e1 ON "
-                 "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
-                 "DO DELETE FROM diff_event.t1 WHERE a = 'not there';", 0),
-                ("Event on completion",
-                 "CREATE definer=root@localhost EVENT diff_event.e1 ON "
-                 "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' ON "
-                 "COMPLETION PRESERVE DISABLE DO DELETE FROM diff_event.t1 "
-                 "WHERE a = 'not there';",
-                 "CREATE definer=root@localhost EVENT diff_event.e1 ON "
-                 "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' ON "
-                 "COMPLETION NOT PRESERVE DISABLE DO DELETE FROM diff_event.t1"
-                 " WHERE a = 'not there';", 0),
-                ("Event schedule interval",
-                 "CREATE definer=root@localhost EVENT diff_event.e1 ON "
-                 "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
-                 "DO DELETE FROM diff_event.t1 WHERE a = 'not there';",
-                 "CREATE definer=root@localhost EVENT diff_event.e1 ON "
-                 "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
-                 "ON SLAVE DO DELETE FROM diff_event.t1 "
-                 "WHERE a = 'not there';", 0),
-                ("Event body",
-                 "CREATE definer=root@localhost EVENT diff_event.e1 ON "
-                 "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
-                 "DO DELETE FROM diff_event.t1 WHERE a = 'not there';",
-                 "CREATE definer=root@localhost EVENT diff_event.e1 ON "
-                 "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
-                 "DO DELETE FROM diff_event.t1 WHERE a = 'it is there';", 0),
-                ]
+_EVENT_TESTS = [
+    ("Event schedule interval",
+     "CREATE definer=root@localhost EVENT diff_event.e1 ON "
+     "SCHEDULE EVERY 2 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
+     "DO DELETE FROM diff_event.t1 WHERE a = 'not there';",
+     "CREATE definer=root@localhost EVENT diff_event.e1 ON "
+     "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
+     "DO DELETE FROM diff_event.t1 WHERE a = 'not there';", 0),
+    ("Event on completion",
+     "CREATE definer=root@localhost EVENT diff_event.e1 ON "
+     "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' ON "
+     "COMPLETION PRESERVE DISABLE DO DELETE FROM diff_event.t1 "
+     "WHERE a = 'not there';",
+     "CREATE definer=root@localhost EVENT diff_event.e1 ON "
+     "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' ON "
+     "COMPLETION NOT PRESERVE DISABLE DO DELETE FROM diff_event.t1"
+     " WHERE a = 'not there';", 0),
+    ("Event schedule interval",
+     "CREATE definer=root@localhost EVENT diff_event.e1 ON "
+     "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
+     "DO DELETE FROM diff_event.t1 WHERE a = 'not there';",
+     "CREATE definer=root@localhost EVENT diff_event.e1 ON "
+     "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
+     "ON SLAVE DO DELETE FROM diff_event.t1 "
+     "WHERE a = 'not there';", 0),
+    ("Event body",
+     "CREATE definer=root@localhost EVENT diff_event.e1 ON "
+     "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
+     "DO DELETE FROM diff_event.t1 WHERE a = 'not there';",
+     "CREATE definer=root@localhost EVENT diff_event.e1 ON "
+     "SCHEDULE EVERY 1 YEAR STARTS '2011-11-11 20:00:00' DISABLE "
+     "DO DELETE FROM diff_event.t1 WHERE a = 'it is there';", 0),
+]
 
 
 class test(test_sql_template.test):
@@ -71,7 +72,7 @@ class test(test_sql_template.test):
     def check_prerequisites(self):
         return test_sql_template.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         test_object = {'db1': 'diff_event', 'db2': 'diff_event',
                        'object_name': '', 'startup_cmds': [_DIFF_TABLE],
                        'shutdown_cmds': [], }

@@ -55,7 +55,7 @@ class test(copy_user.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
-        comment = "Test case 2 - show the help".format(test_num)
+        comment = "Test case {0} - show the help".format(test_num)
         res = self.run_test_case(0, cmd_str + " --help", comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -65,7 +65,7 @@ class test(copy_user.test):
                                            "version", 6)
 
         test_num += 1
-        comment = "Test case 3 - use the quiet parameter".format(test_num)
+        comment = "Test case {0} - use the quiet parameter".format(test_num)
         res = self.run_test_case(0, cmd_str + "joe_nopass@user --force "
                                               "jack@user john@user "
                                               "jill@user --quiet ",

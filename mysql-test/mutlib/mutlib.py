@@ -539,6 +539,7 @@ class ServerList(object):
     def shutdown_spawned_servers(self):
         """Shutdown all spawned servers.
         """
+        # pylint: disable=R0101
         for server in self.server_list:
             if server[1] and server[0] is not None and server[0].is_alive():
                 try:
@@ -556,7 +557,7 @@ class ServerList(object):
                                 os.kill(int(server[2]),
                                         subprocess.signal.SIGTERM)
                             except OSError as err:
-                                retval = err.errno
+                                retval = int(err.errno)
                         else:
                             retval = subprocess.call("taskkill /F /T /PID "
                                                      "{0}".format(server[2],
@@ -690,8 +691,9 @@ class ServerList(object):
             if server.ssl_ca is not None:
                 conn_str = "{0} --ssl-ca={1}".format(conn_str, server.ssl_ca)
             if server.ssl_cert is not None:
-                conn_str = ("{0} --ssl-cert={1}"
-                            ).format(conn_str, server.ssl_cert)
+                conn_str = (
+                    "{0} --ssl-cert={1}"
+                ).format(conn_str, server.ssl_cert)
             if server.ssl_key is not None:
                 conn_str = "{0} --ssl-key={1}".format(conn_str, server.ssl_key)
         return conn_str
@@ -1166,6 +1168,7 @@ class System_test(object):
         # Try block is used to capture situations where there is no
         # result file or there is a problem accessing it. In which case,
         # it is Ok to skip the replacement.
+        # pylint: disable=R0101
         try:
             for line in self.results:
                 index = line.find(prefix)
@@ -1246,6 +1249,7 @@ class System_test(object):
 
         # Convert to list and sort in reverse order to remove those
         # lines from the list
+        # pylint: disable=E1101,R0204
         lines_to_remove = list(lines_to_remove)
         lines_to_remove.sort(reverse=True)
         # Must remove lines in reverse order
@@ -1482,7 +1486,7 @@ class System_test(object):
         rej_file.close()
 
         # Write preamble if there are differences
-        if not rej_list == []:
+        if rej_list != []:
             rej_list.insert(0, "Result file mismatch:\n")
 
         # If test passed, delete the reject file if it exists

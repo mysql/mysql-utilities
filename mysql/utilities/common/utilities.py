@@ -230,7 +230,7 @@ class Utilities(object):
         # filter extensions
         exts = ['.py', '.exe', '', 'pyc']
         if (parts[0] not in _EXCLUDE_UTILS and
-           (len(parts) == 1 or (len(parts) == 2 and parts[1] in exts))):
+                (len(parts) == 1 or (len(parts) == 2 and parts[1] in exts))):
             util_name = str(parts[0])
             file_ext = parts[1]
             command = "{0}{1}".format(util_name, file_ext)
@@ -278,7 +278,7 @@ class Utilities(object):
             # utilities not previously found in a previos call.
             utils = self.available_utilities
             working_utils = [util['name'] for util in self.util_list]
-            if not len(working_utils) < len(self.util_list):
+            if len(working_utils) >= len(self.util_list):
                 utils = [name for name in utils if name not in working_utils]
             if len(utils) < 1:
                 return

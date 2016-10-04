@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ class test(mutlib.System_test):
                               self.db_test_name))
 
         res = self.exec_util(copy_cmd, self.setup_temp_file)
-        if not res == 0:
+        if res != 0:
             raise MUTLibError("Failed to clone the database {0}:{1}"
                               "".format(self.db_test_name, self.db_test_name))
 

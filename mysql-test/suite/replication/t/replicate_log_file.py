@@ -149,7 +149,7 @@ class test(replicate.test):
                 self.server2.exec_query('INSERT INTO log_test.t1 '
                                         'VALUES ("{0}")'.format(row))
                 res = self.server2.exec_query("SHOW MASTER STATUS")
-                if res and not res == []:
+                if res and res != []:
                     self.master_log_info.append((res[0][0], res[0][1]))
             self.server2.exec_query("FLUSH LOGS")
         except UtilError:
@@ -260,7 +260,7 @@ class test(replicate.test):
 
             result_msg = "Result: {0} ? {1}".format(result[1], post_rpl)
 
-            if not result[1] == post_rpl:
+            if result[1] != post_rpl:
                 return (False, "{0}: Result mismatch."
                                "\n{1}".format(test_case, result_msg))
             if self.debug:

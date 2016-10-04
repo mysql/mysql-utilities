@@ -21,12 +21,11 @@ This file contains the operations to perform database consistency checking
 on two databases.
 """
 
-from mysql.utilities.common.tools import check_python_version
-
 import os
 import re
 import sys
 
+from mysql.utilities.common.tools import check_python_version
 from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.command.dbcompare import (compare_all_databases,
                                                database_compare)
@@ -431,7 +430,7 @@ if __name__ == '__main__':
         else:
             sys.stdout.write("# Databases are consistent")
             if (opt.no_object_check or opt.no_diff or
-               opt.no_row_count or opt.no_data or opt.skip_tbl_opts):
+                    opt.no_row_count or opt.no_data or opt.skip_tbl_opts):
                 sys.stdout.write(" given skip options specified")
             print(".")
         print("#\n# ...done")

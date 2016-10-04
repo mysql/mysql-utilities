@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -94,8 +94,8 @@ class test(mutlib.System_test):
         else:
             self.s2_serverid = self.servers.get_next_id()
             res = self.servers.spawn_new_server(self.server0, self.s2_serverid,
-                                                "import_basic", '"--sql_mode="'
-                                                )
+                                                "import_basic",
+                                                '"--sql_mode="')
             if not res:
                 raise MUTLibError("Cannot spawn import_basic server.")
             self.server2 = res[0]

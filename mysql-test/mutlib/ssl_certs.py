@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -102,14 +102,17 @@ SSL_CERT_B = "{0}/utils-server-cert.pem"
 
 SSL_KEY_B = "{0}/utils-server-key.pem"
 
-ssl_c_ca_b = os.path.abspath(SSL_CA_B.format(STD_DATA_PATH)
-                             ).replace('\\', '/')
+ssl_c_ca_b = os.path.abspath(
+    SSL_CA_B.format(STD_DATA_PATH)
+).replace('\\', '/')
 
-ssl_c_cert_b = os.path.abspath(SSL_CERT_B.format(STD_DATA_PATH)
-                               ).replace('\\', '/')
+ssl_c_cert_b = os.path.abspath(
+    SSL_CERT_B.format(STD_DATA_PATH)
+).replace('\\', '/')
 
-ssl_c_key_b = os.path.abspath(SSL_KEY_B.format(STD_DATA_PATH)
-                              ).replace('\\', '/')
+ssl_c_key_b = os.path.abspath(
+    SSL_KEY_B.format(STD_DATA_PATH)
+).replace('\\', '/')
 
 SSL_OPTS_B = (
     ' --ssl-ca={0}/utils-cacert.pem'
@@ -128,13 +131,15 @@ MYSQLD_SSL_B = (
     '--bind-address=:: --master-info-repository=table {ssl_opts} "'
 ).format(ssl_opts=SSL_OPTS_B)
 
-CREATE_SSL_USER_B = ("GRANT ALL PRIVILEGES ON *.* TO '{0}'@'localhost' "
-                     "IDENTIFIED BY '{1}' REQUIRE SSL"
-                     ).format(ssl_user_b, ssl_pass_b)
+CREATE_SSL_USER_B = (
+    "GRANT ALL PRIVILEGES ON *.* TO '{0}'@'localhost' "
+    "IDENTIFIED BY '{1}' REQUIRE SSL"
+).format(ssl_user_b, ssl_pass_b)
 
-CREATE_SSL_USER_2_B = ("GRANT ALL PRIVILEGES ON *.* TO '{0}'@'127.0.0.1' "
-                       "IDENTIFIED BY '{1}' REQUIRE SSL"
-                       ).format(ssl_user_b, ssl_pass_b)
+CREATE_SSL_USER_2_B = (
+    "GRANT ALL PRIVILEGES ON *.* TO '{0}'@'127.0.0.1' "
+    "IDENTIFIED BY '{1}' REQUIRE SSL"
+).format(ssl_user_b, ssl_pass_b)
 
 
 def ssl_server_opts_b(std_data_path=STD_DATA_PATH):

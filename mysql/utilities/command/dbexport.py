@@ -595,8 +595,8 @@ def _export_table_data(source_srv, table, output_file, options):
     # then rows won't be correctly copied using the update statement,
     # so we must warn the user.
     if (not skip_blobs and frmt == "sql" and
-        (cur_table.blob_columns == len(cur_table.column_names) or
-            (not unique_indexes and cur_table.blob_columns))):
+            (cur_table.blob_columns == len(cur_table.column_names) or
+             (not unique_indexes and cur_table.blob_columns))):
         print("# WARNING: Table {0}.{1} contains only BLOB and TEXT "
               "fields. Rows will be generated with separate INSERT "
               "statements.".format(cur_table.db_name, cur_table.tbl_name))
@@ -663,12 +663,13 @@ def get_copy_lock(server, db_list, options, include_mysql=False,
 
     # if this is a lock-all type and not replication operation,
     # find all tables and lock them
+    # pylint: disable=R0101
     elif locking == 'lock-all':
         table_lock_list = []
 
         # Build table lock list
         for db_name in db_list:
-            db = db_name[0] if type(db_name) == tuple else db_name
+            db = db_name[0] if isinstance(db_name, tuple) else db_name
             source_db = Database(server, db)
             tables = source_db.get_db_objects("TABLE")
             for table in tables:
@@ -822,7 +823,7 @@ def get_gtid_commands(master):
     Returns tuple - ([],"") = list of commands for start, command for end or
                               None if GTIDs are not enabled.
     """
-    if not master.supports_gtid() == "ON":
+    if master.supports_gtid() != "ON":
         return None
     rows = master.exec_query(_GET_GTID_EXECUTED)
     master_gtids_list = ["%s" % row[0] for row in rows]
@@ -899,7 +900,7 @@ def multiprocess_db_export_task(export_db_task):
     except UtilError:
         _, err, _ = sys.exc_info()
         print("ERROR: {0}".format(err.errmsg))
-    except Exception:
+    except:
         _, err, _ = sys.exc_info()
         print("UNEXPECTED ERROR: {0}".format(err.errmsg))
 
@@ -972,7 +973,7 @@ def export_databases(server_values, db_list, output_file, options):
 
     # Check for GTID support
     supports_gtid = servers[0].supports_gtid()
-    if not skip_gtids and not supports_gtid == 'ON':
+    if not skip_gtids and supports_gtid != 'ON':
         skip_gtids = True
     elif skip_gtids and supports_gtid == 'ON':
         output_file.write(_GTID_WARNING)
@@ -990,7 +991,7 @@ def export_databases(server_values, db_list, output_file, options):
             if db[0].upper() in ["MYSQL", "INFORMATION_SCHEMA",
                                  "PERFORMANCE_SCHEMA", "SYS"]:
                 continue
-            if not db[0] in db_list:
+            if db[0] not in db_list:
                 output_file.write(_GTID_BACKUP_WARNING)
                 warning_printed = True
 

@@ -51,6 +51,7 @@ class test(test_sql_template.test):
     """
 
     utility = None
+    server0 = None
     server1 = None
 
     def check_prerequisites(self):
@@ -59,7 +60,7 @@ class test(test_sql_template.test):
             raise MUTLibError("Test requires server version 5.6.5 and later.")
         return test_sql_template.test.check_prerequisites(self)
 
-    def setup(self):
+    def setup(self, spawn_servers=True):
         mysqld = _DEFAULT_MYSQL_OPTS.format(self.servers.view_next_port())
         self.server1 = self.servers.spawn_server("diff_sql_srv1_ansi_quotes",
                                                  mysqld, True)

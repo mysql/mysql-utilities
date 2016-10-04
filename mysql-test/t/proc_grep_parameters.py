@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,10 +20,10 @@ proc_grep_parameters test.
 """
 
 import os
-import proc_grep
 import subprocess
 import tempfile
 import time
+import proc_grep
 
 from mutlib.mutlib import kill_process
 from mysql.utilities.common.tools import get_tool_path

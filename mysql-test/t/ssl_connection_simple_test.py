@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,11 +19,10 @@
 check ssl connection support test.
 """
 
-import mutlib
-
 from mysql.utilities.exception import MUTLibError, UtilError
 from mysql.utilities.common.server import Server
 from mysql.utilities.common.user import grant_proxy_ssl_privileges
+import mutlib
 from mutlib.ssl_certs import (ssl_pass, ssl_user, ssl_server_opts,
                               ssl_c_ca, ssl_c_cert, ssl_c_key)
 

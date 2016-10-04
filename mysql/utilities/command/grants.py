@@ -205,6 +205,7 @@ def check_grants(server_cnx_val, options, dict_of_objects):
 
     # Print the information
     obj_type_lst = [DATABASE_TYPE, TABLE_TYPE, ROUTINE_TYPE]
+    # pylint: disable=R0101
     for obj_type in obj_type_lst:
         if obj_type in grantee_info_dict:
             # Sort by object name

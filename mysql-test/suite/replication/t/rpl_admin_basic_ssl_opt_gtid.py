@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,8 +57,9 @@ class test(rpl_admin_basic_ssl_gtid.test):
         test_num += 1
         comment = ("Test case {0} - SSL "
                    "switchover demote-master ".format(test_num))
-        cmd_str = ("mysqlrpladmin.py --master={0} {1} {2} "
-                   ).format(master_conn, ssl1, ssl_ca)
+        cmd_str = (
+            "mysqlrpladmin.py --master={0} {1} {2} "
+        ).format(master_conn, ssl1, ssl_ca)
         cmd_opts = (" --new-master={0} --discover-slaves={1} "
                     "--rpl-user=rpluser:hispassword --demote-master "
                     "switchover".format(slave1_conn,

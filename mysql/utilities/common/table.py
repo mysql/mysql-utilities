@@ -26,7 +26,6 @@ from itertools import izip
 from mysql.utilities.exception import UtilError, UtilDBError
 from mysql.connector.conversion import MySQLConverter
 from mysql.utilities.common.format import print_list
-from mysql.utilities.common.database import Database
 from mysql.utilities.common.lock import Lock
 from mysql.utilities.common.pattern_matching import parse_object_name
 from mysql.utilities.common.server import Server
@@ -88,6 +87,7 @@ class Index(object):
         self.type = index_tuple[10]
         self.compared = False                    # mark as compared for speed
         self.duplicate_of = None                 # saves duplicate index
+        # pylint: disable=R0102
         if index_tuple[7] > 0:
             self.column_subparts = True          # check subparts e.g. a(20)
         else:
@@ -110,10 +110,7 @@ class Index(object):
         if col_a[0] == col_b[0]:
             # if they both have sub_parts, compare them
             if sz_this and sz_that:
-                if sz_this <= sz_that:
-                    return True
-                else:
-                    return False
+                return (sz_this <= sz_that)
             # if this index has a sub_part and the other does
             # not, it is potentially redundant
             elif sz_this and sz_that is None:
@@ -150,7 +147,7 @@ class Index(object):
                 indexes = izip(self.columns, index.columns)
                 return (same_size and
                         all((self.__cmp_columns(*idx_pair)
-                            for idx_pair in indexes)))
+                             for idx_pair in indexes)))
             else:  # FULLTEXT index
                 # A FULLTEXT index A is redundant of FULLTEXT index B if
                 # the columns of A are a subset of B's columns, the order
@@ -514,7 +511,7 @@ class Table(object):
         false.
         """
         if [idx_q_name for idx_q_name in self.indexes_q_names
-           if idx_q_name == index_q_name]:
+                if idx_q_name == index_q_name]:
             return True
         return False
 
@@ -613,6 +610,7 @@ class Table(object):
         row_vals = []
         # Deal with blob, special characters and NULL values.
         for index, column in enumerate(row):
+            # pylint: disable=W0212
             if index in self.blob_columns:
                 row_vals.append(converter.quote(
                     convert_special_characters(column)))
@@ -694,6 +692,7 @@ class Table(object):
             for col in self.bit_columns:
                 if values[col] is not None:
                     # Convert BIT to INTEGER for dump.
+                    # pylint: disable=W0212
                     values[col] = MySQLConverter()._BIT_to_python(values[col])
 
             # Build string (add quotes to "string" like types)

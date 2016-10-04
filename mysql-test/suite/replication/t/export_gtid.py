@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -174,7 +174,7 @@ class test(mutlib.System_test):
             server2.exec_query("RESET MASTER")  # reset GTID_EXECUTED
         cmd_str = "{0}{1} {2}".format(imp_cmd, conn2, self.export_file)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str, comment)
-        if not res == ret_val:
+        if res != ret_val:
             # Output additional information if the executed command fails
             # in order to help determine the issue.
             print("Test output (results):")

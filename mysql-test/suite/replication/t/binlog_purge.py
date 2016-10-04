@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,8 +41,9 @@ class test(mutlib.System_test):
         return self.check_num_servers(1)
 
     def setup(self):
-        mysqld = ("--log-bin=mysql-bin --report-port={0}"
-                  ).format(self.servers.view_next_port())
+        mysqld = (
+            "--log-bin=mysql-bin --report-port={0}"
+        ).format(self.servers.view_next_port())
         self.server1 = self.servers.spawn_server(
             "server_binlog_purge", mysqld, True)
 
