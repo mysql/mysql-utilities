@@ -296,7 +296,9 @@ def get_mysqld_version(mysqld_path):
 
     if line is None:
         return None
-    return parse_mysqld_version(line)
+    # strip path for long, unusual paths that contain version number
+    fixed_str = "{0} {1}".format("mysqld", line.strip(mysqld_path))
+    return parse_mysqld_version(fixed_str)
 
 
 def show_file_statistics(file_name, wild=False, out_format="GRID"):
