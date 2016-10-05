@@ -21,7 +21,8 @@ connection_values test.
 
 import mutlib
 
-from mysql.utilities.exception import (ConnectionValuesError, UtilError)
+from mysql.utilities.exception import (ConnectionValuesError, UtilError,
+                                       FormatError)
 from mysql.utilities.common.server import (get_connection_dictionary,
                                            connect_servers)
 
@@ -75,6 +76,8 @@ class test(mutlib.System_test):
                 self.results.append((True, err.errmsg))
             except ConnectionValuesError as err:
                 self.results.append((True, err.errmsg))
+            except FormatError as err:
+                self.results.append((True, err))
             else:
                 self.results.append((False, ''))
             if self.debug:
