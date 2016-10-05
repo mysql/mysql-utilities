@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ connect_servers test.
 
 import mutlib
 
-from mysql.utilities.exception import UtilError
+from mysql.utilities.exception import UtilError, FormatError
 from mysql.utilities.common.server import connect_servers
 
 
@@ -66,7 +66,8 @@ class test(mutlib.System_test):
             ('Bad String and Server', 'DAS*!@#MASD&UKKLKDA)!@#',
              self.server0, "Connection 'DAS*!@#MASD"
                            "&UKKLKDA)!@#' cannot be parsed as "
-                           "a connection", True),
+                           "a connection",
+             True),
         ]
         return True
 
@@ -79,6 +80,8 @@ class test(mutlib.System_test):
                 connect_servers(test_case[1], test_case[2], server_options)
             except UtilError as err:
                 self.results.append((test_case[0], True, err.errmsg))
+            except FormatError as err:
+                self.results.append((test_case[0], True, err))
             else:
                 self.results.append((test_case[0], False, None))
 

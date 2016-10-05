@@ -256,7 +256,6 @@ def parse_mysqld_version(vers_str):
     if not match:
         return None
     version = match.group(1)
-    num_dots = vers_str.count('.')
     try:
         # get the version digits. If more than 2, we get first 3 parts
         # pylint: disable=W0612
