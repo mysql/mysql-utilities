@@ -22,9 +22,15 @@ import unittest
 from mysql.utilities.common.tools import parse_mysqld_version
 
 version_list = [
-    ("mysqld  Ver 5.5.49 for Linux on x86_64 (Source distribution)", ('5','5','49')),
-    ("mysqld  Ver 5.6.30 for Linux on x86_64 (Source distribution)", ('5','6','30')),
-    ("mysqld  Ver 5.7.13-0ubuntu0.16.04.2 for Linux on x86_64 ((Ubuntu))", ('5','7','13')),
+    ("mysqld  Ver 5.5.49 for Linux on x86_64 (Source distribution)",
+     ('5','5','49')),
+    ("mysqld  Ver 5.6.30 for Linux on x86_64 (Source distribution)",
+     ('5','6','30')),
+    ("mysqld  Ver 5.7.13-0ubuntu0.16.04.2 for Linux on x86_64 ((Ubuntu))",
+     ('5','7','13')),
+    ("mysqld  Ver 5.7.16-enterprise-commercial-advanced for linux-glibc2.5"
+     " on x86_64 (MySQL Enterprise Server - Advanced Edition (Commercial))",
+     ('5','7','16')),
 ]
 
 

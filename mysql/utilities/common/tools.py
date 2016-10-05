@@ -260,10 +260,7 @@ def parse_mysqld_version(vers_str):
     try:
         # get the version digits. If more than 2, we get first 3 parts
         # pylint: disable=W0612
-        if num_dots == 2:
-            maj_ver, min_ver, dev = version.split(".", 2)
-        else:
-            maj_ver, min_ver, dev, __ = version.split(".", 3)
+        maj_ver, min_ver, dev = version.split(".", 2)
         rel = dev.split("-", 1)
         return (maj_ver, min_ver, rel[0])
     except:
