@@ -173,6 +173,9 @@ class test(frm_reader_base.test):
         # Must remove these lines because on Windows they are not printed
         # in the same order as other systems.
         self.remove_result("# Source on")
+        self.replace_result("mysqlfrm: error: Unknown error 1045",
+                            "mysqlfrm: error: Access denied for user 'root'@"
+                            "'localhost' (using password: YES)\n")
 
         return True
 

@@ -160,6 +160,9 @@ class test(check_index.test):
 
         self.replace_result("ERROR: Can't connect",
                             "ERROR: Can't connect to XXXX\n")
+        self.replace_result("ERROR: Unknown error 1045",
+                            "ERROR: Access denied for user 'nope'@'localhost' "
+                            "(using password: YES)\n")
         self.replace_any_result(["Error 1045", "Error 2003",
                                  "Error Can't connect to MySQL server on",
                                  "Error Access denied for user"],

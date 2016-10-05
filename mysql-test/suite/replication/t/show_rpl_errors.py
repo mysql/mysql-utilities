@@ -162,6 +162,9 @@ class test(show_rpl.test):
                             "values invalid",
                             "mysqlrplshow: error: Master connection "
                             "values invalid\n")
+        self.replace_result("ERROR: Unknown error 1045",
+                            "ERROR: Access denied for user 'wanda'@'localhost'"
+                            " (using password: YES)\n")
 
         show_rpl.test.stop_replication(self.server_list[1])
 

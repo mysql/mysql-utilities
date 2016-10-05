@@ -336,6 +336,9 @@ class test(import_basic.test):
                             "values invalid",
                             "mysqldbimport: error: Server connection "
                             "values invalid\n")
+        self.replace_result("ERROR: Unknown error 1045",
+                            "ERROR: Access denied for user 'nope'@'localhost' "
+                            "(using password: YES)\n")
 
         return True
 

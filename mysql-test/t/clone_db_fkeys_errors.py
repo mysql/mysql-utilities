@@ -80,13 +80,13 @@ class test(mutlib.System_test):
             self.server1.disconnect()
             res = self.exec_util(cmd_str + cmd_opts, self.res_fname)
             self.results.append(res)
+            self.server1.connect()
             return res == 0
         except UtilDBError as err:
             raise MUTLibError(comment.format(test_num, err.errmsg))
 
     def get_result(self):
         # Reconnect to check status of test case
-        self.server1.connect()
         if self.server1 and self.results[0] == 0:
             query = "DELETE FROM `util_test_fk_clone`.t1 WHERE d = 1"
             try:
