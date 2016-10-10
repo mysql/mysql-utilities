@@ -21,7 +21,7 @@ mylogin_socket test.
 
 import mutlib
 import os
-from mysql.utilities.exception import FormatError
+from mysql.utilities.exception import FormatError, MUTLibError
 
 from mysql.utilities.common.ip_parser import parse_connection
 from mysql.utilities.common.options import parse_user_password
