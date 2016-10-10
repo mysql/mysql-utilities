@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,10 +16,11 @@
 #
 
 """
-mylogin test.
+mylogin_socket test.
 """
 
 import mutlib
+import os
 from mysql.utilities.exception import FormatError
 
 from mysql.utilities.common.ip_parser import parse_connection
@@ -36,7 +37,8 @@ class test(mutlib.System_test):
     def check_prerequisites(self):
         # Check if the required tools are accessible
         self.check_mylogin_requisites()
-
+        if os.name != "posix":
+            raise MUTLibError("Test requires Posix machines.")
         # Check the required number of servers
         return self.check_num_servers(0)
 
@@ -50,10 +52,14 @@ class test(mutlib.System_test):
 
     def run(self):
         # Test parse_connection with login-paths
-        con_tests = ["test_user@localhost:3306", "test_mylogin:3306",
-                     "test_user@localhost:1000", "test_mylogin:1000",
-                     "test-hyphen1234#:3306",
-                     "test' \\\"-hyphen:3306"]
+        con_tests = ["test_user@localhost:1000:/my.socket",
+                     "test_mylogin:1000:/my.socket",
+                     "test_user@localhost:3306:/my.socket",
+                     "test_mylogin:3306:/my.socket",
+                     "test-hyphen1234#:13000:my.socket",
+                     "test' \\\"-hyphen:3306:my.socket",
+                     "test' \\\"-hyphen:13001:my.socket",
+                     "rpl:'L5!w1Sj40(p?tF@(_@:z(HXc'@'localhost':3308:sock1"]
 
         for test_ in con_tests:
             con_dic = parse_connection(test_, options={"charset": "utf8"})

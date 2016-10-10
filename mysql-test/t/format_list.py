@@ -68,7 +68,8 @@ class test(mutlib.System_test):
         for line in test_file.readlines():
             self.results.append(line)
         test_file.close()
-
+        # Fix result file for Windows removing extra chars at end (CRLF)
+        self.replace_result("á,é,í", "á,é,í\n")
         return True
 
     def get_result(self):
