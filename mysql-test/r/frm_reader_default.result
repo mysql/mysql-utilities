@@ -916,7 +916,6 @@ CREATE TABLE `frm_test`.`t0001` (
   KEY `idx2583` (`col1163`(18),`col758`(224),`col351`,`col663`(134)),
   KEY `idx2584` (`col611`(25),`col181`,`col159`,`col663`(226),`col815`,`col195`,`col1345`,`col1021`,`col196`,`col255`(27),`col897`(192)) USING HASH,
   KEY `idx2585` (`col660`,`col896`(113),`col1081`),
-  KEY `idx2647` (`col1163`(93),`col226`(171),`col229`,`col1111`,`col27`,`col221`,`col381`(38),`col605`(172)),
   KEY `idx2648` (`col1343`,`col1009`(116),`col1110`,`col306`,`col1183`,`col1333`(126),`col1158`(59),`col839`,`col150`,`col1152`(6),`col224`(223),`col1063`,`col758`(54),`col230`) USING HASH,
   KEY `idx2649` (`col1277`,`col398`(20),`col979`,`col1110`,`col22`,`col1183`,`col347`(235),`col835`),
   KEY `idx2650` (`col1070`(106),`col609`,`col1067`,`col178`,`col1159`,`col1323`,`col227`) USING BTREE,
