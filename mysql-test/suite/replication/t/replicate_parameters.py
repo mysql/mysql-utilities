@@ -101,6 +101,8 @@ class test(replicate.test):
         self.remove_result("# SQL thread running: Yes")
         self.remove_result("# SQL error: None")
         self.remove_result("# Waiting for slave to synchronize with master")
+        self.remove_result("# IO status: Checking master version")
+        self.remove_result("# IO thread running: Yes")
 
         return True
 

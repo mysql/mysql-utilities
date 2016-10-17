@@ -62,7 +62,6 @@ WARNING: Using a password on the command line interface can be insecure.
 # Connecting slave to master...
 # Starting slave from master's last position...
 # IO status: Waiting for master to send event
-# IO thread running: Yes
 # ...done.
 Test case 4 - use the start-from-beginning feature
 WARNING: Using a password on the command line interface can be insecure.
