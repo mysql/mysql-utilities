@@ -267,6 +267,19 @@ class test(rpl_sync.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Check when slave has extra database that does not exist on master.
+        test_num += 1
+        self.server2.exec_query("CREATE DATABASE db2")
+        self.server2.exec_query("CREATE TABLE db2.t1 (a int)")
+        self.server2.exec_query("INSERT INTO db2.t1 VALUES (1), (2), (3)")
+        comment = ("Test case {0} - check a non existing database on master."
+                   "").format(test_num)
+        cmd = ("{0} --master={1} --slaves={2} "
+               "--exclude=oracle").format(cmd_base, master_con, slaves_con)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask out non-deterministic data
         self.do_masks()
 

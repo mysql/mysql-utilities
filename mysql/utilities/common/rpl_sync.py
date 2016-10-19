@@ -1086,11 +1086,13 @@ class RPLSynchronizer(object):
                     obj_name = db_obj[1][0]
                     # Process tables to include/exclude from check (on base
                     # server).
-                    if (data_to_include and data_to_include[db_name] and
+                    if (data_to_include and db_name in data_to_include and
+                            data_to_include[db_name] and
                             obj_name not in data_to_include[db_name]):
                         # Skip to the next object if not in data to include.
                         continue
-                    if (data_to_exclude and data_to_exclude[db_name] and
+                    if (data_to_exclude and db_name in data_to_exclude and
+                            data_to_exclude[db_name] and
                             obj_name in data_to_exclude[db_name]):
                         # Skip to the next object if in data to exclude.
                         continue

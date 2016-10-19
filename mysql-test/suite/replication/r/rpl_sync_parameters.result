@@ -442,3 +442,36 @@ Test case 13 - check a non existing database.
 #
 # SUMMARY: No data consistency issue found.
 #
+Test case 14 - check a non existing database on master.
+#
+# GTID differences between Master and Slaves:
+# - Slave 'localhost@PORT2' is up-to-date.
+# - Slave 'localhost@PORT3' is up-to-date.
+#
+# Checking data consistency.
+#
+# Using Master 'localhost@PORT1' as base server for comparison.
+# [DIFF] Databases NOT on base server but found on 'localhost@PORT2': db2,only_on_slave_db
+# Checking 'empty_db' database...
+# Checking 'test_rplsync_db' database...
+#   [DIFF] Table NOT on base server but found on 'localhost@PORT2': t3
+#   [DIFF] Table NOT on base server but found on 'localhost@PORT3': t3
+#   [DIFF] Table 'test_rplsync_db.t0' NOT on server 'localhost@PORT2'.
+# - Checking 't0' table data...
+#   [DIFF] `test_rplsync_db`.`t0` checksum for server 'localhost@PORT3'.
+# - Checking 't1' table data...
+#   WARNING: Slave not active 'localhost@PORT2' - Sync skipped.
+#   [DIFF] `test_rplsync_db`.`t1` checksum for server 'localhost@PORT2'.
+#   [OK] `test_rplsync_db`.`t1` checksum for server 'localhost@PORT3'.
+# - Checking 't2' table data...
+#   WARNING: Slave not active 'localhost@PORT2' - Sync skipped.
+#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORT2'.
+#   [OK] `test_rplsync_db`.`t2` checksum for server 'localhost@PORT3'.
+# Checking 'only_on_master_db' database...
+#   [DIFF] Database 'only_on_master_db' NOT on server 'localhost@PORT2'.
+#   [DIFF] Database 'only_on_master_db' NOT on server 'localhost@PORT3'.
+#
+#...done.
+#
+# SUMMARY: 9 data consistency issues found.
+#
