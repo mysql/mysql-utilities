@@ -2155,6 +2155,39 @@ class Server(object):
                 server_binlogs.append(row[0])
         return server_binlogs
 
+    def sql_mode(self, mode, enable):
+        """Set the sql_mode
+
+        This method sets the sql_mode passed. If enable is True,
+        the method adds the mode, else, it removes the mode.
+
+        mode[in]      The sql_mode you want to set
+        enable[in]    If True, set the mode, else remove the mode.
+
+        Returns string - new sql_mode setting or None=not enabled/disabled
+        """
+        SQL_MODE = 'SET @@GLOBAL.SQL_MODE = "{0}"'
+        sql_mode = self.show_server_variable("sql_mode")
+        if sql_mode[0]:
+            modes = sql_mode[0][1].split(",")
+            sql_mode_str = 'mt'
+            if enable:
+                if mode not in modes:
+                    modes.append(mode)
+                else:
+                    sql_mode_str = None
+            else:
+                if mode in modes:
+                    index = modes.index(mode)
+                    modes.pop(index)
+                else:
+                    sql_mode_str = None
+            if sql_mode_str:
+                sql_mode_str = SQL_MODE.format(",".join(modes))
+                self.exec_query(sql_mode_str)
+                return sql_mode_str
+        return None
+
 
 class QueryKillerThread(threading.Thread):
     """Class to run a thread to kill an executing query.

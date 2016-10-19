@@ -177,6 +177,40 @@ class test(copy_db_parameters.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        # try exporting a table with 0 auto_increment value
+        try:
+            previous_sql_mode = self.server1.select_variable("SQL_MODE")
+            self.server1.exec_query("SET SQL_MODE="
+                                    "'NO_AUTO_VALUE_ON_ZERO'")
+            self.drop_db(self.server1, 'util_test')
+            self.server1.exec_query("CREATE DATABASE util_test")
+            self.server1.exec_query("CREATE TABLE util_test.tt0 "
+                                    "(a int auto_increment primary key, "
+                                    "b char(10))")
+            self.server1.exec_query("INSERT INTO util_test.tt0 "
+                                    "VALUES (0, 'a'), (null, 'b')")
+        except UtilError as err:
+            raise MUTLibError("Failed to change setup 0 auto_increment: "
+                              "{0}".format(err.errmsg))
+
+        # Just want to show the warning.
+        comment = ("Test case {0} - export data with 0 auto_increment"
+                   "".format(test_num))
+        cmd_str = ("{0} --export=both --format=SQL --skip=events,"
+                   "grants,functions,procedures,triggers,views".format(cmd))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Restore previous SQL_MODE in the source server
+        try:
+            self.server1.exec_query("SET SQL_MODE='{0}'"
+                                    "".format(previous_sql_mode))
+        except UtilError as err:
+            raise MUTLibError("Failed to restore SQL_MODE: "
+                              "{0}".format(err.errmsg))
+
         self.replace_result("Time:", "Time:       XXXXXX\n")
 
         _REPLACEMENTS = ("PROCEDURE", "FUNCTION", "TRIGGER", "SQL")
@@ -204,6 +238,10 @@ class test(copy_db_parameters.test):
         self.remove_result("# WARNING: Number of processes ")
         # Mask already existing outfile (in case cleanup-up fails).
         self.remove_result("# WARNING: Specified output file already exists.")
+
+        # Mask sql_mode
+        self.replace_result("# SET SQL_MODE",
+                            "# SET SQL_MODE '...,NO_AUTO_VALUE_ON_ZERO'\n")
 
         return True
 

@@ -339,6 +339,42 @@ class test(mutlib.System_test):
             raise MUTLibError("Failed to restore SQL_MODE: "
                               "{0}".format(err.errmsg))
 
+        test_num += 1
+        # try copying a table with 0 auto_increment value
+        try:
+            previous_sql_mode = self.server1.select_variable("SQL_MODE")
+            self.server1.exec_query("SET @@GLOBAL.SQL_MODE="
+                                    "'NO_AUTO_VALUE_ON_ZERO'")
+            self.server1.exec_query("CREATE TABLE util_test.tt0 "
+                                    "(a int auto_increment primary key, "
+                                    "b char(10))")
+            self.server1.exec_query("INSERT INTO util_test.tt0 "
+                                    "VALUES (0, 'a'), (null, 'b')")
+        except UtilError as err:
+            raise MUTLibError("Failed to change setup 0 auto_increment: "
+                              "{0}".format(err.errmsg))
+
+        comment = ("Test case {0} - Copy database with 0 in the "
+                   "auto_increment column").format(test_num)
+        to_conn = "--destination={0} --drop --skip=views".format(
+            self.build_connection_string(self.server2))
+        cmd = ("mysqldbcopy.py --skip-gtid {0} {1} {2}".format(
+            from_conn, to_conn, "util_test"))
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        self.server1.exec_query("DROP TABLE util_test.tt0")
+        self.server2.exec_query("DROP TABLE util_test.tt0")
+
+        # Restore previous SQL_MODE in the source server
+        try:
+            self.server1.exec_query("SET @@GLOBAL.SQL_MODE='{0}'"
+                                    "".format(previous_sql_mode))
+        except UtilError as err:
+            raise MUTLibError("Failed to restore SQL_MODE: "
+                              "{0}".format(err.errmsg))
+
         return True
 
     def get_result(self):

@@ -1922,3 +1922,39 @@ class Database(object):
                                    priv[0]), -1, priv[0])
 
         return True
+
+    def check_auto_increment(self, tbl=None):
+        """Check for any tables in the database with auto_increment values
+        of 0. This will require a special sql_mode to copy or export. The
+        method returns True if any table has an auto_increment value of 0.
+        If tbl provided, use that table in the query otherwise check all
+        tables.
+
+        tbl[in]      If provided, use this table name
+
+        Returns True if any table has 0 in auto_increment, False if not
+        """
+        FIND_AUTO_INC_COLS = """
+            SELECT table_name, column_name FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE table_schema = '{0}' AND extra LIKE '%auto_increment%'
+        """
+        AUTO_INC_ZERO = "SELECT * FROM {0}.`{1}` WHERE {2} < 1;"
+        # Watchout for weird tick marks in the name
+        if self.db_name.count("`") > 0:
+            query = FIND_AUTO_INC_COLS.format(self.q_db_name)
+        else:
+            query = FIND_AUTO_INC_COLS.format(self.db_name)
+        if tbl:
+            query = "{0} AND table_name = '{1}'".format(query, tbl)
+        res = self.source.exec_query(query)
+        for row in res:
+            # Watchout for weird tick marks.
+            column = row[1]
+            # pylint: disable=W0125
+            if (i in row[1] for i in ('`', '"', "'")):
+                column = "`{0}`".format(row[1])
+            query = AUTO_INC_ZERO.format(self.q_db_name, row[0], column)
+            res = self.source.exec_query(query)
+            if res:
+                return True
+        return False

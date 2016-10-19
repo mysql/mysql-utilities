@@ -1227,3 +1227,27 @@ INSERT INTO `util_test`.`t5` VALUES (3, 'milk', 0.67, 5);
 INSERT INTO `util_test`.`t5` VALUES (4, 'Dr. Pepper', 0.99, 19);
 #...done.
 SET FOREIGN_KEY_CHECKS=1;
+Test case 13 - export data with 0 auto_increment
+# WARNING: Using a password on the command line interface can be insecure.
+# Source on localhost: ... connected.
+#
+# WARNING: One or more tables were detected with a value of 0 in an auto_increment column. If you want to import the data, you must enable the SQL_MODE 'NO_AUTO_VALUE_ON_ZERO' during the import. Failure to do so may result in the wrong value used for the rows with 0 as the auto_increment value. The following statement is an example taken from the source server. Uncomment and adjust this statement as needed for the destination server.
+# SET SQL_MODE '...,NO_AUTO_VALUE_ON_ZERO'
+#
+# Exporting metadata from util_test
+DROP DATABASE IF EXISTS `util_test`;
+CREATE DATABASE `util_test`;
+USE `util_test`;
+# TABLE: util_test.tt0
+CREATE TABLE `tt0` (
+  `a` int(11) NOT NULL AUTO_INCREMENT,
+  `b` char(10) DEFAULT NULL,
+  PRIMARY KEY (`a`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+#...done.
+USE `util_test`;
+# Exporting data from util_test
+# Data for table `util_test`.`tt0`:
+INSERT INTO `util_test`.`tt0` VALUES (0, 'a');
+INSERT INTO `util_test`.`tt0` VALUES (1, 'b');
+#...done.

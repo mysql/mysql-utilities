@@ -59,6 +59,15 @@ _FKEYS = ("SELECT DISTINCT constraint_schema "
           "FROM INFORMATION_SCHEMA.referential_constraints "
           "WHERE constraint_schema in ({0})")
 _FKEYS_SWITCH = "SET FOREIGN_KEY_CHECKS={0};"
+_AUTO_INC_WARNING = ("#\n# WARNING: One or more tables were detected with a "
+                     "value of 0 in an auto_increment column. If you want "
+                     "to import the data, you must enable the SQL_MODE '"
+                     "NO_AUTO_VALUE_ON_ZERO' during the import. Failure to "
+                     "do so may result in the wrong value used for the "
+                     "rows with 0 as the auto_increment value. The following "
+                     "statement is an example taken from the source server. "
+                     "Uncomment and adjust this statement as needed for the "
+                     "destination server.")
 
 
 def check_read_permissions(server, db_list, options):
@@ -933,6 +942,33 @@ def multiprocess_tbl_export_task(export_tbl_task):
                                                                  err.errmsg))
 
 
+def _check_auto_increment(source, db_list, options):
+    """Check auto increment values for 0
+
+    If any tables are found to have 0 in the list of databases,
+    the code prints a warning along with a sample statement
+    that can be used should the user decide she needs it when
+    she does the import.
+
+    source[in]      Source connection
+    db_list[in]     List of databases to export
+    options[in[     Global option list
+    """
+    for db in db_list:
+        db_obj = Database(source, db, options)
+        # print warning if any tables have 0 as auto_increment value
+        if db_obj.check_auto_increment():
+            sql_mode = source.show_server_variable("sql_mode")
+            sql_mode_str = "NO_AUTO_VALUE_ON_ZERO"
+            if sql_mode[0]:
+                sql_mode_str = sql_mode[0][1]
+                if 'NO_AUTO_VALUE_ON_ZERO' not in sql_mode[0][1]:
+                    sql_mode_str = ("'{0}',NO_AUTO_VALUE_ON_ZERO"
+                                    "".format(sql_mode_str))
+            print(_AUTO_INC_WARNING)
+            print("# SET SQL_MODE = '{0}'\n#".format(sql_mode_str))
+
+
 def export_databases(server_values, db_list, output_file, options):
     """Export one or more databases
 
@@ -1043,6 +1079,10 @@ def export_databases(server_values, db_list, output_file, options):
     if gtid_info:
         write_commands(output_file, gtid_info[0], options, True, rpl_cmt,
                        rpl_cmt_prefix)
+
+    # Checking auto increment. See if any tables have 0 in their auto
+    # increment column.
+    _check_auto_increment(source, db_list, options)
 
     # dump metadata
     if export in ("definitions", "both"):

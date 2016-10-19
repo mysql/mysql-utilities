@@ -33,7 +33,7 @@ from mysql.utilities.command.dbexport import (get_change_master_command,
 _RPL_COMMANDS, _RPL_FILE = 0, 1
 
 _GTID_WARNING = ("# WARNING: The server supports GTIDs but you have elected "
-                 "to skip exexcuting the GTID_EXECUTED statement. Please "
+                 "to skip executing the GTID_EXECUTED statement. Please "
                  "refer to the MySQL online reference manual for more "
                  "information about how to handle GTID enabled servers with "
                  "backup and restore operations.")
@@ -61,6 +61,11 @@ _BLOBS_NOT_NULL_ERROR = ("The copy operation cannot proceed unless "
                          "with NOT NULL blob fields, first remove the NOT "
                          "NULL restriction, copy the data, then add the NOT "
                          "NULL restriction using ALTER TABLE statements.")
+_AUTO_INC_WARNING = ("# WARNING: One or more tables were detected with a "
+                     "value of 0 in an auto_increment column. To enable "
+                     "copying of data, the code enabled the sql_mode "
+                     "NO_AUTO_VALUE_ON_ZERO during the copy and disabled "
+                     "it after the copy. Use -vvv to see the statements.")
 
 
 def get_alter_table_col_not_null(server, db1, db2, table, col):
@@ -281,6 +286,7 @@ def copy_db(src_val, dest_val, db_list, options):
     #  - Check to see if executing on same server but same db name (error)
     #  - Build list of tables to lock for copying data (if no skipping data)
     #  - Check storage engine compatibility
+    auto_increment_zero = False
     for db_name in db_list:
         source_db = Database(source, db_name[0])
         if destination is None:
@@ -332,6 +338,11 @@ def copy_db(src_val, dest_val, db_list, options):
                              options.get("def_engine", None),
                              False, options.get("quiet", False))
 
+        # Checking auto increment. See if any tables have 0 in their auto
+        # increment column.
+        if source_db.check_auto_increment():
+            auto_increment_zero = True
+
     # Get replication commands if rpl_mode specified.
     # if --rpl specified, dump replication initial commands
     rpl_info = None
@@ -370,6 +381,14 @@ def copy_db(src_val, dest_val, db_list, options):
         new_opts['strict'] = True
         rpl_info = get_change_master_command(src_val, new_opts)
         destination.exec_query("STOP SLAVE", {'fetch': False, 'commit': False})
+
+    # Add sql_mode for copying 0 auto increment values
+    if auto_increment_zero:
+        sql_mode_str = destination.sql_mode("NO_AUTO_VALUE_ON_ZERO", True)
+        if sql_mode_str:
+            print(_AUTO_INC_WARNING)
+            if verbose:
+                print("# {0}".format(sql_mode_str))
 
     # Copy (create) objects.
     # We need to delay trigger and events to after data is loaded
@@ -466,6 +485,12 @@ def copy_db(src_val, dest_val, db_list, options):
 
     # Turn on foreign keys if they were on at the start
     destination.disable_foreign_key_checks(False)
+
+    # Remove sql_mode for copying 0 auto increment values
+    if auto_increment_zero:
+        sql_mode_str = destination.sql_mode("NO_AUTO_VALUE_ON_ZERO", False)
+        if sql_mode_str and verbose:
+            print("# {0}".format(sql_mode_str))
 
     if not quiet:
         print "#...done."
