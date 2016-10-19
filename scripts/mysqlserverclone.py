@@ -45,6 +45,11 @@ DESCRIPTION = "mysqlserverclone - start another instance of a running server"
 USAGE = "%prog --server=user:pass@host:port:socket --new-data=/tmp/data2 " \
         "--new-port=3310 --new-id=12 --root-password=root"
 
+CLONE_FAILED = ("ERROR: Unable to connect to cloned server. Server may have "
+                "failed to start. Try running the clone again using the -vvv "
+                "option, which presents all of the messages from the server "
+                "to the console. Correct the error(s) and retry the clone.")
+
 # Check for connector/python
 if not check_connector_python():
     sys.exit(1)
@@ -209,6 +214,7 @@ if __name__ == '__main__':
         serverclone.clone_server(conn, options)
     except exception.UtilError:
         _, e, _ = sys.exc_info()
+        print(CLONE_FAILED)
         print("ERROR: {0}".format(e.errmsg))
         sys.exit(1)
 

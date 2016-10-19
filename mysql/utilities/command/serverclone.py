@@ -315,8 +315,8 @@ def clone_server(conn_val, options):
                 os.kill(proc.pid, subprocess.signal.SIGTERM)
             except OSError as error:
                 if not str(error.strerror).startswith("No such process"):
-                    raise UtilError("Failed to kill process with pid '{0}'"
-                                    "".format(proc.pid))
+                    raise UtilError("Failed to complete initialization of "
+                                    "clone. Pid = '{0}'".format(proc.pid))
         else:
             ret_code = subprocess.call("taskkill /F /T /PID "
                                        "{0}".format(proc.pid), shell=True)
@@ -324,9 +324,9 @@ def clone_server(conn_val, options):
             # return code 0 means it was successful and 128 means it tried
             # to kill a process that doesn't exist
             if ret_code not in (0, 128):
-                raise UtilError("Failed to kill process with pid '{0}'. "
-                                "Return code {1}".format(proc.pid,
-                                                         ret_code))
+                raise UtilError("Failed to complete initialization of clone."
+                                " Pid = {0}. Return code {1}"
+                                "".format(proc.pid, ret_code))
 
     # Drop the bootstrap file
     if os.path.isfile("bootstrap.sql"):

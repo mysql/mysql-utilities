@@ -9,22 +9,28 @@ Usage: mysqlserverclone --server=user:pass@host:port:socket --new-data=/tmp/data
 mysqlserverclone: error: Server to be cloned must be running on the same machine as mysqlserverclone.
 Test case 3 - error: no login
 # WARNING: Root password for new instance has not been set.
+ERROR: Unable to connect to cloned server. Server may have failed to start. Try running the clone again using the -vvv option, which presents all of the messages from the server to the console. Correct the error(s) and retry the clone.
 Error ####: Can't connect to MySQL server on 'nothere:####'
 Test case 4 - error: cannot connect
+ERROR: Unable to connect to cloned server. Server may have failed to start. Try running the clone again using the -vvv option, which presents all of the messages from the server to the console. Correct the error(s) and retry the clone.
 Error ####: Can't connect to MySQL server on 'nothere:####'
 Test case 5 - cannot create directory
 # Cloning the MySQL server running on XXXXX-XXXXX.
 # Creating new data directory...
+ERROR: Unable to connect to cloned server. Server may have failed to start. Try running the clone again using the -vvv option, which presents all of the messages from the server to the console. Correct the error(s) and retry the clone.
 ERROR: Unable to create directory '/not/there/yes'
 Test case 6 - error: --new-data exists
 Usage: mysqlserverclone --server=user:pass@host:port:socket --new-data=/tmp/data2 --new-port=3310 --new-id=12 --root-password=root
 
 mysqlserverclone: error: Target data directory exists and is not empty. Use --delete-data option to delete folder before cloning.
 Test case 7 - --new-data does not exist (but cannot connect)
+ERROR: Unable to connect to cloned server. Server may have failed to start. Try running the clone again using the -vvv option, which presents all of the messages from the server to the console. Correct the error(s) and retry the clone.
 Error ####: Can't connect to MySQL server on 'nothere:####'
 Test case 8 - attempt to use existing port
+ERROR: Unable to connect to cloned server. Server may have failed to start. Try running the clone again using the -vvv option, which presents all of the messages from the server to the console. Correct the error(s) and retry the clone.
 ERROR: Port ##### in use. Please choose an available port.
 Test case 9 - use invalid big path in --new-data
+ERROR: Unable to connect to cloned server. Server may have failed to start. Try running the clone again using the -vvv option, which presents all of the messages from the server to the console. Correct the error(s) and retry the clone.
 ERROR: The --new-data path 'XXXX' is too long (> 200 characters). Please use a smaller one. You can use the --force option to skip this check
 Test case 10 - No minimum required Free space for path in --new-data
 Pass
