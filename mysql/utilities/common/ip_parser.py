@@ -112,7 +112,7 @@ _CONN_HOST_NAME = re.compile(
 _CONN_IPv4_NUM_ONLY = re.compile(
     r"""(
           (?:         # start of the IPv4 1st group
-             25[0-4]  # this match numbers 250 to 254
+             25[0-5]  # this match numbers 250 to 255
                     | # or
              2[0-4]\d # this match numbers from 200 to 249
                     | # or
@@ -123,7 +123,7 @@ _CONN_IPv4_NUM_ONLY = re.compile(
           (?:         # start of the 3 next groups
              \.       # the prefix '.' like in '.255'
              (?:
-                25[0-4]|2[0-4]\d|1\d\d|[1-9]?\d
+                25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d
                       # same group as before
               )
            )
