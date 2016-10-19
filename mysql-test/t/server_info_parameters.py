@@ -102,6 +102,13 @@ class test(server_info.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = "Test case {0} - show servers (no conn)".format(test_num)
+        res = self.run_test_case(0, "mysqlserverinfo.py --show-servers",
+                                 comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Now, stop the server then run verbose test again
         res = self.server3.show_server_variable('basedir')
         self.basedir = os.path.normpath(res[0][1])

@@ -543,6 +543,9 @@ def show_server_info(servers, options):
             _show_running_servers(start_p, end_p)
         else:
             _show_running_servers()
+        # Don't continue unless at least one server is specified.
+        if not servers:
+            return
 
     ssl_dict = {}
     ssl_dict['ssl_cert'] = options.get("ssl_cert", None)

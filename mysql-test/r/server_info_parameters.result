@@ -130,7 +130,12 @@ Test case 8 - show servers
  slow_query_log_file_size: XXXX
 1 row.
 #...done.
-Test case 9 - run against offline server
+Test case 9 - show servers (no conn)
+# 
+# The following MySQL servers are active on this host:
+# 
+#...done.
+Test case 10 - run against offline server
 # WARNING: --start-timeout must be >= 10 seconds. Using default value 10.
 # Server is offline.
 # Checking server version ... done.

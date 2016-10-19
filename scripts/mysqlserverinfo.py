@@ -144,7 +144,7 @@ if __name__ == '__main__':
         "start_timeout": opt.start_timeout,
     }
 
-    if opt.server is None:
+    if opt.server is None and not opt.show_servers:
         parser.error("You must specify at least one server.")
 
     # add ssl options values.
