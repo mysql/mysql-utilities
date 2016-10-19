@@ -52,17 +52,47 @@ _CHECK_BLOBS_NOT_NULL = """
     SELECT DISTINCT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME
     FROM INFORMATION_SCHEMA.COLUMNS
     WHERE (COLUMN_TYPE LIKE '%BLOB%' OR COLUMN_TYPE LIKE '%TEXT%') AND
-    IS_NULLABLE = 'NO' AND TABLE_SCHEMA IN ({0});
+    IS_NULLABLE = 'NO' AND TABLE_SCHEMA = '{0}';
 """
-_BLOBS_NOT_NULL_ERROR = ("ERROR: The following tables have blob fields set to "
-                         "NOT NULL. The copy operation cannot proceed unless "
+_BLOBS_NOT_NULL_MSG = ("{0}: The following tables have blob fields set to "
+                       "NOT NULL.")
+_BLOBS_NOT_NULL_ERROR = ("The copy operation cannot proceed unless "
                          "the blob fields permit NULL values. To copy data "
                          "with NOT NULL blob fields, first remove the NOT "
                          "NULL restriction, copy the data, then add the NOT "
                          "NULL restriction using ALTER TABLE statements.")
 
 
-def check_blobs_not_null(server, db_list):
+def get_alter_table_col_not_null(server, db1, db2, table, col):
+    """
+    Get the ALTER TABLE statement for the column in a tuple stripping
+    the NOT NULL option for the second item in the tuple. This allows
+    the execution of the statements before and after to remove then
+    reset the NOT NULL restriction.
+
+    server[in]             Server class instance
+    db1[in]                Source database name
+    db2[in]                Destination database name
+    table[in]              Table name
+    col[in]                Column name
+
+    Returns: before and after ALTER statement, None = col not found
+    """
+    alter_table = "ALTER TABLE {0}.{1} CHANGE COLUMN {2} {3}"
+    res = server.exec_query("SHOW CREATE TABLE {0}.{1}".format(db1, table))
+    if res:
+        rows = res[0][1]
+    else:
+        return None
+    for row in rows.split("\n"):
+        if "`{0}`".format(col) in row:
+            col_str = row.strip().strip(",")
+            col_str_new = row.strip().strip(",").strip("NOT NULL")
+            return (alter_table.format(db2, table, col, col_str_new),
+                    alter_table.format(db2, table, col, col_str))
+
+
+def check_blobs_not_null(server, db_list, warn=False):
     """
     Check for any blob fields that have NOT null set. Prints error message
     if any are encountered.
@@ -70,24 +100,28 @@ def check_blobs_not_null(server, db_list):
     server[in]             Server class instance
     db_list[in]            List of databases to be copied in form
                            (src, dst)
+    warn[in]               If true, print WARNING instead of ERROR
 
-    Returns: bool - True = blobs with NOT NULL, False = none found
+    Returns: list - list of blobs with NOT NULL, None = none found
     """
     if not db_list:
-        return False
-    db_name_include = ""
+        return None
+    blob_fields = []
     for db in db_list:
-        if db_name_include != "":
-            db_name_include = "{0},".format(db_name_include)
-        db_name_include = "{0}'{1}'".format(db_name_include, db[0])
-    res = server.exec_query(_CHECK_BLOBS_NOT_NULL.format(db_name_include))
-    if res:
-        print(_BLOBS_NOT_NULL_ERROR)
-        for row in res:
-            print("    {0}.{1} Column {2}".format(row[0], row[1], row[2]))
-        print
-        return True
-    return False
+        res = server.exec_query(_CHECK_BLOBS_NOT_NULL.format(db[0]))
+        if res:
+            if warn:
+                print(_BLOBS_NOT_NULL_MSG.format("WARNING"))
+            else:
+                print("{0} {1}".format(_BLOBS_NOT_NULL_MSG.format("ERROR"),
+                                       _BLOBS_NOT_NULL_ERROR))
+            for row in res:
+                print("    {0}.{1} Column {2}".format(row[0], row[1], row[2]))
+                blob_fields.append((row[0], row[1], row[2], db[1]))
+            print
+    if blob_fields == []:
+        return None
+    return blob_fields
 
 
 def _copy_objects(source, destination, db_list, options,
@@ -356,6 +390,14 @@ def copy_db(src_val, dest_val, db_list, options):
     # Copy tables data
     if not skip_data and not skip_tables:
 
+        # If there are statements to execute before the copy, execute them here
+        before_stmts = options.get("before_alter", None)
+        if before_stmts:
+            for stmt in before_stmts:
+                if not destination.exec_query(stmt):
+                    print("WARNING: Statement did not execute: "
+                          "{0}".format(stmt))
+
         # Copy tables
         for db_name in db_list:
 
@@ -367,6 +409,14 @@ def copy_db(src_val, dest_val, db_list, options):
             db.init()
             db.copy_data(db_name[1], options, destination, connections=1,
                          src_con_val=src_val, dest_con_val=dest_val)
+
+        # If there are statements to execute after the copy, execute them here
+        after_stmts = options.get("after_alter", None)
+        if after_stmts:
+            for stmt in after_stmts:
+                if not destination.exec_query(stmt):
+                    print("WARNING: Statement did not execute: "
+                          "{0}".format(stmt))
 
     # if cloning with lock-all unlock here to avoid system table lock conflicts
     if cloning and locking == 'lock-all':

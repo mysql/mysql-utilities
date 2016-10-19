@@ -432,6 +432,17 @@ class test(copy_db.test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        to_conn = "--destination={0}".format(
+            self.build_connection_string(self.server2)
+        )
+        cmd = ("mysqldbcopy.py --skip-gtid --skip=grants --drop-first {0} "
+               "{1} util_test:util_db_clone --not".format(from_conn, to_conn))
+        comment = "Test case {0} - allow blobs with not null".format(test_num)
+        res = self.run_test_case(0, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask socket for destination server
         self.replace_result("# Destination: root@localhost:",
                             "# Destination: root@localhost:[] ... connected\n")

@@ -140,6 +140,14 @@ if __name__ == '__main__':
                       "Special values: 0 (number of processes equal to the "
                       "CPUs detected) and 1 (default - no concurrency).")
 
+    # Add override for blob not null test
+    parser.add_option("--not-null-blobs", action="store_true",
+                      dest="not_null_blobs", default=False,
+                      help="Allow conversion of blob fields marked as NOT "
+                      "NULL to NULL before copy then restore NOT NULL "
+                      "after the copy. May cause indexes to be rebuilt if "
+                      "the affected blob fields are used in indexes.")
+
     # Now we process the rest of the arguments.
     opt, args = parser.parse_args()
 
@@ -223,6 +231,8 @@ if __name__ == '__main__':
         "skip_gtid": opt.skip_gtid,
         "charset": opt.charset,
         "multiprocess": num_cpu if opt.multiprocess == 0 else opt.multiprocess,
+        "before_alter": [],
+        "after_alter": [],
     }
 
     options.update(get_ssl_dict(opt))
@@ -331,8 +341,27 @@ if __name__ == '__main__':
         db_list.append(db_entry)
 
     # Check databases for blob fields set to NOT NULL
-    if servers and dbcopy.check_blobs_not_null(servers[0], db_list):
-        sys.exit(1)
+    before_alter = []
+    after_alter = []
+    not_null_blob_cols = None
+    if servers:
+        not_null_blob_cols = dbcopy.check_blobs_not_null(servers[0], db_list,
+                                                         opt.not_null_blobs)
+    if servers and not_null_blob_cols:
+        if not opt.not_null_blobs:
+            sys.exit(1)
+        # if --not-null-blobs, get the ALTER statements to execute before
+        # the copy and after the copy
+        alter_stmts = []
+        for col in not_null_blob_cols:
+            stmts = dbcopy.get_alter_table_col_not_null(servers[0], col[0],
+                                                        col[3], col[1],
+                                                        col[2])
+            if stmts:
+                before_alter.append(stmts[0])
+                after_alter.append(stmts[1])
+        options["before_alter"] = before_alter
+        options["after_alter"] = after_alter
 
     try:
         # Record start time.

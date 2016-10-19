@@ -19,8 +19,8 @@
 mylogin_socket test.
 """
 
-import mutlib
 import os
+import mutlib
 from mysql.utilities.exception import FormatError, MUTLibError
 
 from mysql.utilities.common.ip_parser import parse_connection

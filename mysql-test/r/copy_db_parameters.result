@@ -108,6 +108,10 @@ Options:
                         concurrent execution. Special values: 0 (number of
                         processes equal to the CPUs detected) and 1 (default -
                         no concurrency).
+  --not-null-blobs      Allow conversion of blob fields marked as NOT NULL to
+                        NULL before copy then restore NOT NULL after the copy.
+                        May cause indexes to be rebuilt if the affected blob
+                        fields are used in indexes.
 Test case 4 - no data
 WARNING: Using a password on the command line interface can be insecure.
 # Source on XXXX-XXXX: ... connected.

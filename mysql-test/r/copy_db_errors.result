@@ -243,3 +243,30 @@ Test case 33 - blobs with not null
 ERROR: The following tables have blob fields set to NOT NULL. The copy operation cannot proceed unless the blob fields permit NULL values. To copy data with NOT NULL blob fields, first remove the NOT NULL restriction, copy the data, then add the NOT NULL restriction using ALTER TABLE statements.
     util_test.b1 Column blobby
 
+Test case 34 - allow blobs with not null
+WARNING: The following tables have blob fields set to NOT NULL.
+    util_test.b1 Column blobby
+
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_test renamed as util_db_clone
+# Copying TABLE util_test.b1
+# Copying TABLE util_test.t1
+# Copying TABLE util_test.t2
+# Copying TABLE util_test.t3
+# Copying TABLE util_test.t4
+# Copying TABLE util_test.t5
+# Copying FUNCTION util_test.f1
+# Copying FUNCTION util_test.f2
+# Copying PROCEDURE util_test.p1
+# Copying VIEW util_test.v2
+# Copying VIEW util_test.v1
+# Copying data for TABLE util_test.b1
+# Copying data for TABLE util_test.t1
+# Copying data for TABLE util_test.t2
+# Copying data for TABLE util_test.t3
+# Copying data for TABLE util_test.t4
+# Copying data for TABLE util_test.t5
+# Copying TRIGGER util_test.trg
+# Copying EVENT util_test.e1
+#...done.
