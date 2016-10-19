@@ -21,6 +21,7 @@ slaves and down-stream replicants for mapping topologies.
 """
 
 import getpass
+import os
 
 from mysql.utilities.common.options import parse_user_password
 from mysql.utilities.common.replication import Slave
@@ -108,14 +109,8 @@ class TopologyMap(object):
 
         conn_options.update(certs_paths)
 
-        master_info = "%s:%s" % (conn['host'],
-                                 conn['port'])
+        master_info = "{0}:{1}".format(conn['host'], conn['port'])
         master = None
-
-        # Clear socket if used with a local server
-        if (conn['host'] == 'localhost' or conn['host'] == "127.0.0.1" or
-                conn['host'] == "::1" or conn['host'] == "[::1]"):
-            conn['unix_socket'] = None
 
         # Increment num_retries if not set when --prompt is used
         if self.prompt_user and self.num_retries == 0:
@@ -138,6 +133,10 @@ class TopologyMap(object):
                 else:
                     # retries expired - re-raise error if still failing
                     raise UtilError(e.errmsg)
+
+        # Correct port for socket connections
+        if os.name == 'posix' and master.socket:
+            master_info = "{0}:{1}".format(conn['host'], master.port)
 
         return (master, master_info)
 

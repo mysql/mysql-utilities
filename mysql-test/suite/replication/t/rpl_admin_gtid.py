@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -66,6 +66,9 @@ class test(rpl_admin.test):
 
     def setup(self):
         self.res_fname = "result.txt"
+
+        # Check if the required tools are accessible
+        self.check_mylogin_requisites()
 
         # Spawn servers
         self.server0 = self.servers.get_server(0)
@@ -150,7 +153,7 @@ class test(rpl_admin.test):
         self.remove_result("localhost,{0},SLAVE,".format(self.s2_port))
         self.remove_result("localhost,{0},SLAVE,".format(self.s3_port))
 
-        comment = "Test case {0} - heatlh with discover".format(test_num)
+        comment = "Test case {0} - health with discover".format(test_num)
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn])
         cmd_str = "mysqlrpladmin.py --master={0} ".format(master_conn)
         cmd_opts = " --discover-slaves-login=root:root health --format=csv "
@@ -165,7 +168,7 @@ class test(rpl_admin.test):
         slaves = ",".join(["root:root@127.0.0.1:{0}".format(self.server2.port),
                            slave2_conn, slave3_conn])
         cmd_str = "mysqlrpladmin.py "
-        cmd_opts = " --candidates={0}  --slaves={1} failover".format(
+        cmd_opts = " --candidates={0} --slaves={1} --force failover".format(
             slave3_conn, slaves)
         res = mutlib.System_test.run_test_case(self, 0, cmd_str + cmd_opts,
                                                comment)
@@ -243,6 +246,44 @@ class test(rpl_admin.test):
         self.server5.exec_query("STOP SLAVE")
         self.server5.exec_query("RESET SLAVE")
 
+        test_num += 1
+
+        master_socket = self.server1.show_server_variable('socket')
+        self.server1.exec_query("SET sql_log_bin = 0")
+        try:
+            self.server1.exec_query("DROP USER 'root_me'@'localhost'")
+        except:
+            pass   # Ok if user doesn't exist
+        self.server1.exec_query("CREATE USER 'root_me'@'localhost'")
+        self.server1.exec_query("GRANT ALL ON *.* TO 'root_me'@'localhost' "
+                                "WITH GRANT OPTION")
+        self.server1.exec_query("SET sql_log_bin = 1")
+        self.create_login_path_data('test_master_socket', 'root_me',
+                                    'localhost', None,
+                                    "'{0}'".format(master_socket[0][1]))
+
+        slave_socket = self.server2.show_server_variable('socket')
+        self.server2.exec_query("SET sql_log_bin = 0")
+        try:
+            self.server2.exec_query("DROP USER 'root_me'@'localhost'")
+        except:
+            pass   # Ok if user doesn't exist
+        self.server2.exec_query("CREATE USER 'root_me'@'localhost'")
+        self.server2.exec_query("GRANT ALL ON *.* TO 'root_me'@'localhost'"
+                                "WITH GRANT OPTION")
+        self.server2.exec_query("SET sql_log_bin = 1")
+        self.create_login_path_data('test_slave_socket', 'root_me',
+                                    'localhost', None,
+                                    "'{0}'".format(slave_socket[0][1]))
+
+        cmd_str = ("mysqlrpladmin.py --master=test_master_socket elect "
+                   "--disc=root:root --candidates=test_slave_socket")
+        comment = ("Test case {0} - elect with discovery and socket"
+                   "".format(test_num))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Test for BUG#16571812
         comment = "Test case {0} - slave not part of topology".format(test_num)
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn, slave4_conn])
@@ -287,6 +328,19 @@ class test(rpl_admin.test):
                 self.server2.inject_empty_trx(gtid, automatic)
 
         # Run the test
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        # Now we return the topology to its original state for other tests
+        self.reset_topology()
+
+        test_num += 1
+        cmd_str = ("mysqlrpladmin.py failover --slaves={0} "
+                   "--candidates=test_slave_socket --rpl-user=rpl:rpl "
+                   "--force ".format(slave1_conn))
+        comment = ("Test case {0} - failover with discovery and socket"
+                   "".format(test_num))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -351,6 +405,14 @@ class test(rpl_admin.test):
                                "| OK      |")
         self.replace_substring("| Slave has 1 transactions behind master.  |",
                                "| OK      |")
+        self.replace_result("#  - For slave '127.0.0.1@PORT2':",
+                            "#  - For slave '127.0.0.1@PORT2': XXXXXXXXX:1\n")
+        self.replace_result("#  - For slave 'localhost@PORT2':",
+                            "#  - For slave 'localhost@PORT2': XXXXXXXXX:1\n")
+
+        # Cleanup for login paths
+        self.remove_login_path_data('test_master_socket')
+        self.remove_login_path_data('test_slave_socket')
 
         return True
 

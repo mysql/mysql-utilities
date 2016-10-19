@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -59,6 +59,9 @@ class test(mutlib.System_test):
 
     def setup(self):
         self.res_fname = "result.txt"
+
+        # Check if the required tools are accessible
+        self.check_mylogin_requisites()
 
         # Spawn servers
         self.server0 = self.servers.get_server(0)
@@ -226,6 +229,53 @@ class test(mutlib.System_test):
                     raise MUTLibError("{0}: failed".format(comment))
             test_num += 1
 
+        test_num += 1
+        self.reset_topology()
+        master_socket = self.server1.show_server_variable('socket')
+        self.server1.exec_query("SET sql_log_bin = 0")
+        try:
+            self.server1.exec_query("DROP USER 'root_me'@'localhost'")
+        except:
+            pass   # Ok if user doesn't exist
+        self.server1.exec_query("CREATE USER 'root_me'@'localhost'")
+        self.server1.exec_query("GRANT ALL ON *.* TO 'root_me'@'localhost' "
+                                "WITH GRANT OPTION")
+        self.server1.exec_query("SET sql_log_bin = 1")
+        self.create_login_path_data('test_master_socket', 'root_me',
+                                    'localhost', None,
+                                    "'{0}'".format(master_socket[0][1]))
+
+        cmd_str = ("mysqlrpladmin.py --master=test_master_socket health "
+                   "--disc=root:root")
+        comment = ("Test case {0} - health with discovery and socket"
+                   "".format(test_num))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+
+        slave_socket = self.server2.show_server_variable('socket')
+        self.server2.exec_query("SET sql_log_bin = 0")
+        try:
+            self.server2.exec_query("DROP USER 'root_me'@'localhost'")
+        except:
+            pass   # Ok if user doesn't exist
+        self.server2.exec_query("CREATE USER 'root_me'@'localhost'")
+        self.server2.exec_query("GRANT ALL ON *.* TO 'root_me'@'localhost'")
+        self.server2.exec_query("SET sql_log_bin = 1")
+        self.create_login_path_data('test_slave_socket', 'root_me',
+                                    'localhost', None,
+                                    "'{0}'".format(slave_socket[0][1]))
+
+        cmd_str = ("mysqlrpladmin.py --master=test_master_socket health "
+                   "--slaves=test_slave_socket")
+        comment = ("Test case {0} - health with sockets"
+                   "".format(test_num))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Now we return the topology to its original state for other tests
         self.reset_topology()
 
@@ -234,6 +284,10 @@ class test(mutlib.System_test):
 
         # Remove warning when using test servers without GTID enabled.
         self.remove_result("# WARNING: Errant transactions check skipped")
+
+        # Cleanup for login paths
+        self.remove_login_path_data('test_master_socket')
+        self.remove_login_path_data('test_slave_socket')
 
         return True
 

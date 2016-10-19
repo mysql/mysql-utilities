@@ -411,3 +411,34 @@ WARNING: Using a password on the command line interface can be insecure.
 #   Executing reset on slave localhost:PORT3 Ok
 #   Executing reset on slave localhost:PORT4 Ok
 # ...done.
+Test case 20 - health with discovery and socket
+# Discovering slaves for master at localhost:PORT1
+# Discovering slave at localhost:PORT2
+# Found slave: localhost:PORT2
+# Discovering slave at localhost:PORT3
+# Found slave: localhost:PORT3
+# Discovering slave at localhost:PORT4
+# Found slave: localhost:PORT4
+# Checking privileges.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT3  | SLAVE   | UP     | XXX        | OK      |
+| localhost  | PORT4  | SLAVE   | UP     | XXX        | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.
+Test case 21 - health with sockets
+# Checking privileges.
+#
+# Replication Topology Health:
++------------+-------+---------+--------+------------+---------+
+| host       | port  | role    | state  | gtid_mode  | health  |
++------------+-------+---------+--------+------------+---------+
+| localhost  | PORT1  | MASTER  | UP     | XXX        | OK      |
+| localhost  | PORT2  | SLAVE   | UP     | XXX        | OK      |
++------------+-------+---------+--------+------------+---------+
+# ...done.

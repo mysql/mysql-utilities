@@ -40,6 +40,7 @@ from mysql.utilities.common.format import print_list
 from mysql.utilities.common.topology import Topology
 from mysql.utilities.command.failover_console import FailoverConsole
 from mysql.utilities.command.failover_daemon import FailoverDaemon
+from mysql.utilities.common.server import check_hostname_alias, get_port
 
 _VALID_COMMANDS_TEXT = """
 Available Commands:
@@ -437,13 +438,13 @@ class RplCommands(object):
         """
         # Check new master is not actual master - need valid candidate
         candidate = self.options.get("new_master", None)
-        if (self.topology.master.is_alias(candidate['host']) and
-                self.master_vals['port'] == candidate['port']):
-            err_msg = ERROR_SAME_MASTER.format(candidate['host'],
-                                               candidate['port'],
-                                               self.master_vals['host'],
-                                               self.master_vals['port'])
-            self._report(err_msg, logging.WARN)
+        if check_hostname_alias(self.master_vals, candidate):
+            err_msg = ERROR_SAME_MASTER.format(
+                n_master_host=candidate['host'],
+                n_master_port=candidate['port'],
+                master_host=self.master_vals['host'],
+                master_port=self.master_vals['port']
+            )
             self._report(err_msg, logging.CRITICAL)
             raise UtilRplError(err_msg)
 
@@ -487,10 +488,20 @@ class RplCommands(object):
             print("# WARNING: {0}".format(warn_msg))
             self._report(warn_msg, logging.WARN, False)
 
+        # Fix ports before continuing.
+        candidate_port = candidate['port']
+        if os.name == "posix":
+            if self.topology.master.socket:
+                self.master_vals['port'] = self.topology.master.port
+            # Requires quick connection to server to get correct port
+            port = get_port(candidate)
+            if port:
+                candidate_port = port
+
         self._report(" ".join(
             ["# Performing switchover from master at",
              "%s:%s" % (self.master_vals['host'], self.master_vals['port']),
-             "to slave at %s:%s." % (candidate['host'], candidate['port'])]))
+             "to slave at %s:%s." % (candidate['host'], candidate_port)]))
         if not self.topology.switchover(candidate):
             self._report("# Errors found. Switchover aborted.", logging.ERROR)
             return False
@@ -527,8 +538,9 @@ class RplCommands(object):
                          "requirements.", logging.ERROR)
             return
 
-        self._report("# Best slave found is located on %s:%s." %
-                     (best_slave['host'], best_slave['port']))
+        # Get the correct port
+        self._report("# Best slave found is located on {0}:{1}."
+                     "".format(best_slave['host'], best_slave['port']))
 
     def _failover(self, strict=False, options=None):
         """Perform failover

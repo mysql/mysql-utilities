@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -62,6 +62,9 @@ class test(mutlib.System_test):
         return server
 
     def setup(self):
+        # Check if the required tools are accessible
+        self.check_mylogin_requisites()
+
         self.server_list[0] = self.servers.get_server(0)
         self.server_list[1] = self.get_server("rep_slave_show")
         if self.server_list[1] is None:
@@ -214,7 +217,7 @@ class test(mutlib.System_test):
 
         comment = ("Test case {0}b - show topology with phantom "
                    "slave".format(test_num))
-        cmd_str = ("mysqlrplshow.py --disco=root:root {0}"
+        cmd_str = ("mysqlrplshow.py --disco=root:root {0} "
                    "--show-list".format(relay_slave_master))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
@@ -222,8 +225,30 @@ class test(mutlib.System_test):
 
         comment = ("Test case {0}c - show topology with phantom "
                    "slave (with --verbose)".format(test_num))
-        cmd_str = ("mysqlrplshow.py --disco=root:root {0}"
+        cmd_str = ("mysqlrplshow.py --disco=root:root {0} "
                    "--show-list --verbose".format(relay_slave_master))
+        res = self.run_test_case(0, cmd_str, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        master_socket = self.server_list[2].show_server_variable('socket')
+        self.server_list[2].exec_query("SET sql_log_bin = 0")
+        try:
+            self.server_list[2].exec_query("DROP USER 'root_me'@'localhost'")
+        except:
+            pass   # Ok if user doesn't exist
+        self.server_list[2].exec_query("CREATE USER 'root_me'@'localhost'")
+        self.server_list[2].exec_query("GRANT ALL ON *.* TO "
+                                       "'root_me'@'localhost'")
+        self.server_list[2].exec_query("SET sql_log_bin = 1")
+        self.create_login_path_data('test_master_socket', 'root_me',
+                                    'localhost', None,
+                                    "'{0}'".format(master_socket[0][1]))
+        cmd_str = ("mysqlrplshow.py --disco=root:root "
+                   "--master=test_master_socket --show-list")
+        comment = ("Test case {0} - show list with socket"
+                   "".format(test_num))
         res = self.run_test_case(0, cmd_str, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
@@ -281,4 +306,5 @@ class test(mutlib.System_test):
         # Kill the servers that are only for this test.
         kill_list = ['rep_relay_slave', 'multi_master1', 'rep_master_show',
                      'multi_master2', 'rep_slave_show']
+        self.remove_login_path_data('test_master_socket')
         return self.kill_server_list(kill_list)

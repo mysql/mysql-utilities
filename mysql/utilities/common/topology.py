@@ -23,6 +23,7 @@ import sys
 import logging
 import time
 import operator
+import os
 
 from multiprocessing.pool import ThreadPool
 
@@ -1360,6 +1361,9 @@ class Topology(Replication):
             host = slave_dict['host']
             port = slave_dict['port']
             slave = slave_dict['instance']
+            # Get correct port from slave
+            if slave and port != slave.port:
+                port = slave.port
             if slave is None:
                 rpl_health = (False, ["Cannot connect to slave."])
             elif not slave.is_alive():
@@ -2095,6 +2099,10 @@ class Topology(Replication):
             s_host = slave_dict['host']
             s_port = slave_dict['port']
             slave = slave_dict['instance']
+            # Fix port
+            if slave:
+                if os.name == "posix" and slave.socket:
+                    slave_dict['port'] = slave.port
             # skip dead or zombie slaves
             if slave is None or not slave.is_alive():
                 continue

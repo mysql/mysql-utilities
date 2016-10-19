@@ -149,7 +149,7 @@ def _server_info(server_val, get_defaults=False, options=None):
     params_dict['warnings'] = []
 
     # Identify server by string: 'host:port[:socket]'.
-    server_id = "{0}:{1}".format(source_values['host'], source_values['port'])
+    server_id = "{0}:{1}".format(server.host, server.port)
     if source_values.get('socket', None):
         server_id = "{0}:{1}".format(server_id, source_values.get('socket'))
     params_dict['server'] = server_id

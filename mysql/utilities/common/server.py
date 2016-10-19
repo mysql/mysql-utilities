@@ -560,8 +560,39 @@ def test_connect(conn_info, throw_errors=False, ssl_dict=None):
     return True
 
 
+def get_port(server1_vals):
+    """Get the port for a connection using a socket.
+
+    This method attempts to connect to a server to retrieve
+    its port. It is used to try and update local connection
+    values with a valid port number for servers connected
+    via a socket.
+
+    server1_vals[in]   connection dictionary for server1
+
+    Returns string - port for server or None if cannot connect
+                     or server is not connected via socket
+    """
+    socket = server1_vals.get('unix_socket', None)
+    if socket:
+        try:
+            server1 = Server({'conn_info': server1_vals})
+            server1.connect()
+            port = server1.port
+            server1.disconnect()
+            return port
+        except:
+            pass
+    return None
+
+
 def check_hostname_alias(server1_vals, server2_vals):
     """Check to see if the servers are the same machine by host name.
+
+    This method will attempt to compare two servers to see
+    if they are the same host and port. However, if either is
+    using a unix socket, it will connect to the server and attempt
+    so that the port is updated.
 
     server1_vals[in]   connection dictionary for server1
     server2_vals[in]   connection dictionary for server2
@@ -570,6 +601,14 @@ def check_hostname_alias(server1_vals, server2_vals):
     """
     server1 = Server({'conn_info': server1_vals})
     server2 = Server({'conn_info': server2_vals})
+    server1_socket = server1_vals.get('unix_socket', None)
+    server2_socket = server1_vals.get('unix_socket', None)
+    if server1_socket:
+        server1.connect()
+        server1.disconnect()
+    if server2_socket:
+        server2.connect()
+        server2.disconnect()
 
     return (server1.is_alias(server2.host) and
             int(server1.port) == int(server2.port))
@@ -1069,6 +1108,11 @@ class Server(object):
                 res = self.exec_query("SHOW STATUS LIKE 'Ssl_cipher'")
                 if res[0][1] == '':
                     raise UtilError("Can not encrypt server connection.")
+            # if we connected via a socket, get the port
+            if os.name == 'posix' and self.socket:
+                res = self.show_server_variable('port')
+                if res:
+                    self.port = res[0][1]
         except UtilError:
             # Reset any previous value if the connection cannot be established,
             # before raising an exception. This prevents the use of a broken
