@@ -126,7 +126,7 @@ if __name__ == '__main__':
                                   server_default=None,
                                   extended_help=EXTENDED_HELP)
 
-    # Add verbosity option (no --quite option).
+    # Add verbose option (no --quiet option).
     add_verbosity(parser, False)
 
     # Add show mode options

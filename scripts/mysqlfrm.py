@@ -138,7 +138,7 @@ Helpful Hints
   - Use the --show-stats option to see file statistics for each .frm file.
 
   - If you encounter connection or similar errors when running in default
-    mode, re-run the command with the --verbosity option and view the
+    mode, re-run the command with the --verbose option and view the
     output from the spawned server and repair any errors in launching the
     server. If mysqlfrm fails in the middle, you may need to manually
     shutdown the server on the port specified with --port.

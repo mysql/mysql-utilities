@@ -147,7 +147,7 @@ if __name__ == '__main__':
     # Add the --ssl options
     add_ssl_options(parser)
 
-    # Add verbosity option (no --quite option).
+    # Add verbose option (no --quiet option).
     add_verbosity(parser, False)
 
     # Add timeout options.

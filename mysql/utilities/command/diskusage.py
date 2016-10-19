@@ -282,7 +282,7 @@ def _build_innodb_list(per_table, folder, datadir, specs, verbosity=0):
     files. It will search all database directories if per_table is True.
     Returns total size of all files found.
 
-    The verbosity option controls how much data is shown:
+    The verbosity argument controls how much data is shown:
           0 : no additional information
         > 0 : include type and specification (for shared tablespaces)
 
@@ -358,7 +358,7 @@ def _build_db_list(server, rows, include_list, datadir, fmt=False,
     constant width using locale-specific options for printing numerals. For
     example, US locale formats 12345 as 12,345.
 
-    The verbosity option controls how much data is shown:
+    The verbosity argument controls how much data is shown:
            0 : no additional information
          > 0 : include data size (calculated) and size of misc files
         >= 2 : also include database directory actual size

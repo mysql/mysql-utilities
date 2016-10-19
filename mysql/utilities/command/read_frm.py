@@ -40,7 +40,7 @@ from mysql.utilities.common.tools import (requires_encoding, encode,
 # The following are storage engines that cannot be read in default mode
 _CANNOT_READ_ENGINE = ["PARTITION", "PERFORMANCE_SCHEMA"]
 _SPAWN_SERVER_ERROR = ("Spawn server operation failed{0}. To diagnose, run "
-                       "the utility again and use the --verbosity option to "
+                       "the utility again and use the --verbose option to "
                        "view the messages from the spawned server and correct "
                        "any errors presented then run the utility again.")
 

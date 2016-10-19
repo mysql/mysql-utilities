@@ -162,7 +162,7 @@ if __name__ == '__main__':
                            "file. If not specified it is assumed to be "
                            "located in the binary log directory.")
 
-    # Add verbosity option (no --quite option).
+    # Add verbose option (no --quiet option).
     add_verbosity(parser, False)
 
     # Add option to specify the type of the binary log files to process.

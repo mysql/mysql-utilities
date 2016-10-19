@@ -113,7 +113,7 @@ if __name__ == '__main__':
                            "them (injecting empty transactions) - useful to "
                            "test the transactions that would be skipped.")
 
-    # Add verbosity option (no --quite option).
+    # Add verbose option (no --quiet option).
     add_verbosity(parser, False)
 
     # Parse the options and arguments.
