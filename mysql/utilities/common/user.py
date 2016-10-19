@@ -77,8 +77,12 @@ def parse_user_host(user_name):
     """Parse user, passwd, host, port from user:passwd@host
 
     user_name[in]      MySQL user string (user:passwd@host)
-    """
 
+    returns - tuple - user, passwd, host
+    """
+    # Check for anonymous user. If not, continue.
+    if user_name == "''@'%'":
+        return ('', None, '%')
     no_ticks = user_name.replace("'", "")
     try:
         conn_values = parse_connection(no_ticks)

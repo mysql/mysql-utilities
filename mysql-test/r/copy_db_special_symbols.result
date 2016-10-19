@@ -5,3 +5,16 @@ Test case 1 - copy a database with special symbols
 # Copying FUNCTION util_spec.spec_date
 #...done.
 RETURN DATE_FORMAT(mydatetime, '%d/%m %H:%i')
+Test case 2 - copy a database with anonymous user 
+# Source on XXXX-XXXX: ... connected.
+# Destination on XXXX-XXXX: ... connected.
+# Copying database util_spec renamed as util_spec_clone
+# Dropping new object FUNCTION util_spec_clone.`spec_date`
+# WARNING: Unable to drop `spec_date` from destination database (object may not exist): DROP FUNCTION `util_spec_clone`.`spec_date`
+# Copying FUNCTION util_spec.spec_date
+CREATE DEFINER=`root`@`localhost` FUNCTION `spec_date`(mydatetime datetime) RETURNS datetime
+    DETERMINISTIC
+RETURN DATE_FORMAT(mydatetime, '%d/%m %H:%i')
+# Copying GRANTS from util_spec
+GRANT SELECT ON `util_spec_clone`.* TO ''@'%'
+#...done.

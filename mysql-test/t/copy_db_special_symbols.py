@@ -89,6 +89,19 @@ class test(mutlib.System_test):
                                       " AND ROUTINE_NAME = 'spec_date'")
         self.results.append(res[0][0].strip(' ') + "\n")
 
+        test_num += 1
+        self.server1.exec_query("CREATE USER ''@'%'")
+        self.server2.exec_query("CREATE USER ''@'%'")
+        self.server1.exec_query("GRANT SELECT ON util_spec.* TO ''@'%'")
+        comment = ("Test case {0} - copy a database with anonymous user "
+                   "".format(test_num))
+        cmd_str = ("mysqldbcopy.py --skip-gtid {0} {1} --drop -v "
+                   "".format(from_conn, to_conn))
+        res = self.run_test_case(0, cmd_str + " util_spec:util_spec_clone",
+                                 comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         # Mask known source and destination host name.
         self.replace_result("# Source on ",
                             "# Source on XXXX-XXXX: ... connected.\n")
@@ -109,6 +122,14 @@ class test(mutlib.System_test):
     def drop_all(self):
         """Drops all databases created.
         """
+        try:
+            self.server1.exec_query("DROP USER ''@'%'")
+        except:
+            pass
+        try:
+            self.server2.exec_query("DROP USER ''@'%'")
+        except:
+            pass
         res1 = self.drop_db(self.server1, "util_spec")
         res2 = self.drop_db(self.server2, "util_spec_clone")
         return res1 and res2
