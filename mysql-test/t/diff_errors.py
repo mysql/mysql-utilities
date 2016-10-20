@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2014, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -86,6 +86,38 @@ class test(diff.test):
         test_num += 1
         cmd_opts = " util_test.t31:util_test.t3"
         comment = "Test case {0} - object doesn't exist".format(test_num)
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = " util_test.t3:util_test.t33 --force"
+        comment = "Test case {0} - doesn't exist force".format(test_num)
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = " util_test.t31:util_test.t3 --force"
+        comment = "Test case {0} - doesn't exist force".format(test_num)
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = (" util_test.t3:util_test.t33 util_test.t1:util_test.t1 "
+                    "--force")
+        comment = ("Test case {0} - check all existing objects using "
+                   "--force").format(test_num)
+        res = self.run_test_case(1, cmd_str + cmd_opts, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
+        cmd_opts = (" util_test.t31:util_test.t3 util_test.t1:util_test.t1 "
+                    "--force")
+        comment = ("Test case {0} - check all existing objects using "
+                   "--force").format(test_num)
         res = self.run_test_case(1, cmd_str + cmd_opts, comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
