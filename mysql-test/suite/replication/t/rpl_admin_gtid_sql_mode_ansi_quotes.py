@@ -144,5 +144,5 @@ class test(rpl_admin_gtid_loopback.test):
                      'rep_slave1_gtid_ansiquotes',
                      'rep_slave2_gtid_ansiquotes',
                      'rep_slave3_gtid_ansiquotes']
-        return (rpl_admin_gtid_loopback.test.cleanup(self) and
-                self.kill_server_list(kill_list))
+        rpl_admin_gtid_loopback.test.cleanup(self)
+        return (self.kill_server_list(kill_list))

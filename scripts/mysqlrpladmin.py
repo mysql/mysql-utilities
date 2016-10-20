@@ -155,8 +155,9 @@ if __name__ == '__main__':
     command = args[0].lower()
 
     # At least one of the options --discover-slaves-login or --slaves is
-    # required unless we are doing a health command.
-    if not opt.discover and not opt.slaves and command != 'health':
+    # required unless we are doing a health or failover command.
+    if (not opt.discover and not opt.slaves and
+            command not in ('health', 'failover')):
         parser.error(PARSE_ERR_SLAVE_DISCO_REQ)
 
     # --discover-slaves-login and --slaves cannot be used simultaneously
@@ -221,6 +222,10 @@ if __name__ == '__main__':
         if opt.master:
             print(WARN_OPT_NOT_REQUIRED.format(opt='--master', cmd=command))
             opt.master = None
+        if not opt.slaves:
+            req_opts = '--slaves'
+            parser.error(PARSE_ERR_OPTS_REQ_BY_CMD.format(cmd=command,
+                                                          opts=req_opts))
 
     # --ping only used by 'health' command
     if opt.ping and command != 'health':

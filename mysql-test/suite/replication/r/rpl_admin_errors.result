@@ -52,7 +52,7 @@ ERROR: Not enough privileges to execute command.
 Test case 13 - Failover command requires --slaves
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
-mysqlrpladmin: error: Option --discover-slaves-login or --slaves is required.
+mysqlrpladmin: error: 'failover' requires the following option(s): --slaves.
 Test case 14 - Failover command cannot be used with --discover-slaves-login
 Usage: mysqlrpladmin --slaves=root@localhost:3306 <command>
 
