@@ -838,7 +838,7 @@ class System_test(object):
                               "MySQL client tools to your PATH." % err.errmsg)
 
         if not self.login_reader.check_login_path_support():
-            raise MUTLibError("ERROR: the used my_print_defaults tool does "
+            raise MUTLibError("ERROR: the my_print_defaults tool does "
                               "not support login-path options. Used tool: "
                               "{0}".format(self.login_reader.tool_path))
 

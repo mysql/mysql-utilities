@@ -258,6 +258,8 @@ class test(mutlib.System_test):
         for i in range(6, 0, -1):
             self.stop_replication(self.server_list[i])
 
+        self.remove_login_path_data('test_master_socket')
+
         return True
 
     def do_replacements(self):
@@ -306,5 +308,4 @@ class test(mutlib.System_test):
         # Kill the servers that are only for this test.
         kill_list = ['rep_relay_slave', 'multi_master1', 'rep_master_show',
                      'multi_master2', 'rep_slave_show']
-        self.remove_login_path_data('test_master_socket')
         return self.kill_server_list(kill_list)

@@ -132,6 +132,10 @@ class test(mutlib.System_test):
 
         if self.debug:
             print "Test results:", res, False
+
+        self.remove_login_path_data('test_server1')
+        self.remove_login_path_data('test_server2')
+
         return True
 
     def get_result(self):
@@ -157,8 +161,8 @@ class test(mutlib.System_test):
 
     def cleanup(self):
         # Kill all spawned servers.
-        self.server1.exec_query("DROP USER 'root_me'@'localhost'")
-        self.server2.exec_query("DROP USER 'root_me'@'localhost'")
-        self.remove_login_path_data('test_server1')
-        self.remove_login_path_data('test_server2')
+        if self.server1:
+            self.server1.exec_query("DROP USER 'root_me'@'localhost'")
+        if self.server2:
+            self.server2.exec_query("DROP USER 'root_me'@'localhost'")
         return True
