@@ -19,10 +19,11 @@
 connection_values test.
 """
 
+import os
 import mutlib
 
 from mysql.utilities.exception import (ConnectionValuesError, UtilError,
-                                       FormatError)
+                                       FormatError, MUTLibError)
 from mysql.utilities.common.server import (get_connection_dictionary,
                                            connect_servers,
                                            check_hostname_alias)
@@ -50,6 +51,8 @@ class test(mutlib.System_test):
     server2 = None
 
     def check_prerequisites(self):
+        if os.name == 'nt':
+            raise MUTLibError("Test requires a non-Windows platform.")
         return self.check_num_servers(1)
 
     def setup(self):
