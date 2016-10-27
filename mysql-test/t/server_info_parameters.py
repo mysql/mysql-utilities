@@ -104,7 +104,9 @@ class test(server_info.test):
 
         test_num += 1
         comment = "Test case {0} - show servers (no conn)".format(test_num)
-        res = self.run_test_case(0, "mysqlserverinfo.py --show-servers",
+        res = self.run_test_case(0, "mysqlserverinfo.py --show-servers "
+                                 "--port-range=3306:{0}"
+                                 "".format(self.servers.view_next_port()),
                                  comment)
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
