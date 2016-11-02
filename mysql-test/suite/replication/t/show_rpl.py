@@ -231,34 +231,10 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
-        test_num += 1
-        master_socket = self.server_list[2].show_server_variable('socket')
-        self.server_list[2].exec_query("SET sql_log_bin = 0")
-        try:
-            self.server_list[2].exec_query("DROP USER 'root_me'@'localhost'")
-        except:
-            pass   # Ok if user doesn't exist
-        self.server_list[2].exec_query("CREATE USER 'root_me'@'localhost'")
-        self.server_list[2].exec_query("GRANT ALL ON *.* TO "
-                                       "'root_me'@'localhost'")
-        self.server_list[2].exec_query("SET sql_log_bin = 1")
-        self.create_login_path_data('test_master_socket', 'root_me',
-                                    'localhost', None,
-                                    "'{0}'".format(master_socket[0][1]))
-        cmd_str = ("mysqlrplshow.py --disco=root:root "
-                   "--master=test_master_socket --show-list")
-        comment = ("Test case {0} - show list with socket"
-                   "".format(test_num))
-        res = self.run_test_case(0, cmd_str, comment)
-        if not res:
-            raise MUTLibError("{0}: failed".format(comment))
-
         self.do_replacements()
 
         for i in range(6, 0, -1):
             self.stop_replication(self.server_list[i])
-
-        self.remove_login_path_data('test_master_socket')
 
         return True
 

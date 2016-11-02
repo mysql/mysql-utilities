@@ -248,42 +248,6 @@ class test(rpl_admin.test):
 
         test_num += 1
 
-        master_socket = self.server1.show_server_variable('socket')
-        self.server1.exec_query("SET sql_log_bin = 0")
-        try:
-            self.server1.exec_query("DROP USER 'root_me'@'localhost'")
-        except:
-            pass   # Ok if user doesn't exist
-        self.server1.exec_query("CREATE USER 'root_me'@'localhost'")
-        self.server1.exec_query("GRANT ALL ON *.* TO 'root_me'@'localhost' "
-                                "WITH GRANT OPTION")
-        self.server1.exec_query("SET sql_log_bin = 1")
-        self.create_login_path_data('test_master_socket', 'root_me',
-                                    'localhost', None,
-                                    "'{0}'".format(master_socket[0][1]))
-
-        slave_socket = self.server2.show_server_variable('socket')
-        self.server2.exec_query("SET sql_log_bin = 0")
-        try:
-            self.server2.exec_query("DROP USER 'root_me'@'localhost'")
-        except:
-            pass   # Ok if user doesn't exist
-        self.server2.exec_query("CREATE USER 'root_me'@'localhost'")
-        self.server2.exec_query("GRANT ALL ON *.* TO 'root_me'@'localhost'"
-                                "WITH GRANT OPTION")
-        self.server2.exec_query("SET sql_log_bin = 1")
-        self.create_login_path_data('test_slave_socket', 'root_me',
-                                    'localhost', None,
-                                    "'{0}'".format(slave_socket[0][1]))
-
-        cmd_str = ("mysqlrpladmin.py --master=test_master_socket elect "
-                   "--disc=root:root --candidates=test_slave_socket")
-        comment = ("Test case {0} - elect with discovery and socket"
-                   "".format(test_num))
-        res = self.run_test_case(0, cmd_str, comment)
-        if not res:
-            raise MUTLibError("{0}: failed".format(comment))
-
         # Test for BUG#16571812
         comment = "Test case {0} - slave not part of topology".format(test_num)
         slaves = ",".join([slave1_conn, slave2_conn, slave3_conn, slave4_conn])
@@ -335,20 +299,12 @@ class test(rpl_admin.test):
         # Now we return the topology to its original state for other tests
         self.reset_topology()
 
-        test_num += 1
-        cmd_str = ("mysqlrpladmin.py failover --slaves={0} "
-                   "--candidates=test_slave_socket --rpl-user=rpl:rpl "
-                   "--force ".format(slave1_conn))
-        comment = ("Test case {0} - failover with discovery and socket"
-                   "".format(test_num))
-        res = self.run_test_case(0, cmd_str, comment)
-        if not res:
-            raise MUTLibError("{0}: failed".format(comment))
+        self.do_replacements()
 
-        # Now we return the topology to its original state for other tests
-        self.reset_topology()
+        return True
 
-        # Mask out non-deterministic data
+    def do_replacements(self):
+        """Mask out non-deterministic data."""
         rpl_admin.test.do_masks(self)
         self.replace_substring(str(self.s4_port), "PORT5")
 
@@ -409,11 +365,6 @@ class test(rpl_admin.test):
                             "#  - For slave '127.0.0.1@PORT2': XXXXXXXXX:1\n")
         self.replace_result("#  - For slave 'localhost@PORT2':",
                             "#  - For slave 'localhost@PORT2': XXXXXXXXX:1\n")
-
-        # Cleanup for login paths
-        self.remove_login_path_data('test_master_socket')
-        self.remove_login_path_data('test_slave_socket')
-
         return True
 
     def get_result(self):

@@ -155,20 +155,3 @@ WARNING: Cannot connect to some slaves:
 # Replication Topology Graph
 No slaves found.
 
-Test case 8 - show list with socket
-# master on localhost: ... connected.
-# Finding slaves for master: localhost:PORT2
-
-# Replication Topology Graph
-localhost:PORT2 (MASTER)
-   |
-   +--- localhost:PORT1 - (SLAVE)
-   |
-   +--- localhost:PORT3 - (SLAVE)
-
-+-----------------+-----------------+
-| Master          | Slave           |
-+-----------------+-----------------+
-| localhost:PORT2  | localhost:PORT1  |
-| localhost:PORT2  | localhost:PORT3  |
-+-----------------+-----------------+

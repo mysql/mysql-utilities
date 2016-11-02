@@ -560,21 +560,6 @@ WARNING: Using a password on the command line interface can be insecure.
 | localhost  | PORT4  | SLAVE   | UP     | ON         | OK      |
 +------------+-------+---------+--------+------------+---------+
 # ...done.
-Test case 28 - elect with discovery and socket
-# Discovering slaves for master at localhost:PORT1
-
-WARNING: Cannot connect to some slaves (--verbose for more details).
-# Discovering slave at localhost:PORT2
-# Found slave: localhost:PORT2
-# Discovering slave at localhost:PORT3
-# Found slave: localhost:PORT3
-# Discovering slave at localhost:PORT4
-# Found slave: localhost:PORT4
-# Checking privileges.
-# Checking privileges on candidates.
-# Electing candidate slave from candidate list then slaves list.
-# Best slave found is located on localhost:PORT2.
-# ...done.
 Test case 28 - slave not part of topology
 WARNING: Using a password on the command line interface can be insecure.
 # WARNING: Server 'localhost@PORT5' is not acting as a slave.
@@ -632,29 +617,4 @@ WARNING: Using a password on the command line interface can be insecure.
        SQL_Error: 
     Trans_Behind: 4
 2 rows.
-# ...done.
-Test case 30 - failover with discovery and socket
-WARNING: Using a password on the command line interface can be insecure.
-# Checking privileges.
-# Checking privileges on candidates.
-# Performing failover.
-# Candidate slave localhost:PORT2 will become the new master.
-# Checking slaves status (before failover).
-# Preparing candidate for failover.
-# Creating replication user if it does not exist.
-# Stopping slaves.
-# Performing STOP on all slaves.
-# Switching slaves to new master.
-# Disconnecting new master as slave.
-# Starting slaves.
-# Performing START on all slaves.
-# Checking slaves for errors.
-# Failover complete.
-#
-# Replication Topology Health:
-+------------+-------+---------+--------+------------+---------+
-| host       | port  | role    | state  | gtid_mode  | health  |
-+------------+-------+---------+--------+------------+---------+
-| localhost  | PORT2  | MASTER  | UP     | ON         | OK      |
-+------------+-------+---------+--------+------------+---------+
 # ...done.

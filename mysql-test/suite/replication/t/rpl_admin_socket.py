@@ -20,12 +20,10 @@ rpl_admin test.
 """
 
 import os
-import time
 
-import mutlib
 import rpl_admin
 
-from mysql.utilities.exception import MUTLibError, UtilError
+from mysql.utilities.exception import MUTLibError
 
 
 _DEFAULT_MYSQL_OPTS = ('"--log-bin=mysql-bin --report-host=localhost '
@@ -61,14 +59,6 @@ class test(rpl_admin.test):
 
     def run(self):
         rpl_admin.test.mask_global = False  # Turn off global masks
-        cmd_str = "mysqlrpladmin.py {0} ".format(self.master_str)
-
-        master_conn = self.build_connection_string(self.server1).strip(' ')
-        slave1_conn = self.build_connection_string(self.server2).strip(' ')
-        slave2_conn = self.build_connection_string(self.server3).strip(' ')
-        slave3_conn = self.build_connection_string(self.server4).strip(' ')
-
-        slaves_str = ",".join([slave1_conn, slave2_conn, slave3_conn])
 
         test_num = 1
         rpl_admin.test.reset_topology(self)
