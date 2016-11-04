@@ -24,9 +24,11 @@ Test case 2 - failover to localhost:PORT2 with errant transactions using --force
 # Reading events in relay log for slave localhost:PORT4
 # Missing transactions found on localhost:PORT4. SELECT gtid_subset() = 0
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for localhost:PORT4.
 # Connecting candidate to localhost:PORT4 as a temporary slave to retrieve unprocessed GTIDs.
 # Change master command for localhost:PORT2
 # CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Read only is XXX for localhost:PORT4.
 # UNLOCK STRING: UNLOCK TABLES
 # Waiting for candidate to catch up to slave localhost:PORT4.
 # Slave localhost:PORT2:
@@ -87,6 +89,7 @@ Test case 4 - switchover to localhost:PORT2 with errant transactions using --for
 # Creating replication user if it does not exist.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for localhost:PORT1.
 # Waiting for slaves to catch up to old master.
 # Slave localhost:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXXXXXX)
@@ -102,6 +105,7 @@ Test case 4 - switchover to localhost:PORT2 with errant transactions using --for
 #   Executing stop on slave localhost:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
+# Read only is XXX for localhost:PORT1.
 # UNLOCK STRING: UNLOCK TABLES
 # Switching slaves to new master.
 # Executing CHANGE MASTER on localhost:PORT3.

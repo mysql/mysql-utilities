@@ -46,6 +46,7 @@ Test case 3 - demote-master switchover -vvv using actual rpl user
 # Creating replication user if it does not exist.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for XXXXXXXXX:PORT1.
 # Waiting for slaves to catch up to old master.
 # Slave XXXXXXXXX:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
@@ -61,6 +62,7 @@ Test case 3 - demote-master switchover -vvv using actual rpl user
 #   Executing stop on slave XXXXXXXXX:PORT2 Ok
 #   Executing stop on slave XXXXXXXXX:PORT3 Ok
 #   Executing stop on slave XXXXXXXXX:PORT4 Ok
+# Read only is XXX for XXXXXXXXX:PORT1.
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.
@@ -207,6 +209,7 @@ Test case 9 - demote-master switchover -vvv Using a different rpl user and using
 # Creating replication user if it does not exist.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for XXXXXXXXX:PORT2.
 # Waiting for slaves to catch up to old master.
 # Slave XXXXXXXXX:PORT1:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS(XXXXX)
@@ -231,6 +234,7 @@ Test case 9 - demote-master switchover -vvv Using a different rpl user and using
 #   Executing stop on slave XXXXXXXXX:PORT1 Ok
 #   Executing stop on slave XXXXXXXXX:PORT3 Ok
 #   Executing stop on slave XXXXXXXXX:PORT4 Ok
+# Read only is XXX for XXXXXXXXX:PORT2.
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.

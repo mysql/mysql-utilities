@@ -164,12 +164,14 @@ WARNING: The --ping option is not required for 'switchover' (option ignored). On
 # Creating replication user if it does not exist.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for localhost:PORT1.
 # Waiting for slaves to catch up to old master.
 # Stopping slaves.
 # Performing STOP on all slaves.
 #   Executing stop on slave localhost:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
+# Read only is XXX for localhost:PORT1.
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.

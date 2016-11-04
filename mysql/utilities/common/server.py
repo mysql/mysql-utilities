@@ -1120,7 +1120,8 @@ class Server(object):
             self.db_conn = None
             raise
         self.connect_error = None
-        self.read_only = self.show_server_variable("READ_ONLY")[0][1]
+        # Valid values are ON and OFF, not boolean.
+        self.read_only = self.show_server_variable("READ_ONLY")[0][1] == "ON"
 
     def get_connection(self):
         """Return a new connection to the server.
@@ -2155,9 +2156,12 @@ class Server(object):
                        Default is False
         """
         # Only turn on|off read only if it were off at connect()
-        if not self.read_only:
-            return self.exec_query("SET @@GLOBAL.READ_ONLY = %s" %
-                                   "ON" if on else "OFF")
+        if on and not self.read_only:
+            self.exec_query("SET @@GLOBAL.READ_ONLY = 'ON'")
+            self.read_only = True
+        elif not on and self.read_only:
+            self.read_only = False
+            self.exec_query("SET @@GLOBAL.READ_ONLY = 'OFF'")
         return None
 
     def grant_tables_enabled(self):

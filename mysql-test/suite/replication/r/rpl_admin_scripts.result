@@ -82,6 +82,7 @@ Test case 2 - test switchover scripts
 # Script completed Ok.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for localhost:PORT1.
 # Waiting for slaves to catch up to old master.
 # Slave 127.0.0.1:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
@@ -97,6 +98,7 @@ Test case 2 - test switchover scripts
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
+# Read only is XXX for localhost:PORT1.
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.
@@ -156,6 +158,7 @@ WARNING: You have chosen to use external script return code checking. Depending 
 ERROR: XXX Script failed.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for localhost:PORT1.
 # Waiting for slaves to catch up to old master.
 # Slave 127.0.0.1:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
@@ -171,6 +174,7 @@ ERROR: XXX Script failed.
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
+# Read only is XXX for localhost:PORT1.
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.
@@ -279,6 +283,7 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Script completed Ok.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for localhost:PORT1.
 # Waiting for slaves to catch up to old master.
 # Slave 127.0.0.1:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
@@ -294,6 +299,7 @@ WARNING: You have chosen to use external script return code checking. Depending 
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
+# Read only is XXX for localhost:PORT1.
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.
@@ -353,6 +359,7 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Script completed Ok.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for localhost:PORT1.
 # Waiting for slaves to catch up to old master.
 # Slave 127.0.0.1:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
@@ -368,6 +375,7 @@ WARNING: You have chosen to use external script return code checking. Depending 
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
+# Read only is XXX for localhost:PORT1.
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.
@@ -417,6 +425,7 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # Script completed Ok.
 # Blocking writes on master.
 # LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for localhost:PORT1.
 # Waiting for slaves to catch up to old master.
 # Slave 127.0.0.1:PORT2:
 # QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
@@ -432,6 +441,7 @@ WARNING: You have chosen to use external script return code checking. Depending 
 #   Executing stop on slave 127.0.0.1:PORT2 Ok
 #   Executing stop on slave localhost:PORT3 Ok
 #   Executing stop on slave localhost:PORT4 Ok
+# Read only is XXX for localhost:PORT1.
 # UNLOCK STRING: UNLOCK TABLES
 # Demoting old master to be a slave to the new master.
 # Switching slaves to new master.

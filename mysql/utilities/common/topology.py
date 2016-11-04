@@ -936,6 +936,11 @@ class Topology(Replication):
             # Block writes to slave (temp_master)
             lock_ftwrl = Lock(temp_master, [], lock_options)
             temp_master.set_read_only(True)
+            if self.verbose and not self.quiet:
+                read_only = temp_master.show_server_variable("READ_ONLY")
+                self._report("# Read only is {0} for {1}:{2}."
+                             "".format(read_only[0][1], temp_master.host,
+                                       temp_master.port))
 
             # Connect candidate to slave as its temp_master
             if self.verbose and not self.quiet:
@@ -953,6 +958,11 @@ class Topology(Replication):
 
             # Unblock writes to slave (temp_master).
             temp_master.set_read_only(False)
+            if self.verbose and not self.quiet:
+                read_only = temp_master.show_server_variable("READ_ONLY")
+                self._report("# Read only is {0} for {1}:{2}."
+                             "".format(read_only[0][1], temp_master.host,
+                                       temp_master.port))
             lock_ftwrl.unlock()
 
             try:
@@ -1887,6 +1897,11 @@ class Topology(Replication):
         }
         lock_ftwrl = Lock(self.master, [], lock_options)
         self.master.set_read_only(True)
+        if self.verbose and not self.quiet:
+            read_only = self.master.show_server_variable("READ_ONLY")
+            self._report("# Read only is {0} for {1}:{2}."
+                         "".format(read_only[0][1], self.master.host,
+                                   self.master.port))
 
         # Wait for all slaves to catch up.
         gtid_enabled = self.master.supports_gtid() == "ON"
@@ -1927,6 +1942,11 @@ class Topology(Replication):
 
         # Unblock master
         self.master.set_read_only(False)
+        if self.verbose and not self.quiet:
+            read_only = self.master.show_server_variable("READ_ONLY")
+            self._report("# Read only is {0} for {1}:{2}."
+                         "".format(read_only[0][1], self.master.host,
+                                   self.master.port))
         lock_ftwrl.unlock()
 
         # Make master a slave (if specified)
