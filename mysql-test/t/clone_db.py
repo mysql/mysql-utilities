@@ -109,6 +109,28 @@ class test(mutlib.System_test):
             raise MUTLibError(
                 "'{0}' failed. Return code: {1}".format(cmd, res))
 
+        # Now, do a deeper test of view dependencies
+        # Create database with test views (with dependencies)
+        data_file_db_copy_views = os.path.normpath(
+            "./std_data/db_copy_views_dependencies.sql")
+        try:
+            self.server1.exec_query("DROP DATABASE views_test")
+            self.server1.read_and_exec_SQL(data_file_db_copy_views,
+                                           self.debug)
+        except UtilError as err:
+            raise MUTLibError("Failed to read commands from file "
+                              "{0}: {1}".format(data_file_db_copy_views,
+                                                err.errmsg))
+
+        # Test case 4 - clone another sample database with views dependencies
+        cmd = cmd_base.format(from_conn, to_conn,
+                              "views_test:views_test_clone --drop")
+        res = self.exec_util(cmd, self.res_fname)
+        self.results.append(res)
+        if res:  # i.e., res != 0
+            raise MUTLibError(
+                "'{0}' failed. Return code: {1}".format(cmd, res))
+
         return True
 
     def compare_object_counts(self, server, db1, db2):

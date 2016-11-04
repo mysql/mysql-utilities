@@ -456,7 +456,17 @@ class Database(object):
             for v in v_name_dict:
                 # No looking for itself
                 if v != v_name:
-                    index = stmt.find(v)
+                    # split off the from clause
+                    # strip WHERE, ORDER BY, and GROUP BY
+                    try:
+                        from_clause = stmt.rsplit('from', 1)[1]
+                        from_clause = from_clause.split('WHERE', 1)[0]
+                    except:
+                        from_clause = None
+                    if from_clause:
+                        index = from_clause.find(v)
+                    else:
+                        index = stmt.find(v)
                     if index >= 0:
                         base_views.append(v_name_dict[v])
             return base_views
@@ -895,10 +905,44 @@ class Database(object):
         dest_sql_mode = self.destination.select_variable("SQL_MODE")
 
         # Create the objects in the new database
+        # Save any views that fail due to dependencies
+        dependent_views = []
         for obj in self.objects:
             # Drop object if --drop-first specified and database not dropped
             # Grants do not need to be dropped for overwriting
             if options.get("do_drop", False) and obj[0] != _GRANT:
+                obj_name = quote_with_backticks(obj[1][0], dest_sql_mode)
+                self.__drop_object(obj[0], obj_name)
+
+            # Attempt to create the object.
+            try:
+                # Create the object
+                self.__create_object(obj[0], obj[1], not grant_msg_displayed,
+                                     options.get("quiet", False),
+                                     options.get("new_engine", None),
+                                     options.get("def_engine", None))
+            except UtilDBError as err:
+                # If this is a view and it fails dependency checking, save
+                # it and retry the view later, but only if we're not skipping
+                # tables.
+                if (obj[0] == _VIEW and "doesn't exist" in err.errmsg and
+                        not self.skip_tables):
+                    dependent_views.append(obj)
+                else:
+                    raise err
+
+            if obj[0] == _GRANT and not grant_msg_displayed:
+                grant_msg_displayed = True
+
+        # Now retry the views
+        if self.verbose and len(dependent_views) > 0:
+            print("# Attempting to create views that failed dependency "
+                  "checks on first pass.")
+        for obj in dependent_views:
+            # Drop object if --drop-first specified and database not dropped
+            if self.verbose:
+                print("#  Retrying view {0}".format(obj[1]))
+            if options.get("do_drop", False):
                 obj_name = quote_with_backticks(obj[1][0], dest_sql_mode)
                 self.__drop_object(obj[0], obj_name)
 
@@ -908,8 +952,6 @@ class Database(object):
                                  options.get("new_engine", None),
                                  options.get("def_engine", None))
 
-            if obj[0] == _GRANT and not grant_msg_displayed:
-                grant_msg_displayed = True
         # After object creation, add the constraints
         if self.constraints:
             self.__apply_constraints()
