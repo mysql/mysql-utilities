@@ -197,7 +197,8 @@ def _report_error(message, test_name, mode, start_test, error=True):
 
 
 def _exec_and_report(procedure, default_message, test_name, action,
-                     start_test_time, exception_procedure=None):
+                     start_test_time, exception_procedure=None,
+                     error=True):
     """Helper method to manage exception handling.
     """
     extra_message = None
@@ -208,7 +209,8 @@ def _exec_and_report(procedure, default_message, test_name, action,
     except MUTLibError:
         _, e, _ = sys.exc_info()
         extra_message = e.errmsg
-    _report_error(default_message, test_name, action, start_test_time)
+    _report_error(default_message, test_name, action, start_test_time,
+                  error)
     # print the error if raised from the test.
     if extra_message is not None:
         print("%s\n" % extra_message)
@@ -712,14 +714,14 @@ if __name__ == "__main__":
             if not _exec_and_report(test_case.check_prerequisites,
                                     "Cannot establish resources needed to run "
                                     "test.", test_name, "SKIP", start_test,
-                                    None):
+                                    None, False):
                 continue
 
             # Set the preconditions for the test
             if not _exec_and_report(test_case.setup,
                                     "Cannot establish setup conditions to run "
                                     "test.", test_name, "SKIP", start_test,
-                                    test_case.cleanup):
+                                    test_case.cleanup, False):
                 continue
 
             # Run the test
