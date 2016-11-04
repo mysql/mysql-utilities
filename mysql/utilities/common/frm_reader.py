@@ -269,7 +269,7 @@ _KEY_TYPES = ['PRIMARY', 'UNIQUE', 'MULTIPLE', 'FULLTEXT', 'SPATIAL',
               'FOREIGN_KEY']
 
 # Array of field data types that do not require parens for size
-_NO_PARENS = ['TIMESTAMP', 'DATETIME', 'YEAR', 'DATE', 'TIME',
+_NO_PARENS = ['TIMESTAMP', 'DATETIME', 'DATE', 'TIME',
               'TINYBLOB', 'BLOB', 'MEDIUMBLOB', 'LONGBLOB',
               'TINYTEXT', 'TEXT', 'MEDIUMTEXT', 'LONGTEXT']
 
@@ -312,13 +312,6 @@ def _is_real(col):
     Returns bool - True if column is a real type.
     """
     return col['field_type_name'].upper() in _REAL_TYPES
-
-
-def _is_no_parens(col):
-    """Check for column uses parens for size
-    Returns bool - True if column needs parens for size.
-    """
-    return col['field_type_name'].upper() in _NO_PARENS
 
 
 def _is_blob(col):
@@ -1087,6 +1080,27 @@ class FrmReader(object):
 
         Returns list of strings - column definitions
         """
+
+        def _is_no_parens(col):
+            """Check for column uses parens for size
+            Returns bool - True if column needs parens for size.
+            """
+            # If the server version is 5.7.5 or before, we add YEAR to the
+            # no parenthesis list. Otherwise, we print the length: YEAR(4)
+            ver_str = str(self.general_data['MYSQL_VERSION_ID'])
+            vers = (int(ver_str[0]), int(ver_str[1:3]), int(ver_str[3:]))
+            # Check to see if it is in the list
+            try:
+                index_year = _NO_PARENS.index('YEAR')
+            except ValueError:
+                index_year = None
+            if not ((vers[0] >= 5) and (vers[1] >= 7) and (vers[2] >= 5)):
+                if not index_year:
+                    _NO_PARENS.append("YEAR")
+            elif index_year:
+                _NO_PARENS.pop(_NO_PARENS.index('YEAR'))
+            return col['field_type_name'].upper() in _NO_PARENS
+
         columns = []
         stop = len(self.column_data)
         for i in range(0, stop):

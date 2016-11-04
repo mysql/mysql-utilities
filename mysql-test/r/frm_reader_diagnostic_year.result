@@ -1,0 +1,24 @@
+Test case 1: - Check .frm files with year
+# Source on localhost: ... connected.
+# CAUTION: The diagnostic mode is a best-effort parse of the .frm file. As such, it may not identify all of the components of the table correctly. This is especially true for damaged files. It will also not read the default values for the columns and the resulting statement may not be syntactically correct.
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `year`.`5_6_30_year` (
+  `a` int(11) NOT NULL AUTO_INCREMENT, 
+  `d` year DEFAULT NULL, 
+PRIMARY KEY `PRIMARY` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
+CREATE TABLE `year`.`5_7_5_year` (
+  `a` int(11) NOT NULL AUTO_INCREMENT, 
+  `d` year(4) DEFAULT NULL, 
+PRIMARY KEY `PRIMARY` (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+#...done.
