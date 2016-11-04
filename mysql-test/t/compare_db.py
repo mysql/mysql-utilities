@@ -227,6 +227,14 @@ class test(mutlib.System_test):
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 
+        test_num += 1
+        comment = ("Test case {0} - check database with known differences "
+                   "(extra table) and --quiet".format(test_num))
+        cmd = "{0} inventory:inventory -t --quiet".format(cmd_base)
+        res = self.run_test_case(1, cmd, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
         self.drop_extra_table()
         self.alter_data()
 

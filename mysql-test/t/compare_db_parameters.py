@@ -95,6 +95,14 @@ class test(compare_db.test):
             raise MUTLibError("{0}: failed".format(comment))
 
         test_num += 1
+        cmd_str_all = ("mysqldbcompare.py {0} {1} ".format(s1_conn, s2_conn))
+        cmd_opts_all = "--quiet --all  "
+        comment = "Test case {0} - {1}".format(test_num, cmd_opts_all)
+        res = self.run_test_case(1, cmd_str_all + cmd_opts_all, comment)
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        test_num += 1
         cmd_opts = " --format=csv -t"
         cmd_opts += " --width=65"
         comment = "Test case {0} - {1}".format(test_num, cmd_opts)

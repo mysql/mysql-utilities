@@ -41,7 +41,9 @@ Test case 2 - check database with known differences (extra table)
 # Database consistency check failed.
 #
 # ...done
-Test case 3 - check database with known differences direction = server1 (default)
+Test case 3 - check database with known differences (extra table) and --quiet
+# WARNING: Using a password on the command line interface can be insecure.
+Test case 4 - check database with known differences direction = server1 (default)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -124,7 +126,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 4 - check database with known differences direction = server2
+Test case 5 - check database with known differences direction = server2
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -207,7 +209,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 5 - check database with known differences direction = server1 and reverse
+Test case 6 - check database with known differences direction = server1 and reverse
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -348,7 +350,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 6 - check database with known differences direction = server2 and reverse
+Test case 7 - check database with known differences direction = server2 and reverse
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -489,7 +491,7 @@ stock_number,description,qty,cost,type,notes,supplier
 # Database consistency check failed.
 #
 # ...done
-Test case 7 - compare two databases on same server w/server2
+Test case 8 - compare two databases on same server w/server2
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -509,7 +511,7 @@ Test case 7 - compare two databases on same server w/server2
 # Database consistency check failed.
 #
 # ...done
-Test case 8 - compare two databases on same server
+Test case 9 - compare two databases on same server
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # Checking databases inventory and inventory2 on server1
@@ -528,7 +530,7 @@ Test case 8 - compare two databases on same server
 # Database consistency check failed.
 #
 # ...done
-Test case 9 - compare a database with weird names (backticks)
+Test case 10 - compare a database with weird names (backticks)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -546,7 +548,7 @@ Test case 9 - compare a database with weird names (backticks)
 # Databases are consistent.
 #
 # ...done
-Test case 10 - compare two empty databases
+Test case 11 - compare two empty databases
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -559,7 +561,7 @@ Test case 10 - compare two empty databases
 # Databases are consistent.
 #
 # ...done
-Test case 11 - compare a sample database containing tables with weird names (no backticks) and different table options.
+Test case 12 - compare a sample database containing tables with weird names (no backticks) and different table options.
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -586,7 +588,7 @@ Test case 11 - compare a sample database containing tables with weird names (no 
 # Database consistency check failed.
 #
 # ...done
-Test case 12 - compare a sample database containing tables with weird names (no backticks) and skipping table options.
+Test case 13 - compare a sample database containing tables with weird names (no backticks) and skipping table options.
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -600,7 +602,7 @@ Test case 12 - compare a sample database containing tables with weird names (no 
 # Databases are consistent given skip options specified.
 #
 # ...done
-Test case 13 - compare a database with objects of different types with the same name (no differences)
+Test case 14 - compare a database with objects of different types with the same name (no differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -619,7 +621,7 @@ Test case 13 - compare a database with objects of different types with the same 
 # Databases are consistent.
 #
 # ...done
-Test case 14 - compare a database with objects of different types with the same name (with differences)
+Test case 15 - compare a database with objects of different types with the same name (with differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -649,7 +651,7 @@ Test case 14 - compare a database with objects of different types with the same 
 # Database consistency check failed.
 #
 # ...done
-Test case 15 - compare all databases
+Test case 16 - compare all databases
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -759,7 +761,7 @@ ERROR: The list of objects differs among database inventory and inventory.
 # Database consistency check failed.
 #
 # ...done
-Test case 16 - compare all databases with --exclude option and LIKE pattern
+Test case 17 - compare all databases with --exclude option and LIKE pattern
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -807,7 +809,7 @@ Test case 16 - compare all databases with --exclude option and LIKE pattern
 # Databases are consistent.
 #
 # ...done
-Test case 17 - compare all databases with --exclude option and REGEXP pattern
+Test case 18 - compare all databases with --exclude option and REGEXP pattern
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -854,7 +856,7 @@ Test case 17 - compare all databases with --exclude option and REGEXP pattern
 # Databases are consistent.
 #
 # ...done
-Test case 18 - Test automatically picks up the not nullable unique index (No differences)
+Test case 19 - Test automatically picks up the not nullable unique index (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -882,7 +884,7 @@ Test case 18 - Test automatically picks up the not nullable unique index (No dif
 # Databases are consistent.
 #
 # ...done
-Test case 19 - real not nullable unique index for a specific table using --use-indexes (No differences)
+Test case 20 - real not nullable unique index for a specific table using --use-indexes (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -910,7 +912,7 @@ Test case 19 - real not nullable unique index for a specific table using --use-i
 # Databases are consistent.
 #
 # ...done
-Test case 20 - compare using--use-indexes for two tables (No differences)
+Test case 21 - compare using--use-indexes for two tables (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -938,7 +940,7 @@ Test case 20 - compare using--use-indexes for two tables (No differences)
 # Databases are consistent.
 #
 # ...done
-Test case 21 - using --use-indexes for same table (No differences)
+Test case 22 - using --use-indexes for same table (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -966,7 +968,7 @@ Test case 21 - using --use-indexes for same table (No differences)
 # Databases are consistent.
 #
 # ...done
-Test case 22 - using --use-indexes for same table verbose unique index over primary key (No differences)
+Test case 23 - using --use-indexes for same table verbose unique index over primary key (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1192,7 +1194,7 @@ CREATE TABLE "nonix_`2_nix_`2" (
 # Databases are consistent.
 #
 # ...done
-Test case 23 - using --use-indexes with backticks verbose (No differences)
+Test case 24 - using --use-indexes with backticks verbose (No differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1418,7 +1420,7 @@ CREATE TABLE "nonix_`2_nix_`2" (
 # Databases are consistent.
 #
 # ...done
-Test case 24 - using --use-indexes with backticks verbose (Differences) 
+Test case 25 - using --use-indexes with backticks verbose (Differences) 
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1506,7 +1508,7 @@ Test case 24 - using --use-indexes with backticks verbose (Differences)
 # Database consistency check failed.
 #
 # ...done
-Test case 25 - compare two equal databases with different names (including VIEWS)
+Test case 26 - compare two equal databases with different names (including VIEWS)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1528,7 +1530,7 @@ Test case 25 - compare two equal databases with different names (including VIEWS
 # Databases are consistent.
 #
 # ...done
-Test case 26 - data with multiple lines per span (no differences).
+Test case 27 - data with multiple lines per span (no differences).
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1543,7 +1545,7 @@ Test case 26 - data with multiple lines per span (no differences).
 # Databases are consistent.
 #
 # ...done
-Test case 27 - data with multiple lines per span (with changed rows).
+Test case 28 - data with multiple lines per span (with changed rows).
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1575,7 +1577,7 @@ Test case 27 - data with multiple lines per span (with changed rows).
 # Database consistency check failed.
 #
 # ...done
-Test case 28 - data with multiple lines per span (with missing row and CSV format).
+Test case 29 - data with multiple lines per span (with missing row and CSV format).
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1605,7 +1607,7 @@ Test case 28 - data with multiple lines per span (with missing row and CSV forma
 # Database consistency check failed.
 #
 # ...done
-Test case 29 - table with primary keys and different data and SQL format.
+Test case 30 - table with primary keys and different data and SQL format.
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1629,7 +1631,7 @@ UPDATE "compare_db_pkeys_db1"."t" SET "c" = '4' WHERE "a" = '1' AND "b" = '2';
 # Database consistency check failed.
 #
 # ...done
-Test case 30 - table with primary keys and missing data and SQL format and --show-reverse.
+Test case 31 - table with primary keys and missing data and SQL format and --show-reverse.
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -1660,7 +1662,7 @@ INSERT INTO "compare_db_pkeys_db1"."t" ("a", "b", "c") VALUES('1', '2', '4');
 # Database consistency check failed.
 #
 # ...done
-Test case 31 - data with quotes and sql format
+Test case 32 - data with quotes and sql format
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.

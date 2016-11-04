@@ -152,7 +152,8 @@ def _check_databases(server1, server2, db1, db2, options):
             for row in res:
                 print row
             print
-            if not options['run_all_tests']:
+            if not options['run_all_tests'] and \
+                    not options.get('quiet', False):
                 raise UtilError(_ERROR_DB_DIFF)
 
 
@@ -172,6 +173,7 @@ def _check_objects(server1, server2, db1, db2,
     """
 
     differs = False
+    quiet = options.get("quiet", False)
 
     # Check for same number of objects
     in_both, in_db1, in_db2 = get_common_objects(server1, server2,
@@ -187,15 +189,18 @@ def _check_objects(server1, server2, db1, db2,
             if options['run_all_tests']:
                 if len(in_db1) > 0:
                     differs = True
-                    print_missing_list(in_db1, server1_str, server2_str)
-                    print "#"
+                    if not quiet:
+                        print_missing_list(in_db1, server1_str, server2_str)
+                        print "#"
                 if len(in_db2) > 0:
                     differs = True
-                    print_missing_list(in_db2, server2_str, server1_str)
-                    print "#"
+                    if not quiet:
+                        print_missing_list(in_db2, server2_str, server1_str)
+                        print "#"
             else:
                 differs = True
-                raise UtilError(_ERROR_OBJECT_LIST.format(db1, db2))
+                if not quiet:
+                    raise UtilError(_ERROR_OBJECT_LIST.format(db1, db2))
 
     # If in verbose mode, show count of object types.
     if options['verbosity'] > 1:
@@ -247,7 +252,8 @@ def _compare_objects(server1, server2, obj1, obj2, reporter, options,
         if res is not None:
             reporter.report_state('FAIL')
             errors.extend(res)
-            if not options['run_all_tests']:
+            if not options['run_all_tests'] and \
+                    not options.get('quiet', False):
                 raise UtilError(_ERROR_DB_DIFF)
         else:
             reporter.report_state('pass')
@@ -276,7 +282,8 @@ def _check_row_counts(server1, server2, obj1, obj2, reporter, options):
         if rows1 != rows2:
             reporter.report_state('FAIL')
             msg = _ERROR_ROW_COUNT.format(obj1, obj2)
-            if not options['run_all_tests']:
+            if not options['run_all_tests'] and \
+                    not options.get('quiet', False):
                 raise UtilError(msg)
             else:
                 errors.append("# %s" % msg)
@@ -302,6 +309,7 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
     """
     direction = options.get('changes-for', 'server1')
     reverse = options.get('reverse', False)
+    quiet = options.get('quiet', False)
 
     errors = []
     debug_msgs = []
@@ -342,7 +350,8 @@ def _check_data_consistency(server1, server2, obj1, obj2, reporter, options):
             else:
                 reporter.report_state('FAIL')
                 if not options['run_all_tests']:
-                    print
+                    if not quiet:
+                        print
                     raise e
                 else:
                     errors.append(e.errmsg)
@@ -405,6 +414,7 @@ def database_compare(server1_val, server2_val, db1, db2, options):
     """
 
     _check_option_defaults(options)
+    quiet = options.get("quiet", False)
 
     # Connect to servers
     server1, server2 = server_connect(server1_val, server2_val,
@@ -420,11 +430,13 @@ def database_compare(server1_val, server2_val, db1, db2, options):
         raise UtilDBError(_ERROR_DB_MISSING.format(db2))
 
     # Print a different message is server2 is not defined
-    if not server2_val:
-        message = "# Checking databases {0} and {1} on server1\n#"
-    else:
-        message = "# Checking databases {0} on server1 and {1} on server2\n#"
-    print(message.format(db1_conn.db_name, db2_conn.db_name))
+    if not quiet:
+        if not server2_val:
+            message = "# Checking databases {0} and {1} on server1\n#"
+        else:
+            message = ("# Checking databases {0} on server1 and {1} on "
+                       "server2\n#")
+        print(message.format(db1_conn.db_name, db2_conn.db_name))
 
     # Check for database existence and CREATE differences
     _check_databases(server1, server2, db1_conn.q_db_name, db2_conn.q_db_name,
@@ -483,14 +495,16 @@ def database_compare(server1_val, server2_val, db1, db2, options):
             reporter.report_state("-")
 
         if options['verbosity'] > 0:
-            print
+            if not quiet:
+                print
             get_create_object(server1, q_obj1, options, obj_type)
             get_create_object(server2, q_obj2, options, obj_type)
 
         if debug_msgs and options['verbosity'] > 2:
             reporter.report_errors(debug_msgs)
 
-        reporter.report_errors(error_list)
+        if not quiet:
+            reporter.report_errors(error_list)
 
         # Fail if errors are found
         if error_list:
@@ -512,6 +526,7 @@ def compare_all_databases(server1_val, server2_val, exclude_list, options):
     """
 
     success = True
+    quiet = options.get("quiet", False)
 
     # Connect to servers
     conn_options = {
@@ -562,17 +577,20 @@ def compare_all_databases(server1_val, server2_val, exclude_list, options):
         diff_dbs = server1_dbs.difference(server2_dbs)
         for db in diff_dbs:
             msg = _ERROR_DB_MISSING_ON_SERVER.format(db, "server1", "server2")
-            print("# {0}".format(msg))
+            if not quiet:
+                print("# {0}".format(msg))
     else:
         diff_dbs = server2_dbs.difference(server1_dbs)
         for db in diff_dbs:
             msg = _ERROR_DB_MISSING_ON_SERVER.format(db, "server2", "server1")
-            print("# {0}".format(msg))
+            if not quiet:
+                print("# {0}".format(msg))
 
     # Compare databases in common
     common_dbs = server1_dbs.intersection(server2_dbs)
     if common_dbs:
-        print("# Comparing databases: {0}".format(", ".join(common_dbs)))
+        if not quiet:
+            print("# Comparing databases: {0}".format(", ".join(common_dbs)))
     else:
         success = None
     for db in common_dbs:
@@ -580,7 +598,8 @@ def compare_all_databases(server1_val, server2_val, exclude_list, options):
             res = database_compare(server1_val, server2_val, db, db, options)
             if not res:
                 success = False
-            print("\n")
+            if not quiet:
+                print("\n")
         except UtilError as err:
             print("ERROR: {0}\n".format(err.errmsg))
             success = False

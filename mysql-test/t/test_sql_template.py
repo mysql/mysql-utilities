@@ -48,7 +48,7 @@ _TEST_CASES = [
     {'run_util': True,  # If true, run utility
      'options': " --difftype=sql --changes-for=server1 ",
      'comment': "Test case {0} changes-for = server1 post transform : {1}",
-     'load_data': False, 'exp_result': 0, },  # Direction a<-b
+     'load_data': False, 'exp_result': 1, },  # Direction a<-b
     {'run_util': True,  # If true, run utility
      'options': " --quiet --difftype=sql --changes-for=server2 > "
                 "{0}".format(_TRANSFORM_FILE),
@@ -63,7 +63,7 @@ _TEST_CASES = [
     {'run_util': True,  # If true, run utility
      'options': " --difftype=sql --changes-for=server2 ",
      'comment': "Test case {0} changes-for = server2 post transform : {1}",
-     'load_data': False, 'exp_result': 0, },
+     'load_data': False, 'exp_result': 1, },
     # Direction a<->b with dir = a
     {'run_util': True,  # If true, run utility
      'options': " --quiet --difftype=sql --changes-for=server1 "

@@ -211,16 +211,20 @@ if __name__ == '__main__':
     exclude_list = None
     if opt.exclude:
         if not opt.all:
-            print(WARN_OPT_ONLY_USED_WITH.format(opt='--exclude',
-                                                 used_with='the --all option'))
+            if not opt.quiet:
+                print(WARN_OPT_ONLY_USED_WITH.format(opt='--exclude',
+                                                     used_with='the --all'
+                                                               ' option'))
         else:
             # Remove unnecessary outer quotes.
             exclude_list = [pattern.strip("'\"") for pattern in opt.exclude]
 
     # The --regexp option requires --exclude.
     if opt.use_regexp and not opt.exclude:
-        print(WARN_OPT_ONLY_USED_WITH.format(opt='--regexp',
-                                             used_with='the --exclude option'))
+        if not opt.quiet:
+            print(WARN_OPT_ONLY_USED_WITH.format(opt='--regexp',
+                                                 used_with='the --exclude'
+                                                           ' option'))
 
     # Check for regexp symbols
     check_exclude_pattern(exclude_list, opt.use_regexp)
@@ -342,9 +346,10 @@ if __name__ == '__main__':
                 PARSE_ERR_SPAN_KEY_SIZE_TOO_HIGH.format(
                     s_value=opt.span_key_size, max=MAX_SPAN_KEY_SIZE))
         if opt.span_key_size % 2 != 0:
-            print("# WARNING: The value for the --span-key-size option must "
-                  "be an even number. The value {0} will be used instead."
-                  "".format(opt.span_key_size - 1))
+            if not opt.quiet:
+                print("# WARNING: The value for the --span-key-size option"
+                      " must be an even number. The value {0} will be used "
+                      "instead.".format(opt.span_key_size - 1))
 
     # Operations to perform:
     # 1) databases exist
@@ -409,7 +414,8 @@ if __name__ == '__main__':
             try:
                 res = database_compare(server1_values, server2_values,
                                        db1, db2, options)
-                print
+                if not opt.quiet:
+                    print
             except UtilError:
                 _, e, _ = sys.exc_info()
                 print("ERROR: %s" % e.errmsg)
