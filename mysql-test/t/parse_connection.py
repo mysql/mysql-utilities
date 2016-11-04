@@ -164,6 +164,9 @@ _TEST_RESULTS_WITH_CREDENTIALS = [
 
     ('check valid with credentials #14', u'ɱysql:unicode@localhost',
      u'ɱysql:unicode@localhost:3306', False),
+    ('check multiple connections #15',
+     u'root@vitro21:19003,root@vitro21:19004',
+     u'FAIL', True),
 ]
 
 _TEST_RESULTS_WITH_CREDENTIALS_POSIX = [

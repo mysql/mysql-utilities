@@ -43,6 +43,10 @@ _BAD_CONN_FORMAT = (u"Connection '{0}' cannot be parsed. Please review the "
 
 _BAD_QUOTED_HOST = u"Connection '{0}' has a malformed quoted host"
 
+_MULTIPLE_CONNECTIONS = (u"It appears you are attempting to specify multiple "
+                         u"connections. This option does not permit multiple "
+                         u"connections")
+
 _UNPARSED_CONN_FORMAT = ("Connection '{0}' not parsed completely. Parsed "
                          "elements '{1}', unparsed elements '{2}'")
 
@@ -499,6 +503,12 @@ def parse_connection(connection_values, my_defaults_reader=None, options=None):
                                           connection_values))
 
     elif len(conn_format) == 2:
+
+        # Check to see if the user attempted to pass a list of connections.
+        # This is true if there is at least one comma and multiple @ symbols.
+        if ((connection_values.find(',') > 0) and
+                (connection_values.find('@') > 1)):
+            raise FormatError(_MULTIPLE_CONNECTIONS.format(connection_values))
 
         # Handle as in the format: user[:password]@host[:port][:socket]
         userpass, hostportsock = conn_format
