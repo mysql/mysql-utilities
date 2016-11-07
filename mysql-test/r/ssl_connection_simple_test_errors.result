@@ -264,7 +264,7 @@ Test case 50 - basic mysqldiff with ssl
 # server1 on XXXX-XXXX: ... connected.
 # server2 on XXXX-XXXX: ... connected.
 # Comparing util_test_a.t1 to util_test_z.t1                       [PASS]
-Success. All objects are the same.
+# Success. All objects are the same.
 
 Test case 51 - basic mysqlbinlogrotate with ssl
 # The binlog file has been rotated.
