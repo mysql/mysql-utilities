@@ -63,7 +63,7 @@ CREATE DEFINER=root@localhost TRIGGER util_test.trg BEFORE UPDATE ON util_test.t
 ALTER VIEW util_test.v1 AS 
   select `util_test`.`t2`.`a` AS `a` from `util_test`.`t2`;
 
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 2 - create transform for objects for --changes-for=server2
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -129,7 +129,7 @@ CREATE DEFINER=root@localhost TRIGGER util_test.trg AFTER INSERT ON util_test.t1
 ALTER VIEW util_test.v1 AS 
   select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
 
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 3 - create transform for objects for --changes-for=server1 with reverse
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -249,7 +249,7 @@ ALTER VIEW util_test.v1 AS
 #   select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`;
 #
 
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 4 - create transform for objects for --changes-for=server2 with reverse
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -369,7 +369,7 @@ ALTER VIEW util_test.v1 AS
 #   select `util_test`.`t2`.`a` AS `a` from `util_test`.`t2`;
 #
 
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 5 - create transform for renamed table 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -381,12 +381,12 @@ ALTER TABLE `util_test`.`t1`
 RENAME TO util_test.t6 
 , ENGINE=MyISAM;
 
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 6 - test transform for renamed table 
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing util_test.t6 to util_test.t6                           [PASS]
-Success. All objects are the same.
+# Success. All objects are the same.
 Test case 7 - test transform for column with default '' for --changes-for=server1
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -397,7 +397,7 @@ Test case 7 - test transform for column with default '' for --changes-for=server
 ALTER TABLE `util_test`.`t6` 
   CHANGE COLUMN a a char(30) NOT NULL DEFAULT '';
 
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 8 - test transform for column with default '' for --changes-for=server2
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -408,4 +408,4 @@ Test case 8 - test transform for column with default '' for --changes-for=server
 ALTER TABLE `util_test`.`t6` 
   CHANGE COLUMN a a char(30) NULL;
 
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.

@@ -35,7 +35,7 @@ _CREATE_DB = "CREATE DATABASE `{0}`"
 _TEST_CASES = [
     # Direction a->b
     {'run_util': True,  # If true, run utility
-     'options': " --quiet --difftype=sql --changes-for=server1 > "
+     'options': " --difftype=sql --changes-for=server1 > "
                 "{0}".format(_TRANSFORM_FILE),
      'comment': "Test case {0} changes-for = server1 : {1}",
      # If true, run startup commands, load data and create objects
@@ -48,9 +48,9 @@ _TEST_CASES = [
     {'run_util': True,  # If true, run utility
      'options': " --difftype=sql --changes-for=server1 ",
      'comment': "Test case {0} changes-for = server1 post transform : {1}",
-     'load_data': False, 'exp_result': 1, },  # Direction a<-b
+     'load_data': False, 'exp_result': 0, },  # Direction a<-b
     {'run_util': True,  # If true, run utility
-     'options': " --quiet --difftype=sql --changes-for=server2 > "
+     'options': " --difftype=sql --changes-for=server2 > "
                 "{0}".format(_TRANSFORM_FILE),
      'comment': "Test case {0} changes-for = server2 : {1}",
      'load_data': True,  # If true, load the data and create objects
@@ -63,16 +63,16 @@ _TEST_CASES = [
     {'run_util': True,  # If true, run utility
      'options': " --difftype=sql --changes-for=server2 ",
      'comment': "Test case {0} changes-for = server2 post transform : {1}",
-     'load_data': False, 'exp_result': 1, },
+     'load_data': False, 'exp_result': 0, },
     # Direction a<->b with dir = a
     {'run_util': True,  # If true, run utility
-     'options': " --quiet --difftype=sql --changes-for=server1 "
+     'options': " --difftype=sql --changes-for=server1 "
                 "--show-reverse ",
      'comment': "Test case {0} changes-for = server1 with reverse : {1}",
      'load_data': True,  # If true, load the data and create objects
      'exp_result': 1, },  # Direction a<->b with dir = b
     {'run_util': True,  # If true, run utility
-     'options': " --quiet --difftype=sql --changes-for=server2 "
+     'options': " --difftype=sql --changes-for=server2 "
                 "--show-reverse ",
      'comment': "Test case {0} changes-for = server2 with reverse : {1}",
      'load_data': True,  # If true, load the data and create objects

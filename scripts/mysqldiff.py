@@ -277,10 +277,10 @@ if __name__ == '__main__':
 
     if diff_failed:
         if not opt.quiet:
-            print("Compare failed. One or more differences found.")
+            print("# Compare failed. One or more differences found.")
         sys.exit(1)
 
     if not opt.quiet:
-        print("Success. All objects are the same.")
+        print("# Success. All objects are the same.")
 
     sys.exit()

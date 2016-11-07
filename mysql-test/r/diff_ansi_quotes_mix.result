@@ -11,7 +11,7 @@ Test case 1 - diff a sample database
 @@ -1 +1 @@
 -CREATE DATABASE `util_test` /*!40100 DEFAULT CHARACTER SET latin1 */
 +CREATE DATABASE "util_test" /*!40100 DEFAULT CHARACTER SET latin1 */
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 2 - diff a single object - not same
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
@@ -29,14 +29,14 @@ Test case 2 - diff a single object - not same
 +CREATE TABLE "t2" (
 +  "a" char(30) DEFAULT NULL
 +) ENGINE=MEMORY DEFAULT CHARSET=latin1
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 3 - diff a single object - is same
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing util_test.t3 to util_test.t3                           [PASS]
 # WARNING: The tables structure is the same, but the columns order is different. Use --change-for to take the order into account.
-Success. All objects are the same.
+# Success. All objects are the same.
 Test case 4 - diff multiple objects - are same
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
@@ -47,7 +47,7 @@ Test case 4 - diff multiple objects - are same
 # server2 on localhost: ... connected.
 # Comparing util_test.t4 to util_test.t4                           [PASS]
 # WARNING: The tables structure is the same, but the columns order is different. Use --change-for to take the order into account.
-Success. All objects are the same.
+# Success. All objects are the same.
 Test case 5 - diff multiple objects + database - same name
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
@@ -160,7 +160,7 @@ Test case 5 - diff multiple objects + database - same name
 @@ -1 +1 @@
 -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`
 +CREATE ALGORITHM=UNDEFINED DEFINER="root"@"localhost" SQL SECURITY DEFINER VIEW "v2" AS select "t5"."name" AS "name","util_test"."f2"("t5"."base_price","t5"."tax_percentage") AS "price" from "t5"
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 6 - diff two databases on same server w/server2
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
@@ -177,7 +177,7 @@ Test case 6 - diff two databases on same server w/server2
 #         VIEW: v2
 #     FUNCTION: f2
 #        TABLE: t2
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 7 - diff two databases on same server
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
@@ -193,7 +193,7 @@ Test case 7 - diff two databases on same server
 #         VIEW: v2
 #     FUNCTION: f2
 #        TABLE: t2
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 8 - diff a sample database with weird names (backticks)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
@@ -207,14 +207,14 @@ Test case 8 - diff a sample database with weird names (backticks)
 @@ -1 +1 @@
 -CREATE DATABASE `db.``:db` /*!40100 DEFAULT CHARACTER SET latin1 */
 +CREATE DATABASE "db.`:db" /*!40100 DEFAULT CHARACTER SET latin1 */
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 9 - diff a single object with weird names (backticks)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 # Comparing `db.``:db`.```t``.``export_2` to "db.`:db"."`t`.`export_2"   [PASS]
 # WARNING: The tables structure is the same, but the columns order is different. Use --change-for to take the order into account.
-Success. All objects are the same.
+# Success. All objects are the same.
 Test case 10 - diff a sample database containing tables with weird names (no backticks) and different table options.
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
@@ -228,7 +228,7 @@ Test case 10 - diff a sample database containing tables with weird names (no bac
 @@ -1 +1 @@
 -CREATE DATABASE `db_diff_test` /*!40100 DEFAULT CHARACTER SET latin1 */
 +CREATE DATABASE "db_diff_test" /*!40100 DEFAULT CHARACTER SET latin1 */
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 11 - diff a sample database containing tables with weird names (no backticks) and skipping table options.
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
@@ -242,7 +242,7 @@ Test case 11 - diff a sample database containing tables with weird names (no bac
 @@ -1 +1 @@
 -CREATE DATABASE `db_diff_test` /*!40100 DEFAULT CHARACTER SET latin1 */
 +CREATE DATABASE "db_diff_test" /*!40100 DEFAULT CHARACTER SET latin1 */
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 12 - diff a database with objects of different types with differences on name only due sql_mode
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
@@ -279,7 +279,7 @@ Test case 12 - diff a database with objects of different types with differences 
 @@ -1 +1 @@
 -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW ```v``export_1` AS select ```t``export_1`.`id``` AS `id```,```t``export_1`.`other` AS `other` from ```t``export_1`
 +CREATE ALGORITHM=UNDEFINED DEFINER="root"@"localhost" SQL SECURITY DEFINER VIEW "`v`export_1" AS select "`t`export_1"."id`" AS "id`","`t`export_1"."other" AS "other" from "`t`export_1"
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 13 - diff a database with objects of different types with the same name (with differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
@@ -317,7 +317,7 @@ Test case 13 - diff a database with objects of different types with the same nam
 @@ -1 +1 @@
 -CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW ```v``export_1` AS select ```t``export_1`.`id``` AS `id```,```t``export_1`.`other` AS `other` from ```t``export_1`
 +CREATE ALGORITHM=UNDEFINED DEFINER="root"@"localhost" SQL SECURITY DEFINER VIEW "`v`export_1" AS select "`t`export_1"."id`" AS "id`","`t`export_1"."other" AS "other" from "`t`export_1"
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 14 - diff specific objects of different types with the same name (with differences)
 # WARNING: Using a password on the command line interface can be insecure.
 # server1 on localhost: ... connected.
@@ -335,4 +335,4 @@ Test case 14 - diff specific objects of different types with the same name (with
 -SELECT 1
 +CREATE DEFINER="root"@"localhost" PROCEDURE "`t`export_1"()
 +SELECT 2
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.

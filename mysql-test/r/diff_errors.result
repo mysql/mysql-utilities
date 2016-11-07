@@ -15,7 +15,7 @@ Test case 1 - Use diff  --difftype=differ
 ?                            +
 +   `b` int(11) DEFAULT NULL
   ) ENGINE=MEMORY DEFAULT CHARSET=latin1
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 2 - database doesn't exist
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -36,12 +36,12 @@ Test case 6 - doesn't exist force
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 ERROR: The object util_test.t33 does not exist.
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 7 - doesn't exist force
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
 ERROR: The object util_test.t31 does not exist.
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 8 - check all existing objects using --force
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -60,7 +60,7 @@ ERROR: The object util_test.t33 does not exist.
 +  `a` char(30) DEFAULT NULL,
 +  `b` int(11) DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 9 - check all existing objects using --force
 # server1 on localhost: ... connected.
 # server2 on localhost: ... connected.
@@ -79,7 +79,7 @@ ERROR: The object util_test.t31 does not exist.
 +  `a` char(30) DEFAULT NULL,
 +  `b` int(11) DEFAULT NULL
  ) ENGINE=MEMORY DEFAULT CHARSET=latin1
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 10 - malformed argument util_test.util_test 
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
@@ -107,7 +107,7 @@ Test case 15 - some objects don't exist in dbs
 #        TABLE: t6
 # WARNING: Objects in server2.util_test but not in server1.util_test:
 #        TABLE: t7
-Compare failed. One or more differences found.
+# Compare failed. One or more differences found.
 Test case 16 - no objects specified.
 Usage: mysqldiff --server1=user:pass@host:port:socket --server2=user:pass@host:port:socket db1.object1:db2.object1 db3:db4
 
