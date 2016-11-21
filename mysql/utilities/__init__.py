@@ -18,12 +18,12 @@
 """mysql.utilities"""
 
 # Major, Minor, Patch, Status
-VERSION = (1, 6, 4, 'GA', 0)
+VERSION = (1, 6, 5, 'GA', 0)
 # Future versions will have to include only the X, Y (no Z).
 
 VERSION_STRING = "%s.%s.%s" % VERSION[0:3]
 
-COPYRIGHT = "2010, 2016 Oracle and/or its affiliates. All rights reserved."
+COPYRIGHT = "2010, 2017 Oracle and/or its affiliates. All rights reserved."
 
 COPYRIGHT_FULL = "Copyright (c) " + COPYRIGHT + """
 This is a release of dual licensed MySQL Utilities. For the avoidance of
