@@ -1,32 +1,32 @@
 Test case 1 - baseline
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_NAME
 `t1`
 `t2`
 `t3`
 `t4`
 `t5`
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 NAME
 `f1`
 `f2`
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 NAME
 `p1`
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_NAME
 `v2`
 `v1`
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 NAME
 `e1`
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
 'joe'@'user',ALTER ROUTINE,util_test,,,
@@ -69,29 +69,29 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - no data,,grants
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_NAME
 `t1`
 `t2`
 `t3`
 `t4`
 `t5`
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 NAME
 `f1`
 `f2`
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 NAME
 `p1`
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_NAME
 `v2`
 `v1`
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 NAME
 `e1`
 #...done.
@@ -99,26 +99,26 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - no data,,grants,events
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_NAME
 `t1`
 `t2`
 `t3`
 `t4`
 `t5`
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 NAME
 `f1`
 `f2`
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 NAME
 `p1`
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_NAME
 `v2`
 `v1`
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
 #...done.
@@ -126,22 +126,22 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - no data,,grants,events,functions
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_NAME
 `t1`
 `t2`
 `t3`
 `t4`
 `t5`
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 NAME
 `p1`
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_NAME
 `v2`
 `v1`
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
 #...done.
@@ -149,19 +149,19 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - no data,,grants,events,functions,procedures
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_NAME
 `t1`
 `t2`
 `t3`
 `t4`
 `t5`
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_NAME
 `v2`
 `v1`
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
 #...done.
@@ -169,15 +169,15 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - no data,,grants,events,functions,procedures,triggers
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_NAME
 `t1`
 `t2`
 `t3`
 `t4`
 `t5`
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_NAME
 `v2`
 `v1`
@@ -186,8 +186,8 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - no data,,grants,events,functions,procedures,triggers,views
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_NAME
 `t1`
 `t2`
@@ -199,6 +199,6 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - no data,,grants,events,functions,procedures,triggers,views,tables
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
+# Exporting metadata from `util_test`
 #...done.
 SET FOREIGN_KEY_CHECKS=1;

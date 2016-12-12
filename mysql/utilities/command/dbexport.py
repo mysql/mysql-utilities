@@ -186,7 +186,7 @@ def _export_metadata(source, db_list, output_file, options):
         # Export database metadata
         if not quiet:
             output_file.write(
-                "# Exporting metadata from {0}\n".format(db.db_name)
+                "# Exporting metadata from {0}\n".format(db.q_db_name)
             )
 
         # Perform the extraction
@@ -218,8 +218,10 @@ def _export_metadata(source, db_list, output_file, options):
                 else:
                     if not quiet:
                         output_file.write(
-                            "# {0}: {1}.{2}\n".format(dbobj[0], db.db_name,
-                                                      dbobj[1][0])
+                            "# {0}: {1}.{2}\n".format(
+                                dbobj[0], db.q_db_name,
+                                quote_with_backticks(dbobj[1][0], sql_mode)
+                            )
                         )
                     if (dbobj[0] == "PROCEDURE" and not skip_procs) or \
                        (dbobj[0] == "FUNCTION" and not skip_funcs) or \
@@ -254,7 +256,7 @@ def _export_metadata(source, db_list, output_file, options):
                 objects.append("GRANT")
             for obj_type in objects:
                 output_file.write(
-                    "# {0}S in {1}:".format(obj_type, db.db_name)
+                    "# {0}S in {1}:".format(obj_type, db.q_db_name)
                 )
                 if frmt in ('grid', 'vertical'):
                     rows = db.get_db_objects(obj_type, column_type, True)
@@ -338,15 +340,16 @@ def _export_row(data_rows, cur_table, out_format, single, skip_blobs,
                 for row in rows:
                     outfile.write("{0};\n".format(row))
             else:
-                outfile.write("# Table {0} has no data.\n".format(tbl_name))
-
+                outfile.write("# Table {0} has no data.\n"
+                              "".format(cur_table.q_tbl_name))
         if len(blob_rows) > 0:
             if skip_blobs:
                 outfile.write("# WARNING : Table {0} has blob data that "
                               "has been excluded by --skip-blobs."
-                              "\n".format(tbl_name))
+                              "\n".format(cur_table.q_tbl_name))
             else:
-                outfile.write("# Blob data for table {0}:\n".format(tbl_name))
+                outfile.write("# Blob data for table "
+                              "{0}:\n".format(cur_table.q_tbl_name))
                 for blob_row in blob_rows:
                     outfile.write("{0}\n".format(blob_row))
 
@@ -449,11 +452,11 @@ def _export_data(source, server_values, db_list, output_file, options):
         if previous_db != db_name:
             previous_db = db_name
             if not quiet:
+                q_db_name = quote_with_backticks(db_name, sql_mode)
                 if frmt == "sql":
-                    q_db_name = quote_with_backticks(db_name, sql_mode)
                     output_file.write("USE {0};\n".format(q_db_name))
                 output_file.write(
-                    "# Exporting data from {0}\n".format(db_name)
+                    "# Exporting data from {0}\n".format(q_db_name)
                 )
                 if file_per_table:
                     output_file.write("# Writing table data to files.\n")
@@ -608,7 +611,7 @@ def _export_table_data(source_srv, table, output_file, options):
              (not unique_indexes and cur_table.blob_columns))):
         print("# WARNING: Table {0}.{1} contains only BLOB and TEXT "
               "fields. Rows will be generated with separate INSERT "
-              "statements.".format(cur_table.db_name, cur_table.tbl_name))
+              "statements.".format(cur_table.q_db_name, cur_table.q_tbl_name))
 
     for data_rows in cur_table.retrieve_rows(retrieval_mode):
         _export_row(data_rows, cur_table, frmt, single,

@@ -67,6 +67,10 @@ class test(export_parameters_def.test):
                             "# Source on XXXX-XXXX: ... connected.\n")
         self.replace_result("# Source on [::1]: ... connected.",
                             "# Source on XXXX-XXXX: ... connected.\n")
+        self.replace_result(
+            "| None             | util_test       | trg           | INSERT",
+            "| None             | util_test       | trg           | INSERT\n"
+        )
 
         return True
 

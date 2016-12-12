@@ -243,6 +243,11 @@ class test(export_basic.test):
         self._mask_tab()
         self._mask_vertical()
 
+        self.replace_result(
+            "| None             | util_test       | trg           | INSERT",
+            "| None             | util_test       | trg           | INSERT\n"
+        )
+
         return True
 
     def _mask_grid(self):

@@ -2,32 +2,32 @@ Test case 1 : --rpl=master and --comment-rpl
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
 # STOP SLAVE;
-# Exporting metadata from util_test
+# Exporting metadata from `util_test`
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
 USE `util_test`;
-# TABLE: util_test.t1
+# TABLE: `util_test`.`t1`
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
-# TABLE: util_test.t2
+# TABLE: `util_test`.`t2`
 CREATE TABLE `t2` (
   `a` char(30) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-# TABLE: util_test.t3
+# TABLE: `util_test`.`t3`
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
   `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
-# TABLE: util_test.t4
+# TABLE: `util_test`.`t4`
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-# TABLE: util_test.t5
+# TABLE: `util_test`.`t5`
 CREATE TABLE `t5` (
   `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
@@ -35,14 +35,14 @@ CREATE TABLE `t5` (
   `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
-# TRIGGER: util_test.trg
+# TRIGGER: `util_test`.`trg`
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 ||
 DELIMITER ;
 #...done.
 USE `util_test`;
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
@@ -76,32 +76,32 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 2 : --rpl=master and --rpl-file=rpl_test.txt
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
+# Exporting metadata from `util_test`
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
 USE `util_test`;
-# TABLE: util_test.t1
+# TABLE: `util_test`.`t1`
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
-# TABLE: util_test.t2
+# TABLE: `util_test`.`t2`
 CREATE TABLE `t2` (
   `a` char(30) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-# TABLE: util_test.t3
+# TABLE: `util_test`.`t3`
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
   `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
-# TABLE: util_test.t4
+# TABLE: `util_test`.`t4`
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-# TABLE: util_test.t5
+# TABLE: `util_test`.`t5`
 CREATE TABLE `t5` (
   `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
@@ -109,14 +109,14 @@ CREATE TABLE `t5` (
   `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
-# TRIGGER: util_test.trg
+# TRIGGER: `util_test`.`trg`
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 ||
 DELIMITER ;
 #...done.
 USE `util_test`;
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
@@ -147,32 +147,32 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 3 : --rpl=master and --comment-rpl --rpl-file=rpl_test.txt
 # Source on localhost: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
+# Exporting metadata from `util_test`
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
 USE `util_test`;
-# TABLE: util_test.t1
+# TABLE: `util_test`.`t1`
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
-# TABLE: util_test.t2
+# TABLE: `util_test`.`t2`
 CREATE TABLE `t2` (
   `a` char(30) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-# TABLE: util_test.t3
+# TABLE: `util_test`.`t3`
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
   `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
-# TABLE: util_test.t4
+# TABLE: `util_test`.`t4`
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-# TABLE: util_test.t5
+# TABLE: `util_test`.`t5`
 CREATE TABLE `t5` (
   `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
@@ -180,14 +180,14 @@ CREATE TABLE `t5` (
   `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
-# TRIGGER: util_test.trg
+# TRIGGER: `util_test`.`trg`
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 ||
 DELIMITER ;
 #...done.
 USE `util_test`;
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');

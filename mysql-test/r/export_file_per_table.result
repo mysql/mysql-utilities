@@ -1,7 +1,7 @@
 Test case 1 - warning: def only with --file-per-table
 # WARNING: --file-per-table option ignored for metadata export.
 # Source on XXXX-XXXX: ... connected.
-# Exporting metadata from util_test_mt
+# Exporting metadata from `util_test_mt`
 DROP DATABASE IF EXISTS `util_test_mt`;
 CREATE DATABASE `util_test_mt`;
 USE `util_test_mt`;

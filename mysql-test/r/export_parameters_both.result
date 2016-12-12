@@ -1,8 +1,8 @@
 Test case 1 - GRID format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 +---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
 | TABLE_SCHEMA  | TABLE_NAME  | ENGINE  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | TABLE_COLLATION    | CREATE_OPTIONS  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UPDATE_RULE  | DELETE_RULE  | KEY_CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
 +---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
@@ -17,39 +17,39 @@ SET FOREIGN_KEY_CHECKS=0;
 | util_test     | t5          | InnoDB  | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
 | util_test     | t5          | InnoDB  | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | latin1_swedish_ci  |                 | None             | None                   | None                    | None         | None         | PRIMARY              | product_id  | None                     | None                    |
 +---------------+-------------+---------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+--------------------+-----------------+------------------+------------------------+-------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 +-------+-----------+------------------+-------------------+----------------+-----------------+--------------------------------------------------------------------------+-------------------------+------------------------------------------------------+-----------+-----------------------+-----------------------+--------------------+
 | NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | DEFINER         | PARAM_LIST                                                               | RETURNS                 | BODY                                                 | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
 +-------+-----------+------------------+-------------------+----------------+-----------------+--------------------------------------------------------------------------+-------------------------+------------------------------------------------------+-----------+-----------------------+-----------------------+--------------------+
 | f1    | SQL       | CONTAINS_SQL     | YES               | DEFINER        | root@localhost  |                                                                          | int(11)                 | RETURN (SELECT 1)                                    |           | utf8                  | utf8_general_ci       | latin1_swedish_ci  |
 | f2    | SQL       | CONTAINS_SQL     | YES               | DEFINER        | root@localhost  | base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED  | decimal(21,2) unsigned  | RETURN base_price + base_price*(tax_percentage/100)  |           | utf8                  | utf8_general_ci       | latin1_swedish_ci  |
 +-------+-----------+------------------+-------------------+----------------+-----------------+--------------------------------------------------------------------------+-------------------------+------------------------------------------------------+-----------+-----------------------+-----------------------+--------------------+
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 +-------+-----------+------------------+-------------------+----------------+-----------------+--------------+----------+-----------------------------------------+-----------+-----------------------+-----------------------+--------------------+
 | NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | DEFINER         | PARAM_LIST   | RETURNS  | BODY                                    | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
 +-------+-----------+------------------+-------------------+----------------+-----------------+--------------+----------+-----------------------------------------+-----------+-----------------------+-----------------------+--------------------+
 | p1    | SQL       | CONTAINS_SQL     | NO                | DEFINER        | root@localhost  | p1 CHAR(20)  |          | INSERT INTO util_test.t1 VALUES ("50")  |           | utf8                  | utf8_general_ci       | latin1_swedish_ci  |
 +-------+-----------+------------------+-------------------+----------------+-----------------+--------------+----------+-----------------------------------------+-----------+-----------------------+-----------------------+--------------------+
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
 | TABLE_SCHEMA  | TABLE_NAME  | DEFINER         | SECURITY_TYPE  | VIEW_DEFINITION                                                                                                                                              | CHECK_OPTION  | IS_UPDATABLE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
 | util_test     | v2          | root@localhost  | DEFINER        | select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`  | NONE          | YES           | utf8                  | utf8_general_ci       |
 | util_test     | v1          | root@localhost  | DEFINER        | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | utf8                  | utf8_general_ci       |
 +---------------+-------------+-----------------+----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------------+-----------------------+
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 +---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
 | TRIGGER_NAME  | DEFINER         | EVENT_MANIPULATION  | EVENT_OBJECT_SCHEMA  | EVENT_OBJECT_TABLE  | ACTION_ORIENTATION  | ACTION_TIMING  | ACTION_STATEMENT                                       | SQL_MODE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DATABASE_COLLATION  |
 +---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
 | trg           | root@localhost  | INSERT              | util_test            | t1                  | ROW                 | AFTER          | INSERT INTO util_test.t2 VALUES('Test objects count')  |           | utf8                  | utf8_general_ci       | latin1_swedish_ci   |
 +---------------+-----------------+---------------------+----------------------+---------------------+---------------------+----------------+--------------------------------------------------------+-----------+-----------------------+-----------------------+---------------------+
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 | NAME  | DEFINER         | BODY                                            | STATUS    | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | SQL_MODE  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | ORIGINATOR  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
 | e1    | root@localhost  | DELETE FROM util_test.t1 WHERE a = "not there"  | DISABLED  | None        | 1               | YEAR            |           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           | X           | utf8                  | utf8_general_ci       | latin1_swedish_ci  |
 +-------+-----------------+-------------------------------------------------+-----------+-------------+-----------------+-----------------+-----------+----------------------+-------+-----------+----------------+-------------+-----------------------+-----------------------+--------------------+
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 | GRANTEE             | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
@@ -91,7 +91,7 @@ SET FOREIGN_KEY_CHECKS=0;
 | 'joe_wildcard'@'%'  | UPDATE                   | util_test     | None        | None         | None          |
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 +---------------------------------+
 | a                               |
@@ -142,8 +142,8 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 2 - GRID format with FULL display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 +----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
 | TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | TABLE_TYPE  | ENGINE  | VERSION  | ROW_FORMAT  | TABLE_ROWS  | AVG_ROW_LENGTH  | DATA_LENGTH  | MAX_DATA_LENGTH   | INDEX_LENGTH  | DATA_FREE  | AUTO_INCREMENT  | CREATE_TIME          | UPDATE_TIME          | CHECK_TIME  | TABLE_COLLATION    | CHECKSUM  | CREATE_OPTIONS  | TABLE_COMMENT  | ORDINAL_POSITION  | COLUMN_NAME     | COLUMN_TYPE             | IS_NULLABLE  | COLUMN_DEFAULT  | COLUMN_KEY  | CONSTRAINT_NAME  | REFERENCED_TABLE_NAME  | UNIQUE_CONSTRAINT_NAME  | UNIQUE_CONSTRAINT_SCHEMA  | UPDATE_RULE  | DELETE_RULE  | KEY_CONSTRAINT_NAME  | COL_NAME    | REFERENCED_TABLE_SCHEMA  | REFERENCED_COLUMN_NAME  |
 +----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
@@ -158,39 +158,39 @@ SET FOREIGN_KEY_CHECKS=0;
 | None           | util_test     | t5          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 3                 | base_price      | decimal(20,2) unsigned  | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY              | product_id  | None                     | None                    |
 | None           | util_test     | t5          | BASE TABLE  | InnoDB  | 10       | Compact     | 4           | 4096            | XXXXXXXXXX | XXXXXXXXXX | 0             | XXXXXXXXXX | 5               | XXXX-XX-XX XX:XX:XX | XXXX-XX-XX XX:XX:XX | None        | latin1_swedish_ci  | None      |                 |                | 4                 | tax_percentage  | decimal(3,0) unsigned   | YES          | None            |             | None             | None                   | None                    | None                      | None         | None         | PRIMARY              | product_id  | None                     | None                    |
 +----------------+---------------+-------------+-------------+---------+----------+-------------+-------------+-----------------+--------------+-------------------+---------------+------------+-----------------+----------------------+----------------------+-------------+--------------------+-----------+-----------------+----------------+-------------------+-----------------+-------------------------+--------------+-----------------+-------------+------------------+------------------------+-------------------------+---------------------------+--------------+--------------+----------------------+-------------+--------------------------+-------------------------+
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 +------------+-------+-----------+----------------+-----------+------------------+-------------------+----------------+--------------------------------------------------------------------------+-------------------------+------------------------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+------------------------------------------------------+
 | DB         | NAME  | TYPE      | SPECIFIC_NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | PARAM_LIST                                                               | RETURNS                 | BODY                                                 | DEFINER         | CREATED              | MODIFIED             | SQL_MODE  | COMMENT  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       | BODY_UTF8                                            |
 +------------+-------+-----------+----------------+-----------+------------------+-------------------+----------------+--------------------------------------------------------------------------+-------------------------+------------------------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+------------------------------------------------------+
 | util_test  | f1    | FUNCTION  | f1             | SQL       | CONTAINS_SQL     | YES               | DEFINER        |                                                                          | int(11)                 | RETURN (SELECT 1)                                    | root@localhost  | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  |           |          | utf8                  | utf8_general_ci       | latin1_swedish_ci  | RETURN (SELECT 1)                                    |
 | util_test  | f2    | FUNCTION  | f2             | SQL       | CONTAINS_SQL     | YES               | DEFINER        | base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED  | decimal(21,2) unsigned  | RETURN base_price + base_price*(tax_percentage/100)  | root@localhost  | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  |           |          | utf8                  | utf8_general_ci       | latin1_swedish_ci  | RETURN base_price + base_price*(tax_percentage/100)  |
 +------------+-------+-----------+----------------+-----------+------------------+-------------------+----------------+--------------------------------------------------------------------------+-------------------------+------------------------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+------------------------------------------------------+
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 +------------+-------+------------+----------------+-----------+------------------+-------------------+----------------+--------------+----------+-----------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+-----------------------------------------+
 | DB         | NAME  | TYPE       | SPECIFIC_NAME  | LANGUAGE  | SQL_DATA_ACCESS  | IS_DETERMINISTIC  | SECURITY_TYPE  | PARAM_LIST   | RETURNS  | BODY                                    | DEFINER         | CREATED              | MODIFIED             | SQL_MODE  | COMMENT  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       | BODY_UTF8                               |
 +------------+-------+------------+----------------+-----------+------------------+-------------------+----------------+--------------+----------+-----------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+-----------------------------------------+
 | util_test  | p1    | PROCEDURE  | p1             | SQL       | CONTAINS_SQL     | NO                | DEFINER        | p1 CHAR(20)  |          | INSERT INTO util_test.t1 VALUES ("50")  | root@localhost  | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  |           |          | utf8                  | utf8_general_ci       | latin1_swedish_ci  | INSERT INTO util_test.t1 VALUES ("50")  |
 +------------+-------+------------+----------------+-----------+------------------+-------------------+----------------+--------------+----------+-----------------------------------------+-----------------+----------------------+----------------------+-----------+----------+-----------------------+-----------------------+--------------------+-----------------------------------------+
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 +----------------+---------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------+----------------+-----------------------+-----------------------+
 | TABLE_CATALOG  | TABLE_SCHEMA  | TABLE_NAME  | VIEW_DEFINITION                                                                                                                                              | CHECK_OPTION  | IS_UPDATABLE  | DEFINER         | SECURITY_TYPE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  |
 +----------------+---------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------+----------------+-----------------------+-----------------------+
 | None           | util_test     | v2          | select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`  | NONE          | YES           | root@localhost  | DEFINER        | utf8                  | utf8_general_ci       |
 | None           | util_test     | v1          | select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`                                                                                                     | NONE          | YES           | root@localhost  | DEFINER        | utf8                  | utf8_general_ci       |
 +----------------+---------------+-------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------+---------------+-----------------+----------------+-----------------------+-----------------------+
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 +------------------+-----------------+---------------+---------------------+
 | TRIGGER_CATALOG  | TRIGGER_SCHEMA  | TRIGGER_NAME  |
 +------------------+-----------------+---------------+---------------------+
 | None             | util_test       | trg           | INSERT
 +------------------+-----------------+---------------+---------------------+
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 +------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
 | DB         | NAME  | BODY                                            | DEFINER         | EXECUTE_AT  | INTERVAL_VALUE  | INTERVAL_FIELD  | CREATED              | MODIFIED             | LAST_EXECUTED  | STARTS               | ENDS  | STATUS    | ON_COMPLETION  | SQL_MODE  | COMMENT  | ORIGINATOR  | TIME_ZONE  | CHARACTER_SET_CLIENT  | COLLATION_CONNECTION  | DB_COLLATION       | BODY_UTF8                                       |
 +------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
 | util_test  | e1    | DELETE FROM util_test.t1 WHERE a = "not there"  | root@localhost  | None        | 1               | YEAR            | XXXX-XX-XX XX:XX:XX  | XXXX-XX-XX XX:XX:XX  | None           | XXXX-XX-XX XX:XX:XX  | None  | DISABLED  | DROP           |           |          | X           | SYSTEM     | utf8                  | utf8_general_ci       | latin1_swedish_ci  | DELETE FROM util_test.t1 WHERE a = "not there"  |
 +------------+-------+-------------------------------------------------+-----------------+-------------+-----------------+-----------------+----------------------+----------------------+----------------+----------------------+-------+-----------+----------------+-----------+----------+-------------+------------+-----------------------+-----------------------+--------------------+-------------------------------------------------+
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 | GRANTEE             | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
@@ -233,7 +233,7 @@ SET FOREIGN_KEY_CHECKS=0;
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
 # NOTE : --display is ignored for data export.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 +---------------------------------+
 | a                               |
@@ -284,8 +284,8 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 3 - GRID format with NAMES display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 +-------------+
 | TABLE_NAME  |
 +-------------+
@@ -295,39 +295,39 @@ SET FOREIGN_KEY_CHECKS=0;
 | t4          |
 | t5          |
 +-------------+
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 +-------+
 | NAME  |
 +-------+
 | f1    |
 | f2    |
 +-------+
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 +-------+
 | NAME  |
 +-------+
 | p1    |
 +-------+
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 +-------------+
 | TABLE_NAME  |
 +-------------+
 | v2          |
 | v1          |
 +-------------+
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 +---------------+
 | TRIGGER_NAME  |
 +---------------+
 | trg           |
 +---------------+
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 +-------+
 | NAME  |
 +-------+
 | e1    |
 +-------+
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 | GRANTEE             | PRIVILEGE_TYPE           | TABLE_SCHEMA  | TABLE_NAME  | COLUMN_NAME  | ROUTINE_NAME  |
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
@@ -370,7 +370,7 @@ SET FOREIGN_KEY_CHECKS=0;
 +---------------------+--------------------------+---------------+-------------+--------------+---------------+
 #...done.
 # NOTE : --display is ignored for data export.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 +---------------------------------+
 | a                               |
@@ -421,8 +421,8 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 4 - CSV format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,TABLE_COLLATION,CREATE_OPTIONS,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UPDATE_RULE,DELETE_RULE,KEY_CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
 `util_test`,`t1`,MEMORY,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
 `util_test`,`t2`,MyISAM,1,`a`,char(30),YES,,,latin1_swedish_ci,,,,,,,,,,
@@ -434,24 +434,24 @@ TABLE_SCHEMA,TABLE_NAME,ENGINE,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLA
 `util_test`,`t5`,InnoDB,2,`name`,varchar(20),YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`product_id`,,
 `util_test`,`t5`,InnoDB,3,`base_price`,"decimal(20,2) unsigned",YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`product_id`,,
 `util_test`,`t5`,InnoDB,4,`tax_percentage`,"decimal(3,0) unsigned",YES,,,latin1_swedish_ci,,,,,,,`PRIMARY`,`product_id`,,
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,RETURNS,BODY,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
 `f1`,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,,int(11),RETURN (SELECT 1),,utf8,utf8_general_ci,latin1_swedish_ci
 `f2`,SQL,CONTAINS_SQL,YES,DEFINER,root@localhost,"base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED","decimal(21,2) unsigned",RETURN base_price + base_price*(tax_percentage/100),,utf8,utf8_general_ci,latin1_swedish_ci
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,DEFINER,PARAM_LIST,RETURNS,BODY,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
 `p1`,SQL,CONTAINS_SQL,NO,DEFINER,root@localhost,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",,utf8,utf8_general_ci,latin1_swedish_ci
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_SCHEMA,TABLE_NAME,DEFINER,SECURITY_TYPE,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
 `util_test`,`v2`,root@localhost,DEFINER,"select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`",NONE,YES,utf8,utf8_general_ci
 `util_test`,`v1`,root@localhost,DEFINER,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,utf8,utf8_general_ci
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 TRIGGER_NAME,DEFINER,EVENT_MANIPULATION,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORIENTATION,ACTION_TIMING,ACTION_STATEMENT,SQL_MODE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
 `trg`,root@localhost,INSERT,`util_test`,`t1`,ROW,AFTER,INSERT INTO util_test.t2 VALUES('Test objects count'),,utf8,utf8_general_ci,latin1_swedish_ci
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 NAME,DEFINER,BODY,STATUS,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,SQL_MODE,STARTS,ENDS,STATUS,ON_COMPLETION,ORIGINATOR,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION
 `e1`,root@localhost,"DELETE FROM util_test.t1 WHERE a = ""not there""",DISABLED,XXXX-XX-XX XX:XX:XX,1,YEAR,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,DISABLED,DROP,XX,utf8,utf8_general_ci,latin1_swedish_ci
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
 'joe'@'user',ALTER ROUTINE,util_test,,,
@@ -490,7 +490,7 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe_wildcard'@'%',TRIGGER,util_test,,,
 'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
@@ -526,8 +526,8 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 5 - CSV format with FULL display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE_ROWS,AVG_ROW_LENGTH,DATA_LENGTH,MAX_DATA_LENGTH,INDEX_LENGTH,DATA_FREE,AUTO_INCREMENT,CREATE_TIME,UPDATE_TIME,CHECK_TIME,TABLE_COLLATION,CHECKSUM,CREATE_OPTIONS,TABLE_COMMENT,ORDINAL_POSITION,COLUMN_NAME,COLUMN_TYPE,IS_NULLABLE,COLUMN_DEFAULT,COLUMN_KEY,CONSTRAINT_NAME,REFERENCED_TABLE_NAME,UNIQUE_CONSTRAINT_NAME,UNIQUE_CONSTRAINT_SCHEMA,UPDATE_RULE,DELETE_RULE,KEY_CONSTRAINT_NAME,COL_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_COLUMN_NAME
 ,`util_test`,`t1`,BASE TABLE,MEMORY,10,Fixed,7,31,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,char(30),YES,,,,,,,,,,,,
 ,`util_test`,`t2`,BASE TABLE,MyISAM,10,Fixed,4,31,XXXXXXXXXX,XXXXXXXXXX,1024,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,1,`a`,char(30),YES,,,,,,,,,,,,
@@ -539,24 +539,24 @@ TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,TABLE_TYPE,ENGINE,VERSION,ROW_FORMAT,TABLE
 ,`util_test`,`t5`,BASE TABLE,InnoDB,10,Compact,4,4096,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,5,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,2,`name`,varchar(20),YES,,,,,,,,,`PRIMARY`,`product_id`,,
 ,`util_test`,`t5`,BASE TABLE,InnoDB,10,Compact,4,4096,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,5,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,3,`base_price`,"decimal(20,2) unsigned",YES,,,,,,,,,`PRIMARY`,`product_id`,,
 ,`util_test`,`t5`,BASE TABLE,InnoDB,10,Compact,4,4096,XXXXXXXXXX,XXXXXXXXXX,0,XXXXXXXXXX,5,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,latin1_swedish_ci,,,,4,`tax_percentage`,"decimal(3,0) unsigned",YES,,,,,,,,,`PRIMARY`,`product_id`,,
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 DB,NAME,TYPE,SPECIFIC_NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,PARAM_LIST,RETURNS,BODY,DEFINER,CREATED,MODIFIED,SQL_MODE,COMMENT,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION,BODY_UTF8
 `util_test`,`f1`,FUNCTION,`f1`,SQL,CONTAINS_SQL,YES,DEFINER,,int(11),RETURN (SELECT 1),root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,utf8,utf8_general_ci,latin1_swedish_ci,RETURN (SELECT 1)
 `util_test`,`f2`,FUNCTION,`f2`,SQL,CONTAINS_SQL,YES,DEFINER,"base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED","decimal(21,2) unsigned",RETURN base_price + base_price*(tax_percentage/100),root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,utf8,utf8_general_ci,latin1_swedish_ci,RETURN base_price + base_price*(tax_percentage/100)
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 DB,NAME,TYPE,SPECIFIC_NAME,LANGUAGE,SQL_DATA_ACCESS,IS_DETERMINISTIC,SECURITY_TYPE,PARAM_LIST,RETURNS,BODY,DEFINER,CREATED,MODIFIED,SQL_MODE,COMMENT,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION,BODY_UTF8
 `util_test`,`p1`,PROCEDURE,`p1`,SQL,CONTAINS_SQL,NO,DEFINER,p1 CHAR(20),,"INSERT INTO util_test.t1 VALUES (""50"")",root@localhost,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,utf8,utf8_general_ci,latin1_swedish_ci,"INSERT INTO util_test.t1 VALUES (""50"")"
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,VIEW_DEFINITION,CHECK_OPTION,IS_UPDATABLE,DEFINER,SECURITY_TYPE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION
 ,`util_test`,`v2`,"select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`",NONE,YES,root@localhost,DEFINER,utf8,utf8_general_ci
 ,`util_test`,`v1`,select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`,NONE,YES,root@localhost,DEFINER,utf8,utf8_general_ci
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 TRIGGER_CATALOG,TRIGGER_SCHEMA,TRIGGER_NAME,EVENT_MANIPULATION,EVENT_OBJECT_CATALOG,EVENT_OBJECT_SCHEMA,EVENT_OBJECT_TABLE,ACTION_ORDER,ACTION_CONDITION,ACTION_STATEMENT,ACTION_ORIENTATION,ACTION_TIMING,ACTION_REFERENCE_OLD_TABLE,ACTION_REFERENCE_NEW_TABLE,ACTION_REFERENCE_OLD_ROW,ACTION_REFERENCE_NEW_ROW,CREATED,SQL_MODE,DEFINER,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DATABASE_COLLATION
 ,`util_test`,`trg`,INSERT,,`util_test`,`t1`,X,,XXXXXXXXXX,XXXXXXXXXX,AFTER,XXXXXXXXXX,,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,,root@localhost,utf8,utf8_general_ci,latin1_swedish_ci
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 DB,NAME,BODY,DEFINER,EXECUTE_AT,INTERVAL_VALUE,INTERVAL_FIELD,CREATED,MODIFIED,LAST_EXECUTED,STARTS,ENDS,STATUS,ON_COMPLETION,SQL_MODE,COMMENT,ORIGINATOR,TIME_ZONE,CHARACTER_SET_CLIENT,COLLATION_CONNECTION,DB_COLLATION,BODY_UTF8
 `util_test`,`e1`,"DELETE FROM util_test.t1 WHERE a = ""not there""",root@localhost,,1,YEAR,XXXX-XX-XX XX:XX:XX,XXXX-XX-XX XX:XX:XX,,XXXX-XX-XX XX:XX:XX,,DISABLED,DROP,,,XX,SYSTEM,utf8,utf8_general_ci,latin1_swedish_ci,"DELETE FROM util_test.t1 WHERE a = ""not there"""
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
 'joe'@'user',ALTER ROUTINE,util_test,,,
@@ -596,7 +596,7 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
 # NOTE : --display is ignored for data export.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
@@ -632,32 +632,32 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 6 - CSV format with NAMES display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_NAME
 `t1`
 `t2`
 `t3`
 `t4`
 `t5`
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 NAME
 `f1`
 `f2`
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 NAME
 `p1`
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_NAME
 `v2`
 `v1`
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 NAME
 `e1`
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe'@'user',ALTER,util_test,,,
 'joe'@'user',ALTER ROUTINE,util_test,,,
@@ -697,7 +697,7 @@ GRANTEE,PRIVILEGE_TYPE,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ROUTINE_NAME
 'joe_wildcard'@'%',UPDATE,util_test,,,
 #...done.
 # NOTE : --display is ignored for data export.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
@@ -733,8 +733,8 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 7 - TAB format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	TABLE_COLLATION	CREATE_OPTIONS	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UPDATE_RULE	DELETE_RULE	KEY_CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
 `util_test`	`t1`	MEMORY	1	`a`	char(30)	YES			latin1_swedish_ci										
 `util_test`	`t2`	MyISAM	1	`a`	char(30)	YES			latin1_swedish_ci										
@@ -746,24 +746,24 @@ TABLE_SCHEMA	TABLE_NAME	ENGINE	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLA
 `util_test`	`t5`	InnoDB	2	`name`	varchar(20)	YES			latin1_swedish_ci							`PRIMARY`	`product_id`		
 `util_test`	`t5`	InnoDB	3	`base_price`	decimal(20,2) unsigned	YES			latin1_swedish_ci							`PRIMARY`	`product_id`		
 `util_test`	`t5`	InnoDB	4	`tax_percentage`	decimal(3,0) unsigned	YES			latin1_swedish_ci							`PRIMARY`	`product_id`		
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	RETURNS	BODY	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
 `f1`	SQL	CONTAINS_SQL	YES	DEFINER	root@localhost		int(11)	RETURN (SELECT 1)		utf8	utf8_general_ci	latin1_swedish_ci
 `f2`	SQL	CONTAINS_SQL	YES	DEFINER	root@localhost	base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED	decimal(21,2) unsigned	RETURN base_price + base_price*(tax_percentage/100)		utf8	utf8_general_ci	latin1_swedish_ci
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	DEFINER	PARAM_LIST	RETURNS	BODY	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
 `p1`	SQL	CONTAINS_SQL	NO	DEFINER	root@localhost	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"		utf8	utf8_general_ci	latin1_swedish_ci
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_SCHEMA	TABLE_NAME	DEFINER	SECURITY_TYPE	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
 `util_test`	`v2`	root@localhost	DEFINER	select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`	NONE	YES	utf8	utf8_general_ci
 `util_test`	`v1`	root@localhost	DEFINER	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	utf8	utf8_general_ci
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 TRIGGER_NAME	DEFINER	EVENT_MANIPULATION	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORIENTATION	ACTION_TIMING	ACTION_STATEMENT	SQL_MODE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
 `trg`	root@localhost	INSERT	`util_test`	`t1`	ROW	AFTER	INSERT INTO util_test.t2 VALUES('Test objects count')		utf8	utf8_general_ci	latin1_swedish_ci
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 NAME	DEFINER	BODY	STATUS	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	SQL_MODE	STARTS	ENDS	STATUS	ON_COMPLETION	ORIGINATOR	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION
 `e1`	root@localhost	"DELETE FROM util_test.t1 WHERE a = ""not there"""	DISABLED	XXXX-XX-XX XX:XX:XX	1	YEAR		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	DISABLED	DROP	XX	utf8	utf8_general_ci	latin1_swedish_ci
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	ALTER	util_test			
 'joe'@'user'	ALTER ROUTINE	util_test			
@@ -802,7 +802,7 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe_wildcard'@'%'	TRIGGER	util_test			
 'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
@@ -838,8 +838,8 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 8 - TAB format with FULL display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE_ROWS	AVG_ROW_LENGTH	DATA_LENGTH	MAX_DATA_LENGTH	INDEX_LENGTH	DATA_FREE	AUTO_INCREMENT	CREATE_TIME	UPDATE_TIME	CHECK_TIME	TABLE_COLLATION	CHECKSUM	CREATE_OPTIONS	TABLE_COMMENT	ORDINAL_POSITION	COLUMN_NAME	COLUMN_TYPE	IS_NULLABLE	COLUMN_DEFAULT	COLUMN_KEY	CONSTRAINT_NAME	REFERENCED_TABLE_NAME	UNIQUE_CONSTRAINT_NAME	UNIQUE_CONSTRAINT_SCHEMA	UPDATE_RULE	DELETE_RULE	KEY_CONSTRAINT_NAME	COL_NAME	REFERENCED_TABLE_SCHEMA	REFERENCED_COLUMN_NAME
 	`util_test`	`t1`	BASE TABLE	MEMORY	10	Fixed	7	31	XXXXXX	XXXXXXXX	0	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	char(30)	YES												
 	`util_test`	`t2`	BASE TABLE	MyISAM	10	Fixed	4	31	XXXXXX	XXXXXXXX	1024	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				1	`a`	char(30)	YES												
@@ -851,24 +851,24 @@ TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE	ENGINE	VERSION	ROW_FORMAT	TABLE
 	`util_test`	`t5`	BASE TABLE	InnoDB	10	Compact	4	4096	XXXXXX	XXXXXXXX	0	XX	5	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				2	`name`	varchar(20)	YES									`PRIMARY`	`product_id`		
 	`util_test`	`t5`	BASE TABLE	InnoDB	10	Compact	4	4096	XXXXXX	XXXXXXXX	0	XX	5	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				3	`base_price`	decimal(20,2) unsigned	YES									`PRIMARY`	`product_id`		
 	`util_test`	`t5`	BASE TABLE	InnoDB	10	Compact	4	4096	XXXXXX	XXXXXXXX	0	XX	5	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		latin1_swedish_ci				4	`tax_percentage`	decimal(3,0) unsigned	YES									`PRIMARY`	`product_id`		
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 DB	NAME	TYPE	SPECIFIC_NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	PARAM_LIST	RETURNS	BODY	DEFINER	CREATED	MODIFIED	SQL_MODE	COMMENT	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION	BODY_UTF8
 `util_test`	`f1`	FUNCTION	`f1`	SQL	CONTAINS_SQL	YES	DEFINER		int(11)	RETURN (SELECT 1)	root@localhost	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			utf8	utf8_general_ci	latin1_swedish_ci	RETURN (SELECT 1)
 `util_test`	`f2`	FUNCTION	`f2`	SQL	CONTAINS_SQL	YES	DEFINER	base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED	decimal(21,2) unsigned	RETURN base_price + base_price*(tax_percentage/100)	root@localhost	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			utf8	utf8_general_ci	latin1_swedish_ci	RETURN base_price + base_price*(tax_percentage/100)
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 DB	NAME	TYPE	SPECIFIC_NAME	LANGUAGE	SQL_DATA_ACCESS	IS_DETERMINISTIC	SECURITY_TYPE	PARAM_LIST	RETURNS	BODY	DEFINER	CREATED	MODIFIED	SQL_MODE	COMMENT	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION	BODY_UTF8
 `util_test`	`p1`	PROCEDURE	`p1`	SQL	CONTAINS_SQL	NO	DEFINER	p1 CHAR(20)		"INSERT INTO util_test.t1 VALUES (""50"")"	root@localhost	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX			utf8	utf8_general_ci	latin1_swedish_ci	"INSERT INTO util_test.t1 VALUES (""50"")"
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	VIEW_DEFINITION	CHECK_OPTION	IS_UPDATABLE	DEFINER	SECURITY_TYPE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION
 	`util_test`	`v2`	select `util_test`.`t5`.`name` AS `name`,`util_test`.`f2`(`util_test`.`t5`.`base_price`,`util_test`.`t5`.`tax_percentage`) AS `price` from `util_test`.`t5`	NONE	YES	root@localhost	DEFINER	utf8	utf8_general_ci
 	`util_test`	`v1`	select `util_test`.`t1`.`a` AS `a` from `util_test`.`t1`	NONE	YES	root@localhost	DEFINER	utf8	utf8_general_ci
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 TRIGGER_CATALOG	TRIGGER_SCHEMA	TRIGGER_NAME	EVENT_MANIPULATION	EVENT_OBJECT_CATALOG	EVENT_OBJECT_SCHEMA	EVENT_OBJECT_TABLE	ACTION_ORDER	ACTION_CONDITION	ACTION_STATEMENT	ACTION_ORIENTATION	ACTION_TIMING	ACTION_REFERENCE_OLD_TABLE	ACTION_REFERENCE_NEW_TABLE	ACTION_REFERENCE_OLD_ROW	ACTION_REFERENCE_NEW_ROW	CREATED	SQL_MODE	DEFINER	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DATABASE_COLLATION
 	`util_test`	`trg`	INSERT		`util_test`	`t1`	1		XXXXXX	XXXXXXXX	AFTER	XX		XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		root@localhost	utf8	utf8_general_ci	latin1_swedish_ci
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 DB	NAME	BODY	DEFINER	EXECUTE_AT	INTERVAL_VALUE	INTERVAL_FIELD	CREATED	MODIFIED	LAST_EXECUTED	STARTS	ENDS	STATUS	ON_COMPLETION	SQL_MODE	COMMENT	ORIGINATOR	TIME_ZONE	CHARACTER_SET_CLIENT	COLLATION_CONNECTION	DB_COLLATION	BODY_UTF8
 `util_test`	`e1`	"DELETE FROM util_test.t1 WHERE a = ""not there"""	root@localhost		1	YEAR	XXXX-XX-XX XX:XX:XX	XXXX-XX-XX XX:XX:XX		XXXX-XX-XX XX:XX:XX		DISABLED	DROP			XX	SYSTEM	utf8	utf8_general_ci	latin1_swedish_ci	"DELETE FROM util_test.t1 WHERE a = ""not there"""
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	ALTER	util_test			
 'joe'@'user'	ALTER ROUTINE	util_test			
@@ -908,7 +908,7 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
 # NOTE : --display is ignored for data export.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
@@ -944,32 +944,32 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 9 - TAB format with NAMES display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 TABLE_NAME
 `t1`
 `t2`
 `t3`
 `t4`
 `t5`
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 NAME
 `f1`
 `f2`
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 NAME
 `p1`
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 TABLE_NAME
 `v2`
 `v1`
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 TRIGGER_NAME
 `trg`
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 NAME
 `e1`
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe'@'user'	ALTER	util_test			
 'joe'@'user'	ALTER ROUTINE	util_test			
@@ -1009,7 +1009,7 @@ GRANTEE	PRIVILEGE_TYPE	TABLE_SCHEMA	TABLE_NAME	COLUMN_NAME	ROUTINE_NAME
 'joe_wildcard'@'%'	UPDATE	util_test			
 #...done.
 # NOTE : --display is ignored for data export.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 `a`
 01 Test Basic database example
@@ -1045,8 +1045,8 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 10 - VERTICAL format with BRIEF display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 *************************       1. row *************************
             TABLE_SCHEMA: util_test
               TABLE_NAME: t1
@@ -1258,7 +1258,7 @@ SET FOREIGN_KEY_CHECKS=0;
  REFERENCED_TABLE_SCHEMA: None
   REFERENCED_COLUMN_NAME: None
 10 rows.
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 *************************       1. row *************************
                  NAME: f1
              LANGUAGE: SQL
@@ -1288,7 +1288,7 @@ SET FOREIGN_KEY_CHECKS=0;
  COLLATION_CONNECTION: utf8_general_ci
          DB_COLLATION: latin1_swedish_ci
 2 rows.
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 *************************       1. row *************************
                  NAME: p1
              LANGUAGE: SQL
@@ -1304,7 +1304,7 @@ SET FOREIGN_KEY_CHECKS=0;
  COLLATION_CONNECTION: utf8_general_ci
          DB_COLLATION: latin1_swedish_ci
 1 row.
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 *************************       1. row *************************
          TABLE_SCHEMA: util_test
            TABLE_NAME: v2
@@ -1326,7 +1326,7 @@ SET FOREIGN_KEY_CHECKS=0;
  CHARACTER_SET_CLIENT: utf8
  COLLATION_CONNECTION: utf8_general_ci
 2 rows.
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 *************************       1. row *************************
          TRIGGER_NAME: trg
               DEFINER: root@localhost
@@ -1341,7 +1341,7 @@ SET FOREIGN_KEY_CHECKS=0;
  COLLATION_CONNECTION: utf8_general_ci
    DATABASE_COLLATION: latin1_swedish_ci
 1 row.
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 *************************       1. row *************************
                  NAME: e1
               DEFINER: root@localhost
@@ -1360,7 +1360,7 @@ SET FOREIGN_KEY_CHECKS=0;
  COLLATION_CONNECTION: utf8_general_ci
          DB_COLLATION: latin1_swedish_ci
 1 row.
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
  PRIVILEGE_TYPE: ALTER
@@ -1615,7 +1615,7 @@ SET FOREIGN_KEY_CHECKS=0;
    ROUTINE_NAME: None
 36 rows.
 #...done.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 *************************       1. row *************************
  a: 01 Test Basic database example
@@ -1688,8 +1688,8 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 11 - VERTICAL format with FULL display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 *************************       1. row *************************
             TABLE_CATALOG: None
              TABLE_SCHEMA: util_test
@@ -2071,7 +2071,7 @@ SET FOREIGN_KEY_CHECKS=0;
   REFERENCED_TABLE_SCHEMA: None
    REFERENCED_COLUMN_NAME: None
 10 rows.
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 *************************       1. row *************************
                    DB: util_test
                  NAME: f1
@@ -2115,7 +2115,7 @@ SET FOREIGN_KEY_CHECKS=0;
          DB_COLLATION: latin1_swedish_ci
             BODY_UTF8: RETURN base_price + base_price*(tax_percentage/100)
 2 rows.
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 *************************       1. row *************************
                    DB: util_test
                  NAME: p1
@@ -2138,7 +2138,7 @@ SET FOREIGN_KEY_CHECKS=0;
          DB_COLLATION: latin1_swedish_ci
             BODY_UTF8: INSERT INTO util_test.t1 VALUES ("50")
 1 row.
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 *************************       1. row *************************
         TABLE_CATALOG: None
          TABLE_SCHEMA: util_test
@@ -2162,7 +2162,7 @@ SET FOREIGN_KEY_CHECKS=0;
  CHARACTER_SET_CLIENT: utf8
  COLLATION_CONNECTION: utf8_general_ci
 2 rows.
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 *************************       1. row *************************
             TRIGGER_CATALOG: None
              TRIGGER_SCHEMA: util_test
@@ -2187,7 +2187,7 @@ SET FOREIGN_KEY_CHECKS=0;
        COLLATION_CONNECTION: utf8_general_ci
          DATABASE_COLLATION: latin1_swedish_ci
 1 row.
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 *************************       1. row *************************
                    DB: util_test
                  NAME: e1
@@ -2212,7 +2212,7 @@ SET FOREIGN_KEY_CHECKS=0;
          DB_COLLATION: latin1_swedish_ci
             BODY_UTF8: DELETE FROM util_test.t1 WHERE a = "not there"
 1 row.
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
  PRIVILEGE_TYPE: ALTER
@@ -2468,7 +2468,7 @@ SET FOREIGN_KEY_CHECKS=0;
 36 rows.
 #...done.
 # NOTE : --display is ignored for data export.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 *************************       1. row *************************
  a: 01 Test Basic database example
@@ -2541,8 +2541,8 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 12 - VERTICAL format with NAMES display
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
-# TABLES in util_test:
+# Exporting metadata from `util_test`
+# TABLES in `util_test`:
 *************************       1. row *************************
  TABLE_NAME: t1
 *************************       2. row *************************
@@ -2554,31 +2554,31 @@ SET FOREIGN_KEY_CHECKS=0;
 *************************       5. row *************************
  TABLE_NAME: t5
 5 rows.
-# FUNCTIONS in util_test:
+# FUNCTIONS in `util_test`:
 *************************       1. row *************************
  NAME: f1
 *************************       2. row *************************
  NAME: f2
 2 rows.
-# PROCEDURES in util_test:
+# PROCEDURES in `util_test`:
 *************************       1. row *************************
  NAME: p1
 1 row.
-# VIEWS in util_test:
+# VIEWS in `util_test`:
 *************************       1. row *************************
  TABLE_NAME: v2
 *************************       2. row *************************
  TABLE_NAME: v1
 2 rows.
-# TRIGGERS in util_test:
+# TRIGGERS in `util_test`:
 *************************       1. row *************************
  TRIGGER_NAME: trg
 1 row.
-# EVENTS in util_test:
+# EVENTS in `util_test`:
 *************************       1. row *************************
  NAME: e1
 1 row.
-# GRANTS in util_test:
+# GRANTS in `util_test`:
 *************************       1. row *************************
         GRANTEE: 'joe'@'user'
  PRIVILEGE_TYPE: ALTER
@@ -2834,7 +2834,7 @@ SET FOREIGN_KEY_CHECKS=0;
 36 rows.
 #...done.
 # NOTE : --display is ignored for data export.
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 *************************       1. row *************************
  a: 01 Test Basic database example
@@ -2907,32 +2907,32 @@ SET FOREIGN_KEY_CHECKS=1;
 Test case 13 - copy all databases
 # Source on XXXX-XXXX: ... connected.
 SET FOREIGN_KEY_CHECKS=0;
-# Exporting metadata from util_test
+# Exporting metadata from `util_test`
 DROP DATABASE IF EXISTS `util_test`;
 CREATE DATABASE `util_test`;
 USE `util_test`;
-# TABLE: util_test.t1
+# TABLE: `util_test`.`t1`
 CREATE TABLE `t1` (
   `a` char(30) DEFAULT NULL
 ) ENGINE=MEMORY DEFAULT CHARSET=latin1;
-# TABLE: util_test.t2
+# TABLE: `util_test`.`t2`
 CREATE TABLE `t2` (
   `a` char(30) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-# TABLE: util_test.t3
+# TABLE: `util_test`.`t3`
 CREATE TABLE `t3` (
   `a` int(11) NOT NULL AUTO_INCREMENT,
   `b` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`a`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
-# TABLE: util_test.t4
+# TABLE: `util_test`.`t4`
 CREATE TABLE `t4` (
   `c` int(11) NOT NULL,
   `d` int(11) NOT NULL,
   KEY `ref_t3` (`c`),
   CONSTRAINT `ref_t3` FOREIGN KEY (`c`) REFERENCES `t3` (`a`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-# TABLE: util_test.t5
+# TABLE: `util_test`.`t5`
 CREATE TABLE `t5` (
   `product_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
@@ -2940,42 +2940,42 @@ CREATE TABLE `t5` (
   `tax_percentage` decimal(3,0) unsigned DEFAULT NULL,
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
-# FUNCTION: util_test.f1
+# FUNCTION: `util_test`.`f1`
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f1`() RETURNS int(11)
     DETERMINISTIC
 RETURN (SELECT 1);
 ||
 DELIMITER ;
-# FUNCTION: util_test.f2
+# FUNCTION: `util_test`.`f2`
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` FUNCTION `f2`(base_price DECIMAL(20,2) UNSIGNED, tax_percentage DECIMAL(3,0) UNSIGNED) RETURNS decimal(21,2) unsigned
     DETERMINISTIC
 RETURN base_price + base_price*(tax_percentage/100);
 ||
 DELIMITER ;
-# PROCEDURE: util_test.p1
+# PROCEDURE: `util_test`.`p1`
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` PROCEDURE `p1`(p1 CHAR(20))
 INSERT INTO util_test.t1 VALUES ("50");
 ||
 DELIMITER ;
-# VIEW: util_test.v2
+# VIEW: `util_test`.`v2`
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v2` AS select `t5`.`name` AS `name`,`util_test`.`f2`(`t5`.`base_price`,`t5`.`tax_percentage`) AS `price` from `t5`;
-# VIEW: util_test.v1
+# VIEW: `util_test`.`v1`
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v1` AS select `t1`.`a` AS `a` from `t1`;
-# TRIGGER: util_test.trg
+# TRIGGER: `util_test`.`trg`
 DELIMITER ||
 CREATE DEFINER=`root`@`localhost` TRIGGER util_test.trg AFTER INSERT ON util_test.t1 FOR EACH ROW INSERT INTO util_test.t2 VALUES('Test objects count');
 ||
 DELIMITER ;
-# Exporting metadata from wesaysocorp
+# Exporting metadata from `wesaysocorp`
 DROP DATABASE IF EXISTS `wesaysocorp`;
 CREATE DATABASE `wesaysocorp`;
 USE `wesaysocorp`;
 #...done.
 USE `util_test`;
-# Exporting data from util_test
+# Exporting data from `util_test`
 # Data for table `util_test`.`t1`:
 INSERT INTO `util_test`.`t1` VALUES ('01 Test Basic database example');
 INSERT INTO `util_test`.`t1` VALUES ('02 Test Basic database example');
