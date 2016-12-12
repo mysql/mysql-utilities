@@ -876,17 +876,21 @@ class Master(Server):
             host = clean_IPv6(host)
 
         # Create user class instance
-        user = User(self, "%s:%s@%s:%s" % (r_user, r_pass, host, port))
+        user = User(self, "{0}:{1}@{2}:{3}".format(r_user, r_pass, host, port))
         if not user.exists():
             user.create()
+            # Save current user for privilege checking
+            user.current_user = "'{0}'@'{1}'".format(r_user, host)
 
-        if not user.has_privilege("*", "*", "REPLICATION SLAVE"):
+        # Check privileges, but do not user the anonymous host
+        if not user.has_privilege("*", "*", "REPLICATION SLAVE",
+                                  globals_privs=False):
             if verbosity > 0:
                 print "# Granting replication access to replication user..."
-            query_str = "GRANT REPLICATION SLAVE ON *.* TO '%s'@'%s' " % \
-                        (r_user, host)
+            query_str = ("GRANT REPLICATION SLAVE ON *.* TO "
+                         "'{0}'@'{1}' ".format(r_user, host))
             if r_pass:
-                query_str += "IDENTIFIED BY '%s'" % r_pass
+                query_str += "IDENTIFIED BY '{0}'".format(r_pass)
 
             if ssl:
                 query_str = "{0} {1}".format(query_str, " REQUIRE SSL")

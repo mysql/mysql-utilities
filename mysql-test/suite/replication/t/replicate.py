@@ -83,21 +83,31 @@ class test(mutlib.System_test):
 
     def run_rpl_test(self, slave, master, s_id,
                      comment, options=None, save_for_compare=False,
-                     expected_result=0, save_results=True):
+                     expected_result=0, save_results=True,
+                     slave_conn=None, master_conn=None):
         """Run replication test.
 
-        slave[in]           Slave instance.
-        master[in]          Master instance.
+        slave[in]           Slave instance or connection string.
+        master[in]          Master instance or connection string.
         s_id[in]            Slave ID.
         comment[in]         Comment.
         options[in]         Options.
         save_for_compare    True for save compare
         expected_result     Expected result.
         save_results        True for save results.
+        slave_conn[in]      Connection string for slave
+        master_conn[in]     Connection string for master
         """
-        master_str = "--master={0}".format(
-            self.build_connection_string(master))
-        slave_str = " --slave={0}".format(self.build_connection_string(slave))
+        if not master_conn:
+            master_str = "--master={0}".format(
+                self.build_connection_string(master))
+        else:
+            master_str = master_conn
+        if not slave_conn:
+            slave_str = " --slave={0}".format(
+                self.build_connection_string(slave))
+        else:
+            slave_str = slave_conn
         conn_str = master_str + slave_str
 
         # Test case 1 - setup replication among two servers
@@ -155,7 +165,42 @@ class test(mutlib.System_test):
         comment = ("Test case {0} - replicate server2 as slave of "
                    "server1 ".format(test_num))
         res = self.run_rpl_test(self.server2, self.server1, self.s2_serverid,
-                                comment, None)
+                                comment, None, )
+        if not res:
+            raise MUTLibError("{0}: failed".format(comment))
+
+        try:
+            self.server2.exec_query("STOP SLAVE")
+        except UtilError:
+            raise MUTLibError("{0}: Failed to stop slave.".format(comment))
+
+        # Prepare the conditions for using mysqlreplicate when the connecting
+        # user has an anonymous host and is the same as the replication
+        # user account (rpl@'%'). Delete both @'%' and @'localhost' creating
+        # the @'%' with full privileges then run mysqlreplicate.
+        try:
+            self.server1.exec_query("DROP USER IF EXISTS 'rpl'@'localhost'")
+            self.server1.exec_query("DROP USER IF EXISTS 'rpl'@'%'")
+            self.server1.exec_query("CREATE USER 'rpl'@'%'")
+            self.server1.exec_query("GRANT ALL ON *.* TO  'rpl'@'%' "
+                                    "IDENTIFIED BY 'rpl' WITH GRANT OPTION")
+            self.server2.exec_query("DROP USER IF EXISTS 'rpl'@'localhost'")
+            self.server2.exec_query("DROP USER IF EXISTS 'rpl'@'%'")
+            self.server2.exec_query("CREATE USER 'rpl'@'%'")
+            self.server2.exec_query("GRANT ALL ON *.* TO  'rpl'@'%' "
+                                    "IDENTIFIED BY 'rpl' WITH GRANT OPTION")
+        except UtilError:
+            raise MUTLibError("{0}: Failed to stop slave.".format(comment))
+
+        test_num += 1
+        comment = ("Test case {0} - replicate server2 as slave of "
+                   "server1 using same account as rpl-user".format(test_num))
+        res = self.run_rpl_test(
+            self.server2, self.server1, self.s2_serverid, comment, None,
+            slave_conn="--slave=rpl:rpl@localhost:{0} "
+                       "".format(self.server1.port),
+            master_conn="--master=rpl:rpl@localhost:{0} "
+                        "".format(self.server2.port))
         if not res:
             raise MUTLibError("{0}: failed".format(comment))
 

@@ -242,10 +242,11 @@ class User(object):
         user, passwd, host = None, None, None
         if new_user:
             user, passwd, host = parse_user_host(new_user)
-            query_str += "'%s'@'%s' " % (user, host)
+            user_host_str = "'{0}'@'{1}' ".format(user, host)
         else:
-            query_str += "'%s'@'%s' " % (self.user, self.host)
+            user_host_str = "'{0}'@'{1}' ".format(self.user, self.host)
             passwd = self.passwd
+        query_str += user_host_str
 
         if passwd and authentication:
             print("WARNING: using a password and an authentication plugin is "
@@ -470,7 +471,8 @@ class User(object):
 
         return grants
 
-    def has_privilege(self, db, obj, access, allow_skip_grant_tables=True):
+    def has_privilege(self, db, obj, access, allow_skip_grant_tables=True,
+                      globals_privs=True):
         """Check to see user has a specific access to a db.object.
 
         db[in]             Name of database
@@ -479,6 +481,8 @@ class User(object):
         allow_skip_grant_tables[in]  If True, allow silent failure for
                            cases where the server is started with
                            --skip-grant-tables. Default=True
+        globals_privs[in]  Include global privileges in clone (i.e. user@%)
+                           Default is True
 
         Returns True if user has access, False if not
         """
@@ -491,7 +495,7 @@ class User(object):
         access = access.upper()
 
         # Get grant dictionary
-        grant_dict = self.get_grants(globals_privs=True, as_dict=True)
+        grant_dict = self.get_grants(globals_privs, as_dict=True)
 
         # If self has all privileges for all databases, no need to check,
         # simply return True
