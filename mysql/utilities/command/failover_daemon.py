@@ -231,7 +231,7 @@ class FailoverDaemon(Daemon):
         """Tries to reconnect to the master
 
         This method tries to reconnect to the master and if connection fails
-        after 3 attemps, returns False.
+        after 3 attempts, returns False.
         """
         if self.master and self.master.is_alive():
             return True
@@ -509,7 +509,7 @@ class FailoverDaemon(Daemon):
                         failover = False  # Master is now connected again
                     if failover:
                         self._report("Failed to reconnect to the master after "
-                                     "3 attemps.", logging.INFO)
+                                     "3 attempts.", logging.INFO)
 
             if failover:
                 self._report("Master is confirmed to be down or "

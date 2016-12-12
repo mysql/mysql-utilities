@@ -1056,7 +1056,7 @@ class Topology(Replication):
             sql_error = res[2]
             if sql_running == "No" or sql_errorno or sql_error:
                 msg = ("Problem detected with SQL thread for slave "
-                       "'{host}'@'{port}' that can result on a unstable "
+                       "'{host}'@'{port}' that can result in an unstable "
                        "topology.").format(host=s_host, port=s_port)
                 msg_thread = " - SQL thread running: {0}".format(sql_running)
                 if not sql_errorno and not sql_error:
@@ -2248,7 +2248,7 @@ class Topology(Replication):
 
         user, passwd = self._get_rpl_user(self._change_role(new_master))
 
-        # Check slaves for errors that might result on an unstable topology
+        # Check slaves for errors that might result in an unstable topology
         self._report("# Checking slaves status (before failover).")
         self._check_slaves_status(stop_on_error)
 

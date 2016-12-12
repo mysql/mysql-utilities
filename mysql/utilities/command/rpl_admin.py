@@ -534,7 +534,7 @@ class RplCommands(object):
                          "then slaves list.")
         best_slave = self.topology.find_best_slave(candidates)
         if best_slave is None:
-            self._report("ERROR: No slave found that meets eligilibility "
+            self._report("ERROR: No slave found that meets eligibility "
                          "requirements.", logging.ERROR)
             return
 

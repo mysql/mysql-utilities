@@ -30,11 +30,11 @@ WARNING: The --master option is not required for 'failover' (option ignored).
 #   Replication user exists ... Ok
 # Candidate slave localhost:PORT2 will become the new master.
 # Checking slaves status (before failover).
-# WARNING: Problem detected with SQL thread for slave 'localhost'@'PORT3' that can result on a unstable topology.
+# WARNING: Problem detected with SQL thread for slave 'localhost'@'PORT3' that can result in an unstable topology.
 #  - SQL thread running: No
 #  - SQL error: None
 #  Tip: Check the slave server log to identify the problem and fix it. For more information, see: http://dev.mysql.com/doc/refman/5.6/en/replication-problems.html
-# WARNING: Problem detected with SQL thread for slave 'localhost'@'PORT4' that can result on a unstable topology.
+# WARNING: Problem detected with SQL thread for slave 'localhost'@'PORT4' that can result in an unstable topology.
 #  - SQL thread running: No
 #  - SQL error: None
 #  Tip: Check the slave server log to identify the problem and fix it. For more information, see: http://dev.mysql.com/doc/refman/5.6/en/replication-problems.html
