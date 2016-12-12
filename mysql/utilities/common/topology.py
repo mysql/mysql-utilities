@@ -38,7 +38,7 @@ from mysql.utilities.common.format import print_list
 from mysql.utilities.common.user import User
 from mysql.utilities.common.server import (get_server_state, get_server,
                                            get_connection_dictionary,
-                                           log_server_version)
+                                           log_server_version, Server)
 from mysql.utilities.common.messages import USER_PASSWORD_FORMAT
 
 
@@ -53,14 +53,12 @@ _GTID_WAIT = "SELECT WAIT_UNTIL_SQL_THREAD_AFTER_GTIDS('%s', %s)"
 _GTID_SUBTRACT_TO_EXECUTED = ("SELECT GTID_SUBTRACT('{0}', "
                               "@@GLOBAL.GTID_EXECUTED)")
 
-# TODO: Remove the use of PASSWORD(), depercated from 5.7.6.
 _UPDATE_RPL_USER_QUERY = ("UPDATE mysql.user "
                           "SET password = PASSWORD('{passwd}')"
                           "where user ='{user}'")
 # Query for server versions >= 5.7.6.
 _UPDATE_RPL_USER_QUERY_5_7_6 = (
-    "UPDATE mysql.user SET authentication_string = PASSWORD('{passwd}') "
-    "WHERE user = '{user}'")
+    "ALTER USER IF EXISTS '{user}'@'{host}' IDENTIFIED BY '{passwd}'")
 
 _SELECT_RPL_USER_PASS_QUERY = ("SELECT user, host, grant_priv, password, "
                                "Repl_slave_priv FROM mysql.user "
@@ -1845,39 +1843,61 @@ class Topology(Replication):
                     passwd_hash = passwd_hash[0][3]
                 else:
                     passwd_hash = ""
-                # now hash the given rpl password from --rpl-user.
-                # TODO: Remove the use of PASSWORD(), depercated from 5.7.6.
-                rpl_master_pass = slave_qry("SELECT PASSWORD('%s');" %
-                                            passwd)
-                rpl_master_pass = rpl_master_pass[0][0]
-
-                if (rpl_master_pass != passwd_hash):
-                    if passwd == '':
-                        msg = ("The specified replication user is using a "
-                               "password (but none was specified).\n"
-                               "Use the --force option to force the use of "
-                               "the user specified with  --rpl-user and no "
-                               "password.")
+                if passwd == '':
+                    msg = ("The specified replication user is using a "
+                           "password (but none was specified).\n"
+                           "Use the --force option to force the use of "
+                           "the user specified with  --rpl-user and no "
+                           "password.")
+                else:
+                    msg = ("The specified replication user is using a "
+                           "different password that the one specified.\n"
+                           "Use the --force option to force the use of "
+                           "the user specified with  --rpl-user and new "
+                           "password.")
+                # If 5.7.6+, check by trying to connect
+                if self.master.check_version_compat(5, 7, 6):
+                    config = {
+                        'user': user,
+                        'passwd': passwd,
+                        'host': m_candidate.host,
+                        'port': m_candidate.port,
+                    }
+                    s_conn = Server({'conn_info': config})
+                    try:
+                        s_conn.connect()
+                    except:
+                        self._report("ERROR: %s" % msg, logging.ERROR)
+                        return
                     else:
-                        msg = ("The specified replication user is using a "
-                               "different password that the one specified.\n"
-                               "Use the --force option to force the use of "
-                               "the user specified with  --rpl-user and new "
-                               "password.")
-                    self._report("ERROR: %s" % msg, logging.ERROR)
-                    return
+                        s_conn.disconnect()
+                # else compare the hash fom --rpl-user.
+                else:
+                    rpl_master_pass = slave_qry("SELECT PASSWORD('%s');" %
+                                                passwd)
+                    rpl_master_pass = rpl_master_pass[0][0]
+                    if rpl_master_pass != passwd_hash:
+                        self._report("ERROR: %s" % msg, logging.ERROR)
+                        return
             # Use the correct query for server (changed for 5.7.6).
+            self.master.toggle_binlog("DISABLE")
             if self.master.check_version_compat(5, 7, 6):
                 query = _UPDATE_RPL_USER_QUERY_5_7_6
+                self.master.exec_query(query.format(user=user,
+                                                    host=m_candidate.host,
+                                                    passwd=passwd))
             else:
                 query = _UPDATE_RPL_USER_QUERY
-            self.master.exec_query(query.format(user=user, passwd=passwd))
+                self.master.exec_query(query.format(user=user, passwd=passwd))
+            self.master.toggle_binlog("ENABLE")
 
         if self.verbose:
             self._report("# Creating replication user if it does not exist.")
+        self.master.toggle_binlog("DISABLE")
         res = m_candidate.create_rpl_user(m_candidate.host,
                                           m_candidate.port,
                                           user, passwd, ssl=self.ssl)
+        self.master.toggle_binlog("ENABLE")
         if not res[0]:
             print("# ERROR: {0}".format(res[1]))
             self._report(res[1], logging.CRITICAL, False)
