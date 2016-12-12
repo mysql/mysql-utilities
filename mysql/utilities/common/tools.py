@@ -209,12 +209,12 @@ def execute_script(run_cmd, filename=None, options=None, verbosity=False):
         command.extend([str(opt) for opt in options])
 
     if verbosity:
-        print("# SCRIPT EXECUTED: {0}".format(command))
+        print("# SCRIPT EXECUTED: {0}".format(" ".join(command)))
 
     try:
         proc = subprocess.Popen(command, shell=False,
                                 stdout=f_out, stderr=f_out)
-    except OSError:
+    except:
         _, err, _ = sys.exc_info()
         raise UtilError(str(err))
 

@@ -152,4 +152,4 @@ WARNING: Using a password on the command line interface can be insecure.
 # ERROR: User m_user on localhost@PORT1 does not have sufficient privileges to execute the failover command (required: SUPER, GRANT OPTION, REPLICATION SLAVE, SELECT, RELOAD, DROP, CREATE, INSERT).
 ERROR: Not enough privileges to execute command.
 Test case 17 - failover (succeed) using 's_user' and 'm_user' with: REPLICATION SLAVE, SUPER, GRANT OPTION, SELECT, RELOAD, DROP, CREATE, INSERT.
-Failover complete ? True
+Failover complete ? [False, True, True]

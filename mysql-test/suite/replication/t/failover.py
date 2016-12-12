@@ -177,7 +177,7 @@ class test(rpl_admin_gtid.test):
         kill_console = test_case[2]
         log_filename = test_case[3]
         comment = test_case[4]
-        key_phrase = test_case[5]
+        key_phrase = test_case[5]   # May be a list of phrases
         unregister = test_case[6]
         server_version = server.get_version()
 
@@ -224,8 +224,8 @@ class test(rpl_admin_gtid.test):
 
         phrase = "Failover console started"
         if self.debug:
-            print("Waiting for failover console to register master and start "
-                  "its monitoring process")
+            print("# Waiting for failover console to register master and start"
+                  " its monitoring process")
         # Wait because of the warning message that may appear due to
         # mixing hostnames and IP addresses
         time.sleep(WARNING_SLEEP_TIME + 1)
@@ -330,17 +330,38 @@ class test(rpl_admin_gtid.test):
                   "{0}".format(ret_val))
 
         # Check result code from stop_process then read the log to find the
-        # key phrase.
-        found_row = False
+        # key phrase. There are (3) things to find: 1) the key phrase,
+        # 2) the Utilities version, 3) the server version with host:port
+        found_row = [False, False, False]
         log_file = open(log_filename)
         rows = log_file.readlines()
+
+        # If the key_phrase from the test case is a list, look for all items
+        # in the list. All must be present to succeed
+        if isinstance(key_phrase, list):
+            phrases = key_phrase
+        else:
+            phrases = [key_phrase]   # Make it a list
+        num_phrases = len(key_phrase)
+        found_count = 0
         if self.debug:
-            print("# Looking in log for: {0}".format(key_phrase))
-        for row in rows:
-            if key_phrase in row:
-                found_row = True
-                if self.debug:
-                    print("# Found in row = '{0}'.".format(row[:len(row) - 1]))
+            print("# Phrases: ", num_phrases, phrases)
+        for phrase in phrases:
+            if self.debug:
+                print("# Looking in log for: {0}".format(phrase))
+            found = False
+            for row in rows:
+                if phrase in row:
+                    found = True
+                    found_count += 1
+                    if self.debug:
+                        print("# Found in row = '{0}'."
+                              "".format(row[:len(row) - 1]))
+            if not found:
+                print("# ERROR: Cannot find test case entry in log: "
+                      "{0}".format(phrase))
+
+        found_row[0] = found_count == num_phrases
 
         # Find MySQL Utilities version in the log
         if self.debug:
@@ -348,12 +369,16 @@ class test(rpl_admin_gtid.test):
                   "".format(_UTILITIES_VERSION_PHRASE))
         for row in rows:
             if _UTILITIES_VERSION_PHRASE in row:
-                found_row = True
+                found_row[1] = True
                 if self.debug:
                     print("# Found in row = '{0}'.".format(row[:-1]))
                 break
 
-        # Find MySQL server version in the log
+        if not found_row[1]:
+            print("# ERROR: Cannot find version entry in log: {0}"
+                  "".format(_UTILITIES_VERSION_PHRASE))
+
+        # Find MySQL server version with host:port in the log
         host_port = "{host}:{port}".format(**get_connection_dictionary(server))
         key_phrase = MSG_MYSQL_VERSION.format(server=host_port,
                                               version=server_version)
@@ -361,17 +386,16 @@ class test(rpl_admin_gtid.test):
             print("# Looking in log for: {0}".format(key_phrase))
         for row in rows:
             if key_phrase in row:
-                found_row = True
+                found_row[2] = True
                 if self.debug:
                     print("# Found in row = '{0}'.".format(row[:-1]))
                 break
 
-        log_file.close()
+        if not found_row[2]:
+            print("# ERROR: Cannot find host:port entry in log: {0}"
+                  "".format(key_phrase))
 
-        if not found_row:
-            print("# ERROR: Cannot find entry in log:")
-            for row in rows:
-                print row,
+        log_file.close()
 
         # Cleanup after test case
         try:
@@ -450,7 +474,7 @@ class test(rpl_admin_gtid.test):
                 self.server5, str_, False, FAILOVER_LOG.format('4'),
                 "Test case {0} - Simple failover with "
                 "--failover=fail and --connection-timeout=3.".format(test_num),
-                "Master has failed and not automatic (no slaves either)", True
+                "Master has failed and automatic failover is not", True
             )
         )
 

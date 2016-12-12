@@ -110,7 +110,7 @@ class test(rpl_admin_gtid.test):
         # b) border cases for threshold parameter
 
         script_exit = os.path.join(os.getcwd(), "std_data/check_threshold.sh")
-        script_test_cases = [("<", 11, 0), ("=", 10, 1), (">", 9, 1)]
+        script_test_cases = [("<", 11, 0), ("=", 10, 0), (">", 9, 0)]
         script_options = [(script_exit, script), (script, script_exit)]
 
         com_fmt = "Test case {0} - test script exit {1} threshold {2}"
@@ -146,6 +146,10 @@ class test(rpl_admin_gtid.test):
         self.remove_result("|")
 
         # fix non-deterministic statements
+        self.replace_result("# Before script failed!",
+                            "# Before script failed!\n")
+        self.replace_result("# After script failed!",
+                            "# After script failed!\n")
         self.replace_result("# SCRIPT EXECUTED:",
                             "# SCRIPT EXECUTED: XXXXXXX\n")
         self.replace_result("# QUERY = SELECT WAIT_UNTIL_SQL_THREAD_AFTER_",

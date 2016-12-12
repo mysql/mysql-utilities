@@ -231,9 +231,60 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
-ERROR: External script XXXXXXX
-Specified threshold exceeded. Operation aborted.
-WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
+# Before script failed!
+# Blocking writes on master.
+# LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for localhost:PORT1.
+# Waiting for slaves to catch up to old master.
+# Slave 127.0.0.1:PORT2:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
+# Return Code = XXX
+# Slave localhost:PORT3:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
+# Return Code = XXX
+# Slave localhost:PORT4:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
+# Return Code = XXX
+# Stopping slaves.
+# Performing STOP on all slaves.
+#   Executing stop on slave 127.0.0.1:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
+# Read only is XXX for localhost:PORT1.
+# UNLOCK STRING: UNLOCK TABLES
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Executing CHANGE MASTER on 127.0.0.1:PORT2.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT3.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT1.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Starting all slaves.
+# Performing START on all slaves.
+#   Executing start on slave 127.0.0.1:PORT2 Ok
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT1 Ok
+# Spawning external script.
+# SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT4
+# new master host: 
+# new master port: 
+# Script completed Ok.
+# Checking slaves for errors.
+# 127.0.0.1:PORT2 status: Ok 
+# localhost:PORT3 status: Ok 
+# localhost:PORT1 status: Ok 
+# Switchover complete.
+# Attempting to contact localhost ... Success
+# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
+#
+# Replication Topology Health:
+# ...done.
 Test case 5 - test script exit > threshold switchover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
@@ -256,9 +307,60 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
-ERROR: External script XXXXXXX
-Specified threshold exceeded. Operation aborted.
-WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
+# Before script failed!
+# Blocking writes on master.
+# LOCK STRING: FLUSH TABLES WITH READ LOCK
+# Read only is ON for localhost:PORT1.
+# Waiting for slaves to catch up to old master.
+# Slave 127.0.0.1:PORT2:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
+# Return Code = XXX
+# Slave localhost:PORT3:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
+# Return Code = XXX
+# Slave localhost:PORT4:
+# QUERY = SELECT WAIT_UNTIL_SQL_THREAD[...]
+# Return Code = XXX
+# Stopping slaves.
+# Performing STOP on all slaves.
+#   Executing stop on slave 127.0.0.1:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 Ok
+# Read only is XXX for localhost:PORT1.
+# UNLOCK STRING: UNLOCK TABLES
+# Demoting old master to be a slave to the new master.
+# Switching slaves to new master.
+# Executing CHANGE MASTER on 127.0.0.1:PORT2.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT3.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Executing CHANGE MASTER on localhost:PORT1.
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Starting all slaves.
+# Performing START on all slaves.
+#   Executing start on slave 127.0.0.1:PORT2 Ok
+#   Executing start on slave localhost:PORT3 Ok
+#   Executing start on slave localhost:PORT1 Ok
+# Spawning external script.
+# SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  localhost
+# old master port:  PORT4
+# new master host: 
+# new master port: 
+# Script completed Ok.
+# Checking slaves for errors.
+# 127.0.0.1:PORT2 status: Ok 
+# localhost:PORT3 status: Ok 
+# localhost:PORT1 status: Ok 
+# Switchover complete.
+# Attempting to contact localhost ... Success
+# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
+#
+# Replication Topology Health:
+# ...done.
 Test case 6 - test script exit < threshold switchover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
@@ -398,9 +500,19 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # new master host: 
 # new master port: 
 # Returning code 10
-ERROR: External script XXXXXXX
-Specified threshold exceeded. Operation aborted.
-WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
+# After script failed!
+# Checking slaves for errors.
+# 127.0.0.1:PORT2 status: Ok 
+# localhost:PORT3 status: Ok 
+# localhost:PORT1 status: Ok 
+# Switchover complete.
+# Attempting to contact localhost ... Success
+# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
+#
+# Replication Topology Health:
+# ...done.
 Test case 8 - test script exit > threshold switchover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
@@ -464,9 +576,19 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # new master host: 
 # new master port: 
 # Returning code 10
-ERROR: External script XXXXXXX
-Specified threshold exceeded. Operation aborted.
-WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
+# After script failed!
+# Checking slaves for errors.
+# 127.0.0.1:PORT2 status: Ok 
+# localhost:PORT3 status: Ok 
+# localhost:PORT1 status: Ok 
+# Switchover complete.
+# Attempting to contact localhost ... Success
+# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+# Attempting to contact localhost ... Success
+#
+# Replication Topology Health:
+# ...done.
 Test case 9 - test script exit < threshold failover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
@@ -549,9 +671,44 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
-ERROR: External script XXXXXXX
-Specified threshold exceeded. Operation aborted.
-WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
+# Before script failed!
+# Stopping slaves.
+# Performing STOP on all slaves.
+#   Executing stop on slave 127.0.0.1:PORT2 WARN - slave is not configured with this master
+#   Executing stop on slave 127.0.0.1:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT4 Ok
+# Switching slaves to new master.
+# Change master command for 127.0.0.1:PORT2
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Change master command for localhost:PORT3
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Disconnecting new master as slave.
+# Execute on localhost:PORT4: RESET SLAVE ALL
+# Starting slaves.
+# Performing START on all slaves.
+#   Executing start on slave 127.0.0.1:PORT2 Ok
+#   Executing start on slave localhost:PORT3 Ok
+# Spawning external script.
+# SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
+# Script completed Ok.
+# Checking slaves for errors.
+# 127.0.0.1:PORT2 status: Ok 
+# localhost:PORT3 status: Ok 
+# Failover complete.
+# Attempting to contact localhost ... Success
+# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+#
+# Replication Topology Health:
+# ...done.
 Test case 11 - test script exit > threshold failover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
@@ -574,9 +731,44 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
-ERROR: External script XXXXXXX
-Specified threshold exceeded. Operation aborted.
-WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
+# Before script failed!
+# Stopping slaves.
+# Performing STOP on all slaves.
+#   Executing stop on slave 127.0.0.1:PORT2 WARN - slave is not configured with this master
+#   Executing stop on slave 127.0.0.1:PORT2 Ok
+#   Executing stop on slave localhost:PORT3 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT3 Ok
+#   Executing stop on slave localhost:PORT4 WARN - slave is not configured with this master
+#   Executing stop on slave localhost:PORT4 Ok
+# Switching slaves to new master.
+# Change master command for 127.0.0.1:PORT2
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Change master command for localhost:PORT3
+# CHANGE MASTER TO MASTER_HOST = 'localhost', MASTER_USER = 'rpl', MASTER_PASSWORD = 'rpl', MASTER_PORT = PORT4, MASTER_AUTO_POSITION=1
+# Disconnecting new master as slave.
+# Execute on localhost:PORT4: RESET SLAVE ALL
+# Starting slaves.
+# Performing START on all slaves.
+#   Executing start on slave 127.0.0.1:PORT2 Ok
+#   Executing start on slave localhost:PORT3 Ok
+# Spawning external script.
+# SCRIPT EXECUTED: XXXXXXX
+# ARGUMENTS PASSED:
+# old master host:  UNKNOWN
+# old master port:  UNKNOWN
+# new master host:  localhost
+# new master port:  PORT4
+# Script completed Ok.
+# Checking slaves for errors.
+# 127.0.0.1:PORT2 status: Ok 
+# localhost:PORT3 status: Ok 
+# Failover complete.
+# Attempting to contact localhost ... Success
+# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+#
+# Replication Topology Health:
+# ...done.
 Test case 12 - test script exit < threshold failover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
@@ -686,9 +878,17 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
-ERROR: External script XXXXXXX
-Specified threshold exceeded. Operation aborted.
-WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
+# After script failed!
+# Checking slaves for errors.
+# 127.0.0.1:PORT2 status: Ok 
+# localhost:PORT3 status: Ok 
+# Failover complete.
+# Attempting to contact localhost ... Success
+# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+#
+# Replication Topology Health:
+# ...done.
 Test case 14 - test script exit > threshold failover
 WARNING: You have chosen to use external script return code checking. Depending on which script fails, this can leave the operation in an undefined state. Please check your results carefully if the operation aborts.
 # Checking privileges.
@@ -738,6 +938,14 @@ WARNING: You have chosen to use external script return code checking. Depending 
 # new master host:  localhost
 # new master port:  PORT4
 # Returning code 10
-ERROR: External script XXXXXXX
-Specified threshold exceeded. Operation aborted.
-WARNING: The operation did not complete. Depending on when the external script was called, you should check the topology for inconsistencies.
+# After script failed!
+# Checking slaves for errors.
+# 127.0.0.1:PORT2 status: Ok 
+# localhost:PORT3 status: Ok 
+# Failover complete.
+# Attempting to contact localhost ... Success
+# Attempting to contact 127.0.0.1 ... Success
+# Attempting to contact localhost ... Success
+#
+# Replication Topology Health:
+# ...done.

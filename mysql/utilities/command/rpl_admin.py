@@ -979,16 +979,24 @@ class RplCommands(object):
                                              "failover is not enabled. ")
                     self._report(msg, logging.CRITICAL, False)
                     # Execute post failover script
-                    self.topology.run_script(post_fail, False,
-                                             [old_host, old_port])
+                    try:
+                        self.topology.run_script(post_fail, False,
+                                                 [old_host, old_port])
+                    except Exception as err:  # pylint: disable=W0703
+                        self._report("# Post fail script failed! {0}"
+                                     "".format(err), level=logging.ERROR)
                     raise UtilRplError(msg, _FAILOVER_ERRNO)
                 if not res:
                     msg = _FAILOVER_ERROR % ("An error was encountered "
                                              "during failover. ")
                     self._report(msg, logging.CRITICAL, False)
                     # Execute post failover script
-                    self.topology.run_script(post_fail, False,
-                                             [old_host, old_port])
+                    try:
+                        self.topology.run_script(post_fail, False,
+                                                 [old_host, old_port])
+                    except Exception as err:  # pylint: disable=W0703
+                        self._report("# Post fail script failed! {0}"
+                                     "".format(err), level=logging.ERROR)
                     raise UtilRplError(msg)
                 self.master = self.topology.master
                 console.master = self.master
@@ -1000,9 +1008,14 @@ class RplCommands(object):
                 console.clear()
                 failover = False
                 # Execute post failover script
-                self.topology.run_script(post_fail, False,
-                                         [old_host, old_port,
-                                          self.master.host, self.master.port])
+                try:
+                    self.topology.run_script(post_fail, False,
+                                             [old_host, old_port,
+                                              self.master.host,
+                                              self.master.port])
+                except Exception as err:  # pylint: disable=W0703
+                    self._report("# Post fail script failed! {0}"
+                                 "".format(err), level=logging.ERROR)
 
                 # Unregister existing instances from slaves
                 self._report("Unregistering existing instances from slaves.",

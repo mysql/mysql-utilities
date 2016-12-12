@@ -1903,9 +1903,13 @@ class Topology(Replication):
             self._report(res[1], logging.CRITICAL, False)
 
         # Call exec_before script - display output if verbose on
-        self.run_script(self.before_script, False,
-                        [self.master.host, self.master.port,
-                         m_candidate.host, m_candidate.port])
+        try:
+            self.run_script(self.before_script, False,
+                            [self.master.host, self.master.port,
+                             m_candidate.host, m_candidate.port])
+        except Exception as err:  # pylint: disable=W0703
+            self._report("# Before script failed! {0}".format(err),
+                         level=logging.ERROR)
 
         if self.verbose:
             self._report("# Blocking writes on master.")
@@ -2049,8 +2053,12 @@ class Topology(Replication):
         self.run_cmd_on_slaves("start", not self.verbose)
 
         # Call exec_after script - display output if verbose on
-        self.run_script(self.after_script, False,
-                        [self.master.host, self.master.port])
+        try:
+            self.run_script(self.after_script, False,
+                            [self.master.host, self.master.port])
+        except Exception as err:  # pylint: disable=W0703
+            self._report("# After script failed! {0}".format(err),
+                         level=logging.ERROR)
 
         # Check all slaves for status, errors
         self._report("# Checking slaves for errors.")
@@ -2268,8 +2276,12 @@ class Topology(Replication):
             self._report(res[1], logging.CRITICAL, False)
 
         # Call exec_before script - display output if verbose on
-        self.run_script(self.before_script, False,
-                        [old_host, old_port, host, port])
+        try:
+            self.run_script(self.before_script, False,
+                            [old_host, old_port, host, port])
+        except Exception as err:  # pylint: disable=W0703
+            self._report("# Before script failed! {0}".format(err),
+                         level=logging.ERROR)
 
         # Stop all slaves
         self._report("# Stopping slaves.")
@@ -2303,8 +2315,12 @@ class Topology(Replication):
         self.run_cmd_on_slaves("start", not self.verbose)
 
         # Call exec_after script - display output if verbose on
-        self.run_script(self.after_script, False,
-                        [old_host, old_port, host, port])
+        try:
+            self.run_script(self.after_script, False,
+                            [old_host, old_port, host, port])
+        except Exception as err:  # pylint: disable=W0703
+            self._report("# After script failed! {0}".format(err),
+                         level=logging.ERROR)
 
         # Check slaves for errors
         self._report("# Checking slaves for errors.")
