@@ -950,6 +950,40 @@ WARNING: Using a password on the command line interface can be insecure.
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files
 #
+# Reading the bad_table.frm file.
+#
+# CREATE statement for [...]
+#
+
+CREATE TABLE `frm_files`.`bad_table` (
+  `bi01` bigint(20) NOT NULL,
+  `bi02` bigint(20) DEFAULT NULL,
+  `bi03` bigint(20) DEFAULT NULL,
+  `dt01` datetime DEFAULT NULL,
+  `i01` int(11) DEFAULT NULL,
+  `i02` int(11) DEFAULT NULL,
+  `i03` int(11) DEFAULT NULL,
+  `i04` int(11) DEFAULT NULL,
+  `i05` int(11) DEFAULT NULL,
+  `i06` int(11) DEFAULT NULL,
+  `t01` text,
+  `t02` text,
+  `vc01` varchar(1) DEFAULT NULL,
+  `vc02` varchar(169) DEFAULT NULL,
+  PRIMARY KEY (`bi01`),
+  KEY `ibi02` (`bi02`),
+  KEY `ibi03` (`bi03`),
+  KEY `idt01` (`dt01`),
+  KEY `ii01` (`i01`),
+  KEY `ii02` (`i02`),
+  KEY `ii03` (`i03`),
+  KEY `ii04` (`i04`),
+  KEY `ii05` (`i05`),
+  KEY `ii06` (`i06`),
+  KEY `ivc01` (`vc01`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+#
 # Reading the col_widths.frm file.
 #
 # CREATE statement for [...]
@@ -1097,6 +1131,9 @@ WARNING: Using a password on the command line interface can be insecure.
 # Starting the spawned server on port XXXXXXX
 # Reading .frm files
 #
+# Reading the bad_table.frm file.
+ERROR: Failed to correctly read the .frm file. Please try reading the file with the --diagnostic mode.
+#
 # Reading the col_widths.frm file.
 ERROR: Failed to correctly read the .frm file. Please try reading the file with the --diagnostic mode.
 #
@@ -1217,6 +1254,7 @@ CREATE TABLE `frm_files`.`this.has.periods` (
 #
 # WARNING: The following files could not be read. You can try the --diagnostic mode to read these files.
 #
+# std_data/frm_files/t9.frm
 # std_data/frm_files/t9.frm
 # std_data/frm_files/t9.frm
 #

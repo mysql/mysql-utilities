@@ -319,6 +319,53 @@ Test case 2: - Check .frm files in a db folder
 # The .frm file is a TABLE.
 # CREATE TABLE Statement:
 
+CREATE TABLE `frm_files`.`bad_table` (
+  `bi01` bigint(20) NOT NULL, 
+  `bi02` bigint(20) DEFAULT NULL, 
+  `bi03` bigint(20) DEFAULT NULL, 
+  `dt01` datetime DEFAULT NULL, 
+  `i01` int(11) DEFAULT NULL, 
+  `i02` int(11) DEFAULT NULL, 
+  `i03` int(11) DEFAULT NULL, 
+  `i04` int(11) DEFAULT NULL, 
+  `i05` int(11) DEFAULT NULL, 
+  `i06` int(11) DEFAULT NULL, 
+  `t01` text COLLATE `latin1_swedish_ci` DEFAULT NULL, 
+  `t02` text COLLATE `latin1_swedish_ci` DEFAULT NULL, 
+  `vc01` varchar(1) COLLATE `latin1_swedish_ci` DEFAULT NULL, 
+  `vc02` varchar(169) COLLATE `latin1_swedish_ci` DEFAULT NULL, 
+PRIMARY KEY `PRIMARY` (`bi01`),
+KEY `ibi02` (`bi02`),
+KEY `ibi03` (`bi03`),
+KEY `idt01` (`dt01`),
+KEY `ii01` (`i01`),
+KEY `ii02` (`i02`),
+KEY `ii03` (`i03`),
+KEY `ii04` (`i04`),
+KEY `ii05` (`i05`),
+KEY `ii06` (`i06`),
+KEY `ivc01` (`vc01`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+# File Statistics:
+#         Last Modified : XXXXXXXXXXXXXXXXX
+#         Creation Time : XXXXXXXXXXXXXXXXX
+#         Last Accessed : XXXXXXXXXXXXXXXXX
+#                  Mode : XXXXX
+#                  Size : 13030
+
+# Table Statistics:
+#                Engine : INNODB
+#           frm Version : 10
+#         MySQL Version : XXXXXXXX
+#      frm File_Version : 5
+#               IO_SIZE : 4096
+#  Def Partition Engine : None
+
+# Reading .frm file XXXXXXX
+# The .frm file is a TABLE.
+# CREATE TABLE Statement:
+
 CREATE TABLE `frm_files`.`col_widths` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT, 
   `parent_id` int(10) unsigned DEFAULT NULL, 

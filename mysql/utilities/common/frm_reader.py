@@ -932,7 +932,8 @@ class FrmReader(object):
         io_size = self.general_data['IO_SIZE']
         record_offset = io_size + self.general_data['tmp_key_length'] + \
             self.general_data['rec_length']
-        offset = (((record_offset / io_size) + 1) * io_size) + 258
+        offset = ((((record_offset + self.general_data['key_info_length']) /
+                    io_size) + 1) * io_size) + 258
         try:
             # Skip to column position
             if self.verbosity > 1:
