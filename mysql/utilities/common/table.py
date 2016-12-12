@@ -1112,6 +1112,20 @@ class Table(object):
         Returns result set
         """
         res = self.server.exec_query("SHOW INDEXES FROM %s" % self.q_table)
+        # Clear the cardinality column
+        if res:
+            new_res = []
+            for row in res:
+                new_row = []
+                i = 0
+                for item in row:
+                    if not i == 6:
+                        new_row.append(item)
+                    else:
+                        new_row.append("0")
+                    i = i + 1
+                new_res.append(tuple(new_row))
+            res = new_res
         return res
 
     def get_tbl_foreign_keys(self):

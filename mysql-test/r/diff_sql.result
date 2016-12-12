@@ -34,9 +34,7 @@ DELIMITER ;
 #
 
 ALTER TABLE `util_test`.`t3` 
-  DROP PRIMARY KEY, 
   DROP COLUMN b, 
-  ADD PRIMARY KEY(`a`), 
   ADD COLUMN d char(30) NULL AFTER a, 
 ENGINE=MyISAM, AUTO_INCREMENT=4;
 
@@ -100,9 +98,7 @@ DELIMITER ;
 #
 
 ALTER TABLE `util_test`.`t3` 
-  DROP PRIMARY KEY, 
   DROP COLUMN d, 
-  ADD PRIMARY KEY(`a`), 
   ADD COLUMN b varchar(30) NULL AFTER a, 
 ENGINE=InnoDB, AUTO_INCREMENT=5;
 
@@ -186,9 +182,7 @@ DELIMITER ;
 #
 
 ALTER TABLE `util_test`.`t3` 
-  DROP PRIMARY KEY, 
   DROP COLUMN b, 
-  ADD PRIMARY KEY(`a`), 
   ADD COLUMN d char(30) NULL AFTER a, 
 ENGINE=MyISAM, AUTO_INCREMENT=4;
 
@@ -196,9 +190,7 @@ ENGINE=MyISAM, AUTO_INCREMENT=4;
 # Transformation for reverse changes (--changes-for=server2):
 #
 # ALTER TABLE `util_test`.`t3` 
-#   DROP PRIMARY KEY, 
 #   DROP COLUMN d, 
-#   ADD PRIMARY KEY(`a`), 
 #   ADD COLUMN b varchar(30) NULL AFTER a, 
 # ENGINE=InnoDB, AUTO_INCREMENT=5;
 #
@@ -306,9 +298,7 @@ DELIMITER ;
 #
 
 ALTER TABLE `util_test`.`t3` 
-  DROP PRIMARY KEY, 
   DROP COLUMN d, 
-  ADD PRIMARY KEY(`a`), 
   ADD COLUMN b varchar(30) NULL AFTER a, 
 ENGINE=InnoDB, AUTO_INCREMENT=5;
 
@@ -316,9 +306,7 @@ ENGINE=InnoDB, AUTO_INCREMENT=5;
 # Transformation for reverse changes (--changes-for=server1):
 #
 # ALTER TABLE `util_test`.`t3` 
-#   DROP PRIMARY KEY, 
 #   DROP COLUMN b, 
-#   ADD PRIMARY KEY(`a`), 
 #   ADD COLUMN d char(30) NULL AFTER a, 
 # ENGINE=MyISAM, AUTO_INCREMENT=4;
 #

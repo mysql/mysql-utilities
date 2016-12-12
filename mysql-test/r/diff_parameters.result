@@ -582,8 +582,6 @@ Test case 21a - Changes for server1 --difftype=sql (not skipping table options).
 #
 
 ALTER TABLE `db_diff_test`.`table-dash` 
-  DROP PRIMARY KEY, 
-  ADD PRIMARY KEY(`id`), 
 AUTO_INCREMENT=50000005;
 
 # Compare failed. One or more differences found.
@@ -611,8 +609,6 @@ Test case 22a - Changes for server2 --difftype=sql (not skipping table options).
 #
 
 ALTER TABLE `db_diff_test`.`table-dash` 
-  DROP PRIMARY KEY, 
-  ADD PRIMARY KEY(`id`), 
 AUTO_INCREMENT=50000010;
 
 # Compare failed. One or more differences found.

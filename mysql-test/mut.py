@@ -568,6 +568,8 @@ if __name__ == "__main__":
                 print("CONNECTED")
                 res = conn.show_server_variable("basedir")
                 basedir = res[0][1]
+                res = conn.exec_query("SELECT @@version")
+                print("      MySQL Version: {0}".format(res[0][0]))
             # Here we capture any exception and print the error message.
             # Since all util errors (exceptions) derive from Exception, this is
             # safe.
