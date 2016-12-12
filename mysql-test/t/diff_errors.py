@@ -24,9 +24,10 @@ import diff
 from mysql.utilities.exception import MUTLibError, UtilError
 
 
-_ARGUMENTS = ['util_test.util_test', 'util_test.t3:util_test',
-              'util_test:util_test.t3', 'util_test.t3.t3:util_test.t3',
-              'util_test.t3:util_test..t4']
+# Note: The entry util_test.util_test is a valid test. Removed from list
+#       of malformed entries.
+_ARGUMENTS = ['util_test.t3:util_test', 'util_test:util_test.t3',
+              'util_test.t3.t3:util_test.t3', 'util_test.t3:util_test..t4']
 
 
 class test(diff.test):

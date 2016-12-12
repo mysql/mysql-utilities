@@ -60,6 +60,98 @@ PRINT_WIDTH = 75
 if not check_connector_python():
     sys.exit(1)
 
+
+def parse_database(argument):
+    """
+    Parse the database argument "db[.tbl][:db[.tbl]]"
+
+    argument[in]       text string to parse
+
+    Returns: tuple - to/from db, obj
+    """
+    db1 = None
+    db2 = None
+    obj1 = None
+    obj2 = None
+
+    arg_regex_server1 = REGEXP_QUALIFIED_OBJ_NAME
+    if "ANSI_QUOTES" in server1_sql_mode:
+        arg_regex_server1 = REGEXP_QUALIFIED_OBJ_NAME_AQ
+
+    arg_regex_server2 = REGEXP_QUALIFIED_OBJ_NAME
+    if "ANSI_QUOTES" in server2_sql_mode:
+        arg_regex_server2 = REGEXP_QUALIFIED_OBJ_NAME_AQ
+
+    arg_regexp = re.compile(r'{0}(?:\:){1}'.format(arg_regex_server1,
+                                                   arg_regex_server2))
+
+    if (argument.count(':') == 0) and (argument.count('.') == 0):
+        # We have a single database, match on both
+        db1 = argument
+        db2 = db1
+    elif (argument.count(':') == 0) and (argument.count('.') > 0):
+        # We have a simple db.tbl
+        db1, obj1 = argument.strip('`').split('.', 1)
+        db2 = db1
+        obj2 = obj1
+    else:
+        # search for normal db.?:db.?
+        m_obj = arg_regexp.match(argument)
+        if not m_obj:
+            parser.error(PARSE_ERR_DB_OBJ_PAIR.format(db_obj_pair=argument,
+                                                      db1_label='db1',
+                                                      obj1_label='object1',
+                                                      db2_label='db2',
+                                                      obj2_label='object2'))
+        db1, obj1, db2, obj2 = m_obj.groups()
+        # Verify if the size of the objects matched by the REGEX is equal to
+        # the initial specified string. In general, this identifies the
+        # missing use of backticks.
+        matched_size = len(db1)
+        if obj1:
+            # add 1 for the separator '.'
+            matched_size = matched_size + 1
+            matched_size = matched_size + len(obj1)
+        # add 1 for the separator ':'
+        matched_size = matched_size + 1
+        matched_size = matched_size + len(db2)
+        if obj2:
+            # add 1 for the separator '.'
+            matched_size = matched_size + 1
+            matched_size = matched_size + len(obj2)
+        if matched_size != len(argument):
+            parser.error(PARSE_ERR_DB_OBJ_PAIR_EXT.format(db_obj_pair=argument,
+                                                          db1_label='db1',
+                                                          obj1_label='object1',
+                                                          db2_label='db2',
+                                                          obj2_label='object2',
+                                                          db1_value=db1,
+                                                          obj1_value=obj1,
+                                                          db2_value=db2,
+                                                          obj2_value=obj2))
+
+    if (obj1 and not obj2) or (not obj1 and obj2):
+        if obj1:
+            detail = PARSE_ERR_DB_OBJ_MISSING.format(db_no_obj_label='db2',
+                                                     db_no_obj_value=db2,
+                                                     only_obj_value=obj1,
+                                                     db_obj_label='db1',
+                                                     db_obj_value=db1)
+        else:
+            detail = PARSE_ERR_DB_OBJ_MISSING.format(db_no_obj_label='db1',
+                                                     db_no_obj_value=db1,
+                                                     only_obj_value=obj2,
+                                                     db_obj_label='db2',
+                                                     db_obj_value=db2)
+        parser.error(PARSE_ERR_DB_OBJ_MISSING_MSG.format(
+            detail=detail,
+            db1_label='db1',
+            obj1_label='object1',
+            db2_label='db2',
+            obj2_label='object2'))
+    return db1, obj1, db2, obj2
+
+
 if __name__ == '__main__':
     # Setup the command parser
     parser = setup_common_options(os.path.basename(sys.argv[0]),
@@ -185,71 +277,8 @@ if __name__ == '__main__':
 
     # run the diff
     diff_failed = False
-    arg_regex_server1 = REGEXP_QUALIFIED_OBJ_NAME
-    if "ANSI_QUOTES" in server1_sql_mode:
-        arg_regex_server1 = REGEXP_QUALIFIED_OBJ_NAME_AQ
-
-    arg_regex_server2 = REGEXP_QUALIFIED_OBJ_NAME
-    if "ANSI_QUOTES" in server2_sql_mode:
-        arg_regex_server2 = REGEXP_QUALIFIED_OBJ_NAME_AQ
-
-    arg_regexp = re.compile(r'{0}(?:\:){1}'.format(arg_regex_server1,
-                                                   arg_regex_server2))
     for argument in args:
-        m_obj = arg_regexp.match(argument)
-        if not m_obj:
-            parser.error(PARSE_ERR_DB_OBJ_PAIR.format(db_obj_pair=argument,
-                                                      db1_label='db1',
-                                                      obj1_label='object1',
-                                                      db2_label='db2',
-                                                      obj2_label='object2'))
-        db1, obj1, db2, obj2 = m_obj.groups()
-        # Verify if the size of the objects matched by the REGEX is equal to
-        # the initial specified string. In general, this identifies the
-        # missing use of backticks.
-        matched_size = len(db1)
-        if obj1:
-            # add 1 for the separator '.'
-            matched_size = matched_size + 1
-            matched_size = matched_size + len(obj1)
-        # add 1 for the separator ':'
-        matched_size = matched_size + 1
-        matched_size = matched_size + len(db2)
-        if obj2:
-            # add 1 for the separator '.'
-            matched_size = matched_size + 1
-            matched_size = matched_size + len(obj2)
-        if matched_size != len(argument):
-            parser.error(PARSE_ERR_DB_OBJ_PAIR_EXT.format(db_obj_pair=argument,
-                                                          db1_label='db1',
-                                                          obj1_label='object1',
-                                                          db2_label='db2',
-                                                          obj2_label='object2',
-                                                          db1_value=db1,
-                                                          obj1_value=obj1,
-                                                          db2_value=db2,
-                                                          obj2_value=obj2))
-
-        if (obj1 and not obj2) or (not obj1 and obj2):
-            if obj1:
-                detail = PARSE_ERR_DB_OBJ_MISSING.format(db_no_obj_label='db2',
-                                                         db_no_obj_value=db2,
-                                                         only_obj_value=obj1,
-                                                         db_obj_label='db1',
-                                                         db_obj_value=db1)
-            else:
-                detail = PARSE_ERR_DB_OBJ_MISSING.format(db_no_obj_label='db1',
-                                                         db_no_obj_value=db1,
-                                                         only_obj_value=obj2,
-                                                         db_obj_label='db2',
-                                                         db_obj_value=db2)
-            parser.error(PARSE_ERR_DB_OBJ_MISSING_MSG.format(
-                detail=detail,
-                db1_label='db1',
-                obj1_label='object1',
-                db2_label='db2',
-                obj2_label='object2'))
-
+        db1, obj1, db2, obj2 = parse_database(argument)
         # We have db1.obj:db2.obj
         if obj1:
             try:
