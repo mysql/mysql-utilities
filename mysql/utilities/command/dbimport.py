@@ -1149,7 +1149,7 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
         for st in st_list:
             # Execute query.
             try:
-                if dryrun:
+                if dryrun and not _skip_sql(st, options):
                     print(st)
                 elif fmt != "sql" or not _skip_sql(st, options):
                     # Check query type to determine if a COMMIT is needed, in
@@ -1178,7 +1178,7 @@ def _exec_statements(statements, destination, fmt, options, dryrun=False):
         # Make sure last bulk insert is executed.
         st = ",".join(bulk_values)
         try:
-            if dryrun:
+            if dryrun and not _skip_sql(st, options):
                 print(st)
             elif fmt != "sql" or not _skip_sql(st, options):
                 destination.exec_query(st, options=query_opts)

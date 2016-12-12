@@ -149,7 +149,7 @@ class test(import_basic.test):
         case_num += 1
         cmd_str = ("mysqldbimport.py {0} {1} --import=both --dryrun "
                    "--format=CSV --bulk-insert "
-                   "--skip=events,"
+                   "--skip=events,grants,"
                    "data".format(to_conn, self.export_import_file))
         comment = "Test case {0} - no {1}".format(case_num, "data")
         res = self.run_test_case(0, cmd_str, comment)
