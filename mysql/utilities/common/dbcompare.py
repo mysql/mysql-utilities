@@ -24,7 +24,7 @@ import tempfile
 import difflib
 
 from mysql.utilities.exception import UtilError, UtilDBError
-from mysql.utilities.common.format import print_list
+from mysql.utilities.common.format import print_list, get_col_widths
 from mysql.utilities.common.pattern_matching import (
     parse_object_name,
     REGEXP_QUALIFIED_OBJ_NAME,
@@ -512,7 +512,7 @@ def build_diff_list(diff1, diff2, transform1, transform2,
     Note: to specify a non-SQL difference for data, set
           options['data_diff'] = True
 
-    diff1[in]              definitiion diff for first server
+    diff1[in]              definition diff for first server
     diff2[in]              definition diff for second server
     transform1[in]         transformation for first server
     transform2[in]         transformation for second server
@@ -1187,7 +1187,7 @@ def _get_changed_rows_span(table1, table2, span, index):
     return (changed_in1, extra_in1), (changed_in2, extra_in2)
 
 
-def _get_formatted_rows(rows, table, fmt='GRID'):
+def _get_formatted_rows(rows, table, fmt='GRID', col_widths=None):
     """Get a printable representation of the data rows
 
     This method generates a formatted view of the rows from a table. The output
@@ -1200,15 +1200,19 @@ def _get_formatted_rows(rows, table, fmt='GRID'):
     obj1_str[in]      full table name for base table
     obj2_str[in]      full table name for other table
     fmt[in]           format to print
+    col_widths[in]    column widths to use instead of actual col
 
     Returns list of formatted rows
     """
     result_rows = []
+    if not col_widths:
+        col_widths = []
     outfile = tempfile.TemporaryFile()
     to_sql = False
     if fmt.upper() == 'CSV':
         to_sql = True
-    print_list(outfile, fmt, table.get_col_names(), rows, to_sql=to_sql)
+    print_list(outfile, fmt, table.get_col_names(), rows, to_sql=to_sql,
+               col_widths=col_widths)
     outfile.seek(0)
     for line in outfile.readlines():
         result_rows.append(line.strip('\n'))
@@ -1244,6 +1248,37 @@ def _generate_data_diff_output(diff_data, table1, table2, used_index, options):
     changed_rows, extra1, extra2 = diff_data
     data_diffs = []
 
+    def get_max_cols(tbl1_rows, tbl2_rows):
+        """Get maximum columns for each set of rows
+
+        Find maximum column widths for each column for a pair of tables.
+
+        tbl1_rows[in]  first table rows
+        tbl2_rows[in]  second table rows
+
+        Return a list of the columns and the max width for each
+        """
+        # We need to turn the list of tuples to list of lists
+        row_list = []
+        for r in tbl1_rows:
+            for i in r:
+                row_list.append(list(i))
+        t1_cols = get_col_widths(table1.get_col_names(), row_list)
+        row_list = []
+        for r in tbl2_rows:
+            for i in r:
+                row_list.append(list(i))
+        t2_cols = get_col_widths(table2.get_col_names(), row_list)
+
+        # Get max of each
+        max_cols = []
+        for i in range(0, len(t1_cols)):
+            if t1_cols[i] > t2_cols[i]:
+                max_cols.append(t1_cols[i])
+            elif t1_cols[i] <= t2_cols[i]:
+                max_cols.append(t2_cols[i])
+        return max_cols
+
     if len(changed_rows) > 0:
         data_diffs.append("# Data differences found among rows:")
         # Get original changed/extra rows for each table within the given
@@ -1266,12 +1301,17 @@ def _generate_data_diff_output(diff_data, table1, table2, used_index, options):
                 data_diffs.extend(transform_data(table1, table2,
                                                  "INSERT", tbl2_rows[1]))
         else:
+            # Ok, to make the comparison more uniform, we need to get the
+            # max column widths for each table and use the higher of the
+            # two to format the rows in the output.
+            max_cols = get_max_cols(tbl1_rows, tbl2_rows)
+
             # Join changed and extra rows for table 1.
             tbl1_rows = tbl1_rows[0] + tbl1_rows[1]
-            rows1 = _get_formatted_rows(tbl1_rows, table1, fmt)
+            rows1 = _get_formatted_rows(tbl1_rows, table1, fmt, max_cols)
             # Join changed and extra rows for table 2.
             tbl2_rows = tbl2_rows[0] + tbl2_rows[1]
-            rows2 = _get_formatted_rows(tbl2_rows, table2, fmt)
+            rows2 = _get_formatted_rows(tbl2_rows, table2, fmt, max_cols)
             # Compute diff for all changes between table 1 and 2.
             diff_str = _get_diff(rows1, rows2, table1_name, table2_name,
                                  difftype, compact=compact_diff)
