@@ -38,6 +38,9 @@ class test(mutlib.System_test):
     s2_serverid = None
 
     def check_prerequisites(self):
+        # Test requires 5.6 or higher due to "IF EXISTS' clause
+        if not self.servers.get_server(0).check_version_compat(5, 6, 0):
+            raise MUTLibError("Test requires server version 5.6 and later.")
         return self.check_num_servers(1)
 
     def setup(self):

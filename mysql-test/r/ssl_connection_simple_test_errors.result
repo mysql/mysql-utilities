@@ -190,11 +190,11 @@ GRANT SELECT ON `util_test`.* TO 'joe_pass'@'user'
 
 Test case 43 - basic dbexport with ssl
 # Source on XXXX-XXXX: ... connected.
-# Exporting metadata from util_test_a
+# Exporting metadata from `util_test_a`
 DROP DATABASE IF EXISTS `util_test_a`;
 CREATE DATABASE `util_test_a`;
 USE `util_test_a`;
-# TABLE: util_test_a.t1
+# TABLE: `util_test_a`.`t1`
 CREATE TABLE `t1` (
   `A` int(11) NOT NULL DEFAULT '0',
   `b` varchar(2) DEFAULT NULL,
@@ -206,7 +206,7 @@ CREATE TABLE `t1` (
   SPATIAL KEY `s2` (`d`),
   SPATIAL KEY `s4` (`d`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-# TABLE: util_test_a.t2
+# TABLE: `util_test_a`.`t2`
 CREATE TABLE `t2` (
   `id` int(11) DEFAULT NULL,
   KEY `id` (`id`) USING HASH
