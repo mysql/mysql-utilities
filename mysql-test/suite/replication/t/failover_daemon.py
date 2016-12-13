@@ -525,4 +525,9 @@ class test(failover.test):
         else:
             raise MUTLibError("{0}: failed".format(comment))
 
+        # Now, ensure the failover table is empty on the master.
+        res = self.server5.exec_query("SELECT * FROM mysql.failover_console")
+        if not res == []:
+            raise MUTLibError("mysql.failover_console table not purged!")
+
         return True

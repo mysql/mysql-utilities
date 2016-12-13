@@ -680,3 +680,19 @@ class FailoverDaemon(Daemon):
 
         # Start the daemon
         return super(FailoverDaemon, self).start(detach_process)
+
+    def cleanup(self):
+        """Controlled cleanup for the daemon.
+
+        It will unregister the failover_console table.
+        """
+        # if master is not alive, try connecting to it
+        if not self.master.is_alive():
+            self.master.connect()
+        try:
+            self.master.exec_query(_DELETE_FC_TABLE.format(self.master.host,
+                                                           self.master.port))
+            self._report("Master entry in the failover_console"
+                         " table was deleted.", logging.INFO, False)
+        except:
+            pass

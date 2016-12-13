@@ -106,6 +106,13 @@ class Daemon(object):
         # Run automatic failover
         return self.run()
 
+    def cleanup(self):
+        """It will be called during the process to stop the daemon.
+
+        This method should be overridden when subclassing Daemon.
+        """
+        raise NotImplementedError("cleanup() method is not implemented.")
+
     def stop(self):
         """Stops the daemon.
 
@@ -199,6 +206,8 @@ class Daemon(object):
         redirect_stream(sys.stdout, self.stdout)
         redirect_stream(sys.stderr, self.stderr)
 
+        # Call a cleanup task to unregister the master.
+        atexit.register(self.cleanup)
         # write pidfile
         atexit.register(self.delete_pidfile)
         pid = str(os.getpid())
