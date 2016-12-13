@@ -1,3 +1,41 @@
+Release-1.6.5
+-------------
+- BUG#25030151 : mysqlfailover (v:1.6) was stopped silently when using a '--exec-before' script
+- BUG#24742356 : typos in mysqlfailover messages
+- BUG#24657793 : mysqldbcopy fails to copy views which refer other views
+- BUG#24624716 : ISSUE WITH 'MYSQLREPLICATE' 1.6.4 UTILITY
+- BUG#24613794 : MYSQLFRM UNABLE TO PARSE SOME .FRM FILES
+- BUG#23598948 : tables with primary key of 0 with auto_increment fail to copy
+- BUG#23578714 : fix the _conn_ipv4_num_only regular expression
+- BUG#23335753 : mysqldbcopy issue with tinytext
+- BUG#22738248 : mysqlfailover fails with master my.cnf[entry] style option and python 2.6
+- BUG#22616847 : incorrect error message from mysqlrpladmin
+- BUG#22543157 : mysqlbinlogpurge: some documentation requests
+- BUG#22543116 : mysqlbinlogpurge requires the master port explicitly
+- BUG#22457829 : mysql serverclone doesn't detect the error properly and fails with ambiguous msg
+- BUG#22254445 : --verbosity on mysqfrm does't work
+- BUG#22215626 : mysqlserverinfo requires connection option if show-servers used
+- BUG#22155217 : mysqldbimport --skip does not work
+- BUG#22093518 : mysqldbcopy fails to copy grants for test database
+- BUG#22093453 : mysqldbcompare --quiet does not work
+- BUG#21848362 : mysqlfailover ping option description
+- BUG#21764003 : convenience notation not permitted
+- BUG#21626041 : ls: cannot access /usr/share/pyshared/mysql: no such file or directory
+- BUG#21497923 : mu1.5.5: message to be updated for invalid parameters to mysqlrplcheck.py
+- BUG#21270853 : mysqlrplsync does not allow for a --exclude option
+- BUG#21201454 : mysqlfailover do not set read_only to slave during preparing candidate promotion
+- BUG#21068133 : add ssl connection section to clearly document ssl behavior
+- BUG#20857151 : mysqldiff drops and recreates pk and indexes when it is not needed
+- BUG#20807296 : remove use password() function (deprecated as of mysql 5.7.6)
+- BUG#20524886 : mysqlfailover doesn't clean up failover_console table (ie:drop) in daemon mode
+- BUG#20511130 : --force doesn't work for missing objects with mysqldiff
+- BUG#20411237 : mysqlfrmreader must support new year data type
+- BUG#20400663 : mysqldbcopy documented required permissions list is incomplete
+- BUG#18763591 : using grid format header difference should be ignored for mysqldbcompare
+- BUG#18755438 : pep8 issue on utilities code base
+- BUG#18733683 : mysqldbexport table names in the output are not consistent
+- BUG#18293794 : fix some errors on utilities code base and improve it
+
 Release-1.6.4
 -------------
 - BUG#24348569 : utilities fail to properly detect 5.7.13 servers 
