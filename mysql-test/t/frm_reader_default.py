@@ -39,8 +39,8 @@ class test(frm_reader_base.test):
     """
 
     def check_prerequisites(self):
-        if not self.servers.get_server(0).check_version_compat(5, 6, 12):
-            raise MUTLibError("Test requires server version 5.6.12 and later.")
+        if not self.servers.get_server(0).check_version_compat(5, 7, 16):
+            raise MUTLibError("Test requires server version 5.7.16 and later.")
         return frm_reader_base.test.check_prerequisites(self)
 
     def setup(self):
