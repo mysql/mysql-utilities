@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2010, 2016, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2010, 2017, Oracle and/or its affiliates. All rights reserved.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,10 +57,13 @@ _CHECK_BLOBS_NOT_NULL = """
 _BLOBS_NOT_NULL_MSG = ("{0}: The following tables have blob fields set to "
                        "NOT NULL.")
 _BLOBS_NOT_NULL_ERROR = ("The copy operation cannot proceed unless "
-                         "the blob fields permit NULL values. To copy data "
-                         "with NOT NULL blob fields, first remove the NOT "
-                         "NULL restriction, copy the data, then add the NOT "
-                         "NULL restriction using ALTER TABLE statements.")
+                         "the blob fields permit NULL values.\nTo copy data "
+                         "with NOT NULL blob fields, you can either:\na) "
+                         "First remove the NOT NULL restriction, copy the "
+                         "data, then add the NOT NULL restriction using "
+                         "ALTER TABLE statements.\n  -or-\nb) Run the "
+                         "command again with the --not-null-blobs "
+                         "option and the utility will perform (a) for you.\n")
 _AUTO_INC_WARNING = ("# WARNING: One or more tables were detected with a "
                      "value of 0 in an auto_increment column. To enable "
                      "copying of data, the code enabled the sql_mode "

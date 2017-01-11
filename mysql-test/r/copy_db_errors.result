@@ -240,7 +240,12 @@ Test case 32 - dest user has privileges needed
 # Copying EVENT util_test.e1
 #...done.
 Test case 33 - blobs with not null
-ERROR: The following tables have blob fields set to NOT NULL. The copy operation cannot proceed unless the blob fields permit NULL values. To copy data with NOT NULL blob fields, first remove the NOT NULL restriction, copy the data, then add the NOT NULL restriction using ALTER TABLE statements.
+ERROR: The following tables have blob fields set to NOT NULL. The copy operation cannot proceed unless the blob fields permit NULL values.
+To copy data with NOT NULL blob fields, you can either:
+a) First remove the NOT NULL restriction, copy the data, then add the NOT NULL restriction using ALTER TABLE statements.
+  -or-
+b) Run the command again with the --not-null-blobs option and the utility will perform (a) for you.
+
     util_test.b1 Column blobby
 
 Test case 34 - allow blobs with not null
